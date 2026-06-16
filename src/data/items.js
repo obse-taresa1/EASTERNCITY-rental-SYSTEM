@@ -1,1 +1,1 @@
-export const items = []
+export const items = [];

@@ -1,11 +1,5 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet } from "react-router-dom";
 
-function SuperAdminLayout() {
-  return (
-    <main>
-      <Outlet />
-    </main>
-  )
+export default function SuperAdminLayout() {
+  return <Outlet />;
 }
-
-export default SuperAdminLayout
