@@ -1,1 +1,1 @@
-export const dashboardData = {}
+export const dashboardData = {};

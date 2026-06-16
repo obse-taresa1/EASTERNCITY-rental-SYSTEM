@@ -1,11 +1,5 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet } from "react-router-dom";
 
-function PublicLayout() {
-  return (
-    <main>
-      <Outlet />
-    </main>
-  )
+export default function PublicLayout() {
+  return <Outlet />;
 }
-
-export default PublicLayout

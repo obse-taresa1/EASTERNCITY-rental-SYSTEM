@@ -1,1 +1,1 @@
-export const roleRequests = []
+export const roleRequests = [];

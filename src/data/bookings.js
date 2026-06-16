@@ -1,1 +1,1 @@
-export const bookings = []
+export const bookings = [];
