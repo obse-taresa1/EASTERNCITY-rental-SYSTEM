@@ -1,16 +1,32 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-const ThemeContext = createContext(null)
+const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  const value = {
-    theme: 'light',
-  }
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "light",
+  );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const value = useMemo(
+    () => ({
+      theme,
+      setTheme,
+      toggleTheme: () =>
+        setTheme((current) => (current === "dark" ? "light" : "dark")),
+    }),
+    [theme],
+  );
+
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
-  return useContext(ThemeContext)
+  return useContext(ThemeContext);
 }

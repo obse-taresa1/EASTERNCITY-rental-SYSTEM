@@ -46,7 +46,7 @@ const translations = {
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(
     () => localStorage.getItem("language") || "en",
-  ); // ✅ Fixed
+
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -54,7 +54,7 @@ export function LanguageProvider({ children }) {
   }, [language]);
 
   function t(key) {
-    return translations[language]?.[key] || translations.en[key] || key; // ✅ Fixed
+
   }
 
   const value = useMemo(
@@ -74,6 +74,5 @@ export function LanguageProvider({ children }) {
   );
 }
 
-export function useLanguage() {
-  return useContext(LanguageContext);
-}
+
+
