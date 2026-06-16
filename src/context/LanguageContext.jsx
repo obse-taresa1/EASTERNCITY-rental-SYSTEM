@@ -14,7 +14,8 @@ const translations = {
     profile: "Profile",
     messages: "Messages",
     language: "Language",
-    footerTagline: "Citywide Item Rental System - trusted rentals across your city.",
+    footerTagline:
+      "Citywide Item Rental System - trusted rentals across your city.",
     ourStory: "Our Story",
     careers: "Careers",
     privacyPolicy: "Privacy Policy",
@@ -32,7 +33,8 @@ const translations = {
     profile: "Profaayilii",
     messages: "Ergaawwan",
     language: "Afaan",
-    footerTagline: "Sirna kiraa meeshaalee magaalaa - kiraa amanamaa magaalaa kee keessatti.",
+    footerTagline:
+      "Sirna kiraa meeshaalee magaalaa - kiraa amanamaa magaalaa kee keessatti.",
     ourStory: "Seenaa Keenya",
     careers: "Carraa Hojii",
     privacyPolicy: "Imaammata Dhuunfaa",
@@ -42,7 +44,9 @@ const translations = {
 };
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "en");
+  const [language, setLanguage] = useState(
+    () => localStorage.getItem("language") || "en",
+  );
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -63,9 +67,19 @@ export function LanguageProvider({ children }) {
     [language],
   );
 
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
-export function useLanguage() {
-  return useContext(LanguageContext)
-};
+export function useLanguage(defaultLanguage = "en") {
+  const context = useContext(LanguageContext);
+
+  if (!context) {
+    throw new Error("useLanguage must be used within a LanguageProvider");
+  }
+
+  return context;
+}
