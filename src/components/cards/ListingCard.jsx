@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import { formatDailyPrice } from "../../utils/currency.js";
 
 export default function ListingCard({ item }) {
+  const { t } = useLanguage();
+
   if (!item) {
     return null;
   }
@@ -13,7 +16,9 @@ export default function ListingCard({ item }) {
     <article className="motorx-card">
       <div className="motorx-card-img">
         <img src={item.image} alt={item.imageAlt || item.title} />
-        {item.featured ? <span className="badge-featured">Featured</span> : null}
+        {item.featured ? (
+          <span className="badge-featured">{t("featured")}</span>
+        ) : null}
         {item.year ? <span className="badge-year">{item.year}</span> : null}
         {item.photos ? (
           <span className="badge-photos">
@@ -24,31 +29,33 @@ export default function ListingCard({ item }) {
 
       <div className="motorx-card-body">
         <span className="card-similar">
-          {item.similar || item.category || "Rental Item"}
+          {item.categoryKey ? t(item.categoryKey) : item.category || t("rentalItem")}
+          {item.similarCount ? ` - ${item.similarCount} ${t("similar")}` : ""}
         </span>
         <h3>{item.title}</h3>
         <p className="card-price">
-          {displayPrice} <small>/ day</small>
+          {displayPrice} <small>/ {t("perDay")}</small>
         </p>
 
         <div className="card-specs">
           {specs.map((spec) => (
             <span key={`${item.id}-${spec.label}`}>
-              <i className={`bi ${spec.icon}`}></i> {spec.label}
+              <i className={`bi ${spec.icon}`}></i>{" "}
+              {spec.labelKey ? t(spec.labelKey) : spec.label}
             </span>
           ))}
         </div>
 
         <div className="card-footer">
           <Link to={`/items/${item.id}`} className="view-details">
-            VIEW DETAILS <i className="bi bi-arrow-up-right"></i>
+            {t("viewDetails")} <i className="bi bi-arrow-up-right"></i>
           </Link>
 
           <div className="card-actions">
-            <button type="button" className="icon-btn" aria-label="Compare">
+            <button type="button" className="icon-btn" aria-label={t("compare")}>
               <i className="bi bi-arrow-left-right"></i>
             </button>
-            <button type="button" className="icon-btn" aria-label="Wishlist">
+            <button type="button" className="icon-btn" aria-label={t("wishlist")}>
               <i className="bi bi-heart"></i>
             </button>
           </div>

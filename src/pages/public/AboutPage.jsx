@@ -1,15 +1,15 @@
 import SimplePublicPage from "./SimplePublicPage.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function OurStoryPage() {
+  const { t } = useLanguage();
+
   return (
     <SimplePublicPage
-      title="Our Story"
-      subtitle="CityRent connects people with trusted local rental items across the city."
+      title={t("ourStoryTitle")}
+      subtitle={t("ourStorySubtitle")}
     >
-      <p>
-        Our platform helps owners list useful items and helps renters access
-        what they need without buying everything outright.
-      </p>
+      <p>{t("ourStoryBody")}</p>
     </SimplePublicPage>
   );
 }

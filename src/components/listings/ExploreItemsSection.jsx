@@ -1,7 +1,10 @@
 import ListingCard from "../cards/ListingCard.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import { homeListings } from "../../data/homeListings.js";
 
 export default function ExploreItemsSection() {
+  const { t } = useLanguage();
+
   return (
     <section id="featured-listings" className="section-listings py-5">
       <div className="container">
@@ -27,19 +30,19 @@ export default function ExploreItemsSection() {
 
         <div className="listings-header">
           <div>
-            <span className="section-label">TRUSTED RENTAL SERVICE</span>
-            <h2>Explore All Items</h2>
+            <span className="section-label">{t("trustedRentalService")}</span>
+            <h2>{t("exploreAllItems")}</h2>
           </div>
 
           <div className="status-tabs">
             <label className="status-tab" htmlFor="status-all">
-              All Status
+              {t("allStatus")}
             </label>
             <label className="status-tab" htmlFor="status-new">
-              New Items
+              {t("newItems")}
             </label>
             <label className="status-tab" htmlFor="status-used">
-              Used Items
+              {t("usedItems")}
             </label>
           </div>
         </div>

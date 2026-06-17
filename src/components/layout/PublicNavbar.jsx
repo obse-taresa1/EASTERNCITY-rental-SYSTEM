@@ -1,11 +1,14 @@
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import { dashboardForRole } from "../../services/authService.js";
+import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
 import ThemeToggle from "../common/ThemeToggle.jsx";
 import logo from "../../assets/images/logo.png";
 
 export default function PublicNavbar() {
   const { currentUser, isAuthenticated, logout } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <header id="top" className="motorx-header app-public-header">
@@ -19,7 +22,7 @@ export default function PublicNavbar() {
             type="checkbox"
             id="nav-toggle"
             className="nav-check"
-            aria-label="Open menu"
+            aria-label={t("openMenu")}
           />
 
           <label htmlFor="nav-toggle" className="nav-toggler-label">
@@ -29,20 +32,21 @@ export default function PublicNavbar() {
           <nav className="motorx-nav-menu">
             <ul className="motorx-nav-links">
               <li>
-                <NavLink to="/">Home</NavLink>
+                <NavLink to="/">{t("home")}</NavLink>
               </li>
               <li>
-                <a href="#featured-listings">Categories</a>
+                <a href="#featured-listings">{t("categories")}</a>
               </li>
               <li>
-                <NavLink to="/how-it-works">How It Works</NavLink>
+                <NavLink to="/how-it-works">{t("howItWorks")}</NavLink>
               </li>
               <li>
-                <NavLink to="/contact">Contact Us</NavLink>
+                <NavLink to="/contact">{t("contactUs")}</NavLink>
               </li>
             </ul>
 
             <div className="motorx-nav-actions">
+              <LanguageSwitcher />
               <ThemeToggle />
 
               {isAuthenticated ? (
@@ -51,19 +55,19 @@ export default function PublicNavbar() {
                     to={dashboardForRole(currentUser?.role)}
                     className="nav-login"
                   >
-                    Dashboard
+                    {t("dashboard")}
                   </Link>
                   <button
                     className="nav-login nav-logout-btn"
                     type="button"
                     onClick={logout}
                   >
-                    Logout
+                    {t("logout")}
                   </button>
                 </div>
               ) : (
                 <Link to="/login" className="nav-login">
-                  Register / Login
+                  {t("registerLogin")}
                 </Link>
               )}
             </div>

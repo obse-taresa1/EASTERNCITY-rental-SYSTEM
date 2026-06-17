@@ -1,11 +1,13 @@
 import { Link, useParams } from "react-router-dom";
 import ItemGrid from "../../components/listings/ItemGrid.jsx";
 import SectionHeader from "../../components/common/SectionHeader.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
 import { getItemsByCategory } from "../../services/itemService.js";
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
+  const { t } = useLanguage();
 
   const category = categories.find((item) => item.id === categoryId);
 
@@ -13,15 +15,13 @@ export default function CategoryPage() {
     return (
       <main className="container py-5">
         <div className="alert alert-danger p-5 text-center">
-          <h4 className="mb-3">Category Not Found</h4>
+          <h4 className="mb-3">{t("categoryNotFound")}</h4>
 
-          <p className="mb-4">
-            The category "{categoryId}" you're looking for doesn't exist.
-          </p>
+          <p className="mb-4">{t("categoryNotFoundMessage")}</p>
 
           <Link to="/items" className="btn btn-primary">
             <i className="bi bi-arrow-left me-2" />
-            Browse All Items
+            {t("browseAllItems")}
           </Link>
         </div>
       </main>
@@ -33,16 +33,14 @@ export default function CategoryPage() {
   return (
     <main className="container py-5">
       <SectionHeader
-        eyebrow="Category"
-        // Error 1: Fixed missing || operator
-        title={category?.name || "Category"}
-        // Error 2: Fixed missing || operator
-        description={category?.description || "Browse available rental items."}
+        eyebrow={t("category")}
+        title={category?.id ? t(category.id) : t("category")}
+        description={category?.description || t("browseAvailableRentalItems")}
       />
 
       <div className="mb-4">
         <Link to="/items" className="btn btn-outline-secondary">
-          <i className="bi bi-arrow-left" /> All Items
+          <i className="bi bi-arrow-left" /> {t("allItems")}
         </Link>
       </div>
 

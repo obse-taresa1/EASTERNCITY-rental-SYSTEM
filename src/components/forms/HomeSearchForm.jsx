@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function HomeSearchForm() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [category, setCategory] = useState("all");
   const [maxPrice, setMaxPrice] = useState(15600);
   const [status, setStatus] = useState("all");
@@ -51,9 +53,9 @@ export default function HomeSearchForm() {
         />
 
         <div className="search-tabs">
-          <label htmlFor="tab-all">All Items</label>
-          <label htmlFor="tab-used">Used Items</label>
-          <label htmlFor="tab-new">New Items</label>
+          <label htmlFor="tab-all">{t("allItems")}</label>
+          <label htmlFor="tab-used">{t("usedItems")}</label>
+          <label htmlFor="tab-new">{t("newItems")}</label>
         </div>
 
         <form
@@ -61,7 +63,7 @@ export default function HomeSearchForm() {
           onSubmit={submitSearch}
         >
           <div className="search-field">
-            <label htmlFor="home-search-category">Category</label>
+            <label htmlFor="home-search-category">{t("category")}</label>
             <select
               className="form-select"
               id="home-search-category"
@@ -69,18 +71,18 @@ export default function HomeSearchForm() {
               value={category}
               onChange={(event) => setCategory(event.target.value)}
             >
-              <option value="all">All Categories</option>
-              <option value="electronics">Electronics</option>
-              <option value="tools">Tools</option>
-              <option value="vehicles">Vehicles</option>
-              <option value="cameras">Cameras</option>
-              <option value="sports">Sports</option>
-              <option value="furniture">Furniture</option>
+              <option value="all">{t("allCategories")}</option>
+              <option value="electronics">{t("electronics")}</option>
+              <option value="tools">{t("tools")}</option>
+              <option value="vehicles">{t("vehicles")}</option>
+              <option value="cameras">{t("cameras")}</option>
+              <option value="sports">{t("sports")}</option>
+              <option value="furniture">{t("furniture")}</option>
             </select>
           </div>
 
           <div className="search-field search-price">
-            <label htmlFor="home-search-price">Max Price</label>
+            <label htmlFor="home-search-price">{t("maxPrice")}</label>
             <input
               id="home-search-price"
               name="maxPrice"
@@ -89,16 +91,16 @@ export default function HomeSearchForm() {
               min="1000"
               max="20000"
               value={maxPrice}
-              title="Max price per day in ETB"
+              title={t("maxPriceTitle")}
               onChange={(event) => setMaxPrice(event.target.value)}
             />
             <span className="price-val">
-              ETB {Number(maxPrice).toLocaleString("en-ET")} / day
+              ETB {Number(maxPrice).toLocaleString("en-ET")} / {t("perDay")}
             </span>
           </div>
 
           <button type="submit" className="btn-search-main">
-            <span className="search-count">Search Rentals</span>
+            <span className="search-count">{t("searchRentals")}</span>
             <i className="bi bi-search"></i>
           </button>
         </form>

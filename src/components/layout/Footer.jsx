@@ -29,7 +29,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h5>Legal</h5>
+            <h5>{t("legal")}</h5>
             <Link to="/privacy-policy">{t("privacyPolicy")}</Link>
             <Link to="/terms">{t("terms")}</Link>
           </div>

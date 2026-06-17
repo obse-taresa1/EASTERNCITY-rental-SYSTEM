@@ -13,6 +13,8 @@ export default function LanguageSwitcher() {
       >
         <option value="en">English</option>
         <option value="om">Afaan Oromo</option>
+        <option value="am">አማርኛ</option>
+        <option value="so">Af-Soomaali</option>
       </select>
     </label>
   );

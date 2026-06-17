@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function ContactPage() {
   const [message, setMessage] = useState("");
+  const { t } = useLanguage();
 
   function handleSubmit(event) {
     event.preventDefault();
-    setMessage("Message sent successfully.");
+    setMessage(t("messageSent"));
     event.currentTarget.reset();
   }
 
@@ -14,18 +16,17 @@ export default function ContactPage() {
       <div className="row g-4">
         <div className="col-lg-5">
           <section className="card card-custom p-4 h-100">
-            <span className="section-label">CONTACT</span>
-            <h1 className="h3 mb-3">Contact Us</h1>
+            <span className="section-label">{t("contactEyebrow")}</span>
+            <h1 className="h3 mb-3">{t("contactUs")}</h1>
             <p className="text-muted">
-              Reach out to CityRent support for account, listing, or booking
-              help.
+              {t("contactLead")}
             </p>
 
             <p className="mb-2">
               <i className="bi bi-envelope"></i> support@cityrent.com
             </p>
             <p className="mb-0">
-              <i className="bi bi-geo-alt"></i> Addis Ababa, Ethiopia
+              <i className="bi bi-geo-alt"></i> {t("contactLocation")}
             </p>
           </section>
         </div>
@@ -35,14 +36,14 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label className="form-label" htmlFor="contact-name">
-                  Full Name
+                  {t("fullName")}
                 </label>
                 <input id="contact-name" className="form-control" required />
               </div>
 
               <div className="mb-3">
                 <label className="form-label" htmlFor="contact-email">
-                  Email
+                  {t("email")}
                 </label>
                 <input
                   id="contact-email"
@@ -54,7 +55,7 @@ export default function ContactPage() {
 
               <div className="mb-3">
                 <label className="form-label" htmlFor="contact-message">
-                  Message
+                  {t("message")}
                 </label>
                 <textarea
                   id="contact-message"
@@ -65,7 +66,7 @@ export default function ContactPage() {
               </div>
 
               <button className="btn btn-primary-custom" type="submit">
-                Send Message
+                {t("sendMessage")}
               </button>
 
               {message && (

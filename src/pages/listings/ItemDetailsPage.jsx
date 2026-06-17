@@ -3,12 +3,14 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getItemById } from "../../services/itemService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import { canRentItem, getRentalRestrictionMessage } from "../../services/rentalAccessService.js";
 
 export default function ItemDetailsPage() {
   const { itemId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [restrictionMessage, setRestrictionMessage] = useState("");
 
   const item = useMemo(() => getItemById(itemId), [itemId]);
@@ -35,9 +37,9 @@ export default function ItemDetailsPage() {
   if (!item) {
     return (
       <main className="container py-5">
-        <h1 className="h4">Item not found</h1>
+        <h1 className="h4">{t("itemNotFound")}</h1>
         <Link to="/items" className="btn btn-accent-custom mt-3">
-          Browse Items
+          {t("browseItems")}
         </Link>
       </main>
     );
@@ -69,7 +71,7 @@ export default function ItemDetailsPage() {
 
           <p>{item.description}</p>
 
-          <h2 className="h5 mt-4">Features</h2>
+          <h2 className="h5 mt-4">{t("features")}</h2>
           <ul className="feature-list">
             {item.features?.map((feature) => (
               <li key={feature}>
@@ -83,7 +85,7 @@ export default function ItemDetailsPage() {
           )}
 
           <button className="btn btn-accent-custom btn-lg mt-4" onClick={handleRentNow}>
-            Rent Now
+            {t("rentNow")}
           </button>
         </div>
       </div>
