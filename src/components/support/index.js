@@ -1,1 +1,1 @@
-export const supportComponents = {}
+export { default as SupportChatWidget } from "./SupportChatWidget.jsx";

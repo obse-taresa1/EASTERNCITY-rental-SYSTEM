@@ -1,11 +1,15 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet } from "react-router-dom";
+import PublicNavbar from "../components/layout/PublicNavbar.jsx";
+import Footer from "../components/layout/Footer.jsx";
+import SupportChatWidget from "../components/support/SupportChatWidget.jsx";
 
-function PublicLayout() {
+export default function PublicLayout() {
   return (
-    <main>
+    <>
+      <PublicNavbar />
       <Outlet />
-    </main>
-  )
+      <Footer />
+      <SupportChatWidget />
+    </>
+  );
 }
-
-export default PublicLayout

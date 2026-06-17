@@ -1,5 +1,15 @@
-function CareersPage() {
-  return <h1>Careers Page</h1>
-}
+import SimplePublicPage from "./SimplePublicPage.jsx";
 
-export default CareersPage
+export default function CareersPage() {
+  return (
+    <SimplePublicPage
+      title="Careers"
+      subtitle="Join the team building trusted citywide rentals."
+    >
+      <p>
+        We are looking for people who care about community, access, and better
+        rental experiences.
+      </p>
+    </SimplePublicPage>
+  );
+}
