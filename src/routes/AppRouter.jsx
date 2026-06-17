@@ -11,7 +11,7 @@ import RoleRoute from "./RoleRoute.jsx";
 import PlaceholderPage from "../pages/PlaceholderPage.jsx";
 
 import HomePage from "../pages/public/HomePage.jsx";
-import OurStoryPage from "../pages/public/OurStoryPage.jsx";
+import AboutPage from "../pages/public/AboutPage.jsx";
 import CareersPage from "../pages/public/CareersPage.jsx";
 import ContactPage from "../pages/public/ContactPage.jsx";
 import HowItWorksPage from "../pages/public/HowItWorksPage.jsx";
@@ -47,7 +47,7 @@ export default function AppRouter() {
           <Route path="/category/:categoryId" element={<CategoryPage />} />
           <Route path="/items/:itemId" element={<ItemDetailsPage />} />
 
-          <Route path="/our-story" element={<OurStoryPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />

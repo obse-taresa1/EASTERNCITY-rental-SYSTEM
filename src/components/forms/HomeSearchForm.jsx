@@ -23,22 +23,57 @@ export default function HomeSearchForm() {
   }
 
   return (
-    <section id="home-search" className="home-search-section">
-      <div className="container">
-        <form className="search-box" onSubmit={submitSearch}>
+    <div className="container motorx-search-wrap">
+      <div className="motorx-search-card">
+        <input
+          type="radio"
+          name="item-tab"
+          id="tab-all"
+          className="tab-radio"
+          checked={status === "all"}
+          onChange={() => setStatus("all")}
+        />
+        <input
+          type="radio"
+          name="item-tab"
+          id="tab-used"
+          className="tab-radio"
+          checked={status === "used"}
+          onChange={() => setStatus("used")}
+        />
+        <input
+          type="radio"
+          name="item-tab"
+          id="tab-new"
+          className="tab-radio"
+          checked={status === "new"}
+          onChange={() => setStatus("new")}
+        />
+
+        <div className="search-tabs">
+          <label htmlFor="tab-all">All Items</label>
+          <label htmlFor="tab-used">Used Items</label>
+          <label htmlFor="tab-new">New Items</label>
+        </div>
+
+        <form
+          className="search-form-flex home-search-form"
+          onSubmit={submitSearch}
+        >
           <div className="search-field">
             <label htmlFor="home-search-category">Category</label>
             <select
-              id="home-search-category"
               className="form-select"
+              id="home-search-category"
+              name="category"
               value={category}
               onChange={(event) => setCategory(event.target.value)}
             >
               <option value="all">All Categories</option>
               <option value="electronics">Electronics</option>
               <option value="tools">Tools</option>
-              <option value="cameras">Cameras</option>
               <option value="vehicles">Vehicles</option>
+              <option value="cameras">Cameras</option>
               <option value="sports">Sports</option>
               <option value="furniture">Furniture</option>
             </select>
@@ -54,6 +89,7 @@ export default function HomeSearchForm() {
               min="1000"
               max="20000"
               value={maxPrice}
+              title="Max price per day in ETB"
               onChange={(event) => setMaxPrice(event.target.value)}
             />
             <span className="price-val">
@@ -61,25 +97,12 @@ export default function HomeSearchForm() {
             </span>
           </div>
 
-          <div className="search-field">
-            <label htmlFor="home-search-status">Condition</label>
-            <select
-              id="home-search-status"
-              className="form-select"
-              value={status}
-              onChange={(event) => setStatus(event.target.value)}
-            >
-              <option value="all">All Items</option>
-              <option value="new">New Items</option>
-              <option value="used">Used Items</option>
-            </select>
-          </div>
-
-          <button type="submit" className="btn-accent-custom">
-            <i className="bi bi-search"></i> Search Rentals
+          <button type="submit" className="btn-search-main">
+            <span className="search-count">Search Rentals</span>
+            <i className="bi bi-search"></i>
           </button>
         </form>
       </div>
-    </section>
+    </div>
   );
 }

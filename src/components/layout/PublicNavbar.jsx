@@ -1,24 +1,14 @@
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { dashboardForRole } from "../../services/authService.js";
-import { useLanguage } from "../../context/LanguageContext.jsx";
 import ThemeToggle from "../common/ThemeToggle.jsx";
-import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
 import logo from "../../assets/images/logo.png";
-
-const navLinks = [
-  { to: "/", label: "home" },
-  { to: "/our-story", label: "about" },
-  { to: "/contact", label: "contact" },
-  { to: "/items", label: "items" },
-];
 
 export default function PublicNavbar() {
   const { currentUser, isAuthenticated, logout } = useAuth();
-  const { t } = useLanguage();
 
   return (
-    <header className="motorx-header app-public-header">
+    <header id="top" className="motorx-header app-public-header">
       <div className="container">
         <div className="motorx-nav-flex">
           <Link className="motorx-logo" to="/">
@@ -38,59 +28,43 @@ export default function PublicNavbar() {
 
           <nav className="motorx-nav-menu">
             <ul className="motorx-nav-links">
-              {navLinks.map((link) => (
-                <li key={link.to}>
-                  <NavLink
-                    to={link.to}
-                    className={({ isActive }) => (isActive ? "active" : "")}
-                  >
-                    {t(link.label)}
-                  </NavLink>
-                </li>
-              ))}
+              <li>
+                <NavLink to="/">Home</NavLink>
+              </li>
+              <li>
+                <a href="#featured-listings">Categories</a>
+              </li>
+              <li>
+                <NavLink to="/how-it-works">How It Works</NavLink>
+              </li>
+              <li>
+                <NavLink to="/contact">Contact Us</NavLink>
+              </li>
             </ul>
 
             <div className="motorx-nav-actions">
-              <LanguageSwitcher />
               <ThemeToggle />
 
               {isAuthenticated ? (
                 <div className="public-account-actions">
-                  <details className="profile-menu public-profile-menu">
-                    <summary aria-label="Open profile menu">
-                      <img
-                        src="https://i.pravatar.cc/40?img=33"
-                        alt="User profile"
-                      />
-                      <span>{currentUser?.fullname || currentUser?.name || "User"}</span>
-                      <i className="bi bi-chevron-down"></i>
-                    </summary>
-
-                    <div className="profile-menu-list">
-                      <Link to="/profile">
-                        <i className="bi bi-person"></i> {t("profile")}
-                      </Link>
-
-                      <Link to={dashboardForRole(currentUser?.role)}>
-                        <i className="bi bi-speedometer2"></i> {t("dashboard")}
-                      </Link>
-                    </div>
-                  </details>
-
+                  <Link
+                    to={dashboardForRole(currentUser?.role)}
+                    className="nav-login"
+                  >
+                    Dashboard
+                  </Link>
                   <button
                     className="nav-login nav-logout-btn"
                     type="button"
                     onClick={logout}
                   >
-                    {t("logout")}
+                    Logout
                   </button>
                 </div>
               ) : (
-                <div className="public-auth-actions">
-                  <Link to="/login" className="nav-login">
-                    {t("loginRegister")}
-                  </Link>
-                </div>
+                <Link to="/login" className="nav-login">
+                  Register / Login
+                </Link>
               )}
             </div>
           </nav>

@@ -6,56 +6,54 @@ export default function ListingCard({ item }) {
     return null;
   }
 
-  return (
-    <div className="listing-card h-100">
-      <div className="listing-img">
-        {/* Error 1: Fixed missing || operator */}
-        {/* Error 9: Added error handling */}
-        <img 
-          src={item.image} 
-          alt={item.title || "Listing image"}
-          onError={(e) => {
-            e.target.src = "/images/placeholder.jpg";
-          }}
-        />
+  const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
+  const specs = item.specs || [];
 
-        {/* Error 2: Fixed missing || operator */}
-        <span className="listing-price">
-          {formatDailyPrice(item.pricePerDay || 0)}
-        </span>
+  return (
+    <article className="motorx-card">
+      <div className="motorx-card-img">
+        <img src={item.image} alt={item.imageAlt || item.title} />
+        {item.featured ? <span className="badge-featured">Featured</span> : null}
+        {item.year ? <span className="badge-year">{item.year}</span> : null}
+        {item.photos ? (
+          <span className="badge-photos">
+            <i className="bi bi-camera"></i> {item.photos}
+          </span>
+        ) : null}
       </div>
 
-      <div className="listing-body">
-        <div className="d-flex justify-content-between align-items-start mb-2">
-          {/* Error 3: Fixed missing || operator */}
-          <h3>{item.title || "Untitled"}</h3>
+      <div className="motorx-card-body">
+        <span className="card-similar">
+          {item.similar || item.category || "Rental Item"}
+        </span>
+        <h3>{item.title}</h3>
+        <p className="card-price">
+          {displayPrice} <small>/ day</small>
+        </p>
 
-          <span className="rating">
-            <i className="bi bi-star-fill" /> 
-            {/* Error 4: Fixed missing || operator */}
-            {item.rating || "0.0"}
-          </span>
+        <div className="card-specs">
+          {specs.map((spec) => (
+            <span key={`${item.id}-${spec.label}`}>
+              <i className={`bi ${spec.icon}`}></i> {spec.label}
+            </span>
+          ))}
         </div>
 
-        <p className="text-muted mb-2">
-          <i className="bi bi-geo-alt" />{" "}
-          {/* Error 5: Fixed missing || operator */}
-          {item.location || "Location not specified"}
-        </p>
+        <div className="card-footer">
+          <Link to={`/items/${item.id}`} className="view-details">
+            VIEW DETAILS <i className="bi bi-arrow-up-right"></i>
+          </Link>
 
-        <p className="listing-description">
-          {/* Error 6: Fixed missing || operator */}
-          {item.description || "No description available"}
-        </p>
-
-        {/* Errors 7 & 8: Fixed template literal */}
-        <Link
-          to={`/items/${item.id}`}
-          className="btn btn-accent-custom w-100"
-        >
-          View Details
-        </Link>
+          <div className="card-actions">
+            <button type="button" className="icon-btn" aria-label="Compare">
+              <i className="bi bi-arrow-left-right"></i>
+            </button>
+            <button type="button" className="icon-btn" aria-label="Wishlist">
+              <i className="bi bi-heart"></i>
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }

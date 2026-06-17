@@ -2313,6 +2313,16 @@ html:has(#theme-toggle:checked) .theme-toggle .icon-dark {
   margin-top: -4rem;
 }
 
+.hero-text .motorx-search-wrap {
+  width: min(960px, calc(100vw - 2rem));
+  margin: 1.35rem 0 0;
+  padding: 0;
+}
+
+.hero-text .motorx-search-card {
+  padding: 1.25rem;
+}
+
 .motorx-search-card {
   background: #fff;
   border-radius: 14px;

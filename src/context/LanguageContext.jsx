@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 const LanguageContext = createContext(null);
 
@@ -53,9 +61,9 @@ export function LanguageProvider({ children }) {
     localStorage.setItem("language", language);
   }, [language]);
 
-  function t(key) {
+  const t = useCallback((key) => {
     return translations[language]?.[key] || translations.en[key] || key;
-  }
+  }, [language]);
 
   const value = useMemo(
     () => ({
@@ -64,7 +72,7 @@ export function LanguageProvider({ children }) {
       t,
       translations,
     }),
-    [language],
+    [language, t],
   );
 
   return (

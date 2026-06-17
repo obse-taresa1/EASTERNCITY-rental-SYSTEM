@@ -1,0 +1,111 @@
+import canonImage from "../assets/images/canon.png";
+import dewaltImage from "../assets/images/dewalt.png";
+import pcImage from "../assets/images/pc.png";
+import projectorImage from "../assets/images/projector.png";
+import rav4Image from "../assets/images/Toyota RAV4.jpg";
+import washerImage from "../assets/images/waterpp.png";
+
+export const homeListings = [
+  {
+    id: "toyota-rav4-2023",
+    title: "Toyota RAV4 2023",
+    image: rav4Image,
+    imageAlt: "Toyota RAV4",
+    status: "new",
+    featured: true,
+    year: "2023",
+    photos: 8,
+    similar: "SUV - 3 Similar",
+    price: "ETB 8,500",
+    specs: [
+      { icon: "bi-fuel-pump", label: "Petrol" },
+      { icon: "bi-speedometer2", label: "12k mi" },
+      { icon: "bi-gear", label: "Auto" },
+    ],
+  },
+  {
+    id: "canon-eos-dslr-kit",
+    title: "Canon EOS DSLR Kit",
+    image: canonImage,
+    imageAlt: "Canon DSLR",
+    status: "used",
+    featured: true,
+    year: "2022",
+    photos: 12,
+    similar: "Camera - 5 Similar",
+    price: "ETB 6,000",
+    specs: [
+      { icon: "bi-box", label: "Kit" },
+      { icon: "bi-star-fill", label: "4.9" },
+      { icon: "bi-geo-alt", label: "Downtown" },
+    ],
+  },
+  {
+    id: "dewalt-power-drill-set",
+    title: "DeWalt Power Drill Set",
+    image: dewaltImage,
+    imageAlt: "Power Drill",
+    status: "new",
+    featured: false,
+    year: "2024",
+    photos: 4,
+    similar: "Tools - 2 Similar",
+    price: "ETB 2,300",
+    specs: [
+      { icon: "bi-tools", label: "Cordless" },
+      { icon: "bi-check-circle", label: "Like New" },
+      { icon: "bi-geo-alt", label: "Westside" },
+    ],
+  },
+  {
+    id: "gaming-laptop-rtx-4070",
+    title: "Gaming Laptop RTX 4070",
+    image: pcImage,
+    imageAlt: "Gaming Laptop",
+    status: "used",
+    featured: true,
+    year: "2023",
+    photos: 6,
+    similar: "Electronics - 4 Similar",
+    price: "ETB 4,500",
+    specs: [
+      { icon: "bi-cpu", label: "RTX 4070" },
+      { icon: "bi-memory", label: "32GB" },
+      { icon: "bi-geo-alt", label: "Midtown" },
+    ],
+  },
+  {
+    id: "4k-home-theater-projector",
+    title: "4K Home Theater Projector",
+    image: projectorImage,
+    imageAlt: "Projector",
+    status: "new",
+    featured: false,
+    year: "2024",
+    photos: 3,
+    similar: "Events - 1 Similar",
+    price: "ETB 3,600",
+    specs: [
+      { icon: "bi-display", label: "4K" },
+      { icon: "bi-brightness-high", label: "3000lm" },
+      { icon: "bi-geo-alt", label: "North" },
+    ],
+  },
+  {
+    id: "electric-pressure-washer",
+    title: "Electric Pressure Washer",
+    image: washerImage,
+    imageAlt: "Pressure Washer",
+    status: "used",
+    featured: true,
+    year: "2021",
+    photos: 5,
+    similar: "Tools - 6 Similar",
+    price: "ETB 2,800",
+    specs: [
+      { icon: "bi-droplet", label: "2000 PSI" },
+      { icon: "bi-plug", label: "Electric" },
+      { icon: "bi-geo-alt", label: "East End" },
+    ],
+  },
+];

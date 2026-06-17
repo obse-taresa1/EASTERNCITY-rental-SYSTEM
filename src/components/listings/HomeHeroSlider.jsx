@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import heroToyota from "../../assets/images/Toyota RAV4.jpg";
-import heroPc from "../../assets/images/pc.png";
-import heroDrill from "../../assets/images/dewalt.png";
 import heroCanon from "../../assets/images/canon.png";
+import heroDrill from "../../assets/images/dewalt.png";
+import heroPc from "../../assets/images/pc.png";
 import heroSofa from "../../assets/images/furnsofa.png";
 import heroBike from "../../assets/images/sportbick.png";
+import heroToyota from "../../assets/images/Toyota RAV4.jpg";
+import HomeSearchForm from "../forms/HomeSearchForm.jsx";
 
 const slides = [
   {
@@ -13,7 +14,7 @@ const slides = [
     image: heroToyota,
     cardTitle: "Toyota RAV4 2023",
     cardPrice: "ETB 8,500",
-    cardLocation: "Addis Ababa",
+    cardLocation: "Downtown",
   },
   {
     title: "Rent Electronics For Any Occasion",
@@ -21,7 +22,7 @@ const slides = [
     image: heroPc,
     cardTitle: "Gaming Laptop RTX 4070",
     cardPrice: "ETB 4,500",
-    cardLocation: "Kazanchis",
+    cardLocation: "Midtown",
   },
   {
     title: "Professional Tools On Demand",
@@ -29,7 +30,7 @@ const slides = [
     image: heroDrill,
     cardTitle: "DeWalt Power Drill Set",
     cardPrice: "ETB 2,300",
-    cardLocation: "Bole",
+    cardLocation: "Westside",
   },
   {
     title: "Camera Rentals For Every Shoot",
@@ -38,7 +39,7 @@ const slides = [
     image: heroCanon,
     cardTitle: "Canon EOS DSLR Kit",
     cardPrice: "ETB 6,000",
-    cardLocation: "Addis Ababa",
+    cardLocation: "Downtown",
   },
   {
     title: "Furniture Rentals Made Easy",
@@ -46,7 +47,7 @@ const slides = [
     image: heroSofa,
     cardTitle: "Modern Sectional Sofa",
     cardPrice: "ETB 7,200",
-    cardLocation: "Addis Ababa",
+    cardLocation: "Uptown",
   },
   {
     title: "Sports Gear Ready When You Are",
@@ -55,7 +56,7 @@ const slides = [
     image: heroBike,
     cardTitle: "Mountain Bike Pro",
     cardPrice: "ETB 2,000",
-    cardLocation: "Entoto",
+    cardLocation: "Park",
   },
 ];
 
@@ -82,66 +83,84 @@ export default function HomeHeroSlider() {
   }
 
   return (
-    <section className="hero-section motorx-hero" data-hero-slider>
-      <div className="hero-bg">
+    <section className="motorx-hero" data-hero-slider>
+      <div className="motorx-hero-bg" aria-hidden="true">
         {slides.map((slide, index) => (
-          <img
+          <div
             key={slide.title}
-            src={slide.image}
-            alt=""
             className={`hero-slide ${index === activeIndex ? "is-active" : ""}`}
-          />
+            style={{ backgroundImage: `url("${slide.image}")` }}
+          ></div>
         ))}
       </div>
 
-      <div className="container hero-content">
-        <span className="section-label">CITYWIDE RENTALS</span>
-        <h1>{activeSlide.title}</h1>
-        <p>{activeSlide.subtitle}</p>
+      <div className="container motorx-hero-inner">
+        <div className="hero-layout">
+          <div className="hero-text">
+            <span className="hero-tag">TRUSTED DEALER, RENTAL</span>
+            <h1>{activeSlide.title}</h1>
+            <p>{activeSlide.subtitle}</p>
 
-        <div className="hero-buttons">
-          <a href="#featured-listings" className="btn-accent-custom">
-            Explore All Items
-          </a>
-          <a href="#home-search" className="btn btn-outline-light">
-            Search Rentals
-          </a>
-        </div>
+            <div className="hero-cta">
+              <a href="#featured-listings" className="btn-hero-primary">
+                Go To Listing
+              </a>
+            </div>
 
-        <div className="hero-rental-card">
-          <img src={activeSlide.image} alt={activeSlide.cardTitle} />
-          <div>
-            <strong>{activeSlide.cardTitle}</strong>
-            <span className="float-price">
-              {activeSlide.cardPrice} <small>/ day</small>
-            </span>
-            <span className="float-loc">
-              <i className="bi bi-geo-alt"></i> {activeSlide.cardLocation}
-            </span>
+            <HomeSearchForm />
+          </div>
+
+          <div className="hero-side">
+            <div className="hero-discount-badge">
+              <span className="discount-pct">40%</span>
+              <span className="discount-off">OFF</span>
+            </div>
+
+            <div className="hero-float-card">
+              <img src={activeSlide.image} alt="Featured rental item" />
+              <div>
+                <strong>{activeSlide.cardTitle}</strong>
+                <span className="float-price">
+                  {activeSlide.cardPrice} <small>/ day</small>
+                </span>
+                <span className="float-loc">
+                  <i className="bi bi-geo-alt"></i> {activeSlide.cardLocation}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="hero-controls">
+        <div className="hero-slider-controls" aria-label="Hero slider controls">
           <button
             type="button"
+            className="hero-slider-arrow"
             onClick={previousSlide}
-            aria-label="Previous slide"
+            aria-label="Previous hero slide"
           >
             <i className="bi bi-chevron-left"></i>
           </button>
-          [6/16/2026 11:47 PM] Obsi:{" "}
-          <div className="hero-dots">
+
+          <div className="hero-slider-dots" aria-label="Hero slides">
             {slides.map((slide, index) => (
               <button
                 key={slide.title}
                 type="button"
-                className={`hero-dot ${index === activeIndex ? "active" : ""}`}
-                aria-label={`Show slide ${index + 1}`}
+                className={`hero-slider-dot ${
+                  index === activeIndex ? "is-active" : ""
+                }`}
+                aria-label={`Show hero slide ${index + 1}`}
                 onClick={() => setActiveIndex(index)}
               ></button>
             ))}
           </div>
-          <button type="button" onClick={nextSlide} aria-label="Next slide">
+
+          <button
+            type="button"
+            className="hero-slider-arrow"
+            onClick={nextSlide}
+            aria-label="Next hero slide"
+          >
             <i className="bi bi-chevron-right"></i>
           </button>
         </div>

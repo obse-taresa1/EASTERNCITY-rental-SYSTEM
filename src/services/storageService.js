@@ -11,6 +11,9 @@ export function writeStorage(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+export const getStorageItem = readStorage;
+export const setStorageItem = writeStorage;
+
 export function removeStorage(key) {
   localStorage.removeItem(key);
 }
