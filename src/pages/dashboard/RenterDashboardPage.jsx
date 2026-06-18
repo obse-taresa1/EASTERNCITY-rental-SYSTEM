@@ -7,16 +7,22 @@ import { getBookingsByUser } from "../../services/bookingService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
 export default function RenterDashboardPage() {
-  const { user } = useAuth();
-  const bookings = user ? getBookingsByUser(user.id) : [];
-  const totalSpent = bookings.reduce((sum, booking) => sum + booking.totalAmount, 0);
+  const { currentUser, user } = useAuth();
+  const activeUser = user || currentUser;
+
+  const bookings = activeUser ? getBookingsByUser(activeUser.id) : [];
+
+  const totalSpent = bookings.reduce(
+    (sum, booking) => sum + Number(booking.totalAmount || 0),
+    0,
+  );
 
   return (
-    <main className="container py-5">
+    <main className="dashboard-content">
       <div className="dashboard-header">
         <div>
-          <span className="section-label">Renter Dashboard</span>
-          <h1>Welcome, {user?.name || "Renter"}</h1>
+          <span className="section-label">RENTER DASHBOARD</span>
+          <h1>Welcome, {activeUser?.name || "Renter"}</h1>
         </div>
 
         <Link to="/items" className="btn btn-accent-custom">
@@ -45,7 +51,7 @@ export default function RenterDashboardPage() {
         <div className="col-md-4">
           <DashboardStatCard
             icon="bi-phone"
-            label="Payment Options"
+            label="Payment Methods"
             value="3"
             tone="warning"
           />
