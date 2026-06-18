@@ -8,8 +8,6 @@ import SuperAdminLayout from "../layouts/SuperAdminLayout.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx";
 
-import PlaceholderPage from "../pages/PlaceholderPage.jsx";
-
 import HomePage from "../pages/public/HomePage.jsx";
 import AboutPage from "../pages/public/AboutPage.jsx";
 import CareersPage from "../pages/public/CareersPage.jsx";
@@ -37,6 +35,24 @@ import NotificationsPage from "../pages/profile/NotificationsPage.jsx";
 
 import LoginPage from "../pages/auth/LoginPage.jsx";
 import RegisterPage from "../pages/auth/RegisterPage.jsx";
+
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage.jsx";
+import UserManagementPage from "../pages/admin/UserManagementPage.jsx";
+import AdminListingManagementPage from "../pages/admin/AdminListingManagementPage.jsx";
+import AdminReportsPage from "../pages/admin/AdminReportsPage.jsx";
+import AdminStatisticsPage from "../pages/admin/AdminStatisticsPage.jsx";
+import AdminSettingsPage from "../pages/admin/AdminSettingsPage.jsx";
+
+import SuperAdminDashboardPage from "../pages/super-admin/SuperAdminDashboardPage.jsx";
+import AdminManagementPage from "../pages/super-admin/AdminManagementPage.jsx";
+import SuperUserManagementPage from "../pages/super-admin/SuperUserManagementPage.jsx";
+import SuperListingManagementPage from "../pages/super-admin/SuperListingManagementPage.jsx";
+import ContactMessagesPage from "../pages/super-admin/ContactMessagesPage.jsx";
+import RoleRequestsPage from "../pages/super-admin/RoleRequestsPage.jsx";
+import AnalyticsPage from "../pages/super-admin/AnalyticsPage.jsx";
+import ActivityLogsPage from "../pages/super-admin/ActivityLogsPage.jsx";
+import SystemSettingsPage from "../pages/super-admin/SystemSettingsPage.jsx";
+
 import { useAuth } from "../context/AuthContext.jsx";
 
 function DashboardRedirect() {
@@ -124,30 +140,18 @@ export default function AppRouter() {
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allowedRoles={["admin", "supervisor"]} />}>
             <Route element={<AdminLayout />}>
-              <Route
-                path="/admin"
-                element={<PlaceholderPage title="Admin Dashboard" />}
-              />
-              <Route
-                path="/admin/users"
-                element={<PlaceholderPage title="Users" />}
-              />
+              <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/users" element={<UserManagementPage />} />
               <Route
                 path="/admin/listings"
-                element={<PlaceholderPage title="Listings" />}
+                element={<AdminListingManagementPage />}
               />
-              <Route
-                path="/admin/reports"
-                element={<PlaceholderPage title="Reports" />}
-              />
+              <Route path="/admin/reports" element={<AdminReportsPage />} />
               <Route
                 path="/admin/statistics"
-                element={<PlaceholderPage title="Statistics" />}
+                element={<AdminStatisticsPage />}
               />
-              <Route
-                path="/admin/settings"
-                element={<PlaceholderPage title="Settings" />}
-              />
+              <Route path="/admin/settings" element={<AdminSettingsPage />} />
             </Route>
           </Route>
         </Route>
@@ -159,39 +163,39 @@ export default function AppRouter() {
             <Route element={<SuperAdminLayout />}>
               <Route
                 path="/super-admin"
-                element={<PlaceholderPage title="Super Admin Dashboard" />}
+                element={<SuperAdminDashboardPage />}
               />
               <Route
                 path="/super-admin/admin-management"
-                element={<PlaceholderPage title="Admin Management" />}
+                element={<AdminManagementPage />}
               />
               <Route
                 path="/super-admin/user-management"
-                element={<PlaceholderPage title="User Management" />}
+                element={<SuperUserManagementPage />}
               />
               <Route
                 path="/super-admin/listing-management"
-                element={<PlaceholderPage title="Listing Management" />}
+                element={<SuperListingManagementPage />}
               />
               <Route
                 path="/super-admin/contact-messages"
-                element={<PlaceholderPage title="Contact Messages" />}
+                element={<ContactMessagesPage />}
               />
               <Route
                 path="/super-admin/role-requests"
-                element={<PlaceholderPage title="Role Requests" />}
+                element={<RoleRequestsPage />}
               />
               <Route
                 path="/super-admin/analytics"
-                element={<PlaceholderPage title="Analytics" />}
+                element={<AnalyticsPage />}
               />
               <Route
                 path="/super-admin/activity-logs"
-                element={<PlaceholderPage title="Activity Logs" />}
+                element={<ActivityLogsPage />}
               />
               <Route
                 path="/super-admin/system-settings"
-                element={<PlaceholderPage title="System Settings" />}
+                element={<SystemSettingsPage />}
               />
             </Route>
           </Route>
