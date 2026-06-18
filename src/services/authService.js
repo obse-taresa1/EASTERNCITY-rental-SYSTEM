@@ -8,6 +8,22 @@ export function getUsers() {
   const storedUsers = readStorage(USERS_KEY, null);
 
   if (storedUsers) {
+    const storedUserIds = new Set(storedUsers.map((user) => user.id));
+    const storedUserEmails = new Set(
+      storedUsers.map((user) => user.email?.toLowerCase()).filter(Boolean),
+    );
+    const missingDefaultUsers = defaultUsers.filter(
+      (user) =>
+        !storedUserIds.has(user.id) &&
+        !storedUserEmails.has(user.email?.toLowerCase()),
+    );
+
+    if (missingDefaultUsers.length > 0) {
+      const mergedUsers = [...missingDefaultUsers, ...storedUsers];
+      writeStorage(USERS_KEY, mergedUsers);
+      return mergedUsers;
+    }
+
     return storedUsers;
   }
 
