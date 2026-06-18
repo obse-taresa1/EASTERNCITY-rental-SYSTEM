@@ -1,39 +1,52 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import {
+  dashboardForRole,
   getCurrentUser,
+  loginUser,
+  logoutUser,
+  registerUser,
   setCurrentUser as saveCurrentUser,
-  authenticateUser,
 } from "../services/authService.js";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
+  const [currentUser, setCurrentUserState] = useState(() => getCurrentUser());
 
-  useEffect(() => {
-    saveCurrentUser(currentUser);
-  }, [currentUser]);
+  function setCurrentUser(user) {
+    setCurrentUserState(user);
+    saveCurrentUser(user);
+  }
 
   function login(email, password) {
-    const user = authenticateUser(email, password);
-    if (!user) return null;
-    setCurrentUser(user);
+    const user = loginUser(email, password);
+    setCurrentUserState(user);
+    return user;
+  }
+
+  function register(formData) {
+    const user = registerUser(formData);
+    setCurrentUserState(user);
     return user;
   }
 
   function logout() {
-    setCurrentUser(null);
+    logoutUser();
+    setCurrentUserState(null);
   }
 
   const value = useMemo(
     () => ({
       currentUser,
+      user: currentUser,
       isAuthenticated: Boolean(currentUser),
       role: currentUser?.role?.toLowerCase() || "",
       login,
+      register,
       logout,
       setCurrentUser,
+      dashboardForRole,
     }),
     [currentUser],
   );
@@ -42,5 +55,13 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  return context;
 }
+
+export const getDashboardPath = dashboardForRole;
