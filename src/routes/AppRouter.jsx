@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import PublicLayout from "../layouts/PublicLayout.jsx";
 import DashboardLayout from "../layouts/DashboardLayout.jsx";
@@ -35,48 +35,47 @@ import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import MessagesPage from "../pages/profile/MessagesPage.jsx";
 import NotificationsPage from "../pages/profile/NotificationsPage.jsx";
 
+import LoginPage from "../pages/auth/LoginPage.jsx";
+import RegisterPage from "../pages/auth/RegisterPage.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+
+function DashboardRedirect() {
+  const { currentUser, user, dashboardForRole } = useAuth();
+  const activeUser = user || currentUser;
+
+  return <Navigate to={dashboardForRole(activeUser?.role)} replace />;
+}
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
-
           <Route path="/items" element={<ItemsPage />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
           <Route path="/items/:itemId" element={<ItemDetailsPage />} />
 
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/our-story" element={<AboutPage />} />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
 
-          <Route path="/login" element={<PlaceholderPage title="Login" />} />
-          <Route
-            path="/register"
-            element={<PlaceholderPage title="Register" />}
-          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
 
-        {/* Protected Routes - Error 1 & 2: Fixed structure */}
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route
-              path="/dashboard"
-              element={
-                <RoleRoute allowedRoles={["renter", "lessor", "both"]}>
-                  <RenterDashboardPage />
-                </RoleRoute>
-              }
-            />
+            <Route path="/dashboard" element={<DashboardRedirect />} />
 
             <Route
               path="/renter-dashboard"
               element={
-                <RoleRoute allowedRoles={["renter"]}>
+                <RoleRoute allowedRoles={["renter", "lessee"]}>
                   <RenterDashboardPage />
                 </RoleRoute>
               }
@@ -122,9 +121,8 @@ export default function AppRouter() {
           </Route>
         </Route>
 
-        {/* Admin Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route element={<RoleRoute allowedRoles={["admin"]} />}>
+          <Route element={<RoleRoute allowedRoles={["admin", "supervisor"]} />}>
             <Route element={<AdminLayout />}>
               <Route
                 path="/admin"
@@ -154,9 +152,10 @@ export default function AppRouter() {
           </Route>
         </Route>
 
-        {/* Super Admin Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route element={<RoleRoute allowedRoles={["superadmin"]} />}>
+          <Route
+            element={<RoleRoute allowedRoles={["superadmin", "super-admin"]} />}
+          >
             <Route element={<SuperAdminLayout />}>
               <Route
                 path="/super-admin"

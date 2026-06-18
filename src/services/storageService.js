@@ -1,19 +1,25 @@
-export function readStorage(key, fallback = null) {
+export function getStorageItem(key, fallbackValue = null) {
   try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : fallback;
+    const storedValue = localStorage.getItem(key);
+
+    if (!storedValue) {
+      return fallbackValue;
+    }
+
+    return JSON.parse(storedValue);
   } catch {
-    return fallback;
+    return fallbackValue;
   }
 }
 
-export function writeStorage(key, value) {
+export function setStorageItem(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-export const getStorageItem = readStorage;
-export const setStorageItem = writeStorage;
-
-export function removeStorage(key) {
+export function removeStorageItem(key) {
   localStorage.removeItem(key);
 }
+
+export const readStorage = getStorageItem;
+export const writeStorage = setStorageItem;
+export const removeStorage = removeStorageItem;

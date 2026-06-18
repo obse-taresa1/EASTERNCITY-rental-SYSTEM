@@ -38,8 +38,8 @@ export default function ListingCard({ item }) {
         </p>
 
         <div className="card-specs">
-          {specs.map((spec) => (
-            <span key={`${item.id}-${spec.label}`}>
+          {specs.map((spec, index) => (
+            <span key={`${item.id}-${spec.labelKey || spec.label || index}`}>
               <i className={`bi ${spec.icon}`}></i>{" "}
               {spec.labelKey ? t(spec.labelKey) : spec.label}
             </span>

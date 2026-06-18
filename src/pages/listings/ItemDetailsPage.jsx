@@ -1,17 +1,23 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { getItemById } from "../../services/itemService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import { canRentItem, getRentalRestrictionMessage } from "../../services/rentalAccessService.js";
+import {
+  canRentItem,
+  getRentalRestrictionMessage,
+} from "../../services/rentalAccessService.js";
 
 export default function ItemDetailsPage() {
   const { itemId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t } = useLanguage();
-  const [restrictionMessage, setRestrictionMessage] = useState("");
+  const location = useLocation();
+  const [restrictionMessage, setRestrictionMessage] = useState(
+    location.state?.rentRestrictionMessage || "",
+  );
 
   const item = useMemo(() => getItemById(itemId), [itemId]);
 
@@ -63,7 +69,9 @@ export default function ItemDetailsPage() {
           </p>
 
           <div className="d-flex align-items-center gap-3 mb-3">
-            <strong className="h4 mb-0">{formatDailyPrice(item.pricePerDay)}</strong>
+            <strong className="h4 mb-0">
+              {formatDailyPrice(item.pricePerDay)}
+            </strong>
             <span className="rating">
               <i className="bi bi-star-fill" /> {item.rating}
             </span>
@@ -84,7 +92,10 @@ export default function ItemDetailsPage() {
             <div className="alert alert-warning mt-4">{restrictionMessage}</div>
           )}
 
-          <button className="btn btn-accent-custom btn-lg mt-4" onClick={handleRentNow}>
+          <button
+            className="btn btn-accent-custom btn-lg mt-4"
+            onClick={handleRentNow}
+          >
             {t("rentNow")}
           </button>
         </div>

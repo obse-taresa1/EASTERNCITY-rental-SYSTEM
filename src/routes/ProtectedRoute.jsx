@@ -6,15 +6,8 @@ export default function ProtectedRoute({ children }) {
   const location = useLocation();
 
   if (!user) {
-    // Errors 1 & 2: Fixed template literal with backticks
-    localStorage.setItem(
-      "pendingRentalUrl",
-      `${location.pathname}${location.search}`,
-    );
-
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Error 3: Clarified return logic (optional improvement)
-  return children ? children : <Outlet />;
+  return children || <Outlet />;
 }
