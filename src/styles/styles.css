@@ -4888,4 +4888,154 @@ main.page-header.dashboard-main,
     height: 4.5rem;
     border-radius: 16px;
   }
+  .dashboard-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    background: #f6f7fb;
+  }
+
+  .dashboard-sidebar {
+    background: #08265a;
+    color: #fff;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-brand {
+    color: #fff;
+    font-weight: 900;
+    text-decoration: none;
+    margin-bottom: 32px;
+  }
+
+  .dashboard-brand span {
+    color: #ed1c24;
+  }
+
+  .dashboard-nav {
+    display: grid;
+    gap: 8px;
+  }
+
+  .dashboard-nav a,
+  .dashboard-logout {
+    color: #dbe7ff;
+    text-decoration: none;
+    border: 0;
+    background: transparent;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: left;
+  }
+
+  .dashboard-nav a.active,
+  .dashboard-nav a:hover,
+  .dashboard-logout:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+
+  .dashboard-logout {
+    margin-top: auto;
+  }
+
+  .dashboard-main {
+    min-width: 0;
+  }
+
+  .dashboard-topbar {
+    height: 78px;
+    background: #fff;
+    border-bottom: 1px solid #e8edf5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+  }
+
+  .dashboard-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f4f9;
+    padding: 10px 14px;
+    border-radius: 999px;
+    text-transform: capitalize;
+  }
+
+  .dashboard-content {
+    padding: 32px;
+  }
+
+  .dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .dashboard-stat-card,
+  .dashboard-section,
+  .owner-earnings-card {
+    background: #fff;
+    border: 1px solid #e8edf5;
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .dashboard-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .dashboard-stat-icon {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    background: #f1f4f9;
+    border-radius: 8px;
+    font-size: 22px;
+  }
+
+  .dashboard-table-img {
+    width: 58px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  .owner-earnings-icon {
+    margin-top: 16px;
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    background: #ed1c24;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 26px;
+  }
+
+  @media (max-width: 900px) {
+    .dashboard-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard-sidebar {
+      position: static;
+    }
+
+    .dashboard-header,
+    .dashboard-topbar {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
 }

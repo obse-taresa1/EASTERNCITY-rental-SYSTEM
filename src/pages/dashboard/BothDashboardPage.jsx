@@ -6,31 +6,37 @@ import ListingManagementTable from "../../components/dashboard/ListingManagement
 import OwnerEarningsCard from "../../components/dashboard/OwnerEarningsCard.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { items } from "../../data/items.js";
-import { getBookingsByOwner, getBookingsByUser } from "../../services/bookingService.js";
+import {
+  getBookingsByOwner,
+  getBookingsByUser,
+} from "../../services/bookingService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
 export default function BothDashboardPage() {
-  const { user } = useAuth();
+  const { currentUser, user } = useAuth();
+  const activeUser = user || currentUser;
 
-  const renterBookings = user ? getBookingsByUser(user.id) : [];
+  const renterBookings = activeUser ? getBookingsByUser(activeUser.id) : [];
   const ownedItems = items.slice(0, 3);
-  const ownerBookings = ownedItems.flatMap((item) => getBookingsByOwner(item.owner));
+  const ownerBookings = ownedItems.flatMap((item) =>
+    getBookingsByOwner(item.owner),
+  );
 
   const totalSpent = renterBookings.reduce(
-    (sum, booking) => sum + booking.totalAmount,
-    0
+    (sum, booking) => sum + Number(booking.totalAmount || 0),
+    0,
   );
 
   const totalEarnings = ownerBookings.reduce(
-    (sum, booking) => sum + booking.totalAmount,
-    0
+    (sum, booking) => sum + Number(booking.totalAmount || 0),
+    0,
   );
 
   return (
-    <main className="container py-5">
+    <main className="dashboard-content">
       <div className="dashboard-header">
         <div>
-          <span className="section-label">Both Dashboard</span>
+          <span className="section-label">BOTH DASHBOARD</span>
           <h1>Rent and Manage Listings</h1>
         </div>
 
