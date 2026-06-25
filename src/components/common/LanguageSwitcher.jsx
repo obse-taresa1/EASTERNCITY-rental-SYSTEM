@@ -10,7 +10,8 @@ const LANGUAGES = [
 
 export default function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
-  const current = LANGUAGES.find((lang) => lang.code === language) || LANGUAGES[0];
+  const current =
+    LANGUAGES.find((lang) => lang.code === language) || LANGUAGES[0];
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -52,7 +53,9 @@ export default function LanguageSwitcher() {
             >
               <span className="language-option-code">{lang.abbr}</span>
               <span>{lang.label}</span>
-              {language === lang.code && <i className="bi bi-check2-circle"></i>}
+              {language === lang.code && (
+                <i className="bi bi-check2-circle"></i>
+              )}
             </button>
           ))}
         </div>

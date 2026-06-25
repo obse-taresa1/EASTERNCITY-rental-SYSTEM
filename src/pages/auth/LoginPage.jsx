@@ -36,7 +36,8 @@ export default function LoginPage() {
         navigate(pendingContactUrl, {
           replace: true,
           state: {
-            contactReadyMessage: "You are signed in. Click Contact Owner to start the conversation.",
+            contactReadyMessage:
+              "You are signed in. Click Contact Owner to start the conversation.",
           },
         });
         return;

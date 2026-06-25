@@ -109,7 +109,9 @@ export default function AppRouter() {
             <Route
               path="/both-dashboard"
               element={
-                <RoleRoute allowedRoles={["renter", "lessee", "lessor", "both"]}>
+                <RoleRoute
+                  allowedRoles={["renter", "lessee", "lessor", "both"]}
+                >
                   <BothDashboardPage />
                 </RoleRoute>
               }
@@ -118,7 +120,9 @@ export default function AppRouter() {
             <Route
               path="/list-item"
               element={
-                <RoleRoute allowedRoles={["renter", "lessee", "lessor", "both"]}>
+                <RoleRoute
+                  allowedRoles={["renter", "lessee", "lessor", "both"]}
+                >
                   <ListItemPage />
                 </RoleRoute>
               }

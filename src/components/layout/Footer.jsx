@@ -3,20 +3,18 @@ import { useLanguage } from "../../context/LanguageContext.jsx";
 import logo from "../../assets/images/logo.png";
 
 const SOCIAL_LINKS = [
-  { icon: "bi-facebook",  href: "#", label: "Facebook" },
+  { icon: "bi-facebook", href: "#", label: "Facebook" },
   { icon: "bi-instagram", href: "#", label: "Instagram" },
   { icon: "bi-twitter-x", href: "#", label: "Twitter / X" },
-  { icon: "bi-telegram",  href: "#", label: "Telegram" },
-  { icon: "bi-youtube",   href: "#", label: "YouTube" },
+  { icon: "bi-telegram", href: "#", label: "Telegram" },
+  { icon: "bi-youtube", href: "#", label: "YouTube" },
 ];
 
 const SERVICE_AREAS = [
-  { name: "Jigjiga",   icon: "bi-geo-alt-fill" },
+  { name: "Jigjiga", icon: "bi-geo-alt-fill" },
   { name: "Dire Dawa", icon: "bi-geo-alt-fill" },
-  { name: "Harar",     icon: "bi-geo-alt-fill" },
+  { name: "Harar", icon: "bi-geo-alt-fill" },
 ];
-
-
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -29,11 +27,14 @@ export default function Footer() {
       <div className="footer-main">
         <div className="container">
           <div className="footer-grid">
-
             {/* Col 1 — Brand */}
             <div className="footer-col footer-brand-col">
               <Link to="/" className="footer-logo-link">
-                <img src={logo} alt="EasternCity Logo" className="footer-logo-img" />
+                <img
+                  src={logo}
+                  alt="EasternCity Logo"
+                  className="footer-logo-img"
+                />
               </Link>
               <p className="footer-tagline">{t("footerTagline")}</p>
               <div className="footer-social-row">
@@ -52,7 +53,9 @@ export default function Footer() {
 
             {/* Col 2 — Service Areas */}
             <div className="footer-col">
-              <h5 className="footer-col-title">{t("location") || "Service Areas"}</h5>
+              <h5 className="footer-col-title">
+                {t("location") || "Service Areas"}
+              </h5>
               <ul className="footer-area-list">
                 {SERVICE_AREAS.map((area) => (
                   <li key={area.name} className="footer-area-item">
@@ -68,12 +71,24 @@ export default function Footer() {
             <div className="footer-col">
               <h5 className="footer-col-title">Quick Links</h5>
               <ul className="footer-link-list">
-                <li><Link to="/">{t("home")}</Link></li>
-                <li><Link to="/items">{t("categories")}</Link></li>
-                <li><Link to="/about">{t("about")}</Link></li>
-                <li><Link to="/contact">{t("contactUs")}</Link></li>
-                <li><Link to="/privacy-policy">{t("privacyPolicy")}</Link></li>
-                <li><Link to="/terms">{t("terms")}</Link></li>
+                <li>
+                  <Link to="/">{t("home")}</Link>
+                </li>
+                <li>
+                  <Link to="/items">{t("categories")}</Link>
+                </li>
+                <li>
+                  <Link to="/about">{t("about")}</Link>
+                </li>
+                <li>
+                  <Link to="/contact">{t("contactUs")}</Link>
+                </li>
+                <li>
+                  <Link to="/privacy-policy">{t("privacyPolicy")}</Link>
+                </li>
+                <li>
+                  <Link to="/terms">{t("terms")}</Link>
+                </li>
               </ul>
             </div>
 
@@ -83,7 +98,9 @@ export default function Footer() {
               <ul className="footer-contact-list">
                 <li>
                   <i className="bi bi-envelope-fill text-danger me-2"></i>
-                  <a href="mailto:support@easterncities.com">support@easterncities.com</a>
+                  <a href="mailto:support@easterncities.com">
+                    support@easterncities.com
+                  </a>
                 </li>
                 <li>
                   <i className="bi bi-telephone-fill text-danger me-2"></i>
@@ -99,9 +116,6 @@ export default function Footer() {
                 </li>
               </ul>
             </div>
-
-
-
           </div>
         </div>
       </div>
@@ -111,7 +125,8 @@ export default function Footer() {
         <div className="container">
           <div className="footer-bottom-inner">
             <p className="footer-copyright">
-              &copy; {new Date().getFullYear()} EasternCities. All rights reserved.
+              &copy; {new Date().getFullYear()} EasternCities. All rights
+              reserved.
             </p>
             <p className="footer-built-with">
               <i className="bi bi-heart-fill text-danger me-1"></i>

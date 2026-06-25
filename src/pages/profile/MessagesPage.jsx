@@ -1,7 +1,10 @@
 import { Link, useSearchParams } from "react-router-dom";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getConversationById, getConversations } from "../../services/messageService.js";
+import {
+  getConversationById,
+  getConversations,
+} from "../../services/messageService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 
 export default function MessagesPage() {
@@ -20,7 +23,10 @@ export default function MessagesPage() {
         <div>
           <span className="section-label">MESSAGES</span>
           <h1>Rental Conversations</h1>
-          <p className="owner-muted mb-0">Discuss availability, pickup, delivery, duration, pricing, and payment arrangements.</p>
+          <p className="owner-muted mb-0">
+            Discuss availability, pickup, delivery, duration, pricing, and
+            payment arrangements.
+          </p>
         </div>
       </div>
 
@@ -29,7 +35,11 @@ export default function MessagesPage() {
           icon="bi-chat-dots"
           title="No messages"
           description="Contact an owner from a listing page to start a rental conversation."
-          action={<Link to="/items" className="btn btn-accent-custom btn-shine">Browse Listings</Link>}
+          action={
+            <Link to="/items" className="btn btn-accent-custom btn-shine">
+              Browse Listings
+            </Link>
+          }
         />
       ) : (
         <section className="messages-layout">
@@ -40,7 +50,10 @@ export default function MessagesPage() {
                 className={`message-thread ${activeConversation?.id === conversation.id ? "is-active" : ""}`}
                 key={conversation.id}
               >
-                <img src={conversation.listing.image} alt={conversation.listing.title} />
+                <img
+                  src={conversation.listing.image}
+                  alt={conversation.listing.title}
+                />
                 <div>
                   <strong>{conversation.subject}</strong>
                   <span>{conversation.context}</span>
@@ -55,17 +68,28 @@ export default function MessagesPage() {
                 <span className="section-label">LISTING ATTACHED</span>
                 <h2>{activeConversation.subject}</h2>
               </div>
-              <Link to={`/items/${activeConversation.itemId}`} className="btn btn-outline-danger">
+              <Link
+                to={`/items/${activeConversation.itemId}`}
+                className="btn btn-outline-danger"
+              >
                 View Listing
               </Link>
             </div>
 
             <div className="message-listing-context">
-              <img src={activeConversation.listing.image} alt={activeConversation.listing.title} />
+              <img
+                src={activeConversation.listing.image}
+                alt={activeConversation.listing.title}
+              />
               <div>
                 <strong>{activeConversation.listing.title}</strong>
                 <span>{activeConversation.listing.location}</span>
-                <span>{activeConversation.listing.price || formatDailyPrice(activeConversation.listing.pricePerDay || 0)}</span>
+                <span>
+                  {activeConversation.listing.price ||
+                    formatDailyPrice(
+                      activeConversation.listing.pricePerDay || 0,
+                    )}
+                </span>
               </div>
             </div>
 
@@ -79,8 +103,15 @@ export default function MessagesPage() {
               ))}
             </div>
 
-            <form className="message-compose" onSubmit={(event) => event.preventDefault()}>
-              <input type="text" className="form-control" placeholder="Continue the conversation..." />
+            <form
+              className="message-compose"
+              onSubmit={(event) => event.preventDefault()}
+            >
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Continue the conversation..."
+              />
               <button type="submit" className="btn btn-accent-custom btn-shine">
                 <i className="bi bi-send"></i>
               </button>

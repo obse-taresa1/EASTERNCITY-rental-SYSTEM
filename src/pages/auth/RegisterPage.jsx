@@ -57,7 +57,9 @@ export default function RegisterPage() {
     setError("");
 
     if (!formData.nationalIdFront || !formData.nationalIdBack) {
-      setError("Please upload both the front and back side of your National ID.");
+      setError(
+        "Please upload both the front and back side of your National ID.",
+      );
       return;
     }
 
@@ -131,12 +133,18 @@ export default function RegisterPage() {
             <div className="d-flex align-items-start justify-content-between gap-3 mb-3">
               <div>
                 <h2 className="h5 mb-1">National ID Verification</h2>
-                <p className="text-muted mb-0">Upload both sides to keep EasternCity safe and trusted.</p>
+                <p className="text-muted mb-0">
+                  Upload both sides to keep EasternCity safe and trusted.
+                </p>
               </div>
-              <span className="owner-status owner-status-pending-approval">Pending Verification</span>
+              <span className="owner-status owner-status-pending-approval">
+                Pending Verification
+              </span>
             </div>
 
-            {fileNotice && <div className="listing-form-notice">{fileNotice}</div>}
+            {fileNotice && (
+              <div className="listing-form-notice">{fileNotice}</div>
+            )}
 
             <div className="id-upload-grid">
               {[
@@ -156,14 +164,19 @@ export default function RegisterPage() {
                     type="file"
                     accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                     hidden
-                    onChange={(event) => readIdImage(event.target.files[0], fieldName)}
+                    onChange={(event) =>
+                      readIdImage(event.target.files[0], fieldName)
+                    }
                   />
                 </label>
               ))}
             </div>
           </section>
 
-          <button type="submit" className="btn btn-accent-custom btn-shine w-100">
+          <button
+            type="submit"
+            className="btn btn-accent-custom btn-shine w-100"
+          >
             Register
           </button>
         </form>

@@ -78,7 +78,12 @@ export const items = [
     owner: "HomeStyle Rentals",
     description:
       "Clean modern sofa for temporary home setup, staging, and small events.",
-    features: ["3 Seats", "Clean Fabric", "Delivery Available", "Modern Design"],
+    features: [
+      "3 Seats",
+      "Clean Fabric",
+      "Delivery Available",
+      "Modern Design",
+    ],
     available: true,
   },
   {
@@ -103,103 +108,119 @@ export const categories = [
     id: "electronics-cameras",
     name: "Electronics & Cameras",
     icon: "bi-camera",
-    description: "Cameras, projectors, drones, and electronic devices for rent.",
+    description:
+      "Cameras, projectors, drones, and electronic devices for rent.",
   },
   {
     id: "cars-bikes",
     name: "Cars & Bikes",
     icon: "bi-car-front",
-    description: "Cars, motorcycles, and bikes available for daily and weekly rental.",
+    description:
+      "Cars, motorcycles, and bikes available for daily and weekly rental.",
   },
   {
     id: "party-wedding",
     name: "Party & Wedding",
     icon: "bi-balloon",
-    description: "Wedding chairs, tents, decorations, sound systems, and event lighting.",
+    description:
+      "Wedding chairs, tents, decorations, sound systems, and event lighting.",
   },
   {
     id: "event-essentials",
     name: "Event Essentials",
     icon: "bi-calendar-event",
-    description: "Generators, stage platforms, tables, cables, and lighting towers for events.",
+    description:
+      "Generators, stage platforms, tables, cables, and lighting towers for events.",
   },
   {
     id: "vehicles",
     name: "Vehicles",
     icon: "bi-truck",
-    description: "Pickup trucks, minibuses, SUVs, delivery vans, and cargo trucks.",
+    description:
+      "Pickup trucks, minibuses, SUVs, delivery vans, and cargo trucks.",
   },
   {
     id: "gadgets",
     name: "Gadgets",
     icon: "bi-controller",
-    description: "PlayStation, VR headsets, power banks, smart watches, and tablets.",
+    description:
+      "PlayStation, VR headsets, power banks, smart watches, and tablets.",
   },
   {
     id: "construction-diy",
     name: "Construction & DIY",
     icon: "bi-tools",
-    description: "Cement mixers, drills, scaffolding, ladders, and tile cutters.",
+    description:
+      "Cement mixers, drills, scaffolding, ladders, and tile cutters.",
   },
   {
     id: "furniture",
     name: "Furniture",
     icon: "bi-house-heart",
-    description: "Sofa sets, dining tables, office chairs, coffee tables, and wardrobes.",
+    description:
+      "Sofa sets, dining tables, office chairs, coffee tables, and wardrobes.",
   },
   {
     id: "home-appliances",
     name: "Home Appliances",
     icon: "bi-house-gear",
-    description: "Refrigerators, washing machines, microwaves, vacuum cleaners, and blenders.",
+    description:
+      "Refrigerators, washing machines, microwaves, vacuum cleaners, and blenders.",
   },
   {
     id: "sports-outdoor",
     name: "Sports & Outdoor",
     icon: "bi-bicycle",
-    description: "Bicycles, camping tents, treadmills, football kits, and fitness equipment.",
+    description:
+      "Bicycles, camping tents, treadmills, football kits, and fitness equipment.",
   },
   {
     id: "travel-camping",
     name: "Travel & Camping",
     icon: "bi-compass",
-    description: "Sleeping bags, camping stoves, travel backpacks, cooler boxes, and hiking gear.",
+    description:
+      "Sleeping bags, camping stoves, travel backpacks, cooler boxes, and hiking gear.",
   },
   {
     id: "fashion-accessories",
     name: "Fashion & Accessories",
     icon: "bi-handbag",
-    description: "Traditional dresses, wedding jewelry, designer handbags, suits, and evening gowns.",
+    description:
+      "Traditional dresses, wedding jewelry, designer handbags, suits, and evening gowns.",
   },
   {
     id: "music-audio",
     name: "Music & Audio Equipment",
     icon: "bi-music-note-beamed",
-    description: "DJ controllers, keyboards, drum sets, microphones, and guitar amplifiers.",
+    description:
+      "DJ controllers, keyboards, drum sets, microphones, and guitar amplifiers.",
   },
   {
     id: "office-equipment",
     name: "Office Equipment",
     icon: "bi-printer",
-    description: "Projector screens, printers, photocopiers, office desks, and conference chairs.",
+    description:
+      "Projector screens, printers, photocopiers, office desks, and conference chairs.",
   },
   {
     id: "beauty-salon",
     name: "Beauty & Salon Equipment",
     icon: "bi-scissors",
-    description: "Hair dryers, makeup chairs, facial steamers, nail equipment, and salon mirrors.",
+    description:
+      "Hair dryers, makeup chairs, facial steamers, nail equipment, and salon mirrors.",
   },
   {
     id: "baby-kids",
     name: "Baby & Kids Essentials",
     icon: "bi-balloon-heart",
-    description: "Baby strollers, cribs, kids bicycles, car seats, and baby walkers.",
+    description:
+      "Baby strollers, cribs, kids bicycles, car seats, and baby walkers.",
   },
   {
     id: "gaming-equipment",
     name: "Gaming Equipment",
     icon: "bi-joystick",
-    description: "Xbox consoles, gaming chairs, gaming monitors, racing wheels, and Nintendo Switch.",
+    description:
+      "Xbox consoles, gaming chairs, gaming monitors, racing wheels, and Nintendo Switch.",
   },
 ];
-

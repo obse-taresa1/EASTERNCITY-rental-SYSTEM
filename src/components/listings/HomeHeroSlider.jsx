@@ -148,19 +148,30 @@ export default function HomeHeroSlider() {
             <h1 key={`title-${activeIndex}`} className="animate-fade-in-up">
               {t(activeSlide.titleKey)}
             </h1>
-            <p key={`desc-${activeIndex}`} className="animate-fade-in-up" style={{ animationDelay: "120ms" }}>
+            <p
+              key={`desc-${activeIndex}`}
+              className="animate-fade-in-up"
+              style={{ animationDelay: "120ms" }}
+            >
               {t(activeSlide.subtitleKey)}
             </p>
           </div>
 
           <div className="hero-side">
-            <div className="hero-discount-badge animate-fade-in-up" style={{ animationDelay: "150ms" }}>
+            <div
+              className="hero-discount-badge animate-fade-in-up"
+              style={{ animationDelay: "150ms" }}
+            >
               <span className="discount-pct">40%</span>
               <span className="discount-off">{t("heroDiscountOff")}</span>
             </div>
 
             {/* Advanced Spec Floating Card */}
-            <div className="hero-float-card p-3 rounded-4 d-flex flex-column gap-2 animate-fade-in-up" style={{ animationDelay: "300ms" }} key={`card-${activeIndex}`}>
+            <div
+              className="hero-float-card p-3 rounded-4 d-flex flex-column gap-2 animate-fade-in-up"
+              style={{ animationDelay: "300ms" }}
+              key={`card-${activeIndex}`}
+            >
               <div className="d-flex gap-3 align-items-center">
                 <img
                   src={activeSlide.image}
@@ -172,11 +183,16 @@ export default function HomeHeroSlider() {
                   <div className="hero-float-card-rating">
                     <i className="bi bi-star-fill"></i>
                     <span>{activeSlide.rating}</span>
-                    <span className="text-muted" style={{ fontSize: "0.65rem" }}>
+                    <span
+                      className="text-muted"
+                      style={{ fontSize: "0.65rem" }}
+                    >
                       ({activeSlide.reviewsCount})
                     </span>
                   </div>
-                  <h6 className="m-0 fw-bold text-start">{activeSlide.cardTitle}</h6>
+                  <h6 className="m-0 fw-bold text-start">
+                    {activeSlide.cardTitle}
+                  </h6>
                 </div>
               </div>
 
@@ -190,13 +206,25 @@ export default function HomeHeroSlider() {
 
               <div className="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
                 <div className="text-start">
-                  <span className="text-muted" style={{ fontSize: "0.75rem", fontWeight: 600 }}>{t("perDay")}: </span>
-                  <span className="fw-bold text-danger ms-1" style={{ fontSize: "1.1rem" }}>
+                  <span
+                    className="text-muted"
+                    style={{ fontSize: "0.75rem", fontWeight: 600 }}
+                  >
+                    {t("perDay")}:{" "}
+                  </span>
+                  <span
+                    className="fw-bold text-danger ms-1"
+                    style={{ fontSize: "1.1rem" }}
+                  >
                     {activeSlide.cardPrice}
                   </span>
                 </div>
-                <div className="text-muted" style={{ fontSize: "0.75rem", fontWeight: 600 }}>
-                  <i className="bi bi-geo-alt-fill text-danger me-1"></i>{activeSlide.cardLocation}
+                <div
+                  className="text-muted"
+                  style={{ fontSize: "0.75rem", fontWeight: 600 }}
+                >
+                  <i className="bi bi-geo-alt-fill text-danger me-1"></i>
+                  {activeSlide.cardLocation}
                 </div>
               </div>
             </div>
@@ -209,7 +237,10 @@ export default function HomeHeroSlider() {
         </div>
 
         {/* Platform Stats Banner */}
-        <div className="hero-stats-banner animate-fade-in-up" style={{ animationDelay: "450ms" }}>
+        <div
+          className="hero-stats-banner animate-fade-in-up"
+          style={{ animationDelay: "450ms" }}
+        >
           <div className="hero-stat-block">
             <i className="bi bi-check-circle-fill hero-stat-icon"></i>
             <div className="hero-stat-info text-start">
@@ -277,7 +308,9 @@ export default function HomeHeroSlider() {
             aria-label={isPlaying ? "Pause autoplay" : "Play autoplay"}
             title={isPlaying ? "Pause Autoplay" : "Play Autoplay"}
           >
-            <i className={`bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`}></i>
+            <i
+              className={`bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`}
+            ></i>
           </button>
         </div>
       </div>

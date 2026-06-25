@@ -10,14 +10,21 @@ export default function AdminDashboardPage() {
   const bookings = getBookings();
   const items = getAllItems();
   const featuredRevenue = items.filter((item) => item.featured).length * 200;
-  const subscriptionRevenue = items.filter((item) => item.subscriptionPlan === "Pro Plan").length * 750;
-  const verificationRevenue = items.filter((item) => item.verificationStatus === "verified").length * 200;
+  const subscriptionRevenue =
+    items.filter((item) => item.subscriptionPlan === "Pro Plan").length * 750;
+  const verificationRevenue =
+    items.filter((item) => item.verificationStatus === "verified").length * 200;
   const advertisementRevenue = 12400;
 
-  const totalRevenue = bookings.reduce(
-    (sum, booking) => sum + Number(booking.totalAmount || 0),
-    0,
-  ) + featuredRevenue + subscriptionRevenue + verificationRevenue + advertisementRevenue;
+  const totalRevenue =
+    bookings.reduce(
+      (sum, booking) => sum + Number(booking.totalAmount || 0),
+      0,
+    ) +
+    featuredRevenue +
+    subscriptionRevenue +
+    verificationRevenue +
+    advertisementRevenue;
 
   const stats = [
     {
@@ -73,7 +80,10 @@ export default function AdminDashboardPage() {
           <div>
             <span className="section-label">MARKETPLACE REVENUE</span>
             <h2 className="h4 mb-1">Monetization Channels</h2>
-            <p className="owner-muted mb-0">Track subscriptions, featured boosts, verification, and advertisement placements without blocking free entry.</p>
+            <p className="owner-muted mb-0">
+              Track subscriptions, featured boosts, verification, and
+              advertisement placements without blocking free entry.
+            </p>
           </div>
         </div>
         <div className="owner-revenue-grid">

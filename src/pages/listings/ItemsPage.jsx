@@ -29,7 +29,10 @@ export default function ItemsPage() {
         description={t("availableItemsDescription")}
       />
 
-      <form className="row g-3 mb-4" onSubmit={(event) => event.preventDefault()}>
+      <form
+        className="row g-3 mb-4"
+        onSubmit={(event) => event.preventDefault()}
+      >
         <div className="col-md-9">
           <input
             type="search"

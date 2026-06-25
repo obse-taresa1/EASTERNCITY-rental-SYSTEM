@@ -4,16 +4,32 @@ export default function AboutPage() {
   const { t } = useLanguage();
 
   const values = [
-    { icon: "bi-shield-check", titleKey: "aboutTrustTitle", bodyKey: "aboutTrustBody" },
-    { icon: "bi-people",       titleKey: "aboutCommunityTitle", bodyKey: "aboutCommunityBody" },
-    { icon: "bi-lightning-charge", titleKey: "aboutSpeedTitle", bodyKey: "aboutSpeedBody" },
-    { icon: "bi-globe2",       titleKey: "aboutMultilingualTitle", bodyKey: "aboutMultilingualBody" },
+    {
+      icon: "bi-shield-check",
+      titleKey: "aboutTrustTitle",
+      bodyKey: "aboutTrustBody",
+    },
+    {
+      icon: "bi-people",
+      titleKey: "aboutCommunityTitle",
+      bodyKey: "aboutCommunityBody",
+    },
+    {
+      icon: "bi-lightning-charge",
+      titleKey: "aboutSpeedTitle",
+      bodyKey: "aboutSpeedBody",
+    },
+    {
+      icon: "bi-globe2",
+      titleKey: "aboutMultilingualTitle",
+      bodyKey: "aboutMultilingualBody",
+    },
   ];
 
   const cities = [
-    { name: "Jigjiga",    icon: "bi-building",    descKey: "aboutJigjigaDesc" },
-    { name: "Dire Dawa",  icon: "bi-train-front",  descKey: "aboutDireDawaDesc" },
-    { name: "Harar",      icon: "bi-geo-alt",      descKey: "aboutHararDesc" },
+    { name: "Jigjiga", icon: "bi-building", descKey: "aboutJigjigaDesc" },
+    { name: "Dire Dawa", icon: "bi-train-front", descKey: "aboutDireDawaDesc" },
+    { name: "Harar", icon: "bi-geo-alt", descKey: "aboutHararDesc" },
   ];
 
   return (
@@ -35,14 +51,18 @@ export default function AboutPage() {
           <div className="row g-4">
             <div className="col-lg-6">
               <div className="about-glass-card">
-                <div className="about-card-icon"><i className="bi bi-bullseye"></i></div>
+                <div className="about-card-icon">
+                  <i className="bi bi-bullseye"></i>
+                </div>
                 <h3>{t("aboutMissionTitle")}</h3>
                 <p>{t("aboutMissionBody")}</p>
               </div>
             </div>
             <div className="col-lg-6">
               <div className="about-glass-card">
-                <div className="about-card-icon"><i className="bi bi-people-fill"></i></div>
+                <div className="about-card-icon">
+                  <i className="bi bi-people-fill"></i>
+                </div>
                 <h3>{t("aboutWhoWeAreTitle")}</h3>
                 <p>{t("aboutWhoWeAreBody")}</p>
               </div>
@@ -100,8 +120,12 @@ export default function AboutPage() {
             <h2>{t("aboutCtaTitle")}</h2>
             <p>{t("aboutCtaBody")}</p>
             <div className="d-flex gap-3 justify-content-center flex-wrap">
-              <a href="/register" className="btn-hero-primary">{t("aboutCtaGetStarted")}</a>
-              <a href="/items" className="btn-hero-outline">{t("aboutCtaBrowse")}</a>
+              <a href="/register" className="btn-hero-primary">
+                {t("aboutCtaGetStarted")}
+              </a>
+              <a href="/items" className="btn-hero-outline">
+                {t("aboutCtaBrowse")}
+              </a>
             </div>
           </div>
         </div>

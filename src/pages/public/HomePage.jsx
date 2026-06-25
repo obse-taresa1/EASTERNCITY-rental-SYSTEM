@@ -8,13 +8,13 @@ export default function HomePage() {
   return (
     <main className="motorx-home">
       <HomeHeroSlider />
-      
+
       <ExploreItemsSection />
 
       <MarketplaceSections />
-      
+
       <TopRentedItemsSection />
-      
+
       <HowItWorksSection />
     </main>
   );

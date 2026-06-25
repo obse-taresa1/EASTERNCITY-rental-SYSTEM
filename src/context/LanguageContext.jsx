@@ -38,7 +38,8 @@ const translations = {
     settings: "Settings",
 
     // --- Footer ---
-    footerTagline: "The premium rental marketplace connecting communities across Jigjiga, Dire Dawa, and Harar.",
+    footerTagline:
+      "The premium rental marketplace connecting communities across Jigjiga, Dire Dawa, and Harar.",
     ourStory: "Our Story",
     careers: "Careers",
     privacyPolicy: "Privacy Policy",
@@ -59,15 +60,19 @@ const translations = {
     heroVehicleTitle: "Rent Cars & Vehicles Near You",
     heroVehicleSubtitle: "Browse trusted vehicle rentals from local owners.",
     heroElectronicsTitle: "Rent Electronics For Any Occasion",
-    heroElectronicsSubtitle: "Find laptops, speakers, projectors, gaming devices, and more.",
+    heroElectronicsSubtitle:
+      "Find laptops, speakers, projectors, gaming devices, and more.",
     heroToolsTitle: "Professional Tools On Demand",
-    heroToolsSubtitle: "Rent tools and equipment without the cost of ownership.",
+    heroToolsSubtitle:
+      "Rent tools and equipment without the cost of ownership.",
     heroCameraTitle: "Camera Rentals For Every Shoot",
-    heroCameraSubtitle: "Book cameras, lenses, and kits for events, content, and creative work.",
+    heroCameraSubtitle:
+      "Book cameras, lenses, and kits for events, content, and creative work.",
     heroFurnitureTitle: "Furniture Rentals Made Easy",
     heroFurnitureSubtitle: "Affordable furniture rentals for homes and events.",
     heroSportsTitle: "Sports Gear Ready When You Are",
-    heroSportsSubtitle: "Rent bikes, golf sets, kayaks, climbing gear, and outdoor equipment.",
+    heroSportsSubtitle:
+      "Rent bikes, golf sets, kayaks, climbing gear, and outdoor equipment.",
 
     // --- Search & Categories ---
     allItems: "All Items",
@@ -118,11 +123,14 @@ const translations = {
 
     // --- About / How It Works ---
     ourStoryTitle: "Our Story",
-    ourStorySubtitle: "EasternCity connects people with trusted local rental items across the city.",
-    ourStoryBody: "Our platform helps owners list useful items and helps renters access what they need without buying everything outright.",
+    ourStorySubtitle:
+      "EasternCity connects people with trusted local rental items across the city.",
+    ourStoryBody:
+      "Our platform helps owners list useful items and helps renters access what they need without buying everything outright.",
     careersTitle: "Careers",
     careersSubtitle: "Join the team building trusted citywide rentals.",
-    careersBody: "We are looking for people who care about community, access, and better rental experiences.",
+    careersBody:
+      "We are looking for people who care about community, access, and better rental experiences.",
     howItWorksBrowseTitle: "Browse",
     howItWorksBrowseBody: "Search categories and find the item you need.",
     howItWorksBookTitle: "Book",
@@ -133,36 +141,49 @@ const translations = {
     // --- About Page ---
     aboutEyebrow: "ABOUT EASTERNCITIES",
     aboutHeroTitle: "Connecting Communities Through Trust",
-    aboutHeroDesc: "EasternCities connects people who own useful items with people who need them - safely, affordably, and instantly across Eastern Ethiopia.",
+    aboutHeroDesc:
+      "EasternCities connects people who own useful items with people who need them - safely, affordably, and instantly across Eastern Ethiopia.",
     aboutMissionTitle: "Our Mission",
-    aboutMissionBody: "To make renting as easy and trusted as borrowing from a friend. We believe every item sitting unused in your home could be earning money — and every renter deserves access to quality items without buying them outright.",
+    aboutMissionBody:
+      "To make renting as easy and trusted as borrowing from a friend. We believe every item sitting unused in your home could be earning money — and every renter deserves access to quality items without buying them outright.",
     aboutWhoWeAreTitle: "Who We Are",
-    aboutWhoWeAreBody: "EasternCities was founded in Jigjiga with a simple idea: the sharing economy should work for Eastern Ethiopia. We're a team of local technologists, community leaders, and entrepreneurs building trust-based infrastructure for peer-to-peer rental.",
+    aboutWhoWeAreBody:
+      "EasternCities was founded in Jigjiga with a simple idea: the sharing economy should work for Eastern Ethiopia. We're a team of local technologists, community leaders, and entrepreneurs building trust-based infrastructure for peer-to-peer rental.",
     aboutWhyChooseUs: "WHY CHOOSE US",
     aboutBuiltOnValues: "Built on Values That Matter",
     aboutTrustTitle: "Trust & Safety",
-    aboutTrustBody: "Every listing is verified. Every renter is ID-checked. Every transaction is escrow-protected.",
+    aboutTrustBody:
+      "Every listing is verified. Every renter is ID-checked. Every transaction is escrow-protected.",
     aboutCommunityTitle: "Community First",
-    aboutCommunityBody: "We connect neighbours. Real people with real items, building local economic opportunity.",
+    aboutCommunityBody:
+      "We connect neighbours. Real people with real items, building local economic opportunity.",
     aboutSpeedTitle: "Speed & Convenience",
-    aboutSpeedBody: "Search, book, and collect in minutes. No paperwork, no delays.",
+    aboutSpeedBody:
+      "Search, book, and collect in minutes. No paperwork, no delays.",
     aboutMultilingualTitle: "Multilingual",
-    aboutMultilingualBody: "Fully accessible in English, Amharic, Somali, and Afaan Oromo.",
+    aboutMultilingualBody:
+      "Fully accessible in English, Amharic, Somali, and Afaan Oromo.",
     aboutCoverageEyebrow: "OUR COVERAGE",
     aboutCitiesTitle: "Cities We Serve",
     aboutJigjigaDesc: "Capital of Somali Region. Our largest market.",
-    aboutDireDawaDesc: "Industrial hub with high demand for tool & equipment rentals.",
-    aboutHararDesc: "Historic walled city. Perfect for event and furniture rentals.",
+    aboutDireDawaDesc:
+      "Industrial hub with high demand for tool & equipment rentals.",
+    aboutHararDesc:
+      "Historic walled city. Perfect for event and furniture rentals.",
     aboutCtaTitle: "Ready to rent smarter?",
-    aboutCtaBody: "Join thousands of verified members renting across Eastern Ethiopia today.",
+    aboutCtaBody:
+      "Join thousands of verified members renting across Eastern Ethiopia today.",
     aboutCtaGetStarted: "Get Started Free",
     aboutCtaBrowse: "Browse Listings",
 
     // --- Legal / Contact ---
-    privacyBody: "We use account and booking information to support rentals, messaging, notifications, and platform safety.",
-    termsBody: "By using EasternCity, users agree to follow rental, payment, cancellation, and item return policies.",
+    privacyBody:
+      "We use account and booking information to support rentals, messaging, notifications, and platform safety.",
+    termsBody:
+      "By using EasternCity, users agree to follow rental, payment, cancellation, and item return policies.",
     contactEyebrow: "CONTACT",
-    contactLead: "Reach out to EasternCity support for account, listing, or booking help.",
+    contactLead:
+      "Reach out to EasternCity support for account, listing, or booking help.",
     contactLocation: "Jigjiga / Dire Dawa / Harar, Ethiopia",
     fullName: "Full Name",
     email: "Email",
@@ -173,7 +194,8 @@ const translations = {
     // --- Listings / Item Details ---
     browseRentals: "Browse Rentals",
     availableItems: "Available Items",
-    availableItemsDescription: "Find vehicles, tools, electronics, cameras, furniture, and sports equipment for rent.",
+    availableItemsDescription:
+      "Find vehicles, tools, electronics, cameras, furniture, and sports equipment for rent.",
     searchItemsPlaceholder: "Search items, categories, or locations",
     search: "Search",
     categoryNotFound: "Category Not Found",
@@ -219,7 +241,8 @@ const translations = {
     selectDates: "Please select rental dates.",
     endAfterStart: "End date must be after start date.",
     acceptRules: "You must accept the rental rules.",
-    transferAmount: "Please transfer the amount and upload the receipt screenshot.",
+    transferAmount:
+      "Please transfer the amount and upload the receipt screenshot.",
     cbe: "CBE",
     ebirr: "eBirr",
     telebirr: "Telebirr",
@@ -290,7 +313,8 @@ const translations = {
     settings: "Qindaa'ina",
 
     // --- Footer ---
-    footerTagline: "Sirna kiraa meeshaalee magaalaa - kiraa amanamaa magaalaa kee keessatti.",
+    footerTagline:
+      "Sirna kiraa meeshaalee magaalaa - kiraa amanamaa magaalaa kee keessatti.",
     ourStory: "Seenaa Keenya",
     careers: "Carraa Hojii",
     privacyPolicy: "Imaammata Dhuunfaa",
@@ -309,17 +333,23 @@ const translations = {
     heroSlides: "Islaayidiiwwan jalqabaa",
     heroShowSlide: "Islaayidii agarsiisi",
     heroVehicleTitle: "Konkolaataa fi Geejjiba Naannoo Keessan Kireeffadhaa",
-    heroVehicleSubtitle: "Kiraa konkolaataa abbootii naannoo amanamoo irraa ilaalaa.",
+    heroVehicleSubtitle:
+      "Kiraa konkolaataa abbootii naannoo amanamoo irraa ilaalaa.",
     heroElectronicsTitle: "Elektirooniksii Haala Kamiyyuu Kireeffadhaa",
-    heroElectronicsSubtitle: "Laaptooppii, ispiikaraa, piroojektara, meeshaalee taphaa fi kanneen biroo argadhaa.",
+    heroElectronicsSubtitle:
+      "Laaptooppii, ispiikaraa, piroojektara, meeshaalee taphaa fi kanneen biroo argadhaa.",
     heroToolsTitle: "Meeshaalee Ogummaa Yeroo Barbaaddan",
-    heroToolsSubtitle: "Baasiin bituu osoo hin jiraatin meeshaalee hojii fi meeshaalee gargaarsaa kireeffadhaa.",
+    heroToolsSubtitle:
+      "Baasiin bituu osoo hin jiraatin meeshaalee hojii fi meeshaalee gargaarsaa kireeffadhaa.",
     heroCameraTitle: "Kiraa Kaameraa Suuraa Hundumaaf",
-    heroCameraSubtitle: "Taateewwan, qabiyyee fi hojii kalaqaaf kaameraa, leensii fi kiitii buufadhaa.",
+    heroCameraSubtitle:
+      "Taateewwan, qabiyyee fi hojii kalaqaaf kaameraa, leensii fi kiitii buufadhaa.",
     heroFurnitureTitle: "Kiraan Meeshaalee Manaa Salphaa Ta'e",
-    heroFurnitureSubtitle: "Manaafi taateewwaniif kiraa meeshaalee manaa gatii madaalawaa.",
+    heroFurnitureSubtitle:
+      "Manaafi taateewwaniif kiraa meeshaalee manaa gatii madaalawaa.",
     heroSportsTitle: "Meeshaaleen Ispoortii Yeroo Ati Qophooftu Qophaa'oo",
-    heroSportsSubtitle: "Biskileetii, meeshaalee goolfii, kaayaakii, meeshaalee ol-ba'uu fi alaa kireeffadhaa.",
+    heroSportsSubtitle:
+      "Biskileetii, meeshaalee goolfii, kaayaakii, meeshaalee ol-ba'uu fi alaa kireeffadhaa.",
 
     // --- Search & Categories ---
     allItems: "Meeshaalee Hunda",
@@ -370,51 +400,69 @@ const translations = {
 
     // --- About / How It Works ---
     ourStoryTitle: "Seenaa Keenya",
-    ourStorySubtitle: "EasternCity namoota meeshaalee kiraa naannoo amanamoo waliin wal qunnamsiisa.",
-    ourStoryBody: "Waltajjiin keenya abbootiin meeshaalee fayyadu tarreessuu fi kireeffattoonni osoo hin bitin wanta isaan barbaadan argachuu gargaara.",
+    ourStorySubtitle:
+      "EasternCity namoota meeshaalee kiraa naannoo amanamoo waliin wal qunnamsiisa.",
+    ourStoryBody:
+      "Waltajjiin keenya abbootiin meeshaalee fayyadu tarreessuu fi kireeffattoonni osoo hin bitin wanta isaan barbaadan argachuu gargaara.",
     careersTitle: "Carraa Hojii",
     careersSubtitle: "Garee kiraa magaalaa amanamaa ijaaru waliin hojjedhaa.",
-    careersBody: "Namoota hawaasa, argannaa fi muuxannoo kiraa fooyya'aa jaalatan barbaanna.",
+    careersBody:
+      "Namoota hawaasa, argannaa fi muuxannoo kiraa fooyya'aa jaalatan barbaanna.",
     howItWorksBrowseTitle: "Ilaali",
-    howItWorksBrowseBody: "Ramaddii barbaadiitii meeshaa si barbaachisu argadhu.",
+    howItWorksBrowseBody:
+      "Ramaddii barbaadiitii meeshaa si barbaachisu argadhu.",
     howItWorksBookTitle: "Buukii",
     howItWorksBookBody: "Guyyoota filadhuutii kiraa kee mirkaneessi.",
     howItWorksPickupTitle: "Fudhadhu",
-    howItWorksPickupBody: "Abbaa meeshaa waliin wal argiitii kiraa kee fayyadami.",
+    howItWorksPickupBody:
+      "Abbaa meeshaa waliin wal argiitii kiraa kee fayyadami.",
 
     // --- About Page ---
     aboutEyebrow: "WAAEE EASTERNCITIES",
     aboutHeroTitle: "Hawaasota Amanamuummaan Walqunnamsiisuu",
-    aboutHeroDesc: "EasternCities namoota meeshaalee gargaaramoo qaban fi kan isaan barbaadan - nagaan, gatii madaalawaadhaan, yeroo hundaa Itoophiyaa Bahaa keessatti walqunnamsiisa.",
+    aboutHeroDesc:
+      "EasternCities namoota meeshaalee gargaaramoo qaban fi kan isaan barbaadan - nagaan, gatii madaalawaadhaan, yeroo hundaa Itoophiyaa Bahaa keessatti walqunnamsiisa.",
     aboutMissionTitle: "Kaayyoo Keenya",
-    aboutMissionBody: "Kiraa hirmaannaa amansiisaa fi salphaa akka michuu irraa liqeeffachuutti taasisuu. Meeshaaleen mana keessan keessa taa'an galii argachuu danda'u — kireeffattoonnis meeshaa qulqulluu osoo hin bitiin argachuu qabu.",
+    aboutMissionBody:
+      "Kiraa hirmaannaa amansiisaa fi salphaa akka michuu irraa liqeeffachuutti taasisuu. Meeshaaleen mana keessan keessa taa'an galii argachuu danda'u — kireeffattoonnis meeshaa qulqulluu osoo hin bitiin argachuu qabu.",
     aboutWhoWeAreTitle: "Eenyuu Feeti",
-    aboutWhoWeAreBody: "EasternCities Jigjiga keessatti yaad-rimee salphaadhaan hundaa'e: diinagdeen qooduu Itoophiyaa Bahaa keessatti hojjechuu qaba. Tekinoolojistootaa fi namoonni hawaasaa fi hojjetootni damee kiraa namoota gidduutti amansiisaa ijaaraa jirra.",
+    aboutWhoWeAreBody:
+      "EasternCities Jigjiga keessatti yaad-rimee salphaadhaan hundaa'e: diinagdeen qooduu Itoophiyaa Bahaa keessatti hojjechuu qaba. Tekinoolojistootaa fi namoonni hawaasaa fi hojjetootni damee kiraa namoota gidduutti amansiisaa ijaaraa jirra.",
     aboutWhyChooseUs: "MAALIIF NU FILATTA",
     aboutBuiltOnValues: "Gatii Barbaachisoo Irra Ijaarame",
     aboutTrustTitle: "Amanamuummaa fi Nageenyaa",
-    aboutTrustBody: "Tarreeffamni hundumtuu mirkana'eera. Kireeftamtoonni hundumtuu eenyummaadhaan mirkanaa'u. Hariiroon hundumtuu escrow-iin eegama.",
+    aboutTrustBody:
+      "Tarreeffamni hundumtuu mirkana'eera. Kireeftamtoonni hundumtuu eenyummaadhaan mirkanaa'u. Hariiroon hundumtuu escrow-iin eegama.",
     aboutCommunityTitle: "Hawaasni Dursa",
-    aboutCommunityBody: "Ollootaa walqunnamsiisna. Namoota dhugaa meeshaalee dhugaa qaban waliin, carraa diinagdee naannoo ijaaraa.",
+    aboutCommunityBody:
+      "Ollootaa walqunnamsiisna. Namoota dhugaa meeshaalee dhugaa qaban waliin, carraa diinagdee naannoo ijaaraa.",
     aboutSpeedTitle: "Ariifannaa fi Mijatummaa",
-    aboutSpeedBody: "Barbaadi, buukii godhi, fudhanna. Waraqaa hin barbaachisu, hin tursiisu.",
+    aboutSpeedBody:
+      "Barbaadi, buukii godhi, fudhanna. Waraqaa hin barbaachisu, hin tursiisu.",
     aboutMultilingualTitle: "Afaanota Hedduudhaan",
-    aboutMultilingualBody: "Afaan Ingilizii, Amaaraa, Soomaali, fi Afaan Oromoottiin ni argama.",
+    aboutMultilingualBody:
+      "Afaan Ingilizii, Amaaraa, Soomaali, fi Afaan Oromoottiin ni argama.",
     aboutCoverageEyebrow: "HAGUUGGINNI KEENYA",
     aboutCitiesTitle: "Magaalota Tajaajillu",
     aboutJigjigaDesc: "Mootummaa Naannoo Somaalee. Gabata keenya guddaa.",
-    aboutDireDawaDesc: "Giddugala industirii meeshaalee hojii fi qophinaalee kiraa barbaadu.",
-    aboutHararDesc: "Magaala duudhaa eeguumsa gamoo qabu. Taateewwan fi kiraa meeshaalee manaadhaf mijataa.",
+    aboutDireDawaDesc:
+      "Giddugala industirii meeshaalee hojii fi qophinaalee kiraa barbaadu.",
+    aboutHararDesc:
+      "Magaala duudhaa eeguumsa gamoo qabu. Taateewwan fi kiraa meeshaalee manaadhaf mijataa.",
     aboutCtaTitle: "Kiraa Qalbii-qabsiisuun Qopha'aa?",
-    aboutCtaBody: "Miseensota mirkanaa'oo kuma hedduudhaan waliin Itoophiyaa Bahaa keessatti kiraa godhi.",
+    aboutCtaBody:
+      "Miseensota mirkanaa'oo kuma hedduudhaan waliin Itoophiyaa Bahaa keessatti kiraa godhi.",
     aboutCtaGetStarted: "Eegaluu Bilisa",
     aboutCtaBrowse: "Tarreeffamoota Ilaali",
 
     // --- Legal / Contact ---
-    privacyBody: "Odeeffannoo herregaa fi buukii kiraa, ergaa, beeksisota fi nageenya waltajjii deeggaruuf fayyadamna.",
-    termsBody: "EasternCity fayyadamuun, fayyadamtoonni seera kiraa, kaffaltii, haqamuu fi deebisuu meeshaa hordofuuf walii galu.",
+    privacyBody:
+      "Odeeffannoo herregaa fi buukii kiraa, ergaa, beeksisota fi nageenya waltajjii deeggaruuf fayyadamna.",
+    termsBody:
+      "EasternCity fayyadamuun, fayyadamtoonni seera kiraa, kaffaltii, haqamuu fi deebisuu meeshaa hordofuuf walii galu.",
     contactEyebrow: "QUNNAMTII",
-    contactLead: "Gargaarsa herregaa, tarreeffama ykn buukii argachuuf deeggarsa EasternCity qunnamaa.",
+    contactLead:
+      "Gargaarsa herregaa, tarreeffama ykn buukii argachuuf deeggarsa EasternCity qunnamaa.",
     contactLocation: "Jigjiga / Dire Dawa / Harar, Itoophiyaa",
     fullName: "Maqaa Guutuu",
     email: "Imeelii",
@@ -425,7 +473,8 @@ const translations = {
     // --- Listings / Item Details ---
     browseRentals: "Kiraa Ilaali",
     availableItems: "Meeshaalee Jiran",
-    availableItemsDescription: "Konkolaataa, meeshaalee hojii, elektirooniksii, kaameraa, meeshaalee manaa fi meeshaalee ispoortii kiraaf argadhu.",
+    availableItemsDescription:
+      "Konkolaataa, meeshaalee hojii, elektirooniksii, kaameraa, meeshaalee manaa fi meeshaalee ispoortii kiraaf argadhu.",
     searchItemsPlaceholder: "Meeshaalee, ramaddii ykn bakkeewwan barbaadi",
     search: "Barbaadi",
     categoryNotFound: "Ramaddiin Hin Argamne",
@@ -571,7 +620,8 @@ const translations = {
     heroFurnitureTitle: "የቤት እቃ ኪራይ ቀላል ሆኗል",
     heroFurnitureSubtitle: "ለቤቶች እና ክስተቶች ተመጣጣኝ የቤት እቃ ኪራይ።",
     heroSportsTitle: "የስፖርት እቃዎች ሲዘጋጁ ዝግጁ ናቸው",
-    heroSportsSubtitle: "ብስክሌቶች፣ የጎልፍ ስብስቦች፣ ካያኮች፣ የመውጣት እቃዎች እና የውጭ መሳሪያዎችን ይከራዩ።",
+    heroSportsSubtitle:
+      "ብስክሌቶች፣ የጎልፍ ስብስቦች፣ ካያኮች፣ የመውጣት እቃዎች እና የውጭ መሳሪያዎችን ይከራዩ።",
 
     // --- Search & Categories ---
     allItems: "ሁሉም እቃዎች",
@@ -623,7 +673,8 @@ const translations = {
     // --- About / How It Works ---
     ourStoryTitle: "ታሪካችን",
     ourStorySubtitle: "EasternCity ሰዎችን ከታመኑ የአካባቢ የኪራይ እቃዎች ጋር ያገናኛል።",
-    ourStoryBody: "መድረካችን ባለቤቶች ጠቃሚ እቃዎችን እንዲዘረዝሩ እና ተከራዮች ሁሉንም ሳይገዙ የሚፈልጉትን እንዲያገኙ ይረዳል።",
+    ourStoryBody:
+      "መድረካችን ባለቤቶች ጠቃሚ እቃዎችን እንዲዘረዝሩ እና ተከራዮች ሁሉንም ሳይገዙ የሚፈልጉትን እንዲያገኙ ይረዳል።",
     careersTitle: "የስራ እድሎች",
     careersSubtitle: "የታመኑ የከተማ ኪራዮችን ከሚገነባው ቡድን ጋር ይቀላቀሉ።",
     careersBody: "ለማህበረሰብ፣ ለተደራሽነት እና ለተሻለ የኪራይ ተሞክሮ የሚጨነቁ ሰዎችን እንፈልጋለን።",
@@ -637,17 +688,22 @@ const translations = {
     // --- About Page ---
     aboutEyebrow: "ስለ ኢስተርን ሲቲስ",
     aboutHeroTitle: "ማህበረሰቦችን በመተማመን ያገናኛል",
-    aboutHeroDesc: "ኢስተርን ሲቲስ ጠቃሚ እቃዎች ያሏቸው ሰዎች ከሚፈልጓቸው ሰዎች ጋር - ደህንነቱ ተጠብቆ፣ በተመጣጣኝ ዋጋ እና ወዲያውኑ በምስራቅ ኢትዮጵያ ያገናኛል።",
+    aboutHeroDesc:
+      "ኢስተርን ሲቲስ ጠቃሚ እቃዎች ያሏቸው ሰዎች ከሚፈልጓቸው ሰዎች ጋር - ደህንነቱ ተጠብቆ፣ በተመጣጣኝ ዋጋ እና ወዲያውኑ በምስራቅ ኢትዮጵያ ያገናኛል።",
     aboutMissionTitle: "ተልዕኳችን",
-    aboutMissionBody: "ኪራይ ከጓደኛ መበደር ያህል ቀላል እና አስተማማኝ እንዲሆን ማድረግ። በቤትዎ ውስጥ ያልተጠቀሙበት እያንዳንዱ እቃ ገቢ ሊያስገኝ ይችላል ብለን እናምናለን — እያንዳንዱ ተከራይ ደግሞ ሁሉን ሳይገዛ ጥራት ያለው እቃ ሊያገኝ ይገባዋል።",
+    aboutMissionBody:
+      "ኪራይ ከጓደኛ መበደር ያህል ቀላል እና አስተማማኝ እንዲሆን ማድረግ። በቤትዎ ውስጥ ያልተጠቀሙበት እያንዳንዱ እቃ ገቢ ሊያስገኝ ይችላል ብለን እናምናለን — እያንዳንዱ ተከራይ ደግሞ ሁሉን ሳይገዛ ጥራት ያለው እቃ ሊያገኝ ይገባዋል።",
     aboutWhoWeAreTitle: "እነማን ነን",
-    aboutWhoWeAreBody: "ኢስተርን ሲቲስ በጂጂጋ ቀላል ሀሳብ ይዞ ተጀመረ፦ የጋራ ኢኮኖሚ ለምስራቅ ኢትዮጵያ መስራት አለበት። የአካባቢ ቴክኖሎጂ ባለሙያዎች፣ የማህበረሰብ መሪዎች እና ሥራ ፈጣሪዎችን ያቀፈ ቡድን ሆነን በሰዎች መካከል አስተማማኝ የኪራይ መሠረተ ልማት እየገነባን ነው።",
+    aboutWhoWeAreBody:
+      "ኢስተርን ሲቲስ በጂጂጋ ቀላል ሀሳብ ይዞ ተጀመረ፦ የጋራ ኢኮኖሚ ለምስራቅ ኢትዮጵያ መስራት አለበት። የአካባቢ ቴክኖሎጂ ባለሙያዎች፣ የማህበረሰብ መሪዎች እና ሥራ ፈጣሪዎችን ያቀፈ ቡድን ሆነን በሰዎች መካከል አስተማማኝ የኪራይ መሠረተ ልማት እየገነባን ነው።",
     aboutWhyChooseUs: "ለምን እኛን ይምረጡ",
     aboutBuiltOnValues: "በሚቆጠሩ እሴቶች ላይ የተገነባ",
     aboutTrustTitle: "ዓמינነት እና ደህንነት",
-    aboutTrustBody: "እያንዳንዱ ዝርዝር ተረጋግጧል። እያንዳንዱ ተከራይ መታወቂያ ተፈቷል። እያንዳንዱ ግብይት ኢስክሮ ተጠብቋል።",
+    aboutTrustBody:
+      "እያንዳንዱ ዝርዝር ተረጋግጧል። እያንዳንዱ ተከራይ መታወቂያ ተፈቷል። እያንዳንዱ ግብይት ኢስክሮ ተጠብቋል።",
     aboutCommunityTitle: "ማህበረሰብ ቅድሚያ",
-    aboutCommunityBody: "ጎረቤቶችን እናገናኛለን። ትክክለኛ ሰዎች ትክክለኛ እቃዎች ይዘው፣ የአካባቢ ኢኮኖሚ ዕድል ይፈጥራሉ።",
+    aboutCommunityBody:
+      "ጎረቤቶችን እናገናኛለን። ትክክለኛ ሰዎች ትክክለኛ እቃዎች ይዘው፣ የአካባቢ ኢኮኖሚ ዕድል ይፈጥራሉ።",
     aboutSpeedTitle: "ፍጥነት እና ምቹነት",
     aboutSpeedBody: "ፈልጉ፣ ያስይዙ፣ ይቀበሉ - በደቂቃዎች ውስጥ። ምንም ወረቀት፣ ምንም መዘግያ።",
     aboutMultilingualTitle: "ብዙ ቋንቋ",
@@ -663,8 +719,10 @@ const translations = {
     aboutCtaBrowse: "ዝርዝሮችን ያስሱ",
 
     // --- Legal / Contact ---
-    privacyBody: "ኪራዮችን፣ መልዕክቶችን፣ ማሳወቂያዎችን እና የመድረክ ደህንነትን ለመደገፍ የመለያ እና የቦታ ማስያዣ መረጃን እንጠቀማለን።",
-    termsBody: "EasternCityን በመጠቀም ተጠቃሚዎች የኪራይ፣ የክፍያ፣ የስረዛ እና የእቃ መመለሻ ፖሊሲዎችን ለመከተል ይስማማሉ።",
+    privacyBody:
+      "ኪራዮችን፣ መልዕክቶችን፣ ማሳወቂያዎችን እና የመድረክ ደህንነትን ለመደገፍ የመለያ እና የቦታ ማስያዣ መረጃን እንጠቀማለን።",
+    termsBody:
+      "EasternCityን በመጠቀም ተጠቃሚዎች የኪራይ፣ የክፍያ፣ የስረዛ እና የእቃ መመለሻ ፖሊሲዎችን ለመከተል ይስማማሉ።",
     contactEyebrow: "ያግኙን",
     contactLead: "ለመለያ፣ ለዝርዝር ወይም ለቦታ ማስያዣ እገዛ የEasternCity ድጋፍን ያግኙ።",
     contactLocation: "ጂጂጋ / ድሬዳዋ / ሀረር፣ ኢትዮጵያ",
@@ -677,7 +735,8 @@ const translations = {
     // --- Listings / Item Details ---
     browseRentals: "ኪራዮችን ያስሱ",
     availableItems: "ያሉ እቃዎች",
-    availableItemsDescription: "ለኪራይ መኪናዎች፣ መሳሪያዎች፣ ኤሌክትሮኒክስ፣ ካሜራዎች፣ የቤት እቃዎች እና የስፖርት እቃዎችን ያግኙ።",
+    availableItemsDescription:
+      "ለኪራይ መኪናዎች፣ መሳሪያዎች፣ ኤሌክትሮኒክስ፣ ካሜራዎች፣ የቤት እቃዎች እና የስፖርት እቃዎችን ያግኙ።",
     searchItemsPlaceholder: "እቃዎችን፣ ምድቦችን ወይም ቦታዎችን ፈልግ",
     search: "ፈልግ",
     categoryNotFound: "ምድቡ አልተገኘም",
@@ -794,7 +853,8 @@ const translations = {
     settings: "Dejinta",
 
     // --- Footer ---
-    footerTagline: "Suuqa kirada premium-ka ah ee xidha bulshada Jigjiga, Dire Dawa, iyo Harar.",
+    footerTagline:
+      "Suuqa kirada premium-ka ah ee xidha bulshada Jigjiga, Dire Dawa, iyo Harar.",
     ourStory: "Sheekadeena",
     careers: "Shaqooyin",
     privacyPolicy: "Siyaasadda Asturnaanta",
@@ -813,17 +873,23 @@ const translations = {
     heroSlides: "Slide-yada hero",
     heroShowSlide: "Muuji slide",
     heroVehicleTitle: "Ka Kireyso Baabuur iyo Gaadiid Agtaada",
-    heroVehicleSubtitle: "Ka daawo kirada gaadiidka milkiilayaasha deegaanka ee la aamini karo.",
+    heroVehicleSubtitle:
+      "Ka daawo kirada gaadiidka milkiilayaasha deegaanka ee la aamini karo.",
     heroElectronicsTitle: "Kireyso Elektaroonik Xaalad Kasta",
-    heroElectronicsSubtitle: "Hel laptops, speakers, projectors, qalabka ciyaaraha, iyo wax ka badan.",
+    heroElectronicsSubtitle:
+      "Hel laptops, speakers, projectors, qalabka ciyaaraha, iyo wax ka badan.",
     heroToolsTitle: "Qalab Xirfadeed Markaad U Baahato",
-    heroToolsSubtitle: "Kireyso qalab iyo agab adigoon qaadin kharashka lahaanshaha.",
+    heroToolsSubtitle:
+      "Kireyso qalab iyo agab adigoon qaadin kharashka lahaanshaha.",
     heroCameraTitle: "Kirada Kaamirooyinka Duubis Kasta",
-    heroCameraSubtitle: "Qabsado kaamirooyin, lenses, iyo kits munaasabado, content, iyo shaqo hal-abuur leh.",
+    heroCameraSubtitle:
+      "Qabsado kaamirooyin, lenses, iyo kits munaasabado, content, iyo shaqo hal-abuur leh.",
     heroFurnitureTitle: "Kirada Alaabta Guriga Way Fududaatay",
-    heroFurnitureSubtitle: "Kiro alaab guri oo jaban oo loogu talagalay guryo iyo munaasabado.",
+    heroFurnitureSubtitle:
+      "Kiro alaab guri oo jaban oo loogu talagalay guryo iyo munaasabado.",
     heroSportsTitle: "Qalabka Ciyaaraha Waa Diyaar Markaad Diyaar Tahay",
-    heroSportsSubtitle: "Kireyso baaskiillo, golf sets, kayaks, qalabka fuulista, iyo qalabka dibadda.",
+    heroSportsSubtitle:
+      "Kireyso baaskiillo, golf sets, kayaks, qalabka fuulista, iyo qalabka dibadda.",
 
     // --- Search & Categories ---
     allItems: "Dhammaan Alaabta",
@@ -874,11 +940,15 @@ const translations = {
 
     // --- About / How It Works ---
     ourStoryTitle: "Sheekadeena",
-    ourStorySubtitle: "EasternCity waxay dadka ku xirtaa alaab kiro oo deegaanka ah oo la isku halleyn karo.",
-    ourStoryBody: "Madalkayagu wuxuu ka caawiyaa milkiilayaasha inay liis gareeyaan alaab waxtar leh, kiraystayaashana inay helaan waxa ay u baahan yihiin iyagoon iibsan.",
+    ourStorySubtitle:
+      "EasternCity waxay dadka ku xirtaa alaab kiro oo deegaanka ah oo la isku halleyn karo.",
+    ourStoryBody:
+      "Madalkayagu wuxuu ka caawiyaa milkiilayaasha inay liis gareeyaan alaab waxtar leh, kiraystayaashana inay helaan waxa ay u baahan yihiin iyagoon iibsan.",
     careersTitle: "Shaqooyin",
-    careersSubtitle: "Ku biir kooxda dhisaysa kiro magaalo oo la isku halleyn karo.",
-    careersBody: "Waxaan raadineynaa dad daneeya bulshada, helitaanka, iyo khibrad kiro oo wanaagsan.",
+    careersSubtitle:
+      "Ku biir kooxda dhisaysa kiro magaalo oo la isku halleyn karo.",
+    careersBody:
+      "Waxaan raadineynaa dad daneeya bulshada, helitaanka, iyo khibrad kiro oo wanaagsan.",
     howItWorksBrowseTitle: "Daawo",
     howItWorksBrowseBody: "Raadi qaybaha oo hel alaabta aad u baahan tahay.",
     howItWorksBookTitle: "Qabso",
@@ -889,36 +959,49 @@ const translations = {
     // --- About Page ---
     aboutEyebrow: "KU SAABSAN EASTERNCITIES",
     aboutHeroTitle: "Bulshada Ku Xidaysa Aaminaad",
-    aboutHeroDesc: "EasternCities waxay isku xirtaa dadka leh alaab waxtar leh iyo dadka u baahan - si amaan ah, qiimo jaban, oo degdeg ah oo ku saabsan Bariga Itoobiya.",
+    aboutHeroDesc:
+      "EasternCities waxay isku xirtaa dadka leh alaab waxtar leh iyo dadka u baahan - si amaan ah, qiimo jaban, oo degdeg ah oo ku saabsan Bariga Itoobiya.",
     aboutMissionTitle: "Hadafkayaga",
-    aboutMissionBody: "Kiro u dhig mid la aamin karo oo fudud sida saaxiib aad ka amaanato. Waxaan aaminaynaa in alaab kasta oo gurigaaga ku fadhiyo lacag wax soo saari karto — kiraystayaashuna waxay mudan yihiin helitaanka alaab tayo leh iyagoon iibsan.",
+    aboutMissionBody:
+      "Kiro u dhig mid la aamin karo oo fudud sida saaxiib aad ka amaanato. Waxaan aaminaynaa in alaab kasta oo gurigaaga ku fadhiyo lacag wax soo saari karto — kiraystayaashuna waxay mudan yihiin helitaanka alaab tayo leh iyagoon iibsan.",
     aboutWhoWeAreTitle: "Cidda Aynnu Nahay",
-    aboutWhoWeAreBody: "EasternCities waxaa lagu aasaasay Jigjiga fikrad fudud: dhaqaalaha wadaagga waa inuu u shaqeeyaa Bariga Itoobiya. Waxaan nahay koox teknolojiyiyin, hoggaamiyayaasha bulshada, iyo ganacsatada dhisaysa kaabayaasha kiro ee la aaminsan.",
+    aboutWhoWeAreBody:
+      "EasternCities waxaa lagu aasaasay Jigjiga fikrad fudud: dhaqaalaha wadaagga waa inuu u shaqeeyaa Bariga Itoobiya. Waxaan nahay koox teknolojiyiyin, hoggaamiyayaasha bulshada, iyo ganacsatada dhisaysa kaabayaasha kiro ee la aaminsan.",
     aboutWhyChooseUs: "MAXAA NOOGU DOORANAYSAA",
     aboutBuiltOnValues: "Ku Dhisan Qiyamka Muhiimka ah",
     aboutTrustTitle: "Aaminaad & Amniga",
-    aboutTrustBody: "Liiska kasta waa la xaqiijiyay. Kiraystaha kasta waa laga hujoodiyay. Macaamilada kasta waa escrow-lagu ilaaliyay.",
+    aboutTrustBody:
+      "Liiska kasta waa la xaqiijiyay. Kiraystaha kasta waa laga hujoodiyay. Macaamilada kasta waa escrow-lagu ilaaliyay.",
     aboutCommunityTitle: "Bulsho Marka Hore",
-    aboutCommunityBody: "Naabaddayaasha waan ku xidnaa. Dad dhabta ah oo leh alaab dhab ah, oo dhisaya fursadda dhaqaale ee deegaanka.",
+    aboutCommunityBody:
+      "Naabaddayaasha waan ku xidnaa. Dad dhabta ah oo leh alaab dhab ah, oo dhisaya fursadda dhaqaale ee deegaanka.",
     aboutSpeedTitle: "Xawaare & Fudayd",
-    aboutSpeedBody: "Raadi, qabso, oo hel - daqiiqado gudahood. Warqad ma loo baahna, dib u dhac ma jiro.",
+    aboutSpeedBody:
+      "Raadi, qabso, oo hel - daqiiqado gudahood. Warqad ma loo baahna, dib u dhac ma jiro.",
     aboutMultilingualTitle: "Luqado Badan",
-    aboutMultilingualBody: "Si buuxda ugu heli kartaa Ingiriisi, Amxaari, Soomaali, iyo Afaan Oromo.",
+    aboutMultilingualBody:
+      "Si buuxda ugu heli kartaa Ingiriisi, Amxaari, Soomaali, iyo Afaan Oromo.",
     aboutCoverageEyebrow: "DABOOLKAYAGA",
     aboutCitiesTitle: "Magaalooyinka Aan U Adeegno",
     aboutJigjigaDesc: "Caasimadda Gobolka Soomaalida. Suuqayaga ugu weyn.",
-    aboutDireDawaDesc: "Xarunta warshadaha oo leh baahi sare oo kirada qalab iyo tirakoobka.",
-    aboutHararDesc: "Magaalo taariikhiga ah oo leh gidaar. Ku habboon munaasabadaha iyo kirada alaabta guriga.",
+    aboutDireDawaDesc:
+      "Xarunta warshadaha oo leh baahi sare oo kirada qalab iyo tirakoobka.",
+    aboutHararDesc:
+      "Magaalo taariikhiga ah oo leh gidaar. Ku habboon munaasabadaha iyo kirada alaabta guriga.",
     aboutCtaTitle: "Diyaar Maad u Tahay Inaad Si Caqli-gal ah Kireyso?",
-    aboutCtaBody: "Ku biir xubno la xaqiijiyay oo kumanyaal ah oo maanta ku kireysta Bariga Itoobiya.",
+    aboutCtaBody:
+      "Ku biir xubno la xaqiijiyay oo kumanyaal ah oo maanta ku kireysta Bariga Itoobiya.",
     aboutCtaGetStarted: "Bilow Bilaash",
     aboutCtaBrowse: "Daawo Liisaska",
 
     // --- Legal / Contact ---
-    privacyBody: "Waxaan u isticmaalnaa macluumaadka akoonka iyo booking-ka si aan u taageerno kirada, fariimaha, ogeysiisyada, iyo badbaadada madalka.",
-    termsBody: "Marka la isticmaalo EasternCity, isticmaalayaashu waxay oggolaanayaan inay raacaan siyaasadaha kirada, lacag bixinta, baajinta, iyo soo celinta alaabta.",
+    privacyBody:
+      "Waxaan u isticmaalnaa macluumaadka akoonka iyo booking-ka si aan u taageerno kirada, fariimaha, ogeysiisyada, iyo badbaadada madalka.",
+    termsBody:
+      "Marka la isticmaalo EasternCity, isticmaalayaashu waxay oggolaanayaan inay raacaan siyaasadaha kirada, lacag bixinta, baajinta, iyo soo celinta alaabta.",
     contactEyebrow: "XIRIIR",
-    contactLead: "La xiriir taageerada EasternCity si aad uga hesho caawimaad akoon, liis, ama booking.",
+    contactLead:
+      "La xiriir taageerada EasternCity si aad uga hesho caawimaad akoon, liis, ama booking.",
     contactLocation: "Jigjiga / Dire Dawa / Harar, Ethiopia",
     fullName: "Magaca Buuxa",
     email: "Email",
@@ -929,7 +1012,8 @@ const translations = {
     // --- Listings / Item Details ---
     browseRentals: "Daawo Kirooyinka",
     availableItems: "Alaabta La Heli Karo",
-    availableItemsDescription: "Hel gaadiid, qalab, elektaroonik, kaamirooyin, alaab guri, iyo qalab ciyaaro oo kiro ah.",
+    availableItemsDescription:
+      "Hel gaadiid, qalab, elektaroonik, kaamirooyin, alaab guri, iyo qalab ciyaaro oo kiro ah.",
     searchItemsPlaceholder: "Raadi alaab, qaybo, ama goobaha",
     search: "Raadi",
     categoryNotFound: "Qayb Lama Helin",
@@ -973,7 +1057,8 @@ const translations = {
     bookingSubmitted: "Qabsashadii la gudbiyay! Xaqiijin la sugayaa.",
     paymentRequired: "Sawir rasiidka lacag-bixinta ayaa loo baahan yahay.",
     selectDates: "Fadlan dooro taariikhaha kirada.",
-    endAfterStart: "Taariikhda dhamaadka waa inay ka dambeysaa taariikhda bilowga.",
+    endAfterStart:
+      "Taariikhda dhamaadka waa inay ka dambeysaa taariikhda bilowga.",
     acceptRules: "Waa inaad oggolaataa xeerarka kirada.",
     transferAmount: "Fadlan u gudbi lacagta oo soo geli sawirka rasiidka.",
     cbe: "CBE",
@@ -1030,9 +1115,12 @@ export function LanguageProvider({ children }) {
     localStorage.setItem("language", language);
   }, [language]);
 
-  const t = useCallback((key) => {
-    return translations[language]?.[key] || translations.en[key] || key;
-  }, [language]);
+  const t = useCallback(
+    (key) => {
+      return translations[language]?.[key] || translations.en[key] || key;
+    },
+    [language],
+  );
 
   const value = useMemo(
     () => ({

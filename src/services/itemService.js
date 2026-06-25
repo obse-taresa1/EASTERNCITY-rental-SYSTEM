@@ -11,7 +11,9 @@ function normalizeOwnerListing(listing) {
     verifiedOwner: listing.verificationStatus === "verified",
     photos: listing.images?.length || listing.photos || 1,
     image: listing.coverImage || listing.image,
-    price: listing.price || `ETB ${Number(listing.pricePerDay || 0).toLocaleString()}`,
+    price:
+      listing.price ||
+      `ETB ${Number(listing.pricePerDay || 0).toLocaleString()}`,
     specs: listing.specs || [
       { icon: "bi-geo-alt", label: listing.city || "EasternCity" },
       { icon: "bi-clock", label: listing.priceType || "Per Day" },
@@ -70,7 +72,11 @@ export function searchItems(filters = {}) {
     }
 
     // 5. Max Price filter
-    if (maxPrice && Number(maxPrice) > 0 && item.pricePerDay > Number(maxPrice)) {
+    if (
+      maxPrice &&
+      Number(maxPrice) > 0 &&
+      item.pricePerDay > Number(maxPrice)
+    ) {
       return false;
     }
 
@@ -90,18 +96,27 @@ export function saveOwnerListing(listing) {
     ...listing,
     id: listing.id || `owner-listing-${Date.now()}`,
     createdAt: listing.createdAt || new Date().toISOString(),
-    expiresAt: listing.expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+    expiresAt:
+      listing.expiresAt ||
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10),
     inquiries: listing.inquiries || 0,
     messages: listing.messages || 0,
   });
 
-  writeOwnerListings([nextListing, ...listings.filter((item) => item.id !== nextListing.id)]);
+  writeOwnerListings([
+    nextListing,
+    ...listings.filter((item) => item.id !== nextListing.id),
+  ]);
   window.dispatchEvent(new Event("easterncity:listings-updated"));
   return nextListing;
 }
 
 export function deleteOwnerListing(id) {
-  writeOwnerListings(getStorageItem(OWNER_LISTINGS_KEY, []).filter((item) => item.id !== id));
+  writeOwnerListings(
+    getStorageItem(OWNER_LISTINGS_KEY, []).filter((item) => item.id !== id),
+  );
   window.dispatchEvent(new Event("easterncity:listings-updated"));
 }
 
@@ -121,7 +136,9 @@ export function renewOwnerListing(id) {
   return updateOwnerListing(id, {
     status: "renewed",
     available: true,
-    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10),
   });
 }
 
@@ -130,5 +147,21 @@ export function promoteOwnerListing(id, promotion = "7 Days Featured") {
     featured: true,
     status: "featured",
     promotion,
+  });
+}
+
+export function searchItems(query = "") {
+  const searchTerm = query.toLowerCase().trim();
+
+  if (!searchTerm) {
+    return items;
+  }
+
+  return items.filter((item) => {
+    return (
+      item.title.toLowerCase().includes(searchTerm) ||
+      item.category.toLowerCase().includes(searchTerm) ||
+      item.location.toLowerCase().includes(searchTerm)
+    );
   });
 }

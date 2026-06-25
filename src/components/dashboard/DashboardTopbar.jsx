@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { dashboardForRole } from '../../services/authService.js';
-import ThemeToggle from '../common/ThemeToggle.jsx';
-import LanguageSwitcher from '../common/LanguageSwitcher.jsx';
-import ProfilePanel from '../common/ProfilePanel.jsx';
-import { getInitials } from '../../utils/user.js';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { dashboardForRole } from "../../services/authService.js";
+import ThemeToggle from "../common/ThemeToggle.jsx";
+import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
+import ProfilePanel from "../common/ProfilePanel.jsx";
+import { getInitials } from "../../utils/user.js";
 
 export default function DashboardTopbar() {
   const { currentUser, user, logout } = useAuth();
@@ -16,7 +16,7 @@ export default function DashboardTopbar() {
   const handleLogout = () => {
     setOpen(false);
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -40,10 +40,10 @@ export default function DashboardTopbar() {
               <span>{getInitials(activeUser?.name)}</span>
             </div>
             <div className="topbar-user-info">
-              <strong>{activeUser?.name || 'User'}</strong>
-              <span>{activeUser?.role || 'member'}</span>
+              <strong>{activeUser?.name || "User"}</strong>
+              <span>{activeUser?.role || "member"}</span>
             </div>
-            <i className={`bi bi-chevron-${open ? 'up' : 'down'}`}></i>
+            <i className={`bi bi-chevron-${open ? "up" : "down"}`}></i>
           </button>
 
           <ProfilePanel

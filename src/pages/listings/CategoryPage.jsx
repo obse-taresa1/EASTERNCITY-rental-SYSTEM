@@ -23,7 +23,8 @@ export default function CategoryPage() {
 
   const filteredItems = useMemo(() => {
     return allItems.filter((item) => {
-      if (search && !item.title.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search && !item.title.toLowerCase().includes(search.toLowerCase()))
+        return false;
       if (city !== "all" && item.city !== city) return false;
       if (sefar !== "all" && item.sefar !== sefar) return false;
       if (item.pricePerDay > maxPrice) return false;
@@ -76,8 +77,12 @@ export default function CategoryPage() {
         <div className="category-filter-bar mb-4 p-3 rounded-3 border bg-white shadow-sm">
           <div className="row g-2 align-items-end">
             <div className="col-md-3">
-              <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem" }}>
-                <i className="bi bi-search text-danger me-1"></i>{t("search")}
+              <label
+                className="form-label fw-bold mb-1"
+                style={{ fontSize: "0.8rem" }}
+              >
+                <i className="bi bi-search text-danger me-1"></i>
+                {t("search")}
               </label>
               <input
                 type="text"
@@ -88,13 +93,20 @@ export default function CategoryPage() {
               />
             </div>
             <div className="col-md-2">
-              <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem" }}>
-                <i className="bi bi-geo-alt text-danger me-1"></i>{t("location")}
+              <label
+                className="form-label fw-bold mb-1"
+                style={{ fontSize: "0.8rem" }}
+              >
+                <i className="bi bi-geo-alt text-danger me-1"></i>
+                {t("location")}
               </label>
               <select
                 className="form-select form-select-sm"
                 value={city}
-                onChange={(e) => { setCity(e.target.value); setSefar("all"); }}
+                onChange={(e) => {
+                  setCity(e.target.value);
+                  setSefar("all");
+                }}
               >
                 <option value="all">{t("allCities")}</option>
                 <option value="Jigjiga">Jigjiga</option>
@@ -104,8 +116,12 @@ export default function CategoryPage() {
             </div>
             {city !== "all" && (
               <div className="col-md-2">
-                <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem" }}>
-                  <i className="bi bi-signpost text-danger me-1"></i>{t("sefar")}
+                <label
+                  className="form-label fw-bold mb-1"
+                  style={{ fontSize: "0.8rem" }}
+                >
+                  <i className="bi bi-signpost text-danger me-1"></i>
+                  {t("sefar")}
                 </label>
                 <select
                   className="form-select form-select-sm"
@@ -114,17 +130,26 @@ export default function CategoryPage() {
                 >
                   <option value="all">{t("allSefar")}</option>
                   {sefarOptions.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
                 </select>
               </div>
             )}
             <div className="col-md-3">
               <div className="d-flex justify-content-between mb-1">
-                <label className="form-label fw-bold mb-0" style={{ fontSize: "0.8rem" }}>
-                  <i className="bi bi-tag text-danger me-1"></i>{t("maxPrice")}
+                <label
+                  className="form-label fw-bold mb-0"
+                  style={{ fontSize: "0.8rem" }}
+                >
+                  <i className="bi bi-tag text-danger me-1"></i>
+                  {t("maxPrice")}
                 </label>
-                <span className="text-danger fw-bold" style={{ fontSize: "0.75rem" }}>
+                <span
+                  className="text-danger fw-bold"
+                  style={{ fontSize: "0.75rem" }}
+                >
                   ETB {Number(maxPrice).toLocaleString()}
                 </span>
               </div>
@@ -149,7 +174,10 @@ export default function CategoryPage() {
         {/* Listings Grid */}
         {filteredItems.length === 0 ? (
           <div className="text-center py-5">
-            <i className="bi bi-search text-muted" style={{ fontSize: "3rem" }}></i>
+            <i
+              className="bi bi-search text-muted"
+              style={{ fontSize: "3rem" }}
+            ></i>
             <p className="text-muted mt-3">{t("itemNotFound")}</p>
           </div>
         ) : (
@@ -175,7 +203,9 @@ function CategoryListingCard({ item, t }) {
       <div className="card-img-wrapper">
         <img src={item.image} alt={item.title} className="card-img" />
         <div className="card-badges">
-          {item.featured && <span className="badge-featured">{t("featured")}</span>}
+          {item.featured && (
+            <span className="badge-featured">{t("featured")}</span>
+          )}
         </div>
         {item.rating && (
           <span className="badge-photos">
@@ -188,9 +218,19 @@ function CategoryListingCard({ item, t }) {
       <div className="card-body-premium">
         {/* City • Sefar */}
         <div className="d-flex align-items-center gap-1 mb-2">
-          <i className="bi bi-geo-alt-fill text-danger" style={{ fontSize: "0.8rem" }}></i>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}>
-            {item.city}{item.sefar ? ` • ${item.sefar}` : ""}
+          <i
+            className="bi bi-geo-alt-fill text-danger"
+            style={{ fontSize: "0.8rem" }}
+          ></i>
+          <span
+            style={{
+              fontSize: "0.8rem",
+              color: "var(--text-muted)",
+              fontWeight: 600,
+            }}
+          >
+            {item.city}
+            {item.sefar ? ` • ${item.sefar}` : ""}
           </span>
         </div>
 
@@ -207,8 +247,13 @@ function CategoryListingCard({ item, t }) {
           <div className="owner-avatar">
             {(item.owner || item.ownerName || "V").charAt(0)}
           </div>
-          <span className="owner-name">{item.owner || item.ownerName || "Verified Owner"}</span>
-          <i className="bi bi-patch-check-fill text-success" title="Verified Owner"></i>
+          <span className="owner-name">
+            {item.owner || item.ownerName || "Verified Owner"}
+          </span>
+          <i
+            className="bi bi-patch-check-fill text-success"
+            title="Verified Owner"
+          ></i>
         </div>
 
         {/* Actions */}
