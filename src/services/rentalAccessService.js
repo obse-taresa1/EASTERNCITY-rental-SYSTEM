@@ -1,21 +1,21 @@
-export function canRent(role) {
-  return ["renter", "lessee", "both"].includes((role || "").toLowerCase());
+const allowedRentalRoles = ["renter", "both"];
+
+const rentalRestrictionMessages = {
+  lessor:
+    "Lessor accounts cannot rent items. Please use a renter or both-role account.",
+  admin: "Administrators cannot rent items.",
+  superadmin: "Super Administrators cannot rent items.",
+};
+
+export function canRentItem(role) {
+  // Error 1: Fixed missing || operator
+  return allowedRentalRoles.includes(String(role || "").toLowerCase());
 }
 
-export function rentBlockedMessage(role) {
-  const normalizedRole = (role || "").toLowerCase();
-
-  if (normalizedRole === "lessor") {
-    return "Lessor accounts cannot rent items. Please use a renter or both-role account.";
-  }
-
-  if (normalizedRole === "admin" || normalizedRole === "supervisor") {
-    return "Administrators cannot rent items.";
-  }
-
-  if (normalizedRole === "superadmin" || normalizedRole === "super-admin") {
-    return "Super Administrators cannot rent items.";
-  }
-
-  return "Please log in to rent this item.";
+export function getRentalRestrictionMessage(role) {
+  // Error 2: Fixed missing || operator
+  return (
+    rentalRestrictionMessages[String(role || "").toLowerCase()] ||
+    "Your account is not allowed to rent items."
+  );
 }

@@ -1,15 +1,15 @@
 import SimplePublicPage from "./SimplePublicPage.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function CareersPage() {
+  const { t } = useLanguage();
+
   return (
     <SimplePublicPage
-      title="Careers"
-      subtitle="Join the team building trusted citywide rentals."
+      title={t("careersTitle")}
+      subtitle={t("careersSubtitle")}
     >
-      <p>
-        We are looking for people who care about community, access, and better
-        rental experiences.
-      </p>
+      <p>{t("careersBody")}</p>
     </SimplePublicPage>
   );
 }

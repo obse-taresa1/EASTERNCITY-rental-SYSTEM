@@ -1,43 +1,90 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext.jsx';
+import { categories } from '../../data/items.js';
+import { formatDailyPrice } from '../../utils/currency.js';
 
-export default function ListingCard({
-  id,
-  title,
-  image,
-  price,
-  location,
-  category,
-  meta,
-  year,
-  status,
-}) {
+export default function ListingCard({ item }) {
+  const { t } = useLanguage();
+
+  if (!item) return null;
+
+  const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
+  const specs = item.specs || [
+    { icon: "bi-geo-alt", label: item.sefar ? `${item.city} • ${item.sefar}` : (item.city || "EasternCity") },
+    { icon: "bi-clock", label: t('perDay') },
+  ];
+  const categoryName = categories.find((category) => category.id === item.category)?.name || item.category;
+
   return (
-    <div className="col-md-6 col-xl-4" data-status={status || "used"}>
-      <article className="motorx-card h-100">
-        <div className="motorx-card-img-wrap">
-          {year && <span className="badge-year">{year}</span>}
-          <img src={image} alt={title} />
+    <article className="premium-glass-card listing-card-premium">
+      <div className="card-img-wrapper">
+        <img src={item.image} alt={item.imageAlt || item.title} className="card-img" />
+        <div className="card-badges">
+          {item.featured && <span className="badge-featured">{t('featured')}</span>}
+          {item.city && (
+            <span className="badge-city">
+              <i className="bi bi-geo-alt-fill"></i> {item.city}{item.sefar ? ` • ${item.sefar}` : ''}
+            </span>
+          )}
+        </div>
+        {item.photos && (
+          <span className="badge-photos">
+            <i className="bi bi-camera"></i> {item.photos}
+          </span>
+        )}
+      </div>
+
+      <div className="card-body-premium">
+        <div className="card-header-top">
+          <span className="card-category">
+            {item.categoryKey ? t(item.categoryKey) : categoryName || t('rentalItem')}
+          </span>
+          {item.rating && (
+            <span className="card-rating">
+              <i className="bi bi-star-fill"></i> {item.rating}
+            </span>
+          )}
         </div>
 
-        <div className="motorx-card-body">
-          <p className="card-similar">{category}</p>
-          <h3>{title}</h3>
-          {meta && <p className="card-meta">{meta}</p>}
-          <p className="card-price">
-            {price} <small>/ day</small>
-          </p>
+        <h3 className="card-title">{item.title}</h3>
+        
+        <p className="card-price-premium">
+          <strong>{displayPrice}</strong> <small>/ {t('perDay')}</small>
+        </p>
 
-          <div className="card-footer-flex">
-            <span>
-              <i className="bi bi-geo-alt"></i> {location}
+        <div className="card-owner-info">
+          <div className="owner-avatar">
+            {item.ownerName ? item.ownerName.charAt(0) : 'U'}
+          </div>
+          <span className="owner-name">{item.ownerName || 'Verified Owner'}</span>
+          {item.verifiedOwner !== false && (
+            <i className="bi bi-patch-check-fill text-success" title="Verified Owner"></i>
+          )}
+        </div>
+
+        <div className="card-specs-grid">
+          {specs.map((spec, index) => (
+            <span key={`${item.id}-${spec.labelKey || spec.label || index}`} className="spec-item">
+              <i className={`bi ${spec.icon}`}></i>{' '}
+              {spec.labelKey ? t(spec.labelKey) : spec.label}
             </span>
+          ))}
+        </div>
 
-            <Link className="view-details" to={`/item-details/${id}`}>
-              View Details
-            </Link>
+        <div className="card-footer-premium">
+          <Link to={`/items/${item.id}`} className="btn-view-details">
+            {t('viewDetails')} <i className="bi bi-arrow-right"></i>
+          </Link>
+          <div className="card-icon-actions">
+            <button type="button" className="btn-icon-soft" aria-label={t('compare')}>
+              <i className="bi bi-arrow-left-right"></i>
+            </button>
+            <button type="button" className="btn-icon-soft" aria-label={t('wishlist')}>
+              <i className="bi bi-heart"></i>
+            </button>
           </div>
         </div>
-      </article>
-    </div>
+      </div>
+    </article>
   );
 }

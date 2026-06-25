@@ -1,12 +1,12 @@
 import SimplePublicPage from "./SimplePublicPage.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function TermsPage() {
+  const { t } = useLanguage();
+
   return (
-    <SimplePublicPage title="Terms">
-      <p>
-        By using CityRent, users agree to follow rental, payment, cancellation,
-        and item return policies.
-      </p>
+    <SimplePublicPage title={t("terms")}>
+      <p>{t("termsBody")}</p>
     </SimplePublicPage>
   );
 }

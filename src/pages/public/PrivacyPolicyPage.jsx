@@ -1,12 +1,12 @@
 import SimplePublicPage from "./SimplePublicPage.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function PrivacyPolicyPage() {
+  const { t } = useLanguage();
+
   return (
-    <SimplePublicPage title="Privacy Policy">
-      <p>
-        We use account and booking information to support rentals, messaging,
-        notifications, and platform safety.
-      </p>
+    <SimplePublicPage title={t("privacyPolicy")}>
+      <p>{t("privacyBody")}</p>
     </SimplePublicPage>
   );
 }

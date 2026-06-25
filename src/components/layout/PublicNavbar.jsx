@@ -1,53 +1,49 @@
-import { Link, NavLink } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { dashboardForRole } from "../../services/authService.js";
-import { useLanguage } from "../../context/LanguageContext.jsx";
-import ThemeToggle from "../common/ThemeToggle.jsx";
-import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
-import logo from "../../assets/images/logo.png";
-
-const navLinks = [
-  { to: "/", label: "home" },
-  { to: "/our-story", label: "about" },
-  { to: "/contact", label: "contact" },
-  { to: "/items", label: "items" },
-];
+import { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useLanguage } from '../../context/LanguageContext.jsx';
+import { dashboardForRole } from '../../services/authService.js';
+// import { categories } from '../../data/items.js'; // removed unused import
+import LanguageSwitcher from '../common/LanguageSwitcher.jsx';
+import ProfilePanel from '../common/ProfilePanel.jsx';
+import ThemeToggle from '../common/ThemeToggle.jsx';
+import { getInitials } from '../../utils/user.js';
+import logo from '../../assets/images/logo.png';
 
 export default function PublicNavbar() {
   const { currentUser, isAuthenticated, logout } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [panelOpen, setPanelOpen] = useState(false);
+  // const [categoriesOpen, setCategoriesOpen] = useState(false); // removed dropdown state
+
+  const handleLogout = () => {
+    setPanelOpen(false);
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <header className="motorx-header app-public-header">
+    <header id="top" className="motorx-header app-public-header">
       <div className="container">
         <div className="motorx-nav-flex">
           <Link className="motorx-logo" to="/">
-            <img src={logo} alt="CityRent Logo" />
+            <img src={logo} alt="EasternCities Logo" />
           </Link>
 
-          <input
-            type="checkbox"
-            id="nav-toggle"
-            className="nav-check"
-            aria-label="Open menu"
-          />
-
+          <input type="checkbox" id="nav-toggle" className="nav-check" aria-label={t('openMenu')} />
           <label htmlFor="nav-toggle" className="nav-toggler-label">
             <i className="bi bi-list"></i>
           </label>
 
           <nav className="motorx-nav-menu">
             <ul className="motorx-nav-links">
-              {navLinks.map((link) => (
-                <li key={link.to}>
-                  <NavLink
-                    to={link.to}
-                    className={({ isActive }) => (isActive ? "active" : "")}
-                  >
-                    {t(link.label)}
-                  </NavLink>
-                </li>
-              ))}
+              <li><NavLink to="/">{t('home')}</NavLink></li>
+              <li className="nav-category-shell">
+                <NavLink to="/categories" className="nav-category-trigger">{t('categories')}</NavLink>
+              </li>
+              <li><NavLink to="/about">About Us</NavLink></li>
+              <li><NavLink to="/contact">{t('contactUs')}</NavLink></li>
             </ul>
 
             <div className="motorx-nav-actions">
@@ -55,42 +51,26 @@ export default function PublicNavbar() {
               <ThemeToggle />
 
               {isAuthenticated ? (
-                <div className="public-account-actions">
-                  <details className="profile-menu public-profile-menu">
-                    <summary aria-label="Open profile menu">
-                      <img
-                        src="https://i.pravatar.cc/40?img=33"
-                        alt="User profile"
-                      />
-                      <span>{currentUser?.fullname || currentUser?.name || "User"}</span>
-                      <i className="bi bi-chevron-down"></i>
-                    </summary>
-
-                    <div className="profile-menu-list">
-                      <Link to="/profile">
-                        <i className="bi bi-person"></i> {t("profile")}
-                      </Link>
-
-                      <Link to={dashboardForRole(currentUser?.role)}>
-                        <i className="bi bi-speedometer2"></i> {t("dashboard")}
-                      </Link>
-                    </div>
-                  </details>
-
+                <>
                   <button
-                    className="nav-login nav-logout-btn"
+                    className="profile-avatar-btn premium-avatar"
+                    onClick={() => setPanelOpen(true)}
+                    aria-expanded={panelOpen}
+                    aria-haspopup="true"
                     type="button"
-                    onClick={logout}
                   >
-                    {t("logout")}
+                    <span className="avatar-initials">{getInitials(currentUser?.name)}</span>
                   </button>
-                </div>
+                  <ProfilePanel
+                    user={currentUser}
+                    open={panelOpen}
+                    onClose={() => setPanelOpen(false)}
+                    onLogout={handleLogout}
+                    dashboardPath={dashboardForRole(currentUser?.role)}
+                  />
+                </>
               ) : (
-                <div className="public-auth-actions">
-                  <Link to="/login" className="nav-login">
-                    {t("loginRegister")}
-                  </Link>
-                </div>
+                <Link to="/login" className="nav-login">{t('registerLogin')}</Link>
               )}
             </div>
           </nav>
