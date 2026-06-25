@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
-import {
-  canRentItem,
-  getRentalRestrictionMessage,
-} from "../../services/rentalAccessService.js";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -33,30 +29,18 @@ export default function LoginPage() {
 
     try {
       const loggedInUser = login(formData.email, formData.password);
+      const pendingContactUrl = localStorage.getItem("pendingContactUrl");
 
-      const pendingRentalUrl = localStorage.getItem("pendingRentalUrl");
-
-      if (pendingRentalUrl) {
-        localStorage.removeItem("pendingRentalUrl");
-
-        const itemId = pendingRentalUrl.split("/items/")[1];
-
-        if (itemId && canRentItem(loggedInUser.role)) {
-          navigate(`/booking/${itemId}`, { replace: true });
-          return;
-        }
-
-        if (itemId) {
-          navigate(pendingRentalUrl, {
-            replace: true,
-            state: {
-              rentRestrictionMessage: getRentalRestrictionMessage(
-                loggedInUser.role,
-              ),
-            },
-          });
-          return;
-        }
+      if (pendingContactUrl) {
+        localStorage.removeItem("pendingContactUrl");
+        navigate(pendingContactUrl, {
+          replace: true,
+          state: {
+            contactReadyMessage:
+              "You are signed in. Click Contact Owner to start the conversation.",
+          },
+        });
+        return;
       }
 
       const from = location.state?.from?.pathname;

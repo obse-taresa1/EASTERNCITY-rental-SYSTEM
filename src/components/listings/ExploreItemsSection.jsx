@@ -1,9 +1,17 @@
 import ListingCard from "../cards/ListingCard.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import { homeListings } from "../../data/homeListings.js";
+import { getAllItems } from "../../services/itemService.js";
 
 export default function ExploreItemsSection() {
   const { t } = useLanguage();
+  const listings = getAllItems()
+    .filter(
+      (item) =>
+        !["draft", "rejected", "expired"].includes(
+          String(item.status || "").toLowerCase(),
+        ),
+    )
+    .slice(0, 8);
 
   return (
     <section id="featured-listings" className="section-listings py-5">
@@ -33,7 +41,6 @@ export default function ExploreItemsSection() {
             <span className="section-label">{t("trustedRentalService")}</span>
             <h2>{t("exploreAllItems")}</h2>
           </div>
-
           <div className="status-tabs">
             <label className="status-tab" htmlFor="status-all">
               {t("allStatus")}
@@ -48,9 +55,9 @@ export default function ExploreItemsSection() {
         </div>
 
         <div className="row g-4 listings-grid">
-          {homeListings.map((item) => (
+          {listings.map((item) => (
             <div
-              className="col-md-6 col-lg-4 listing-col"
+              className="col-sm-6 col-lg-3 listing-col"
               data-status={item.status}
               key={item.id}
             >

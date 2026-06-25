@@ -10,10 +10,13 @@ export default function RegisterPage() {
     name: "",
     email: "",
     password: "",
-    role: "renter",
+    role: "both",
+    nationalIdFront: "",
+    nationalIdBack: "",
   });
 
   const [error, setError] = useState("");
+  const [fileNotice, setFileNotice] = useState("");
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -24,9 +27,41 @@ export default function RegisterPage() {
     }));
   }
 
+  function readIdImage(file, fieldName) {
+    setFileNotice("");
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      setFileNotice("National ID uploads must be JPG, JPEG, or PNG.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setFileNotice("Each National ID image must be 5MB or smaller.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFormData((current) => ({
+        ...current,
+        [fieldName]: reader.result,
+      }));
+    };
+    reader.readAsDataURL(file);
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
     setError("");
+
+    if (!formData.nationalIdFront || !formData.nationalIdBack) {
+      setError(
+        "Please upload both the front and back side of your National ID.",
+      );
+      return;
+    }
 
     try {
       const registeredUser = register(formData);
@@ -94,24 +129,54 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="role" className="form-label">
-              Account Type
-            </label>
-            <select
-              id="role"
-              name="role"
-              className="form-select"
-              value={formData.role}
-              onChange={handleChange}
-            >
-              <option value="renter">Renter</option>
-              <option value="lessor">Lessor</option>
-              <option value="both">Both</option>
-            </select>
-          </div>
+          <section className="national-id-verification mb-4">
+            <div className="d-flex align-items-start justify-content-between gap-3 mb-3">
+              <div>
+                <h2 className="h5 mb-1">National ID Verification</h2>
+                <p className="text-muted mb-0">
+                  Upload both sides to keep EasternCity safe and trusted.
+                </p>
+              </div>
+              <span className="owner-status owner-status-pending-approval">
+                Pending Verification
+              </span>
+            </div>
 
-          <button type="submit" className="btn btn-accent-custom w-100">
+            {fileNotice && (
+              <div className="listing-form-notice">{fileNotice}</div>
+            )}
+
+            <div className="id-upload-grid">
+              {[
+                ["nationalIdFront", "Front Side"],
+                ["nationalIdBack", "Back Side"],
+              ].map(([fieldName, label]) => (
+                <label className="id-upload-card" key={fieldName}>
+                  {formData[fieldName] ? (
+                    <img src={formData[fieldName]} alt={`${label} preview`} />
+                  ) : (
+                    <span>
+                      <i className="bi bi-card-image"></i>
+                      {label}
+                    </span>
+                  )}
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                    hidden
+                    onChange={(event) =>
+                      readIdImage(event.target.files[0], fieldName)
+                    }
+                  />
+                </label>
+              ))}
+            </div>
+          </section>
+
+          <button
+            type="submit"
+            className="btn btn-accent-custom btn-shine w-100"
+          >
             Register
           </button>
         </form>

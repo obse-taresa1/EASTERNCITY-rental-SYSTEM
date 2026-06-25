@@ -19,13 +19,12 @@ import TermsPage from "../pages/public/TermsPage.jsx";
 import ItemsPage from "../pages/listings/ItemsPage.jsx";
 import CategoryPage from "../pages/listings/CategoryPage.jsx";
 import ItemDetailsPage from "../pages/listings/ItemDetailsPage.jsx";
+import CategoriesPage from "../pages/listings/CategoriesPage.jsx";
 
 import BookingPage from "../pages/booking/BookingPage.jsx";
 import BookingSuccessPage from "../pages/booking/BookingSuccessPage.jsx";
 import MyBookingsPage from "../pages/booking/MyBookingsPage.jsx";
 
-import RenterDashboardPage from "../pages/dashboard/RenterDashboardPage.jsx";
-import LessorDashboardPage from "../pages/dashboard/LessorDashboardPage.jsx";
 import BothDashboardPage from "../pages/dashboard/BothDashboardPage.jsx";
 import ListItemPage from "../pages/dashboard/ListItemPage.jsx";
 
@@ -69,7 +68,8 @@ export default function AppRouter() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/items" element={<ItemsPage />} />
-          <Route path="/category/:categoryId" element={<CategoryPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/categories/:categoryId" element={<CategoryPage />} />
           <Route path="/items/:itemId" element={<ItemDetailsPage />} />
 
           <Route path="/about" element={<AboutPage />} />
@@ -92,7 +92,7 @@ export default function AppRouter() {
               path="/renter-dashboard"
               element={
                 <RoleRoute allowedRoles={["renter", "lessee"]}>
-                  <RenterDashboardPage />
+                  <BothDashboardPage />
                 </RoleRoute>
               }
             />
@@ -100,8 +100,8 @@ export default function AppRouter() {
             <Route
               path="/lessor-dashboard"
               element={
-                <RoleRoute allowedRoles={["lessor"]}>
-                  <LessorDashboardPage />
+                <RoleRoute allowedRoles={["lessor", "both"]}>
+                  <BothDashboardPage initialMode="owner" />
                 </RoleRoute>
               }
             />
@@ -109,7 +109,9 @@ export default function AppRouter() {
             <Route
               path="/both-dashboard"
               element={
-                <RoleRoute allowedRoles={["both"]}>
+                <RoleRoute
+                  allowedRoles={["renter", "lessee", "lessor", "both"]}
+                >
                   <BothDashboardPage />
                 </RoleRoute>
               }
@@ -118,7 +120,9 @@ export default function AppRouter() {
             <Route
               path="/list-item"
               element={
-                <RoleRoute allowedRoles={["lessor", "both"]}>
+                <RoleRoute
+                  allowedRoles={["renter", "lessee", "lessor", "both"]}
+                >
                   <ListItemPage />
                 </RoleRoute>
               }

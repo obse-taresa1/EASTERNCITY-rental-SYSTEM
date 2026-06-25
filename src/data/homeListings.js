@@ -1,9 +1,11 @@
-import canonImage from "../assets/images/canon.png";
-import dewaltImage from "../assets/images/dewalt.png";
-import pcImage from "../assets/images/pc.png";
-import projectorImage from "../assets/images/projector.png";
-import rav4Image from "../assets/images/Toyota RAV4.jpg";
-import washerImage from "../assets/images/waterpp.png";
+import rav4Image from "../assets/images/toyota_rav4_2023_1781969002285.png";
+import canonImage from "../assets/images/canon_dslr_kit_1781969013603.png";
+import dewaltImage from "../assets/images/dewalt_drill_set_1781969024967.png";
+import pcImage from "../assets/images/gaming_laptop_1781969037627.png";
+import projectorImage from "../assets/images/4k_projector_1781969048940.png";
+import washerImage from "../assets/images/pressure_washer_1781969060604.png";
+import sofaImage from "../assets/images/furnsofa.png";
+import bikeImage from "../assets/images/sportbick.png";
 
 export const homeListings = [
   {
@@ -15,13 +17,19 @@ export const homeListings = [
     featured: true,
     year: "2023",
     photos: 8,
-    categoryKey: "suv",
+    categoryKey: "vehicles",
+    category: "vehicles",
+    city: "Jigjiga",
+    location: "Jigjiga",
     similarCount: 3,
+    pricePerDay: 8500,
     price: "ETB 8,500",
+    ownerName: "Ahmed Ali",
+    verifiedOwner: true,
+    rating: "4.9",
     specs: [
       { icon: "bi-fuel-pump", labelKey: "petrol" },
       { icon: "bi-speedometer2", label: "12k mi" },
-      { icon: "bi-gear", labelKey: "auto" },
     ],
   },
   {
@@ -33,13 +41,19 @@ export const homeListings = [
     featured: true,
     year: "2022",
     photos: 12,
-    categoryKey: "camera",
+    categoryKey: "electronics-cameras",
+    category: "electronics-cameras",
+    city: "Dire Dawa",
+    location: "Dire Dawa",
     similarCount: 5,
+    pricePerDay: 6000,
     price: "ETB 6,000",
+    ownerName: "Sara Yonas",
+    verifiedOwner: true,
+    rating: "4.7",
     specs: [
       { icon: "bi-box", labelKey: "kit" },
-      { icon: "bi-star-fill", label: "4.9" },
-      { icon: "bi-geo-alt", labelKey: "downtown" },
+      { icon: "bi-camera", label: "24MP" },
     ],
   },
   {
@@ -51,13 +65,19 @@ export const homeListings = [
     featured: false,
     year: "2024",
     photos: 4,
-    categoryKey: "tools",
+    categoryKey: "construction-diy",
+    category: "construction-diy",
+    city: "Harar",
+    location: "Harar",
     similarCount: 2,
+    pricePerDay: 2300,
     price: "ETB 2,300",
+    ownerName: "Yosef Alemu",
+    verifiedOwner: false,
+    rating: "4.8",
     specs: [
       { icon: "bi-tools", labelKey: "cordless" },
-      { icon: "bi-check-circle", labelKey: "likeNew" },
-      { icon: "bi-geo-alt", labelKey: "westside" },
+      { icon: "bi-battery-charging", label: "20V MAX" },
     ],
   },
   {
@@ -69,13 +89,19 @@ export const homeListings = [
     featured: true,
     year: "2023",
     photos: 6,
-    categoryKey: "electronics",
+    categoryKey: "electronics-cameras",
+    category: "electronics-cameras",
+    city: "Jigjiga",
+    location: "Jigjiga",
     similarCount: 4,
+    pricePerDay: 4500,
     price: "ETB 4,500",
+    ownerName: "Mubarek Tech",
+    verifiedOwner: true,
+    rating: "5.0",
     specs: [
       { icon: "bi-cpu", label: "RTX 4070" },
       { icon: "bi-memory", label: "32GB" },
-      { icon: "bi-geo-alt", labelKey: "midtown" },
     ],
   },
   {
@@ -87,13 +113,19 @@ export const homeListings = [
     featured: false,
     year: "2024",
     photos: 3,
-    categoryKey: "events",
+    categoryKey: "event-essentials",
+    category: "event-essentials",
+    city: "Dire Dawa",
+    location: "Dire Dawa",
     similarCount: 1,
+    pricePerDay: 3600,
     price: "ETB 3,600",
+    ownerName: "Dire Rentals",
+    verifiedOwner: true,
+    rating: "4.6",
     specs: [
-      { icon: "bi-display", label: "4K" },
+      { icon: "bi-display", label: "4K HDR" },
       { icon: "bi-brightness-high", label: "3000lm" },
-      { icon: "bi-geo-alt", labelKey: "north" },
     ],
   },
   {
@@ -105,13 +137,67 @@ export const homeListings = [
     featured: true,
     year: "2021",
     photos: 5,
-    categoryKey: "tools",
+    categoryKey: "construction-diy",
+    category: "construction-diy",
+    city: "Harar",
+    location: "Harar",
     similarCount: 6,
+    pricePerDay: 2800,
     price: "ETB 2,800",
+    ownerName: "Kebede Wash",
+    verifiedOwner: false,
+    rating: "4.5",
     specs: [
       { icon: "bi-droplet", label: "2000 PSI" },
       { icon: "bi-plug", label: "Electric" },
-      { icon: "bi-geo-alt", labelKey: "eastEnd" },
+    ],
+  },
+  {
+    id: "modern-sectional-sofa",
+    title: "Modern Sectional Sofa",
+    image: sofaImage,
+    imageAlt: "Sectional Sofa",
+    status: "new",
+    featured: false,
+    year: "2023",
+    photos: 7,
+    categoryKey: "furniture",
+    category: "furniture",
+    city: "Jigjiga",
+    location: "Jigjiga",
+    similarCount: 2,
+    pricePerDay: 3200,
+    price: "ETB 3,200",
+    ownerName: "HomeDecor",
+    verifiedOwner: true,
+    rating: "4.8",
+    specs: [
+      { icon: "bi-house", label: "L-Shape" },
+      { icon: "bi-palette", label: "Grey" },
+    ],
+  },
+  {
+    id: "mountain-bike-pro",
+    title: "Mountain Bike Pro X1",
+    image: bikeImage,
+    imageAlt: "Mountain Bike",
+    status: "used",
+    featured: true,
+    year: "2022",
+    photos: 5,
+    categoryKey: "sports-outdoor",
+    category: "sports-outdoor",
+    city: "Dire Dawa",
+    location: "Dire Dawa",
+    similarCount: 3,
+    pricePerDay: 1400,
+    price: "ETB 1,400",
+    ownerName: "Ride On",
+    verifiedOwner: true,
+    rating: "4.9",
+    specs: [
+      { icon: "bi-bicycle", label: "21-Speed" },
+      { icon: "bi-speedometer", label: "All Terrain" },
     ],
   },
 ];

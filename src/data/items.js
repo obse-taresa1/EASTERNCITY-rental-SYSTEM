@@ -10,7 +10,8 @@ export const items = [
     id: "toyota-rav4",
     title: "Toyota RAV4",
     category: "vehicles",
-    location: "Addis Ababa, Ethiopia",
+    location: "Downtown, Jigjiga",
+    city: "Jigjiga",
     pricePerDay: 6000,
     image: rav4Image,
     rating: 4.9,
@@ -23,8 +24,9 @@ export const items = [
   {
     id: "gaming-pc",
     title: "Gaming PC",
-    category: "electronics",
-    location: "Bole, Addis Ababa",
+    category: "electronics-cameras",
+    location: "Central, Dire Dawa",
+    city: "Dire Dawa",
     pricePerDay: 3500,
     image: pcImage,
     rating: 4.8,
@@ -37,8 +39,9 @@ export const items = [
   {
     id: "dewalt-drill",
     title: "Dewalt Drill Kit",
-    category: "tools",
-    location: "Piassa, Addis Ababa",
+    category: "construction-diy",
+    location: "Old Town, Harar",
+    city: "Harar",
     pricePerDay: 1300,
     image: dewaltImage,
     rating: 4.7,
@@ -51,8 +54,9 @@ export const items = [
   {
     id: "canon-camera",
     title: "Canon Camera",
-    category: "cameras",
-    location: "Kazanchis, Addis Ababa",
+    category: "electronics-cameras",
+    location: "University Road, Jigjiga",
+    city: "Jigjiga",
     pricePerDay: 2600,
     image: canonImage,
     rating: 4.9,
@@ -66,21 +70,28 @@ export const items = [
     id: "modern-sofa",
     title: "Modern Sofa",
     category: "furniture",
-    location: "Megenagna, Addis Ababa",
+    location: "Kebele 02, Dire Dawa",
+    city: "Dire Dawa",
     pricePerDay: 1800,
     image: sofaImage,
     rating: 4.6,
     owner: "HomeStyle Rentals",
     description:
       "Clean modern sofa for temporary home setup, staging, and small events.",
-    features: ["3 Seats", "Clean Fabric", "Delivery Available", "Modern Design"],
+    features: [
+      "3 Seats",
+      "Clean Fabric",
+      "Delivery Available",
+      "Modern Design",
+    ],
     available: true,
   },
   {
     id: "sport-bike",
     title: "Sport Bike",
-    category: "sports",
-    location: "CMC, Addis Ababa",
+    category: "sports-outdoor",
+    location: "Market Area, Harar",
+    city: "Harar",
     pricePerDay: 1500,
     image: bikeImage,
     rating: 4.8,
@@ -94,39 +105,122 @@ export const items = [
 
 export const categories = [
   {
+    id: "electronics-cameras",
+    name: "Electronics & Cameras",
+    icon: "bi-camera",
+    description:
+      "Cameras, projectors, drones, and electronic devices for rent.",
+  },
+  {
+    id: "cars-bikes",
+    name: "Cars & Bikes",
+    icon: "bi-car-front",
+    description:
+      "Cars, motorcycles, and bikes available for daily and weekly rental.",
+  },
+  {
+    id: "party-wedding",
+    name: "Party & Wedding",
+    icon: "bi-balloon",
+    description:
+      "Wedding chairs, tents, decorations, sound systems, and event lighting.",
+  },
+  {
+    id: "event-essentials",
+    name: "Event Essentials",
+    icon: "bi-calendar-event",
+    description:
+      "Generators, stage platforms, tables, cables, and lighting towers for events.",
+  },
+  {
     id: "vehicles",
     name: "Vehicles",
-    icon: "bi-car-front",
-    description: "Cars and transport rentals",
+    icon: "bi-truck",
+    description:
+      "Pickup trucks, minibuses, SUVs, delivery vans, and cargo trucks.",
   },
   {
-    id: "electronics",
-    name: "Electronics",
-    icon: "bi-laptop",
-    description: "Computers and electronic devices",
+    id: "gadgets",
+    name: "Gadgets",
+    icon: "bi-controller",
+    description:
+      "PlayStation, VR headsets, power banks, smart watches, and tablets.",
   },
   {
-    id: "tools",
-    name: "Tools",
+    id: "construction-diy",
+    name: "Construction & DIY",
     icon: "bi-tools",
-    description: "Construction and repair tools",
-  },
-  {
-    id: "cameras",
-    name: "Cameras",
-    icon: "bi-camera",
-    description: "Photography and video equipment",
+    description:
+      "Cement mixers, drills, scaffolding, ladders, and tile cutters.",
   },
   {
     id: "furniture",
     name: "Furniture",
     icon: "bi-house-heart",
-    description: "Home and event furniture",
+    description:
+      "Sofa sets, dining tables, office chairs, coffee tables, and wardrobes.",
   },
   {
-    id: "sports",
-    name: "Sports",
+    id: "home-appliances",
+    name: "Home Appliances",
+    icon: "bi-house-gear",
+    description:
+      "Refrigerators, washing machines, microwaves, vacuum cleaners, and blenders.",
+  },
+  {
+    id: "sports-outdoor",
+    name: "Sports & Outdoor",
     icon: "bi-bicycle",
-    description: "Sport and outdoor equipment",
+    description:
+      "Bicycles, camping tents, treadmills, football kits, and fitness equipment.",
+  },
+  {
+    id: "travel-camping",
+    name: "Travel & Camping",
+    icon: "bi-compass",
+    description:
+      "Sleeping bags, camping stoves, travel backpacks, cooler boxes, and hiking gear.",
+  },
+  {
+    id: "fashion-accessories",
+    name: "Fashion & Accessories",
+    icon: "bi-handbag",
+    description:
+      "Traditional dresses, wedding jewelry, designer handbags, suits, and evening gowns.",
+  },
+  {
+    id: "music-audio",
+    name: "Music & Audio Equipment",
+    icon: "bi-music-note-beamed",
+    description:
+      "DJ controllers, keyboards, drum sets, microphones, and guitar amplifiers.",
+  },
+  {
+    id: "office-equipment",
+    name: "Office Equipment",
+    icon: "bi-printer",
+    description:
+      "Projector screens, printers, photocopiers, office desks, and conference chairs.",
+  },
+  {
+    id: "beauty-salon",
+    name: "Beauty & Salon Equipment",
+    icon: "bi-scissors",
+    description:
+      "Hair dryers, makeup chairs, facial steamers, nail equipment, and salon mirrors.",
+  },
+  {
+    id: "baby-kids",
+    name: "Baby & Kids Essentials",
+    icon: "bi-balloon-heart",
+    description:
+      "Baby strollers, cribs, kids bicycles, car seats, and baby walkers.",
+  },
+  {
+    id: "gaming-equipment",
+    name: "Gaming Equipment",
+    icon: "bi-joystick",
+    description:
+      "Xbox consoles, gaming chairs, gaming monitors, racing wheels, and Nintendo Switch.",
   },
 ];

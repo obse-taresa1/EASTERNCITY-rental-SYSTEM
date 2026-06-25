@@ -33,7 +33,14 @@ export default function ListingManagementTable({ items }) {
               <td>{formatDailyPrice(item.pricePerDay)}</td>
               <td>{item.location}</td>
               <td>
-                <StatusBadge status={item.available ? "active" : "inactive"} />
+                <StatusBadge
+                  status={
+                    item.status || (item.available ? "active" : "inactive")
+                  }
+                />
+                {item.featured && (
+                  <span className="owner-featured-badge ms-2">Featured</span>
+                )}
               </td>
             </tr>
           ))}

@@ -2,17 +2,29 @@ import AdminStatGrid from "../../components/admin/AdminStatGrid.jsx";
 import AdminDataTable from "../../components/admin/AdminDataTable.jsx";
 import { getBookings } from "../../services/bookingService.js";
 import { getUsers } from "../../services/authService.js";
-import { items } from "../../data/items.js";
+import { getAllItems } from "../../services/itemService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
 export default function AdminDashboardPage() {
   const users = getUsers();
   const bookings = getBookings();
+  const items = getAllItems();
+  const featuredRevenue = items.filter((item) => item.featured).length * 200;
+  const subscriptionRevenue =
+    items.filter((item) => item.subscriptionPlan === "Pro Plan").length * 750;
+  const verificationRevenue =
+    items.filter((item) => item.verificationStatus === "verified").length * 200;
+  const advertisementRevenue = 12400;
 
-  const totalRevenue = bookings.reduce(
-    (sum, booking) => sum + Number(booking.totalAmount || 0),
-    0,
-  );
+  const totalRevenue =
+    bookings.reduce(
+      (sum, booking) => sum + Number(booking.totalAmount || 0),
+      0,
+    ) +
+    featuredRevenue +
+    subscriptionRevenue +
+    verificationRevenue +
+    advertisementRevenue;
 
   const stats = [
     {
@@ -62,6 +74,41 @@ export default function AdminDashboardPage() {
         ]}
         rows={bookings.slice(0, 6)}
       />
+
+      <section className="dashboard-section mt-4">
+        <div className="owner-section-heading">
+          <div>
+            <span className="section-label">MARKETPLACE REVENUE</span>
+            <h2 className="h4 mb-1">Monetization Channels</h2>
+            <p className="owner-muted mb-0">
+              Track subscriptions, featured boosts, verification, and
+              advertisement placements without blocking free entry.
+            </p>
+          </div>
+        </div>
+        <div className="owner-revenue-grid">
+          <div className="owner-monetization-card">
+            <span>Subscription Revenue</span>
+            <strong>{formatCurrency(subscriptionRevenue)}</strong>
+            <small>Pro Plan owners with unlimited listings and insights.</small>
+          </div>
+          <div className="owner-monetization-card">
+            <span>Featured Listing Revenue</span>
+            <strong>{formatCurrency(featuredRevenue)}</strong>
+            <small>3, 7, and 30 day promotion packages.</small>
+          </div>
+          <div className="owner-monetization-card">
+            <span>Verification Revenue</span>
+            <strong>{formatCurrency(verificationRevenue)}</strong>
+            <small>National ID review and verified owner badges.</small>
+          </div>
+          <div className="owner-monetization-card">
+            <span>Advertisement Revenue</span>
+            <strong>{formatCurrency(advertisementRevenue)}</strong>
+            <small>Homepage, category, and dashboard banner inventory.</small>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

@@ -71,6 +71,7 @@ export function loginUser(email, password) {
     email: user.email,
     role: user.role,
     businessName: user.businessName || "",
+    verificationStatus: user.verificationStatus || "Pending Verification",
   };
 
   setCurrentUser(safeUser);
@@ -94,8 +95,11 @@ export function registerUser(formData) {
     name: formData.name,
     email: formData.email,
     password: formData.password,
-    role: formData.role || "renter",
+    role: formData.role || "both",
     businessName: formData.businessName || "",
+    nationalIdFront: formData.nationalIdFront || "",
+    nationalIdBack: formData.nationalIdBack || "",
+    verificationStatus: "Pending Verification",
   };
 
   saveUsers([newUser, ...users]);
@@ -106,6 +110,7 @@ export function registerUser(formData) {
     email: newUser.email,
     role: newUser.role,
     businessName: newUser.businessName,
+    verificationStatus: newUser.verificationStatus,
   };
 
   setCurrentUser(safeUser);
@@ -123,9 +128,9 @@ export function dashboardForRole(role) {
     supervisor: "/admin",
     superadmin: "/super-admin",
     "super-admin": "/super-admin",
-    lessee: "/renter-dashboard",
-    renter: "/renter-dashboard",
-    lessor: "/lessor-dashboard",
+    lessee: "/both-dashboard",
+    renter: "/both-dashboard",
+    lessor: "/both-dashboard",
     both: "/both-dashboard",
   };
 

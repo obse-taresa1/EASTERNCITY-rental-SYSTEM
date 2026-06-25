@@ -9,9 +9,17 @@ export default function ItemsPage() {
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
+  const category = searchParams.get("category") || "all";
+  const city = searchParams.get("city") || "all";
+  const sefar = searchParams.get("sefar") || "all";
+  const maxPrice = searchParams.get("maxPrice") || "";
+  const status = searchParams.get("status") || "all";
+
   const [search, setSearch] = useState(initialSearch);
 
-  const filteredItems = useMemo(() => searchItems(search), [search]);
+  const filteredItems = useMemo(() => {
+    return searchItems({ search, category, city, sefar, maxPrice, status });
+  }, [search, category, city, sefar, maxPrice, status]);
 
   return (
     <main className="container py-5">
@@ -21,7 +29,10 @@ export default function ItemsPage() {
         description={t("availableItemsDescription")}
       />
 
-      <form className="row g-3 mb-4" onSubmit={(event) => event.preventDefault()}>
+      <form
+        className="row g-3 mb-4"
+        onSubmit={(event) => event.preventDefault()}
+      >
         <div className="col-md-9">
           <input
             type="search"
