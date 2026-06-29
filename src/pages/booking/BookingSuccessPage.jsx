@@ -34,12 +34,12 @@ export default function BookingSuccessPage() {
           <p>
             <strong>Total:</strong> {formatCurrency(booking.totalAmount)}
           </p>
-          <p>
-            <strong>Payment Method:</strong> {booking.paymentMethod}
-          </p>
-          <p>
-            <strong>Transaction ID:</strong> {booking.paymentTransactionId}
-          </p>
+          <div className="alert alert-info mb-0">
+            <strong>Payment Information</strong>
+            <p className="mb-0">
+              This platform does not process rental payments. Payment arrangements are made directly with the listing owner.
+            </p>
+          </div>
         </div>
 
         <div className="d-flex justify-content-center gap-3 mt-4">

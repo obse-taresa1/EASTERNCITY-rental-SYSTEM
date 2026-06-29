@@ -7,10 +7,10 @@ import { getBookingsByOwner } from "../../services/bookingService.js";
 import {
   deleteOwnerListing,
   getAllItems,
-  promoteOwnerListing,
   renewOwnerListing,
 } from "../../services/itemService.js";
 import { formatCurrency, formatDailyPrice } from "../../utils/currency.js";
+import { requestPromotion } from "../../services/promotionService.js";
 
 const statusTabs = [
   {
@@ -26,10 +26,20 @@ const statusTabs = [
 ];
 
 const promotionPackages = [
-  { label: "3 Days Featured", price: "100 ETB", icon: "bi-lightning-charge" },
-  { label: "7 Days Featured", price: "200 ETB", icon: "bi-stars" },
-  { label: "30 Days Featured", price: "500 ETB", icon: "bi-gem" },
+  { id: 1, label: "Featured Listing", baseRate: 100, icon: "bi-lightning-charge" },
+  { id: 2, label: "Top Listing", baseRate: 200, icon: "bi-stars" },
+  { id: 3, label: "Homepage Banner", baseRate: 500, icon: "bi-gem" },
 ];
+const durationOptions = [3, 7, 15, 30];
+
+async function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 const revenueCards = [
   {
@@ -64,7 +74,7 @@ function normalizeStatus(item) {
 }
 
 function statusLabel(status) {
-  return status
+  return String(status || "unknown")
     .split(" ")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
@@ -75,6 +85,10 @@ export default function LessorDashboardPage() {
   const activeUser = user || currentUser;
   const [allItems, setAllItems] = useState(() => getAllItems());
   const [notice, setNotice] = useState("");
+  const [promotionListing, setPromotionListing] = useState(null);
+  const [selectedPromotionPackage, setSelectedPromotionPackage] = useState(1);
+  const [selectedPromotionDuration, setSelectedPromotionDuration] = useState(7);
+  const [promotionScreenshot, setPromotionScreenshot] = useState(null);
 
   useEffect(() => {
     function refreshListings() {
@@ -82,11 +96,28 @@ export default function LessorDashboardPage() {
     }
 
     window.addEventListener("easterncity:listings-updated", refreshListings);
+    window.addEventListener("easterncity:promotions-updated", refreshListings);
     return () =>
-      window.removeEventListener(
-        "easterncity:listings-updated",
-        refreshListings,
-      );
+      {
+        window.removeEventListener(
+          "easterncity:listings-updated",
+          refreshListings,
+        );
+        window.removeEventListener(
+          "easterncity:promotions-updated",
+          refreshListings,
+        );
+      };
+  }, []);
+
+  // Refresh bookings when owner accepts/rejects a booking
+  useEffect(() => {
+    const refreshBookings = () => {
+      // Force a re‑render by updating a shallow copy of all items
+      setAllItems((items) => [...items]);
+    };
+    window.addEventListener('easterncity:bookings-updated', refreshBookings);
+    return () => window.removeEventListener('easterncity:bookings-updated', refreshBookings);
   }, []);
 
   const ownedItems = allItems.filter(
@@ -129,7 +160,7 @@ export default function LessorDashboardPage() {
   );
 
   function handleDelete(item) {
-    if (!item.id.startsWith("owner-listing-")) {
+    if (!String(item.id || "").startsWith("owner-listing-")) {
       setNotice(
         "Seed listings are protected demo records. New owner listings can be deleted.",
       );
@@ -140,7 +171,7 @@ export default function LessorDashboardPage() {
   }
 
   function handleRenew(item) {
-    if (!item.id.startsWith("owner-listing-")) {
+    if (!String(item.id || "").startsWith("owner-listing-")) {
       setNotice("Renewal is ready for owner-created listings in this demo.");
       return;
     }
@@ -148,13 +179,65 @@ export default function LessorDashboardPage() {
     setNotice(`${item.title} was renewed for 30 days.`);
   }
 
-  function handlePromote(item, promotion = "7 Days Featured") {
-    if (!item.id.startsWith("owner-listing-")) {
+  function handlePromote(item) {
+    if (!String(item.id || "").startsWith("owner-listing-")) {
       setNotice(`${item.title} already demonstrates the promotion workflow.`);
       return;
     }
-    promoteOwnerListing(item.id, promotion);
-    setNotice(`${item.title} is now featured with ${promotion}.`);
+    setPromotionListing(item);
+    setSelectedPromotionPackage(1);
+    setSelectedPromotionDuration(7);
+    setPromotionScreenshot(null);
+  }
+
+  async function handlePromotionScreenshot(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
+      setNotice("Promotion payment screenshot must be JPG, JPEG, or PNG.");
+      return;
+    }
+
+    const preview = await fileToDataUrl(file);
+    setPromotionScreenshot({
+      name: file.name,
+      preview,
+    });
+  }
+
+  async function submitPromotionRequest(event) {
+    event.preventDefault();
+    if (!promotionListing || !promotionScreenshot) {
+      setNotice("Please upload a promotion payment screenshot.");
+      return;
+    }
+
+    const selectedPackage = promotionPackages.find(
+      (p) => p.id === selectedPromotionPackage,
+    );
+    const amount =
+      (selectedPackage?.baseRate || 100) * selectedPromotionDuration;
+
+    await requestPromotion(
+      promotionListing.id,
+      selectedPromotionPackage,
+      promotionScreenshot,
+      {
+        listingTitle: promotionListing.title,
+        ownerId: activeUser?.id || activeUser?.name || activeUser?.businessName,
+        userId: activeUser?.id || activeUser?.name || activeUser?.businessName,
+        userName: activeUser?.businessName || activeUser?.name || "User",
+        ownerName: activeUser?.businessName || activeUser?.name || promotionListing.ownerName,
+        packageName: selectedPackage?.label,
+        promotionType: selectedPackage?.label,
+        durationDays: selectedPromotionDuration,
+        amount,
+      },
+    );
+    setNotice(`${promotionListing.title} promotion request was submitted for review.`);
+    setPromotionListing(null);
+    setPromotionScreenshot(null);
   }
 
   return (
@@ -250,7 +333,12 @@ export default function LessorDashboardPage() {
             <button
               type="button"
               className="btn btn-accent-custom btn-shine"
-              onClick={() => visibleItems[0] && handlePromote(visibleItems[0])}
+              onClick={() => {
+                const publishedItem = visibleItems.find(
+                  (item) => normalizeStatus(item) === "published",
+                );
+                if (publishedItem) handlePromote(publishedItem);
+              }}
             >
               <i className="bi bi-megaphone" /> Promote Listing
             </button>
@@ -290,13 +378,14 @@ export default function LessorDashboardPage() {
               type="button"
               className="promotion-package"
               key={pack.label}
-              onClick={() =>
-                visibleItems[0] && handlePromote(visibleItems[0], pack.label)
-              }
+              onClick={() => {
+                const publishedItem = visibleItems.find((i) => normalizeStatus(i) === "published");
+                if (publishedItem) handlePromote(publishedItem);
+              }}
             >
               <i className={`bi ${pack.icon}`} />
               <span>{pack.label}</span>
-              <strong>{pack.price}</strong>
+              <strong>From {pack.baseRate * 3} ETB</strong>
             </button>
           ))}
         </div>
@@ -445,13 +534,15 @@ export default function LessorDashboardPage() {
                             >
                               <i className="bi bi-arrow-clockwise" /> Renew
                             </button>
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-accent-custom"
-                              onClick={() => handlePromote(item)}
-                            >
-                              <i className="bi bi-megaphone" /> Promote
-                            </button>
+                            {normalizeStatus(item) === "published" && (
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-accent-custom"
+                                onClick={() => handlePromote(item)}
+                              >
+                                <i className="bi bi-megaphone" /> Promote
+                              </button>
+                            )}
                           </div>
                         </div>
                       </article>
@@ -493,16 +584,118 @@ export default function LessorDashboardPage() {
       </section>
 
       <section className="dashboard-section mt-4">
-        <h2 className="h4 mb-3">Booking Requests and Messages</h2>
+        <h2 className="h4 mb-3">Incoming Booking Requests</h2>
         {ownerBookings.length ? (
           <BookingTable bookings={ownerBookings} />
         ) : (
           <div className="owner-empty-state">
             <i className="bi bi-calendar-x" />
-            Booking requests and listing messages will appear here.
+            Booking requests will appear here.
           </div>
         )}
       </section>
+
+      {promotionListing && (
+        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content" style={{ background: "var(--card-bg, #fff)" }}>
+              <form onSubmit={submitPromotionRequest}>
+                <div className="modal-header border-0">
+                  <h5 className="modal-title">Promote Listing</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setPromotionListing(null)}
+                  />
+                </div>
+                <div className="modal-body">
+                  <p className="fw-bold mb-3">{promotionListing.title}</p>
+                  <div className="mb-3">
+                    <label className="form-label">Promotion Type</label>
+                    <select
+                      className="form-select"
+                      value={selectedPromotionPackage}
+                      onChange={(event) => setSelectedPromotionPackage(Number(event.target.value))}
+                    >
+                      {promotionPackages.map((pack) => (
+                        <option value={pack.id} key={pack.id}>
+                          {pack.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Duration</label>
+                    <select
+                      className="form-select"
+                      value={selectedPromotionDuration}
+                      onChange={(event) => setSelectedPromotionDuration(Number(event.target.value))}
+                    >
+                      {durationOptions.map((days) => (
+                        <option value={days} key={days}>
+                          {days} days
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {(() => {
+                    const pack = promotionPackages.find(
+                      (item) => item.id === selectedPromotionPackage,
+                    );
+                    const amount = (pack?.baseRate || 100) * selectedPromotionDuration;
+                    return (
+                      <div className="alert alert-info">
+                        <strong>Duration:</strong> {selectedPromotionDuration} days
+                        <br />
+                        <strong>Amount:</strong> {amount} ETB
+                      </div>
+                    );
+                  })()}
+                  <label className="payment-upload-zone w-100 position-relative">
+                    <input
+                      type="file"
+                      className="d-none"
+                      accept="image/jpeg,image/png,image/jpg"
+                      onChange={handlePromotionScreenshot}
+                    />
+                    {promotionScreenshot ? (
+                      <div className="position-relative text-center">
+                        <img
+                          src={promotionScreenshot.preview}
+                          alt="Promotion payment screenshot preview"
+                          className="img-fluid rounded-3 border"
+                          style={{ maxHeight: "180px" }}
+                        />
+                        <div className="mt-3 text-primary fw-bold">
+                          <i className="bi bi-image" /> Click to change screenshot
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center p-4 border rounded dashed">
+                        <i className="bi bi-cloud-arrow-up fs-2 text-primary" />
+                        <h5 className="fw-bold mt-2">Upload Payment Screenshot</h5>
+                        <p className="text-muted small mb-0">JPG, JPEG, or PNG</p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+                <div className="modal-footer border-0">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => setPromotionListing(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-accent-custom">
+                    Submit Promotion Request
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

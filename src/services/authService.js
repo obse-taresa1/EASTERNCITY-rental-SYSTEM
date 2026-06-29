@@ -7,7 +7,7 @@ const CURRENT_USER_KEY = "currentUser";
 export function getUsers() {
   const storedUsers = readStorage(USERS_KEY, null);
 
-  if (storedUsers) {
+  if (Array.isArray(storedUsers)) {
     const storedUserIds = new Set(storedUsers.map((user) => user.id));
     const storedUserEmails = new Set(
       storedUsers.map((user) => user.email?.toLowerCase()).filter(Boolean),
@@ -27,6 +27,10 @@ export function getUsers() {
     return storedUsers;
   }
 
+  if (storedUsers) {
+    writeStorage(USERS_KEY, defaultUsers);
+  }
+
   writeStorage(USERS_KEY, defaultUsers);
   return defaultUsers;
 }
@@ -36,7 +40,13 @@ export function saveUsers(users) {
 }
 
 export function getCurrentUser() {
-  return readStorage(CURRENT_USER_KEY, null);
+  const currentUser = readStorage(CURRENT_USER_KEY, null);
+
+  if (!currentUser || typeof currentUser !== "object") {
+    return null;
+  }
+
+  return currentUser;
 }
 
 export function setCurrentUser(user) {
@@ -97,8 +107,8 @@ export function registerUser(formData) {
     password: formData.password,
     role: formData.role || "both",
     businessName: formData.businessName || "",
-    nationalIdFront: formData.nationalIdFront || "",
-    nationalIdBack: formData.nationalIdBack || "",
+    nationalIdFront: formData.nationalIdFront ? "uploaded" : "",
+    nationalIdBack: formData.nationalIdBack ? "uploaded" : "",
     verificationStatus: "Pending Verification",
   };
 
@@ -123,16 +133,27 @@ export function logoutUser() {
 }
 
 export function dashboardForRole(role) {
+  const normalized = normalizeRole(role);
   const routes = {
-    admin: "/admin",
-    supervisor: "/admin",
-    superadmin: "/super-admin",
-    "super-admin": "/super-admin",
-    lessee: "/both-dashboard",
-    renter: "/both-dashboard",
+    "super-admin": "/super-admin-dashboard",
+    admin: "/admin-dashboard",
     lessor: "/both-dashboard",
+    renter: "/both-dashboard",
     both: "/both-dashboard",
+    user: "/both-dashboard",
   };
 
-  return routes[String(role || "").toLowerCase()] || "/login";
+  return routes[normalized] || "/login";
+}
+
+export function normalizeRole(role) {
+  if (!role) return "user";
+  // Replace underscores to handle "SUPER_ADMIN" as "super-admin"
+  const r = String(role).toLowerCase().replace(/_/g, "-");
+  if (r === "superadmin" || r === "super-admin") return "super-admin";
+  if (r === "admin" || r === "supervisor") return "admin";
+  if (r === "lessor" || r === "owner") return "lessor";
+  if (r === "renter" || r === "lessee") return "renter";
+  if (r === "both") return "both";
+  return "user";
 }

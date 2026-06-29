@@ -7,12 +7,6 @@ import "./styles/styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuthProvider>
-      <ThemeProvider>
-        <LanguageProvider>
-          <App />
-        </LanguageProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <App />
   </React.StrictMode>,
 );

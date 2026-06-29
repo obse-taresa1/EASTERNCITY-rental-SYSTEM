@@ -7,7 +7,7 @@ export default function SuperAdminLayout() {
     <div className="dashboard-shell">
       <AdminSidebar variant="superadmin" />
 
-      <div className="dashboard-main">
+      <div className="admin-main">
         <AdminTopbar title="Super Admin Panel" />
         <Outlet />
       </div>

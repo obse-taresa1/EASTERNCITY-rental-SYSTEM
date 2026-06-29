@@ -70,6 +70,9 @@ export default function ListItemPage() {
   const [formData, setFormData] = useState(initialFormData);
   const [images, setImages] = useState([]);
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isPaymentStep, setIsPaymentStep] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("Telebirr");
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
   const [notice, setNotice] = useState("");
 
   const selectedCategory = useMemo(
@@ -158,7 +161,7 @@ export default function ListItemPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function buildListing(status) {
+  function buildListing(status, screenshot) {
     const selectedCategoryName = selectedCategory?.name || formData.category;
     return {
       title: formData.title || "Untitled rental listing",
@@ -176,8 +179,8 @@ export default function ListItemPage() {
       image: images[0]?.preview,
       coverImage: images[0]?.preview,
       images,
-      status: status === "draft" ? "draft" : "pending approval",
-      available: status !== "draft",
+      status: status,
+      available: status === "PUBLISHED" || status === "active",
       featured: false,
       owner:
         activeUser?.businessName || activeUser?.name || "EasternCity Owner",
@@ -206,17 +209,36 @@ export default function ListItemPage() {
         { icon: "bi-tags", label: selectedCategoryName },
         { icon: "bi-geo-alt", label: formData.city || "Jigjiga" },
       ],
+      paymentScreenshot: screenshot?.preview,
+      createdAt: new Date().toISOString()
     };
   }
 
-  function finishListing(status) {
-    saveOwnerListing(buildListing(status));
+  function finishListing(status, screenshot = null) {
+    const listingStatus = status === "draft" ? "draft" : "UNDER_REVIEW";
+    saveOwnerListing(buildListing(listingStatus, screenshot));
     setNotice(
       status === "draft"
         ? "Listing saved as draft."
-        : "Listing submitted for approval.",
+        : "Listing submitted. Waiting for admin review after payment verification.",
     );
-    setTimeout(() => navigate("/lessor-dashboard"), 500);
+    setTimeout(() => navigate("/dashboard"), 500);
+  }
+
+  async function handleScreenshotUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const dataUrl = await fileToDataUrl(file);
+    setPaymentScreenshot({ name: file.name, preview: dataUrl });
+  }
+
+  function handlePaymentSubmit(e) {
+    e.preventDefault();
+    if (!paymentScreenshot) {
+      setNotice("Please upload a payment screenshot before submitting.");
+      return;
+    }
+    finishListing("publish", paymentScreenshot);
   }
 
   if (isPreviewing) {
@@ -300,7 +322,7 @@ export default function ListItemPage() {
           </p>
         </section>
 
-        <div className="listing-form-actions">
+      <div className="listing-form-actions">
           <button
             type="button"
             className="btn btn-outline-secondary"
@@ -308,13 +330,99 @@ export default function ListItemPage() {
           >
             <i className="bi bi-file-earmark" /> Save Draft
           </button>
-          <button
-            type="button"
-            className="btn btn-accent-custom btn-shine"
-            onClick={() => finishListing("publish")}
-          >
-            <i className="bi bi-send-check" /> Publish Listing
-          </button>
+          {!isPaymentStep ? (
+            <button
+              type="button"
+              className="btn btn-accent-custom btn-shine"
+              onClick={() => { setIsPaymentStep(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            >
+              <i className="bi bi-credit-card" /> Proceed to Payment
+            </button>
+          ) : (
+            <div style={{ width: "100%" }}>
+              {/* ── Listing Fee Payment Step ─────────────────────────── */}
+              <div className="listing-form-section" style={{ border: "2px solid var(--primary-color)", borderRadius: "12px", padding: "1.5rem", marginBottom: "1rem" }}>
+                <h2 style={{ color: "var(--primary-color)" }}>
+                  <i className="bi bi-credit-card me-2" />Listing Fee Payment
+                </h2>
+                <p className="text-muted mb-3">
+                  Your listing becomes visible after payment verification and admin approval.
+                </p>
+
+                <div className="bg-light p-3 rounded mb-3">
+                  <div className="d-flex justify-content-between mb-2">
+                    <span className="fw-bold">Listing Fee</span>
+                    <span>500 ETB</span>
+                  </div>
+                  <div className="d-flex justify-content-between fw-bold" style={{ borderTop: "1px solid #dee2e6", paddingTop: "0.5rem" }}>
+                    <span>Total</span>
+                    <span style={{ color: "var(--primary-color)" }}>500 ETB</span>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label fw-bold">Payment Method</label>
+                  <div className="d-flex gap-3">
+                    {["Telebirr", "CBE Birr", "Bank Transfer"].map(method => (
+                      <label key={method} className="d-flex align-items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value={method}
+                          checked={paymentMethod === method}
+                          onChange={e => setPaymentMethod(e.target.value)}
+                        />
+                        <span>{method}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label fw-bold">Upload Payment Screenshot</label>
+                  <label className="btn btn-outline-danger d-block">
+                    <i className="bi bi-upload me-2" />
+                    {paymentScreenshot ? paymentScreenshot.name : "Choose Screenshot (JPG, PNG)"}
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                      hidden
+                      onChange={handleScreenshotUpload}
+                    />
+                  </label>
+                  {paymentScreenshot && (
+                    <img
+                      src={paymentScreenshot.preview}
+                      alt="Payment screenshot"
+                      style={{ maxHeight: "150px", marginTop: "0.5rem", borderRadius: "8px", border: "1px solid #dee2e6" }}
+                    />
+                  )}
+                </div>
+
+                <div className="alert alert-info mb-0">
+                  <i className="bi bi-info-circle me-2" />
+                  After submission your listing will be reviewed by our team. You will be notified once approved.
+                </div>
+              </div>
+
+              <div className="listing-form-actions" style={{ padding: 0 }}>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setIsPaymentStep(false)}
+                >
+                  <i className="bi bi-arrow-left" /> Back to Preview
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-accent-custom btn-shine"
+                  onClick={handlePaymentSubmit}
+                >
+                  <i className="bi bi-send-check" /> Submit &amp; Await Review
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     );

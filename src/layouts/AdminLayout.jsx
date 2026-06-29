@@ -7,7 +7,7 @@ export default function AdminLayout() {
     <div className="dashboard-shell">
       <AdminSidebar />
 
-      <div className="dashboard-main">
+      <div className="admin-main">
         <AdminTopbar title="Admin Panel" />
         <Outlet />
       </div>

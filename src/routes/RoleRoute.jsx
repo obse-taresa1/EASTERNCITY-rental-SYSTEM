@@ -1,38 +1,34 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-
-const dashboardPathByRole = {
-  renter: "/renter-dashboard",
-  lessor: "/lessor-dashboard",
-  both: "/both-dashboard",
-  admin: "/admin",
-  superadmin: "/super-admin",
-};
+import { dashboardForRole, normalizeRole } from "../services/authService.js";
 
 export default function RoleRoute({ allowedRoles = [], children }) {
-  const { user } = useAuth();
+  const { user, currentUser } = useAuth();
+  const activeUser = user || currentUser;
 
-  if (!user) {
+  // If no authenticated user, redirect to login
+  if (!activeUser) {
     return <Navigate to="/login" replace />;
   }
 
+  // Normalize allowed roles for comparison
   const normalizedAllowedRoles = allowedRoles.map((role) =>
-    String(role).toLowerCase(),
+    normalizeRole(role),
   );
 
+  // If no specific role restriction, render children or outlet
   if (normalizedAllowedRoles.length === 0) {
-    // Error 1: Fixed missing || operator
     return children || <Outlet />;
   }
 
-  // Error 2: Fixed missing || operator
-  const userRole = String(user.role || "").toLowerCase();
+  // Determine the user's role (normalize for consistency)
+  const userRole = normalizeRole(activeUser.role);
 
+  // If role not allowed, redirect to appropriate dashboard for that role
   if (!normalizedAllowedRoles.includes(userRole)) {
-    // Error 3: Fixed missing || operator
-    return <Navigate to={dashboardPathByRole[userRole] || "/"} replace />;
+    return <Navigate to={dashboardForRole(userRole)} replace />;
   }
 
-  // Error 4: Fixed missing || operator
+  // Role is allowed – render children or outlet
   return children || <Outlet />;
 }

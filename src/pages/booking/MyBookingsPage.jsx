@@ -9,17 +9,12 @@ import LeaveReviewModal from "../../components/reviews/LeaveReviewModal.jsx";
 
 const STATUS_LABELS = {
   pending: {
-    label: "Pending Payment",
+    label: "Pending",
     class: "badge-pending",
-    icon: "bi-wallet2",
-  },
-  awaiting_verification: {
-    label: "Awaiting Verification",
-    class: "badge-waiting",
     icon: "bi-hourglass-split",
   },
-  confirmed: {
-    label: "Confirmed",
+  accepted: {
+    label: "Accepted",
     class: "badge-confirmed",
     icon: "bi-check-circle-fill",
   },
@@ -46,7 +41,7 @@ export default function MyBookingsPage() {
   const location = useLocation();
   const [, setRefreshToken] = useState(0);
   const [reviewBooking, setReviewBooking] = useState(null);
-  const [activeTab, setActiveTab] = useState("pending_verification");
+  const [activeTab, setActiveTab] = useState("pending");
   const [successMessage, setSuccessMessage] = useState(
     location.state?.successMessage || "",
   );
@@ -61,12 +56,10 @@ export default function MyBookingsPage() {
 
   const getFilteredBookings = () => {
     switch (activeTab) {
-      case "pending_verification":
-        return bookings.filter((b) =>
-          ["pending", "awaiting_verification"].includes(b.status),
-        );
-      case "confirmed":
-        return bookings.filter((b) => b.status === "confirmed");
+      case "pending":
+        return bookings.filter((b) => b.status === "pending");
+      case "accepted":
+        return bookings.filter((b) => b.status === "accepted");
       case "active":
         return bookings.filter((b) => b.status === "active");
       case "finished":
@@ -118,16 +111,16 @@ export default function MyBookingsPage() {
 
       <div className="d-flex gap-2 mb-4 overflow-auto pb-2 border-bottom details-tab-system">
         <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "pending_verification" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("pending_verification")}
+          className={`btn rounded-pill fw-bold px-4 ${activeTab === "pending" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
+          onClick={() => setActiveTab("pending")}
         >
-          Pending Verification
+          Pending
         </button>
         <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "confirmed" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("confirmed")}
+          className={`btn rounded-pill fw-bold px-4 ${activeTab === "accepted" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
+          onClick={() => setActiveTab("accepted")}
         >
-          Confirmed Bookings
+          Accepted Bookings
         </button>
         <button
           className={`btn rounded-pill fw-bold px-4 ${activeTab === "active" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
@@ -169,7 +162,6 @@ export default function MyBookingsPage() {
               STATUS_LABELS[booking.status] || STATUS_LABELS.pending;
             const isCompleted = booking.status === "completed";
             const alreadyReviewed = hasReviewForBooking(booking.id);
-            const isPending = booking.status === "pending";
 
             return (
               <div className="col-12" key={booking.id}>
@@ -226,10 +218,10 @@ export default function MyBookingsPage() {
                         {booking.owner}
                       </div>
                       <div className="col-sm-6 col-md-3">
-                        <i className="bi bi-credit-card me-2"></i>
+                        <i className="bi bi-info-circle me-2"></i>
                         <strong>Payment:</strong>
                         <br />
-                        {booking.paymentMethod?.toUpperCase()}
+                        Direct with owner
                       </div>
                       <div className="col-sm-6 col-md-3">
                         <i className="bi bi-geo-alt me-2"></i>
@@ -251,15 +243,6 @@ export default function MyBookingsPage() {
                       View Item
                     </Link>
 
-                    {isPending && !booking.paymentScreenshotUrl && (
-                      <Link
-                        to={`/booking/${booking.itemId}`}
-                        className="btn btn-danger w-100 rounded-pill fw-bold"
-                      >
-                        Complete Payment
-                      </Link>
-                    )}
-
                     {isCompleted &&
                       (alreadyReviewed ? (
                         <span className="btn btn-light w-100 rounded-pill fw-bold text-success border">
@@ -275,6 +258,12 @@ export default function MyBookingsPage() {
                         </button>
                       ))}
                   </div>
+                </div>
+                <div className="alert alert-info mt-3 mb-0">
+                  <strong>Payment Information</strong>
+                  <p className="mb-0">
+                    This platform does not process rental payments. Payment arrangements are made directly with the listing owner.
+                  </p>
                 </div>
               </div>
             );

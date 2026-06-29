@@ -1,7 +1,7 @@
 import AdminStatGrid from "../../components/admin/AdminStatGrid.jsx";
 import AdminDataTable from "../../components/admin/AdminDataTable.jsx";
 import { getBookings } from "../../services/bookingService.js";
-import { getUsers } from "../../services/authService.js";
+import { getUsers, normalizeRole } from "../../services/authService.js";
 import { getAllItems } from "../../services/itemService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
@@ -9,106 +9,93 @@ export default function AdminDashboardPage() {
   const users = getUsers();
   const bookings = getBookings();
   const items = getAllItems();
-  const featuredRevenue = items.filter((item) => item.featured).length * 200;
-  const subscriptionRevenue =
-    items.filter((item) => item.subscriptionPlan === "Pro Plan").length * 750;
-  const verificationRevenue =
-    items.filter((item) => item.verificationStatus === "verified").length * 200;
-  const advertisementRevenue = 12400;
-
-  const totalRevenue =
-    bookings.reduce(
-      (sum, booking) => sum + Number(booking.totalAmount || 0),
-      0,
-    ) +
-    featuredRevenue +
-    subscriptionRevenue +
-    verificationRevenue +
-    advertisementRevenue;
-
+  
+  const platformUsers = users.filter((user) => normalizeRole(user.role) === "USER");
+  
+  const activeListings = items.filter(i => i.available !== false);
+  const pendingListings = items.filter(i => i.status === 'pending');
+  const featuredListings = items.filter(i => i.isFeatured || i.rating >= 4.8); // Calculate featured based on rating
+  
   const stats = [
-    {
-      icon: "bi-people",
-      label: "Users",
-      value: users.length,
-    },
-    {
-      icon: "bi-box-seam",
-      label: "Listings",
-      value: items.length,
-      tone: "success",
-    },
-    {
-      icon: "bi-calendar-check",
-      label: "Bookings",
-      value: bookings.length,
-      tone: "warning",
-    },
-    {
-      icon: "bi-cash-stack",
-      label: "Revenue",
-      value: formatCurrency(totalRevenue),
-      tone: "info",
-    },
+    { icon: "bi-people", label: "Total Users", value: users.length },
+    { icon: "bi-person-badge", label: "Total Owners", value: platformUsers.length },
+    { icon: "bi-person-check", label: "Total Renters", value: platformUsers.length },
+    { icon: "bi-box-seam", label: "Total Listings", value: items.length },
+    { icon: "bi-check-circle", label: "Active Listings", value: activeListings.length },
+    { icon: "bi-hourglass-split", label: "Pending Listings", value: pendingListings.length },
+    { icon: "bi-award", label: "Featured Listings", value: featuredListings.length },
+    { icon: "bi-cash-stack", label: "Promotion Requests", value: 4 },
+    { icon: "bi-shield-check", label: "Verification Requests", value: 2 },
+    { icon: "bi-headset", label: "Support Tickets", value: 3 },
   ];
 
   return (
     <main className="dashboard-content">
-      <span className="section-label">ADMIN DASHBOARD</span>
-      <h1>Platform Overview</h1>
+      <div className="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <span className="section-label">ADMIN DASHBOARD</span>
+          <h1 className="h3 mb-0">Dashboard Overview</h1>
+        </div>
+      </div>
 
       <AdminStatGrid stats={stats} />
 
-      <h2 className="h4 mb-3">Recent Bookings</h2>
-      <AdminDataTable
-        columns={[
-          { key: "itemTitle", label: "Item" },
-          { key: "userName", label: "Renter" },
-          {
-            key: "totalAmount",
-            label: "Amount",
-            render: (row) => formatCurrency(row.totalAmount),
-          },
-          { key: "paymentMethod", label: "Payment" },
-          { key: "status", label: "Status" },
-        ]}
-        rows={bookings.slice(0, 6)}
-      />
+      <div className="row mt-4">
+        <div className="col-lg-6 mb-4">
+          <div className="admin-table-container">
+            <h2 className="h5 mb-3 d-flex align-items-center gap-2">
+              <i className="bi bi-people text-primary-custom"></i> Recent Users
+            </h2>
+            <AdminDataTable
+              columns={[
+                { key: "name", label: "Name" },
+                { key: "role", label: "Role" },
+                { key: "email", label: "Email" },
+              ]}
+              rows={users.slice(-5).reverse()}
+            />
+          </div>
+        </div>
+        <div className="col-lg-6 mb-4">
+          <div className="admin-table-container">
+            <h2 className="h5 mb-3 d-flex align-items-center gap-2">
+              <i className="bi bi-box-seam text-primary-custom"></i> Recent Listings
+            </h2>
+            <AdminDataTable
+              columns={[
+                { key: "title", label: "Title" },
+                { key: "category", label: "Category" },
+                { key: "pricePerDay", label: "Price/Day", render: (r) => formatCurrency(r.pricePerDay) },
+              ]}
+              rows={items.slice(-5).reverse()}
+            />
+          </div>
+        </div>
+      </div>
 
-      <section className="dashboard-section mt-4">
-        <div className="owner-section-heading">
-          <div>
-            <span className="section-label">MARKETPLACE REVENUE</span>
-            <h2 className="h4 mb-1">Monetization Channels</h2>
-            <p className="owner-muted mb-0">
-              Track subscriptions, featured boosts, verification, and
-              advertisement placements without blocking free entry.
-            </p>
+      <div className="row">
+        <div className="col-lg-12 mb-4">
+          <div className="admin-table-container">
+            <h2 className="h5 mb-3 d-flex align-items-center gap-2">
+              <i className="bi bi-cash-stack text-primary-custom"></i> Recent Promotion Payments
+            </h2>
+            <AdminDataTable
+              columns={[
+                { key: "id", label: "Promo Request ID" },
+                { key: "itemTitle", label: "Listing Item" },
+                { key: "userName", label: "Owner" },
+                { key: "totalAmount", label: "Amount", render: (row) => formatCurrency(row.totalAmount || 1000) },
+                { key: "status", label: "Status" },
+              ]}
+              rows={[
+                { id: "PR-8291", itemTitle: "Toyota RAV4", userName: "Abebe Rental", totalAmount: 2000, status: "pending" },
+                { id: "PR-8292", itemTitle: "Gaming PC", userName: "Tech Hub Rentals", totalAmount: 1000, status: "approved" },
+                { id: "PR-8293", itemTitle: "Dewalt Drill Kit", userName: "BuildRight Tools", totalAmount: 500, status: "active" },
+              ]}
+            />
           </div>
         </div>
-        <div className="owner-revenue-grid">
-          <div className="owner-monetization-card">
-            <span>Subscription Revenue</span>
-            <strong>{formatCurrency(subscriptionRevenue)}</strong>
-            <small>Pro Plan owners with unlimited listings and insights.</small>
-          </div>
-          <div className="owner-monetization-card">
-            <span>Featured Listing Revenue</span>
-            <strong>{formatCurrency(featuredRevenue)}</strong>
-            <small>3, 7, and 30 day promotion packages.</small>
-          </div>
-          <div className="owner-monetization-card">
-            <span>Verification Revenue</span>
-            <strong>{formatCurrency(verificationRevenue)}</strong>
-            <small>National ID review and verified owner badges.</small>
-          </div>
-          <div className="owner-monetization-card">
-            <span>Advertisement Revenue</span>
-            <strong>{formatCurrency(advertisementRevenue)}</strong>
-            <small>Homepage, category, and dashboard banner inventory.</small>
-          </div>
-        </div>
-      </section>
+      </div>
     </main>
   );
 }
