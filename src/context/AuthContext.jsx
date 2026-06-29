@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
 
   function login(email, password) {
     const user = loginUser(email, password);
-    setCurrentUserState(user);
+    setCurrentUser(user);
     return user;
   }
 

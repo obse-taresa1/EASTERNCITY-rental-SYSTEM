@@ -39,7 +39,6 @@ export function createBooking(bookingData) {
     "owner",
     "startDate",
     "endDate",
-    "paymentMethod",
   ];
   const missingFields = requiredFields.filter((f) => !bookingData[f]);
   if (missingFields.length > 0)
@@ -50,10 +49,8 @@ export function createBooking(bookingData) {
 
   const newBooking = {
     id: `booking-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    // Payment flow status: pending -> awaiting_verification -> confirmed -> active -> completed
+    // Booking flow status: pending -> accepted -> active -> completed
     status: "pending",
-    paymentStatus: "pending", // pending | screenshot_uploaded | awaiting_verification | approved | rejected
-    paymentScreenshot: null,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
     ...bookingData,
@@ -66,11 +63,10 @@ export function createBooking(bookingData) {
 export function updateBookingStatus(id, status) {
   const validStatuses = [
     "pending",
-    "confirmed",
+    "accepted",
     "active",
     "completed",
     "cancelled",
-    "awaiting_verification",
   ];
   if (!validStatuses.includes(status))
     throw new Error(`Invalid status: ${status}`);
@@ -82,37 +78,6 @@ export function updateBookingStatus(id, status) {
   bookings[idx] = {
     ...bookings[idx],
     status,
-    updatedAt: new Date().toISOString(),
-  };
-  setStorageItem(BOOKINGS_KEY, bookings);
-  return bookings[idx];
-}
-
-export function uploadPaymentScreenshot(bookingId, screenshotDataUrl) {
-  const bookings = getBookings();
-  const idx = bookings.findIndex((b) => b.id === bookingId);
-  if (idx === -1) throw new Error(`Booking ${bookingId} not found.`);
-
-  bookings[idx] = {
-    ...bookings[idx],
-    paymentScreenshot: screenshotDataUrl,
-    paymentStatus: "awaiting_verification",
-    status: "awaiting_verification",
-    updatedAt: new Date().toISOString(),
-  };
-  setStorageItem(BOOKINGS_KEY, bookings);
-  return bookings[idx];
-}
-
-export function approvePayment(bookingId) {
-  const bookings = getBookings();
-  const idx = bookings.findIndex((b) => b.id === bookingId);
-  if (idx === -1) throw new Error(`Booking ${bookingId} not found.`);
-
-  bookings[idx] = {
-    ...bookings[idx],
-    paymentStatus: "approved",
-    status: "confirmed",
     updatedAt: new Date().toISOString(),
   };
   setStorageItem(BOOKINGS_KEY, bookings);
@@ -141,9 +106,7 @@ export function getBookingsByDateRange(startDate, endDate) {
 
 export function getActiveBookings() {
   return getBookings().filter((b) =>
-    ["confirmed", "pending", "active", "awaiting_verification"].includes(
-      b.status,
-    ),
+    ["pending", "accepted", "active"].includes(b.status),
   );
 }
 

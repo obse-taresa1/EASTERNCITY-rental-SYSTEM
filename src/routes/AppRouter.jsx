@@ -27,6 +27,7 @@ import MyBookingsPage from "../pages/booking/MyBookingsPage.jsx";
 
 import BothDashboardPage from "../pages/dashboard/BothDashboardPage.jsx";
 import ListItemPage from "../pages/dashboard/ListItemPage.jsx";
+import MyListingsPage from "../pages/dashboard/MyListingsPage.jsx";
 
 import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import MessagesPage from "../pages/profile/MessagesPage.jsx";
@@ -35,7 +36,23 @@ import NotificationsPage from "../pages/profile/NotificationsPage.jsx";
 import LoginPage from "../pages/auth/LoginPage.jsx";
 import RegisterPage from "../pages/auth/RegisterPage.jsx";
 
+
+import AdminPaymentsPage from "../pages/admin/AdminPaymentsPage.jsx";
+import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage.jsx";
+import FeaturedListingsPage from "../pages/admin/FeaturedListingsPage.jsx";
+import PromotionHistoryPage from "../pages/admin/PromotionHistoryPage.jsx";
+import AdminVerificationPage from "../pages/admin/AdminVerificationPage.jsx";
+import AdminAnalyticsPage from "../pages/admin/AdminAnalyticsPage.jsx";
+import AdminSupportTicketsPage from "../pages/admin/AdminSupportTicketsPage.jsx";
+import AdminNotificationsPage from "../pages/admin/AdminNotificationsPage.jsx";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage.jsx";
+import AdminOwnersPage from "../pages/admin/AdminOwnersPage.jsx";
+import AdminRentersPage from "../pages/admin/AdminRentersPage.jsx";
+import AdminBookingsPage from "../pages/admin/AdminBookingsPage.jsx";
+import AdminReviewsPage from "../pages/admin/AdminReviewsPage.jsx";
+
+// Inside Admin Layout routes block (after existing admin routes)
+
 import UserManagementPage from "../pages/admin/UserManagementPage.jsx";
 import AdminListingManagementPage from "../pages/admin/AdminListingManagementPage.jsx";
 import AdminReportsPage from "../pages/admin/AdminReportsPage.jsx";
@@ -51,6 +68,15 @@ import RoleRequestsPage from "../pages/super-admin/RoleRequestsPage.jsx";
 import AnalyticsPage from "../pages/super-admin/AnalyticsPage.jsx";
 import ActivityLogsPage from "../pages/super-admin/ActivityLogsPage.jsx";
 import SystemSettingsPage from "../pages/super-admin/SystemSettingsPage.jsx";
+import PlatformOverviewPage from "../pages/super-admin/PlatformOverviewPage.jsx";
+import SuperPaymentsRevenuePage from "../pages/super-admin/SuperPaymentsRevenuePage.jsx";
+import SuperVerificationCenterPage from "../pages/super-admin/SuperVerificationCenterPage.jsx";
+import SecurityCenterPage from "../pages/super-admin/SecurityCenterPage.jsx";
+import SuperReportsComplaintsPage from "../pages/super-admin/SuperReportsComplaintsPage.jsx";
+import SuperSupportCenterPage from "../pages/super-admin/SuperSupportCenterPage.jsx";
+import SuperCategoriesManagementPage from "../pages/super-admin/SuperCategoriesManagementPage.jsx";
+import SuperPlatformMonitoringPage from "../pages/super-admin/SuperPlatformMonitoringPage.jsx";
+import SuperPromotionManagementPage from "../pages/super-admin/SuperPromotionManagementPage.jsx";
 
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -110,7 +136,7 @@ export default function AppRouter() {
               path="/both-dashboard"
               element={
                 <RoleRoute
-                  allowedRoles={["renter", "lessee", "lessor", "both"]}
+                  allowedRoles={["renter", "lessee", "lessor", "both", "user"]}
                 >
                   <BothDashboardPage />
                 </RoleRoute>
@@ -121,9 +147,20 @@ export default function AppRouter() {
               path="/list-item"
               element={
                 <RoleRoute
-                  allowedRoles={["renter", "lessee", "lessor", "both"]}
+                  allowedRoles={["renter", "lessee", "lessor", "both", "user"]}
                 >
                   <ListItemPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/my-listings"
+              element={
+                <RoleRoute
+                  allowedRoles={["renter", "lessee", "lessor", "both", "user"]}
+                >
+                  <MyListingsPage />
                 </RoleRoute>
               }
             />
@@ -144,18 +181,28 @@ export default function AppRouter() {
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allowedRoles={["admin", "supervisor"]} />}>
             <Route element={<AdminLayout />}>
-              <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/admin/users" element={<UserManagementPage />} />
+              <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin-dashboard/categories" element={<AdminCategoriesPage />} />
+              <Route path="/admin-dashboard/payments" element={<AdminPaymentsPage />} />
               <Route
-                path="/admin/listings"
-                element={<AdminListingManagementPage />}
+                path="/admin-dashboard/promotion-management"
+                element={<SuperPromotionManagementPage scope="admin" />}
               />
-              <Route path="/admin/reports" element={<AdminReportsPage />} />
-              <Route
-                path="/admin/statistics"
-                element={<AdminStatisticsPage />}
-              />
-              <Route path="/admin/settings" element={<AdminSettingsPage />} />
+              <Route path="/admin-dashboard/featured-listings" element={<FeaturedListingsPage />} />
+              <Route path="/admin-dashboard/promotion-history" element={<PromotionHistoryPage />} />
+              <Route path="/admin-dashboard/verification-requests" element={<AdminVerificationPage />} />
+              <Route path="/admin-dashboard/analytics" element={<AdminAnalyticsPage />} />
+              <Route path="/admin-dashboard/support-tickets" element={<AdminSupportTicketsPage />} />
+              <Route path="/admin-dashboard/notifications" element={<AdminNotificationsPage />} />
+              <Route path="/admin-dashboard/owners" element={<AdminOwnersPage />} />
+<Route path="/admin-dashboard/renters" element={<AdminRentersPage />} />
+<Route path="/admin-dashboard/bookings" element={<AdminBookingsPage />} />
+<Route path="/admin-dashboard/reviews" element={<AdminReviewsPage />} />
+<Route path="/admin-dashboard/users" element={<UserManagementPage />} />
+              <Route path="/admin-dashboard/listings" element={<AdminListingManagementPage />} />
+              <Route path="/admin-dashboard/reports" element={<AdminReportsPage />} />
+              <Route path="/admin-dashboard/statistics" element={<AdminStatisticsPage />} />
+              <Route path="/admin-dashboard/settings" element={<AdminSettingsPage />} />
             </Route>
           </Route>
         </Route>
@@ -166,41 +213,47 @@ export default function AppRouter() {
           >
             <Route element={<SuperAdminLayout />}>
               <Route
-                path="/super-admin"
+                path="/super-admin-dashboard"
                 element={<SuperAdminDashboardPage />}
               />
               <Route
-                path="/super-admin/admin-management"
+                path="/super-admin-dashboard/admin-management"
                 element={<AdminManagementPage />}
               />
               <Route
-                path="/super-admin/user-management"
+                path="/super-admin-dashboard/user-management"
                 element={<SuperUserManagementPage />}
               />
               <Route
-                path="/super-admin/listing-management"
+                path="/super-admin-dashboard/listing-management"
                 element={<SuperListingManagementPage />}
               />
               <Route
-                path="/super-admin/contact-messages"
+                path="/super-admin-dashboard/contact-messages"
                 element={<ContactMessagesPage />}
               />
               <Route
-                path="/super-admin/role-requests"
+                path="/super-admin-dashboard/role-requests"
                 element={<RoleRequestsPage />}
               />
               <Route
-                path="/super-admin/analytics"
+                path="/super-admin-dashboard/analytics"
                 element={<AnalyticsPage />}
               />
               <Route
-                path="/super-admin/activity-logs"
+                path="/super-admin-dashboard/activity-logs"
                 element={<ActivityLogsPage />}
               />
-              <Route
-                path="/super-admin/system-settings"
-                element={<SystemSettingsPage />}
-              />
+              <Route path="/super-admin-dashboard/platform-overview" element={<PlatformOverviewPage />} />
+              <Route path="/super-admin-dashboard/payments-revenue" element={<SuperPaymentsRevenuePage />} />
+              <Route path="/super-admin-dashboard/verification-center" element={<SuperVerificationCenterPage />} />
+              <Route path="/super-admin-dashboard/security-center" element={<SecurityCenterPage />} />
+              <Route path="/super-admin-dashboard/reports-complaints" element={<SuperReportsComplaintsPage />} />
+              <Route path="/super-admin-dashboard/support-center" element={<SuperSupportCenterPage />} />
+              <Route path="/super-admin-dashboard/categories-management" element={<SuperCategoriesManagementPage />} />
+              <Route path="/super-admin-dashboard/platform-monitoring" element={<SuperPlatformMonitoringPage />} />
+              <Route path="/super-admin-dashboard/promotion-management" element={<SuperPromotionManagementPage />} />
+              <Route path="/super-admin-dashboard/system-settings" element={<SystemSettingsPage />} />
             </Route>
           </Route>
         </Route>

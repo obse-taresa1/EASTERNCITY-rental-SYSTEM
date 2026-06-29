@@ -10,7 +10,7 @@ export default function RegisterPage() {
     name: "",
     email: "",
     password: "",
-    role: "both",
+    role: "USER",
     nationalIdFront: "",
     nationalIdBack: "",
   });

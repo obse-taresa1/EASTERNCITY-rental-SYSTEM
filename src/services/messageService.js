@@ -51,7 +51,7 @@ export function startListingConversation({ renter, item }) {
       location: item.location,
     },
     participants: [
-      { id: renter.id, name: renter.name || "Renter", role: "renter" },
+      { id: renter.id, name: renter.name || "User", role: "USER" },
       { id: ownerId, name: ownerName, role: "owner" },
     ],
     messages: [

@@ -18,7 +18,7 @@ export default function ProfilePage() {
           {/* Error 2: Fixed missing || operator */}
           <p className="text-muted mb-1">{user?.email || "user@example.com"}</p>
           <p className="mb-0">
-            <strong>Role:</strong> {user?.role || "renter"}
+            <strong>Role:</strong> {user?.role || "USER"}
           </p>
         </div>
       </div>

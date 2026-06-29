@@ -136,9 +136,19 @@ export default function ItemDetailsPage() {
                   : renderStars(Math.round(Number(averageRating)))}
               </div>
             </div>
+            <div className="alert alert-info py-2">
+              Rental payments are handled directly between users.
+            </div>
             <button
               type="button"
               className="btn btn-accent-custom btn-shine details-contact-button"
+              onClick={() => navigate(`/booking/${item.id}`)}
+            >
+              <i className="bi bi-calendar-check"></i> Request Booking
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-danger details-contact-button"
               onClick={handleContactOwner}
             >
               <i className="bi bi-chat-dots"></i> Contact Owner

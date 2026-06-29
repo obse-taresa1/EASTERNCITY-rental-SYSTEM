@@ -63,6 +63,22 @@ export async function processPayment(paymentMethod, paymentDetails) {
   return paymentFunction(paymentDetails);
 }
 
+export function fetchPromotionPayments() {
+  const storedRequests = getStoredPromotionRequests();
+
+  return storedRequests.map((request) => ({
+    transactionId: request.transactionId || request.id,
+    listingId: request.listingId,
+    packageId: request.packageId,
+    amount: Number(request.amount || 0),
+    success: !["failed", "rejected"].includes(
+      String(request.status || "").toLowerCase(),
+    ),
+    status: request.status || "pending review",
+    timestamp: request.createdAt || request.reviewedAt || request.requestDate,
+  }));
+}
+
 // Error 5: Make async
 async function simulatePayment(method, paymentDetails) {
   // Error 8: Add error simulation (10% chance of failure for realism)
@@ -88,4 +104,16 @@ async function simulatePayment(method, paymentDetails) {
     timestamp: new Date().toISOString(),
     message: `${method} payment simulated successfully.`,
   };
+}
+
+function getStoredPromotionRequests() {
+  try {
+    const requests = JSON.parse(
+      localStorage.getItem("easterncity_promotion_requests") || "[]",
+    );
+
+    return Array.isArray(requests) ? requests : [];
+  } catch {
+    return [];
+  }
 }

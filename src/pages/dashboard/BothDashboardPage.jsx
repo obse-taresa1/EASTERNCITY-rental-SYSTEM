@@ -1,227 +1,247 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import EmptyState from "../../components/common/EmptyState.jsx";
+import { useMemo } from "react";
 import BookingTable from "../../components/dashboard/BookingTable.jsx";
-import DashboardStatCard from "../../components/dashboard/DashboardStatCard.jsx";
-import ListingManagementTable from "../../components/dashboard/ListingManagementTable.jsx";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import {
-  getBookingsByOwner,
   getBookingsByUser,
+  getBookingsByOwner,
+  getReviewsByUser,
 } from "../../services/bookingService.js";
 import { getAllItems } from "../../services/itemService.js";
+import { getConversations } from "../../services/messageService.js";
+import { getStorageItem } from "../../services/storageService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
-function normalizeStatus(item) {
-  return String(
-    item.status || (item.available ? "published" : "expired"),
-  ).toLowerCase();
+function getInitials(name) {
+  if (!name) return "U";
+  return name.split(" ").map((n) => n[0]).join("").substring(0, 2).toUpperCase();
 }
 
-export default function BothDashboardPage({ initialMode = "renter" }) {
+function normalizeStatus(item) {
+  return String(item.status || (item.available ? "published" : "expired")).toLowerCase();
+}
+
+const QUICK_ACTIONS = [
+  { to: "/list-item", label: "Add Listing", icon: "bi-plus-circle-fill", color: "ud-action-red" },
+  { to: "/my-listings", label: "View Listings", icon: "bi-card-checklist", color: "ud-action-blue" },
+  { to: "/my-bookings", label: "My Bookings", icon: "bi-calendar-check", color: "ud-action-green" },
+  { to: "/messages", label: "Messages", icon: "bi-chat-dots", color: "ud-action-purple" },
+  { to: "/items", label: "Browse Items", icon: "bi-search", color: "ud-action-teal" },
+];
+
+export default function BothDashboardPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
-  const [mode, setMode] = useState(initialMode);
   const allItems = getAllItems();
 
   const renterBookings = activeUser ? getBookingsByUser(activeUser.id) : [];
+  const conversations = activeUser ? getConversations(activeUser.id) : [];
+  const userReviews = activeUser ? getReviewsByUser(activeUser.id) : [];
+  const savedItems = getStorageItem("saved_items", []);
+
   const ownedItems = useMemo(() => {
-    const matchesUser = allItems.filter(
+    const matches = allItems.filter(
       (item) =>
         item.owner === activeUser?.name ||
         item.owner === activeUser?.businessName ||
         item.ownerName === activeUser?.name ||
         item.ownerName === activeUser?.businessName,
     );
-    return matchesUser.length ? matchesUser : allItems.slice(0, 6);
+    return matches.length ? matches : allItems.slice(0, 6);
   }, [activeUser, allItems]);
 
-  const ownerBookings = ownedItems.flatMap((item) =>
-    getBookingsByOwner(item.owner),
-  );
-  const totalSpent = renterBookings.reduce(
-    (sum, booking) =>
-      sum + Number(booking.totalAmount || booking.totalPrice || 0),
-    0,
-  );
-  const totalEarnings = ownerBookings.reduce(
-    (sum, booking) =>
-      sum + Number(booking.totalAmount || booking.totalPrice || 0),
-    0,
-  );
-  const totalInquiries = ownedItems.reduce(
-    (sum, item) => sum + Number(item.inquiries || 0),
-    0,
-  );
+  const ownerBookings = ownedItems.flatMap((item) => getBookingsByOwner(item.owner));
+
   const activeListings = ownedItems.filter((item) =>
-    ["published", "active", "featured", "renewed"].includes(
-      normalizeStatus(item),
-    ),
+    ["published", "active", "featured", "renewed"].includes(normalizeStatus(item)),
   ).length;
 
-  return (
-    <main className="dashboard-content unified-dashboard">
-      <div className="dashboard-header unified-dashboard-header">
-        <div>
-          <span className="section-label">UNIFIED DASHBOARD</span>
-          <h1>{mode === "owner" ? "Owner Mode" : "Renter Mode"}</h1>
-          <p className="owner-muted mb-0">
-            Switch modes without leaving your EasternCity workspace.
-          </p>
-        </div>
+  const activeBookings = renterBookings.filter((b) =>
+    ["pending", "accepted", "active"].includes(b.status),
+  ).length;
 
-        <div
-          className="dashboard-mode-switch"
-          role="tablist"
-          aria-label="Dashboard mode"
-        >
-          <button
-            type="button"
-            className={mode === "renter" ? "is-active" : ""}
-            onClick={() => setMode("renter")}
-          >
-            <i className="bi bi-bag-check"></i> Renter Mode
-          </button>
-          <button
-            type="button"
-            className={mode === "owner" ? "is-active" : ""}
-            onClick={() => setMode("owner")}
-          >
-            <i className="bi bi-shop"></i> Owner Mode
-          </button>
+  const totalEarnings = ownerBookings.reduce(
+    (sum, b) => sum + Number(b.totalAmount || b.totalPrice || 0),
+    0,
+  );
+
+  const isVerified = String(activeUser?.verificationStatus || "")
+    .toLowerCase()
+    .includes("verified");
+
+  const memberSince = activeUser?.createdAt
+    ? new Date(activeUser.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long" })
+    : "2024";
+
+  // Recent activity feed: merge bookings + messages, sort by date
+  const recentActivity = [
+    ...renterBookings.slice(0, 3).map((b) => ({
+      id: b.id,
+      type: "booking",
+      icon: "bi-calendar-check",
+      color: "act-booking",
+      title: b.itemTitle || "Booking",
+      subtitle: `Status: ${b.status}`,
+      date: b.createdAt,
+    })),
+    ...conversations.slice(0, 2).map((c) => ({
+      id: c.id,
+      type: "message",
+      icon: "bi-chat-dots",
+      color: "act-message",
+      title: c.subject || "New Message",
+      subtitle: c.context || "",
+      date: c.updatedAt || c.createdAt,
+    })),
+    ...userReviews.slice(0, 2).map((r) => ({
+      id: r.id,
+      type: "review",
+      icon: "bi-star-fill",
+      color: "act-review",
+      title: `Review: ${r.itemTitle || "Item"}`,
+      subtitle: `${r.rating}★ — ${r.comment?.substring(0, 50) || ""}`,
+      date: r.createdAt,
+    })),
+  ]
+    .filter((a) => a.date)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 6);
+
+  const STAT_CARDS = [
+    { icon: "bi-card-checklist", label: "Active Listings", value: activeListings, color: "stat-red", to: "/my-listings" },
+    { icon: "bi-calendar-check", label: "Total Rentals", value: renterBookings.length, color: "stat-blue", to: "/my-bookings" },
+    { icon: "bi-hourglass-split", label: "Active Bookings", value: activeBookings, color: "stat-green", to: "/my-bookings" },
+    { icon: "bi-heart-fill", label: "Saved Items", value: savedItems.length, color: "stat-pink", to: "/saved-items" },
+    { icon: "bi-chat-dots-fill", label: "Messages", value: conversations.length, color: "stat-purple", to: "/messages" },
+    { icon: "bi-star-fill", label: "Reviews Given", value: userReviews.length, color: "stat-orange", to: "/reviews" },
+    { icon: "bi-cash-coin", label: "Owner Earnings", value: formatCurrency(totalEarnings), color: "stat-teal", to: "/my-listings" },
+    { icon: "bi-shield-check", label: "Verification", value: isVerified ? "Verified" : "Pending", color: isVerified ? "stat-verified" : "stat-pending", to: "/verification" },
+  ];
+
+  return (
+    <div className="ud-overview-page">
+      {/* Welcome Banner */}
+      <div className="ud-welcome-banner">
+        <div className="ud-welcome-avatar">
+          <span>{getInitials(activeUser?.name)}</span>
+          {isVerified && (
+            <span className="ud-welcome-verified-badge" title="Verified">
+              <i className="bi bi-patch-check-fill" />
+            </span>
+          )}
         </div>
+        <div className="ud-welcome-info">
+          <p className="ud-welcome-greeting">Welcome back,</p>
+          <h1 className="ud-welcome-name">{activeUser?.name || "EasternCity User"}</h1>
+          <div className="ud-welcome-tags">
+            <span className={`ud-welcome-tag ${isVerified ? "tag-verified" : "tag-pending"}`}>
+              <i className={`bi ${isVerified ? "bi-shield-check" : "bi-shield-exclamation"}`} />
+              {activeUser?.verificationStatus || "Pending Verification"}
+            </span>
+            <span className="ud-welcome-tag tag-location">
+              <i className="bi bi-geo-alt" />
+              {activeUser?.city || "Jigjiga"}
+            </span>
+            <span className="ud-welcome-tag tag-since">
+              <i className="bi bi-calendar3" />
+              Member since {memberSince}
+            </span>
+          </div>
+        </div>
+        <Link to="/items" className="ud-welcome-cta">
+          <i className="bi bi-search" />
+          Browse Marketplace
+        </Link>
       </div>
 
-      {mode === "renter" ? (
-        <>
-          <div className="row g-4 my-4">
-            <div className="col-md-4">
-              <DashboardStatCard
-                icon="bi-calendar-check"
-                label="Total Bookings"
-                value={renterBookings.length}
-              />
+      {/* Stats Grid */}
+      <div className="ud-stats-grid">
+        {STAT_CARDS.map((stat) => (
+          <Link to={stat.to} className={`ud-stat-card ${stat.color}`} key={stat.label}>
+            <div className="ud-stat-icon">
+              <i className={`bi ${stat.icon}`} />
             </div>
-            <div className="col-md-4">
-              <DashboardStatCard
-                icon="bi-cash-stack"
-                label="Total Spent"
-                value={formatCurrency(totalSpent)}
-                tone="success"
-              />
+            <div className="ud-stat-info">
+              <strong className="ud-stat-value">{stat.value}</strong>
+              <span className="ud-stat-label">{stat.label}</span>
             </div>
-            <div className="col-md-4">
-              <DashboardStatCard
-                icon="bi-shield-check"
-                label="ID Verification"
-                value={activeUser?.verificationStatus || "Pending"}
-                tone="warning"
-              />
+            <i className="bi bi-arrow-right ud-stat-arrow" />
+          </Link>
+        ))}
+      </div>
+      {/* Owner Booking Requests */}
+      <section className="dashboard-section mt-4">
+        <h2 className="h4 mb-3">Incoming Booking Requests</h2>
+        {ownerBookings.length ? (
+          <BookingTable bookings={ownerBookings} />
+        ) : (
+          <div className="owner-empty-state">
+            <i className="bi bi-calendar-x" />
+            Booking requests will appear here.
+          </div>
+        )}
+      </section>
+
+      <div className="ud-overview-bottom">
+        {/* Recent Activity */}
+        <section className="ud-activity-section">
+          <div className="ud-section-header">
+            <div>
+              <h2 className="ud-section-title">Recent Activity</h2>
+              <p className="ud-section-sub">Your latest bookings, messages and reviews</p>
             </div>
           </div>
 
-          <section className="dashboard-section premium-dashboard-panel">
-            <div className="owner-section-heading mb-3">
-              <div>
-                <h2 className="h4 mb-1">My Rental Bookings</h2>
-                <p className="owner-muted mb-0">
-                  Track payments, owner contact, active rentals, and completed
-                  reviews.
-                </p>
-              </div>
-              <Link to="/items" className="btn btn-accent-custom btn-shine">
-                <i className="bi bi-search"></i> Browse Items
+          {recentActivity.length === 0 ? (
+            <div className="ud-empty-activity">
+              <i className="bi bi-activity" />
+              <p>No recent activity yet. Start by browsing listings!</p>
+              <Link to="/items" className="ud-btn-outline">
+                Browse Items
               </Link>
             </div>
-
-            {renterBookings.length ? (
-              <BookingTable bookings={renterBookings} />
-            ) : (
-              <EmptyState
-                icon="bi-calendar-x"
-                title="No bookings yet"
-                description="Browse nearby rentals and contact verified owners when you find the right item."
-                action={
-                  <Link to="/items" className="btn btn-accent-custom btn-shine">
-                    Browse Items
-                  </Link>
-                }
-              />
-            )}
-          </section>
-        </>
-      ) : (
-        <>
-          <div className="owner-trust-stat-grid my-4">
-            <div className="owner-trust-stat premium-glass-card">
-              <i className="bi bi-patch-check"></i>
-              <span>Verified Owner</span>
-              <strong>
-                {activeUser?.verificationStatus === "Verified"
-                  ? "Verified"
-                  : "Pending"}
-              </strong>
-            </div>
-            <div className="owner-trust-stat premium-glass-card">
-              <i className="bi bi-chat-dots"></i>
-              <span>Total Inquiries</span>
-              <strong>{totalInquiries}</strong>
-            </div>
-            <div className="owner-trust-stat premium-glass-card">
-              <i className="bi bi-box-seam"></i>
-              <span>Active Listings</span>
-              <strong>{activeListings}</strong>
-            </div>
-          </div>
-
-          <section className="dashboard-section premium-dashboard-panel">
-            <div className="owner-section-heading mb-3">
-              <div>
-                <span className="section-label">OWNER TOOLS</span>
-                <h2 className="h4 mb-1">My Listings</h2>
-                <p className="owner-muted mb-0">
-                  Manage listings, inquiries, promotion, verification, and{" "}
-                  {formatCurrency(totalEarnings)} in tracked owner earnings.
-                </p>
-              </div>
-              <Link to="/list-item" className="btn btn-accent-custom btn-shine">
-                <i className="bi bi-plus-lg"></i> Add New Listing
-              </Link>
-            </div>
-
-            <ListingManagementTable items={ownedItems} />
-          </section>
-
-          <section className="dashboard-section owner-revenue-section mt-4">
-            <div className="owner-section-heading">
-              <div>
-                <span className="section-label">PROMOTE LISTING</span>
-                <h2 className="h4 mb-1">Boost Visibility</h2>
-                <p className="owner-muted mb-0">
-                  Featured listings appear before regular listings and receive
-                  premium homepage placement.
-                </p>
-              </div>
-              <button type="button" className="btn btn-outline-danger">
-                <i className="bi bi-arrow-up-circle"></i> Upgrade Plan
-              </button>
-            </div>
-            <div className="promotion-package-row promotion-package-premium">
-              {[
-                ["3 Days Featured", "100 ETB", "bi-lightning-charge"],
-                ["7 Days Featured", "200 ETB", "bi-stars"],
-                ["30 Days Featured", "500 ETB", "bi-gem"],
-              ].map(([label, price, icon]) => (
-                <button type="button" className="promotion-package" key={label}>
-                  <i className={`bi ${icon}`}></i>
-                  <span>{label}</span>
-                  <strong>{price}</strong>
-                </button>
+          ) : (
+            <div className="ud-activity-feed">
+              {recentActivity.map((item) => (
+                <div className={`ud-activity-item ${item.color}`} key={item.id}>
+                  <div className="ud-activity-icon">
+                    <i className={`bi ${item.icon}`} />
+                  </div>
+                  <div className="ud-activity-text">
+                    <strong>{item.title}</strong>
+                    <span>{item.subtitle}</span>
+                  </div>
+                  <span className="ud-activity-time">
+                    {item.date ? new Date(item.date).toLocaleDateString() : ""}
+                  </span>
+                </div>
               ))}
             </div>
-          </section>
-        </>
-      )}
-    </main>
+          )}
+        </section>
+
+        {/* Quick Actions */}
+        <section className="ud-quick-actions-section">
+          <div className="ud-section-header">
+            <div>
+              <h2 className="ud-section-title">Quick Actions</h2>
+              <p className="ud-section-sub">Jump to what you need</p>
+            </div>
+          </div>
+          <div className="ud-quick-actions-grid">
+            {QUICK_ACTIONS.map((action) => (
+              <Link
+                key={action.to}
+                to={action.to}
+                className={`ud-quick-action-card ${action.color}`}
+              >
+                <i className={`bi ${action.icon}`} />
+                <span>{action.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
   );
 }

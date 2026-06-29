@@ -1,8 +1,10 @@
 import { items } from "../data/items.js";
 import categoryListings from "../data/categoryListings.js";
+import { homeListings } from "../data/homeListings.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
 
 const OWNER_LISTINGS_KEY = "easterncity_owner_listings";
+export const LISTING_FEE_AMOUNT = 150;
 
 function normalizeOwnerListing(listing) {
   return {
@@ -30,7 +32,7 @@ function writeOwnerListings(listings) {
 }
 
 export function getAllItems() {
-  return [...getOwnerListings(), ...items, ...categoryListings];
+  return [...getOwnerListings(), ...items, ...categoryListings, ...homeListings];
 }
 
 export function getItemById(id) {
@@ -47,6 +49,12 @@ export function searchItems(filters = {}) {
   const searchTerm = search.toLowerCase().trim();
 
   return getAllItems().filter((item) => {
+    const hiddenStatuses = ["draft", "payment pending", "under review", "rejected"];
+    const normalizedStatus = String(item.status || "").toLowerCase();
+    if ((!status || status === "all") && hiddenStatuses.includes(normalizedStatus)) {
+      return false;
+    }
+
     // 1. Text search
     if (searchTerm) {
       const match =
@@ -132,6 +140,24 @@ export function updateOwnerListing(id, updates) {
   return updatedListing;
 }
 
+export function getListingPaymentRequests() {
+  return getOwnerListings().filter((item) =>
+    ["payment pending", "under review", "rejected", "published"].includes(
+      String(item.status || "").toLowerCase(),
+    ) || item.listingFeeAmount,
+  );
+}
+
+export function updateListingPaymentStatus(id, paymentReviewStatus) {
+  const status = paymentReviewStatus === "approved" ? "published" : "rejected";
+  return updateOwnerListing(id, {
+    paymentReviewStatus,
+    status,
+    available: paymentReviewStatus === "approved",
+    reviewedAt: new Date().toISOString(),
+  });
+}
+
 export function renewOwnerListing(id) {
   return updateOwnerListing(id, {
     status: "renewed",
@@ -147,21 +173,5 @@ export function promoteOwnerListing(id, promotion = "7 Days Featured") {
     featured: true,
     status: "featured",
     promotion,
-  });
-}
-
-export function searchItems(query = "") {
-  const searchTerm = query.toLowerCase().trim();
-
-  if (!searchTerm) {
-    return items;
-  }
-
-  return items.filter((item) => {
-    return (
-      item.title.toLowerCase().includes(searchTerm) ||
-      item.category.toLowerCase().includes(searchTerm) ||
-      item.location.toLowerCase().includes(searchTerm)
-    );
   });
 }
