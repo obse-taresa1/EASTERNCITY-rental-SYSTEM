@@ -62,7 +62,7 @@ export default function DashboardSidebar() {
 
   const bookings = activeUser ? getBookingsByUser(activeUser.id) : [];
   const activeBookings = bookings.filter((b) =>
-    ["pending", "accepted", "active"].includes(b.status),
+    ["PENDING", "ACCEPTED", "ACTIVE"].includes(String(b.status || "").toUpperCase()),
   ).length;
   const reviews = activeUser ? getReviewsByUser(activeUser.id).length : 0;
   const savedItems = getStorageItem("saved_items", []).length;
@@ -160,3 +160,4 @@ export default function DashboardSidebar() {
     </aside>
   );
 }
+

@@ -4,7 +4,7 @@ import { getInitials } from "../../utils/user.js";
 export default function ProfilePanel({ user, open, onClose, onLogout, dashboardPath = "/dashboard" }) {
   if (!open) return null;
 
-  const isAdminOrSuperAdmin = ["admin", "superadmin", "super-admin", "supervisor"].includes(String(user?.role).toLowerCase());
+  const isAdminOrSuperAdmin = ["ADMIN", "SUPER_ADMIN"].includes(String(user?.role || "").toUpperCase());
 
   const PANEL_ITEMS = isAdminOrSuperAdmin
     ? [
@@ -82,4 +82,5 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
     </div>
   );
 }
+
 

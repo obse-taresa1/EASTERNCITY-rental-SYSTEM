@@ -1,15 +1,10 @@
 // src/controllers/authController.js
 const authService = require('../services/authService');
 
-/**
- * Handle user registration
- */
 const register = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
-    
-    // Call service to register user
-    const result = await authService.registerUser(name, email, password, role);
+    const { name, email, password } = req.body;
+    const result = await authService.registerUser(name, email, password);
 
     res.status(201).json({
       success: true,
@@ -21,14 +16,9 @@ const register = async (req, res, next) => {
   }
 };
 
-/**
- * Handle user login
- */
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    // Call service to log in user
     const result = await authService.loginUser(email, password);
 
     res.status(200).json({
@@ -41,7 +31,36 @@ const login = async (req, res, next) => {
   }
 };
 
+const refresh = async (req, res, next) => {
+  try {
+    const result = await authService.refreshSession(req.body.refreshToken);
+
+    res.status(200).json({
+      success: true,
+      message: 'Token refreshed successfully.',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const logout = async (req, res, next) => {
+  try {
+    await authService.revokeRefreshToken(req.body.refreshToken);
+
+    res.status(200).json({
+      success: true,
+      message: 'Logout successful.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
+  refresh,
+  logout,
 };

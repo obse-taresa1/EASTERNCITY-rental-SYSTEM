@@ -1,18 +1,32 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { createContactMessage } from "../../services/contactMessageService.js";
 
 export default function ContactPage() {
   const [message, setMessage] = useState("");
+  const { currentUser, user } = useAuth();
+  const activeUser = user || currentUser;
   const { t } = useLanguage();
 
   function handleSubmit(event) {
     event.preventDefault();
-    setMessage(t("messageSent"));
+    const formData = new FormData(event.currentTarget);
+
+    createContactMessage({
+      userId: activeUser?.id || "",
+      name: String(formData.get("name") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      subject: String(formData.get("subject") || "").trim(),
+      message: String(formData.get("message") || "").trim(),
+    });
+
+    setMessage(t("messageSent") || "Your message was sent successfully.");
     event.currentTarget.reset();
   }
 
   return (
-    <main className="container page-header pb-5">
+    <main className="container page-header pb-5 legal-support-page">
       <div className="row g-4">
         <div className="col-lg-5">
           <section className="card card-custom p-4 h-100">
@@ -38,7 +52,13 @@ export default function ContactPage() {
                 <label className="form-label" htmlFor="contact-name">
                   {t("fullName")}
                 </label>
-                <input id="contact-name" className="form-control" required />
+                <input
+                  id="contact-name"
+                  name="name"
+                  className="form-control"
+                  defaultValue={activeUser?.name || ""}
+                  required
+                />
               </div>
 
               <div className="mb-3">
@@ -47,7 +67,21 @@ export default function ContactPage() {
                 </label>
                 <input
                   id="contact-email"
+                  name="email"
                   type="email"
+                  className="form-control"
+                  defaultValue={activeUser?.email || ""}
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label" htmlFor="contact-subject">
+                  Subject
+                </label>
+                <input
+                  id="contact-subject"
+                  name="subject"
                   className="form-control"
                   required
                 />
@@ -59,6 +93,7 @@ export default function ContactPage() {
                 </label>
                 <textarea
                   id="contact-message"
+                  name="message"
                   className="form-control"
                   rows="5"
                   required

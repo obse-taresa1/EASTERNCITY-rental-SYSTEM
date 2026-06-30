@@ -20,7 +20,7 @@ async function fileToDataUrl(file) {
 
 export default function PromoteListingsPage() {
   const { currentUser } = useAuth();
-  const ownerId = currentUser?.id || "user-lessor";
+  const ownerId = currentUser?.id || "user";
 
   const [listings] = useState(() => fetchOwnerListings(ownerId));
   const [selectedListing, setSelectedListing] = useState("");
@@ -225,3 +225,4 @@ export default function PromoteListingsPage() {
     </main>
   );
 }
+

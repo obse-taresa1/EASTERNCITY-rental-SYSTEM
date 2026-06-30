@@ -14,6 +14,7 @@ router.use(authMiddleware);
  * @access  Private (Authenticated Users)
  */
 router.get('/profile', userController.getProfile);
+router.get('/me', userController.getProfile);
 
 /**
  * @route   GET /api/users
@@ -44,3 +45,4 @@ router.put('/:id', userController.update);
 router.delete('/:id', authorize('ADMIN', 'SUPER_ADMIN'), userController.remove);
 
 module.exports = router;
+

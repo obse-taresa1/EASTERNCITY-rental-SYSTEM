@@ -35,24 +35,24 @@ export default function BookingTable({ bookings }) {
                 <tr key={booking.id}>
                   <td>{booking.id}</td>
                   <td>{booking.itemTitle}</td>
-                  <td>{booking.userId}</td>
+                  <td>{booking.renterId || booking.userId}</td>
                   <td>{booking.startDate}</td>
                   <td>{booking.endDate}</td>
                   <td><StatusBadge status={booking.status} /></td>
                   <td>
-                    {booking.status === "pending" ? (
+                    {String(booking.status || "").toUpperCase() === "PENDING" ? (
                       <div className="d-flex gap-2">
                         <button
                           type="button"
                           className="btn btn-sm btn-success"
-                          onClick={() => handleStatusChange(booking.id, "accepted")}
+                          onClick={() => handleStatusChange(booking.id, "ACCEPTED")}
                         >
                           Accept
                         </button>
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleStatusChange(booking.id, "rejected")}
+                          onClick={() => handleStatusChange(booking.id, "REJECTED")}
                         >
                           Reject
                         </button>
@@ -68,3 +68,4 @@ export default function BookingTable({ bookings }) {
     </div>
   );
 }
+

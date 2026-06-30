@@ -4,11 +4,11 @@ import AdminTopbar from "../components/admin/AdminTopbar.jsx";
 
 export default function AdminLayout() {
   return (
-    <div className="dashboard-shell">
+    <div className="dashboard-shell admin-red-shell">
       <AdminSidebar />
 
       <div className="admin-main">
-        <AdminTopbar title="Admin Panel" />
+        <AdminTopbar title="Admin" />
         <Outlet />
       </div>
     </div>

@@ -112,10 +112,10 @@ npm run start
   "name": "Admin User",
   "email": "admin@example.com",
   "password": "password123",
-  "role": "ADMIN" 
+  "role": "USER" 
 }
 ```
-*Note: Allowed roles are `USER`, `ADMIN`, and `SUPER_ADMIN`. Defaults to `USER`.*
+*Note: Public registration always creates `USER`. `ADMIN` and `SUPER_ADMIN` accounts must be created only by `SUPER_ADMIN` workflows.*
 
 #### Login User
 - **URL:** `/api/auth/login`
@@ -165,3 +165,9 @@ npm run start
 - **URL:** `/api/users/:id`
 - **Method:** `DELETE`
 - **Access:** `ADMIN` or `SUPER_ADMIN` only (Cannot delete self)
+
+---
+
+## Architecture Plan
+
+See `backend/IMPLEMENTATION_PLAN.md` for the current backend implementation plan, cleanup phase, role rules, booking architecture, developer allocation, and security checklist.

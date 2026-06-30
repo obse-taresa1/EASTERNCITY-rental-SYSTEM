@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/eastern-cities-footer-logo-transparent.png";
 
 const SOCIAL_LINKS = [
   { icon: "bi-facebook", href: "#", label: "Facebook" },
@@ -32,7 +32,7 @@ export default function Footer() {
               <Link to="/" className="footer-logo-link">
                 <img
                   src={logo}
-                  alt="EasternCity Logo"
+                  alt="Eastern Cities"
                   className="footer-logo-img"
                 />
               </Link>

@@ -8,27 +8,27 @@ import {
 import LeaveReviewModal from "../../components/reviews/LeaveReviewModal.jsx";
 
 const STATUS_LABELS = {
-  pending: {
+  PENDING: {
     label: "Pending",
     class: "badge-pending",
     icon: "bi-hourglass-split",
   },
-  accepted: {
+  ACCEPTED: {
     label: "Accepted",
     class: "badge-confirmed",
     icon: "bi-check-circle-fill",
   },
-  active: {
+  ACTIVE: {
     label: "Active Rental",
     class: "badge-active-rental",
     icon: "bi-play-circle-fill",
   },
-  completed: {
+  COMPLETED: {
     label: "Finished",
     class: "badge-completed",
     icon: "bi-flag-fill",
   },
-  cancelled: {
+  CANCELLED: {
     label: "Cancelled",
     class: "badge-cancelled",
     icon: "bi-x-circle-fill",
@@ -57,13 +57,13 @@ export default function MyBookingsPage() {
   const getFilteredBookings = () => {
     switch (activeTab) {
       case "pending":
-        return bookings.filter((b) => b.status === "pending");
+        return bookings.filter((b) => b.status === "PENDING");
       case "accepted":
-        return bookings.filter((b) => b.status === "accepted");
+        return bookings.filter((b) => b.status === "ACCEPTED");
       case "active":
-        return bookings.filter((b) => b.status === "active");
+        return bookings.filter((b) => b.status === "ACTIVE");
       case "finished":
-        return bookings.filter((b) => b.status === "completed");
+        return bookings.filter((b) => b.status === "COMPLETED");
       default:
         return bookings;
     }
@@ -159,7 +159,7 @@ export default function MyBookingsPage() {
         <div className="row g-4">
           {filtered.map((booking) => {
             const statusInfo =
-              STATUS_LABELS[booking.status] || STATUS_LABELS.pending;
+              STATUS_LABELS[booking.status] || STATUS_LABELS.PENDING;
             const isCompleted = booking.status === "completed";
             const alreadyReviewed = hasReviewForBooking(booking.id);
 
@@ -281,3 +281,4 @@ export default function MyBookingsPage() {
     </main>
   );
 }
+

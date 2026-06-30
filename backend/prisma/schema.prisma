@@ -8,10 +8,100 @@ datasource db {
 }
 
 model User {
+  id                            String          @id @default(uuid())
+  name                          String
+  email                         String          @unique
+  password                      String
+  role                          String          @default("USER") // USER, ADMIN, SUPER_ADMIN
+  createdAt                     DateTime        @default(now())
+  rentedBookings                Booking[]       @relation("BookingRenter")
+  ownedBookings                 Booking[]       @relation("BookingOwner")
+  conversationsAsParticipantOne Conversation[]  @relation("ConversationParticipantOne")
+  conversationsAsParticipantTwo Conversation[]  @relation("ConversationParticipantTwo")
+  updatedSettings               SystemSetting[] @relation("SystemSettingUpdater")
+  refreshTokens                 RefreshToken[]
+  notifications                 Notification[]
+}
+
+model Listing {
+  id            String         @id @default(uuid())
+  bookings      Booking[]
+  conversations Conversation[]
+  images        ListingImage[]
+  createdAt     DateTime       @default(now())
+}
+
+model Booking {
+  id                 String    @id @default(uuid())
+  renterId           String
+  ownerId            String
+  listingId          String
+  startDate          DateTime
+  endDate            DateTime
+  subtotal           Decimal
+  serviceFee         Decimal
+  totalAmount        Decimal
+  agreementAccepted  Boolean   @default(false)
+  cancellationReason String?
+  approvedAt         DateTime?
+  completedAt        DateTime?
+  status             String    @default("PENDING") // PENDING, ACCEPTED, ACTIVE, COMPLETED, CANCELLED, REJECTED
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  renter             User      @relation("BookingRenter", fields: [renterId], references: [id])
+  owner              User      @relation("BookingOwner", fields: [ownerId], references: [id])
+  listing            Listing   @relation(fields: [listingId], references: [id])
+}
+
+model Conversation {
+  id               String    @id @default(uuid())
+  participantOneId String
+  participantTwoId String
+  listingId        String
+  lastMessageAt    DateTime?
+  createdAt        DateTime  @default(now())
+  participantOne   User      @relation("ConversationParticipantOne", fields: [participantOneId], references: [id])
+  participantTwo   User      @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id])
+  listing          Listing   @relation(fields: [listingId], references: [id])
+}
+
+model ListingImage {
   id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("USER") // USER, ADMIN, SUPER_ADMIN
+  listingId String
+  imageUrl  String
+  sortOrder Int      @default(0)
   createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id])
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   User?    @relation("SystemSettingUpdater", fields: [updatedById], references: [id])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String
+  body          String
+  type          String
+  referenceId   String?
+  referenceType String?
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id])
 }
