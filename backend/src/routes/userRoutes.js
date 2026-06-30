@@ -4,6 +4,7 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
+const { validateUpdateUser } = require('../validators/userValidator');
 
 // All user routes require authentication
 router.use(authMiddleware);
@@ -35,7 +36,7 @@ router.get('/:id', authorize('ADMIN', 'SUPER_ADMIN'), userController.getUser);
  * @desc    Update user profile data
  * @access  Private (Self, Admin, or Super Admin)
  */
-router.put('/:id', userController.update);
+router.put('/:id', validateUpdateUser, userController.update);
 
 /**
  * @route   DELETE /api/users/:id
@@ -45,4 +46,3 @@ router.put('/:id', userController.update);
 router.delete('/:id', authorize('ADMIN', 'SUPER_ADMIN'), userController.remove);
 
 module.exports = router;
-
