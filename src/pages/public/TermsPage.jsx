@@ -5,7 +5,7 @@ export default function TermsPage() {
   const { t } = useLanguage();
 
   return (
-    <main className="container page-header pb-5">
+    <main className="container page-header pb-5 legal-document-page">
       <div className="text-center mb-5">
         <span className="section-label">CITYRENT LEGAL</span>
         <h1 className="h2 mb-3">{t("terms") || "Terms & Conditions"}</h1>

@@ -1,5 +1,5 @@
 import { promotionPackages } from "../data/promotions.js";
-import { getAllItems, promoteOwnerListing } from "./itemService.js";
+import { getAllItems, promoteOwnerListing, resolvePromotionPlacement } from "./itemService.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
 
 export const PROMOTION_REQUESTS_KEY = "easterncity_promotion_requests";
@@ -78,6 +78,13 @@ function normalizePromotionRequest(request) {
       request.packageType ||
       selectedPackage?.name ||
       "Promotion Package",
+    promotionPlacement:
+      request.promotionPlacement ||
+      selectedPackage?.placement ||
+      resolvePromotionPlacement(
+        request.packageId || selectedPackage?.id,
+        request.promotionType || request.packageName || selectedPackage?.name,
+      ),
     durationDays: Number(request.durationDays || selectedPackage?.days || 0),
     amount: Number(request.amount || request.revenue || selectedPackage?.amount || 0),
     requestDate:
@@ -148,6 +155,13 @@ export function requestPromotion(
     packageName: metadata.packageName || selectedPackage?.name,
     promotionType:
       metadata.promotionType || metadata.packageName || selectedPackage?.name,
+    promotionPlacement:
+      metadata.promotionPlacement ||
+      selectedPackage?.placement ||
+      resolvePromotionPlacement(
+        packageId,
+        metadata.promotionType || metadata.packageName || selectedPackage?.name,
+      ),
     durationDays,
     amount,
     requestDate: new Date().toISOString().slice(0, 10),
@@ -233,6 +247,11 @@ export function updatePromotionRequestStatus(id, status) {
     promoteOwnerListing(
       updatedRequest.listingId,
       `${updatedRequest.promotionType} - ${updatedRequest.durationDays} Days`,
+      {
+        promotionType: updatedRequest.promotionType,
+        promotionPackageId: updatedRequest.packageId,
+        promotionPlacement: updatedRequest.promotionPlacement,
+      },
     );
   }
 

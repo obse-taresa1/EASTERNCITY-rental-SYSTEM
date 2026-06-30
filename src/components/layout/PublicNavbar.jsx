@@ -8,7 +8,7 @@ import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
 import ProfilePanel from "../common/ProfilePanel.jsx";
 import ThemeToggle from "../common/ThemeToggle.jsx";
 import { getInitials } from "../../utils/user.js";
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
 
 export default function PublicNavbar() {
   const { currentUser, isAuthenticated, logout } = useAuth();
@@ -28,7 +28,7 @@ export default function PublicNavbar() {
       <div className="container">
         <div className="motorx-nav-flex">
           <Link className="motorx-logo" to="/">
-            <img src={logo} alt="EasternCities Logo" />
+            <img src={logo} alt="Eastern Cities" />
           </Link>
 
           <input

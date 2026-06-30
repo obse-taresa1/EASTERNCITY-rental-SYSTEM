@@ -1,4 +1,4 @@
-import { normalizeRole } from "./authService.js";
+import { coerceRole } from "./authService.js";
 
 const allowedRentalRoles = ["USER"];
 
@@ -8,12 +8,13 @@ const rentalRestrictionMessages = {
 };
 
 export function canRentItem(role) {
-  return allowedRentalRoles.includes(normalizeRole(role));
+  return allowedRentalRoles.includes(coerceRole(role));
 }
 
 export function getRentalRestrictionMessage(role) {
   return (
-    rentalRestrictionMessages[normalizeRole(role)] ||
+    rentalRestrictionMessages[coerceRole(role)] ||
     "Your account is not allowed to rent items."
   );
 }
+

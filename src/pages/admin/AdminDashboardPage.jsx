@@ -1,101 +1,138 @@
-import AdminStatGrid from "../../components/admin/AdminStatGrid.jsx";
-import AdminDataTable from "../../components/admin/AdminDataTable.jsx";
+import AdminOverviewDashboard from "../../components/admin/AdminOverviewDashboard.jsx";
 import { getBookings } from "../../services/bookingService.js";
-import { getUsers, normalizeRole } from "../../services/authService.js";
-import { getAllItems } from "../../services/itemService.js";
+import { getUsers, coerceRole } from "../../services/authService.js";
+import { getManagementItems } from "../../services/itemService.js";
+import { getContactMessages } from "../../services/contactMessageService.js";
+import { getNotifications } from "../../services/notificationService.js";
+import { fetchActivePromotions, fetchPromotionRequests } from "../../services/promotionService.js";
 import { formatCurrency } from "../../utils/currency.js";
+
+function uniqueCount(values) {
+  return new Set(values.filter(Boolean).map((value) => String(value).toLowerCase())).size;
+}
+
+function statusIncludes(value, terms) {
+  const normalized = String(value || "").toLowerCase().replace(/[_-]/g, " ");
+  return terms.some((term) => normalized.includes(term));
+}
+
+function percent(part, total) {
+  if (!total) return 0;
+  return Math.round((part / total) * 100);
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+}
+
+function createMonthlySeries(records, keys) {
+  const values = Array.from({ length: 12 }, () => 0);
+  const fallbackMonth = new Date().getMonth();
+
+  records.forEach((record) => {
+    const rawDate = keys.map((key) => record?.[key]).find(Boolean);
+    const date = rawDate ? new Date(rawDate) : null;
+    const month = date && !Number.isNaN(date.getTime()) ? date.getMonth() : fallbackMonth;
+    values[month] += 1;
+  });
+
+  return values;
+}
+
+function createBreakdown(items, key, fallback = "Unknown") {
+  const counts = items.reduce((result, item) => {
+    const label = item?.[key] || fallback;
+    result[label] = (result[label] || 0) + 1;
+    return result;
+  }, {});
+  const total = Math.max(items.length, 1);
+
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([label, value]) => ({ label, value, percent: percent(value, total) }));
+}
 
 export default function AdminDashboardPage() {
   const users = getUsers();
   const bookings = getBookings();
-  const items = getAllItems();
-  
-  const platformUsers = users.filter((user) => normalizeRole(user.role) === "USER");
-  
-  const activeListings = items.filter(i => i.available !== false);
-  const pendingListings = items.filter(i => i.status === 'pending');
-  const featuredListings = items.filter(i => i.isFeatured || i.rating >= 4.8); // Calculate featured based on rating
-  
-  const stats = [
-    { icon: "bi-people", label: "Total Users", value: users.length },
-    { icon: "bi-person-badge", label: "Total Owners", value: platformUsers.length },
-    { icon: "bi-person-check", label: "Total Renters", value: platformUsers.length },
+  const items = getManagementItems();
+  const promotions = fetchPromotionRequests();
+  const activePromotions = fetchActivePromotions();
+  const contactMessages = getContactMessages();
+  const notifications = getNotifications();
+
+  const platformUsers = users.filter((user) => coerceRole(user.role) === "USER");
+  const totalOwners = uniqueCount(items.map((item) => item.ownerId || item.userId || item.ownerName || item.owner));
+  const totalRenters = uniqueCount(bookings.map((booking) => booking.renterId || booking.userId));
+  const activeListings = items.filter((item) => item.available !== false && !statusIncludes(item.status, ["pending", "rejected"]));
+  const pendingListings = items.filter((item) => statusIncludes(item.status, ["pending", "under review", "pending approval"]));
+  const verifiedOwners = uniqueCount(items.filter((item) => item.verifiedOwner || statusIncludes(item.verificationStatus, ["verified"])).map((item) => item.ownerId || item.userId || item.ownerName || item.owner));
+  const pendingVerifications = users.filter((user) => statusIncludes(user.verificationStatus, ["pending"])).length + pendingListings.length;
+  const promotionRevenue = promotions.reduce((sum, promotion) => sum + Number(promotion.amount || 0), 0);
+  const reportsAndComplaints = contactMessages.filter((message) => statusIncludes(message.subject, ["report", "complaint"]) || statusIncludes(message.message, ["report", "complaint"])).length;
+
+  const statCards = [
+    { icon: "bi-people", label: "Total Users", value: platformUsers.length },
+    { icon: "bi-person-badge", label: "Total Owners", value: totalOwners },
+    { icon: "bi-person-check", label: "Total Renters", value: totalRenters },
     { icon: "bi-box-seam", label: "Total Listings", value: items.length },
     { icon: "bi-check-circle", label: "Active Listings", value: activeListings.length },
     { icon: "bi-hourglass-split", label: "Pending Listings", value: pendingListings.length },
-    { icon: "bi-award", label: "Featured Listings", value: featuredListings.length },
-    { icon: "bi-cash-stack", label: "Promotion Requests", value: 4 },
-    { icon: "bi-shield-check", label: "Verification Requests", value: 2 },
-    { icon: "bi-headset", label: "Support Tickets", value: 3 },
+    { icon: "bi-shield-check", label: "Verified Owners", value: verifiedOwners },
+    { icon: "bi-person-vcard", label: "Pending Verifications", value: pendingVerifications },
+    { icon: "bi-megaphone", label: "Active Promotions", value: activePromotions.length },
+    { icon: "bi-envelope-paper", label: "Contact Messages", value: contactMessages.length },
+    { icon: "bi-flag", label: "Reports & Complaints", value: reportsAndComplaints },
+    { icon: "bi-bell", label: "Notifications Sent", value: notifications.length },
+  ];
+
+  const miniCards = [
+    { icon: "bi-shield-check", name: "Verified Owners", value: verifiedOwners, helper: "Owner trust" },
+    { icon: "bi-megaphone", name: "Active Promotions", value: activePromotions.length, helper: formatCurrency(promotionRevenue) },
+    { icon: "bi-envelope-paper", name: "Contact Messages", value: contactMessages.length, helper: "Inbox" },
+  ];
+
+  const rows = [
+    ...users.slice(-2).reverse().map((user) => ({ id: `user-${user.id}`, type: "Recent User", detail: user.email, status: coerceRole(user.role), date: formatDate(user.createdAt) })),
+    ...items.slice(0, 2).map((item) => ({ id: `listing-${item.id}`, type: "Recent Listing", detail: item.title, status: item.status || "Active", date: formatDate(item.createdAt || item.requestDate) })),
+    ...promotions.slice(0, 2).map((promotion) => ({ id: promotion.id, type: "Promotion Payment", detail: promotion.listingTitle, status: promotion.status, date: formatDate(promotion.requestDate) })),
+    ...contactMessages.slice(0, 2).map((message) => ({ id: message.id, type: "Contact Message", detail: message.subject, status: message.status, date: formatDate(message.createdAt) })),
   ];
 
   return (
-    <main className="dashboard-content">
-      <div className="d-flex justify-content-between align-items-end mb-4">
-        <div>
-          <span className="section-label">ADMIN DASHBOARD</span>
-          <h1 className="h3 mb-0">Dashboard Overview</h1>
-        </div>
-      </div>
-
-      <AdminStatGrid stats={stats} />
-
-      <div className="row mt-4">
-        <div className="col-lg-6 mb-4">
-          <div className="admin-table-container">
-            <h2 className="h5 mb-3 d-flex align-items-center gap-2">
-              <i className="bi bi-people text-primary-custom"></i> Recent Users
-            </h2>
-            <AdminDataTable
-              columns={[
-                { key: "name", label: "Name" },
-                { key: "role", label: "Role" },
-                { key: "email", label: "Email" },
-              ]}
-              rows={users.slice(-5).reverse()}
-            />
-          </div>
-        </div>
-        <div className="col-lg-6 mb-4">
-          <div className="admin-table-container">
-            <h2 className="h5 mb-3 d-flex align-items-center gap-2">
-              <i className="bi bi-box-seam text-primary-custom"></i> Recent Listings
-            </h2>
-            <AdminDataTable
-              columns={[
-                { key: "title", label: "Title" },
-                { key: "category", label: "Category" },
-                { key: "pricePerDay", label: "Price/Day", render: (r) => formatCurrency(r.pricePerDay) },
-              ]}
-              rows={items.slice(-5).reverse()}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col-lg-12 mb-4">
-          <div className="admin-table-container">
-            <h2 className="h5 mb-3 d-flex align-items-center gap-2">
-              <i className="bi bi-cash-stack text-primary-custom"></i> Recent Promotion Payments
-            </h2>
-            <AdminDataTable
-              columns={[
-                { key: "id", label: "Promo Request ID" },
-                { key: "itemTitle", label: "Listing Item" },
-                { key: "userName", label: "Owner" },
-                { key: "totalAmount", label: "Amount", render: (row) => formatCurrency(row.totalAmount || 1000) },
-                { key: "status", label: "Status" },
-              ]}
-              rows={[
-                { id: "PR-8291", itemTitle: "Toyota RAV4", userName: "Abebe Rental", totalAmount: 2000, status: "pending" },
-                { id: "PR-8292", itemTitle: "Gaming PC", userName: "Tech Hub Rentals", totalAmount: 1000, status: "approved" },
-                { id: "PR-8293", itemTitle: "Dewalt Drill Kit", userName: "BuildRight Tools", totalAmount: 500, status: "active" },
-              ]}
-            />
-          </div>
-        </div>
-      </div>
-    </main>
+    <AdminOverviewDashboard
+      variant="admin"
+      overview={{
+        title: "Marketplace Overview",
+        primaryValue: activeListings.length,
+        primaryLabel: "Active Listings",
+        icons: ["bi-box-seam", "bi-people", "bi-megaphone"],
+        stats: [
+          { label: "Pending Listings", value: pendingListings.length },
+          { label: "Pending Verifications", value: pendingVerifications },
+          { label: "Notifications Sent", value: notifications.length },
+        ],
+        searchPlaceholder: "Search users, listings, payments",
+      }}
+      statCards={statCards}
+      breakdown={createBreakdown(items, "city", "EasternCity")}
+      ringMetrics={[
+        { label: "Verified Owners", value: percent(verifiedOwners, Math.max(totalOwners, 1)), color: "#dc1218" },
+        { label: "Active Listings", value: percent(activeListings.length, Math.max(items.length, 1)), color: "#f4812a" },
+        { label: "Active Promotions", value: percent(activePromotions.length, Math.max(promotions.length, 1)), color: "#719f58" },
+      ]}
+      miniCards={miniCards}
+      chart={{
+        title: "Marketplace Growth",
+        legends: ["User Growth", "Listing Growth", "Promotion Revenue", "Listings by City"],
+        primaryFilter: "Rental marketplace",
+        values: createMonthlySeries([...users, ...items, ...promotions], ["createdAt", "requestDate", "updatedAt"]),
+      }}
+      rows={rows}
+    />
   );
 }

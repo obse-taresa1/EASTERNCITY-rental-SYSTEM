@@ -22,11 +22,11 @@ export default function LoginPage() {
     }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     try {
-      const loggedInUser = login(formData.email, formData.password);
+      const loggedInUser = await login(formData.email, formData.password);
       const pendingContactUrl = localStorage.getItem("pendingContactUrl");
       if (pendingContactUrl) {
         localStorage.removeItem("pendingContactUrl");
@@ -69,3 +69,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

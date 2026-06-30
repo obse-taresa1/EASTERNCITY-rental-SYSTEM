@@ -1661,3 +1661,411 @@ section.motorx-hero .hero-slider-controls {
   align-items: center !important;
 }
 
+
+
+/* Eastern Cities logo image-only polish */
+.app-public-header .motorx-nav-flex {
+  min-height: 64px;
+  padding: 0.35rem 0;
+}
+
+.app-public-header .motorx-logo,
+.footer-premium .footer-logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.app-public-header .motorx-logo img,
+.app-public-header .navbar-brand img {
+  width: clamp(126px, 13vw, 168px);
+  max-height: 42px !important;
+  height: auto !important;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 8px rgba(15, 23, 42, 0.16));
+}
+
+[data-theme="dark"] .app-public-header .motorx-logo img {
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.28))
+    drop-shadow(0 0 12px rgba(227, 30, 36, 0.2));
+}
+
+.footer-premium {
+  background:
+    radial-gradient(circle at 12% 22%, rgba(227, 30, 36, 0.16), transparent 32%),
+    linear-gradient(180deg, #111827 0%, #070a12 58%, #03050a 100%);
+}
+
+.footer-premium .footer-logo-img {
+  width: clamp(162px, 16vw, 210px);
+  max-height: 78px;
+  height: auto;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.85))
+    drop-shadow(0 0 16px rgba(227, 30, 36, 0.36))
+    drop-shadow(0 10px 22px rgba(0, 0, 0, 0.42));
+}
+
+.footer-premium .footer-logo-link::before {
+  content: none !important;
+}
+
+@media (max-width: 991px) {
+  .app-public-header .motorx-logo img,
+  .app-public-header .navbar-brand img {
+    width: 138px;
+    max-height: 38px !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .app-public-header .motorx-nav-flex {
+    min-height: 58px;
+  }
+
+  .app-public-header .motorx-logo img,
+  .app-public-header .navbar-brand img {
+    width: 116px;
+    max-height: 34px !important;
+  }
+
+  .footer-premium .footer-logo-img {
+    width: 148px;
+    max-height: 70px;
+  }
+}
+/* Footer compact glass polish */
+.footer-premium {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.015) 42%, rgba(227, 30, 36, 0.09)),
+    radial-gradient(circle at 16% 12%, rgba(227, 30, 36, 0.28), transparent 30%),
+    radial-gradient(circle at 88% 80%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, #111827 0%, #070a12 64%, #03050a 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.footer-main {
+  padding: 2.25rem 0 1.35rem;
+}
+
+.footer-grid {
+  gap: 1.65rem 2rem;
+  align-items: start;
+}
+
+.footer-logo-link {
+  margin-bottom: 0.75rem;
+}
+
+.footer-premium .footer-logo-img {
+  width: clamp(188px, 18vw, 242px);
+  max-height: 94px;
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 20px rgba(227, 30, 36, 0.48))
+    drop-shadow(0 12px 26px rgba(0, 0, 0, 0.46));
+}
+
+.footer-tagline {
+  margin-bottom: 1rem;
+}
+
+.footer-bottom-bar {
+  padding: 0.85rem 0;
+  border-top-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.footer-bottom-inner {
+  justify-content: center;
+  text-align: center;
+  gap: 0.35rem 1rem;
+}
+
+.footer-copyright {
+  width: 100%;
+  text-align: center;
+  color: #cbd5e1;
+}
+
+.footer-built-with {
+  justify-content: center;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .footer-premium .footer-logo-img {
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 1))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))
+    drop-shadow(0 0 26px rgba(227, 30, 36, 0.58))
+    drop-shadow(0 14px 28px rgba(0, 0, 0, 0.52));
+}
+
+@media (max-width: 767px) {
+  .footer-main {
+    padding: 1.85rem 0 1.15rem;
+  }
+
+  .footer-grid {
+    gap: 1.35rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .footer-premium .footer-logo-img {
+    width: 176px;
+    max-height: 84px;
+  }
+}
+
+/* Footer size reduction */
+.footer-main {
+  padding: 1.55rem 0 0.85rem !important;
+}
+
+.footer-grid {
+  gap: 1rem 1.4rem !important;
+}
+
+.footer-logo-link {
+  margin-bottom: 0.45rem !important;
+}
+
+.footer-premium .footer-logo-img {
+  width: clamp(160px, 15vw, 205px) !important;
+  max-height: 76px !important;
+}
+
+.footer-tagline {
+  margin-bottom: 0.7rem !important;
+  line-height: 1.45 !important;
+}
+
+.footer-social-row {
+  gap: 0.45rem !important;
+}
+
+.footer-social-icon {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+.footer-col-title {
+  margin-bottom: 0.75rem !important;
+}
+
+.footer-area-list,
+.footer-link-list,
+.footer-contact-list {
+  gap: 0.45rem !important;
+}
+
+.footer-bottom-bar {
+  padding: 0.55rem 0 !important;
+}
+
+@media (max-width: 767px) {
+  .footer-main {
+    padding: 1.25rem 0 0.75rem !important;
+  }
+
+  .footer-grid {
+    gap: 0.9rem !important;
+  }
+}
+
+/* Center public navbar links */
+@media (min-width: 992px) {
+  .app-public-header .motorx-nav-menu {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    align-items: center !important;
+    gap: 1rem !important;
+    min-width: 0;
+  }
+
+  .app-public-header .motorx-nav-links {
+    justify-content: center !important;
+    justify-self: center;
+    margin: 0 !important;
+    width: 100%;
+  }
+
+  .app-public-header .motorx-nav-actions {
+    justify-content: flex-end !important;
+    justify-self: end;
+    margin-left: 0 !important;
+  }
+}
+
+/* Dark mode readability fixes: legal, contact, security, notifications */
+[data-theme="dark"] .page-header,
+[data-theme="dark"] .legal-support-page,
+[data-theme="dark"] .container.page-header {
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-custom,
+[data-theme="dark"] .admin-table-container,
+[data-theme="dark"] .dashboard-section,
+[data-theme="dark"] .contact-message-detail,
+[data-theme="dark"] .list-group-item,
+[data-theme="dark"] .empty-state,
+[data-theme="dark"] .category-filter-bar {
+  background: #111827 !important;
+  border-color: #334155 !important;
+  color: #e5e7eb !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24) !important;
+}
+
+[data-theme="dark"] .card h1,
+[data-theme="dark"] .card h2,
+[data-theme="dark"] .card h3,
+[data-theme="dark"] .card h4,
+[data-theme="dark"] .card h5,
+[data-theme="dark"] .card h6,
+[data-theme="dark"] .card-custom h1,
+[data-theme="dark"] .card-custom h2,
+[data-theme="dark"] .card-custom h3,
+[data-theme="dark"] .card-custom h4,
+[data-theme="dark"] .admin-table-container h1,
+[data-theme="dark"] .admin-table-container h2,
+[data-theme="dark"] .admin-table-container h3,
+[data-theme="dark"] .dashboard-content h1,
+[data-theme="dark"] .dashboard-content h2,
+[data-theme="dark"] .dashboard-content h3,
+[data-theme="dark"] .page-header h1,
+[data-theme="dark"] .page-header h2,
+[data-theme="dark"] .page-header h3 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .card p,
+[data-theme="dark"] .card li,
+[data-theme="dark"] .card span,
+[data-theme="dark"] .card-custom p,
+[data-theme="dark"] .card-custom li,
+[data-theme="dark"] .legal-list li,
+[data-theme="dark"] .contact-message-body,
+[data-theme="dark"] .dashboard-content p,
+[data-theme="dark"] .dashboard-content li {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] small.text-muted,
+[data-theme="dark"] .card .text-muted,
+[data-theme="dark"] .admin-table-container .text-muted,
+[data-theme="dark"] .list-group-item .text-muted {
+  color: #a7b0c0 !important;
+}
+
+[data-theme="dark"] .legal-list strong,
+[data-theme="dark"] .card strong,
+[data-theme="dark"] .admin-table-container strong {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .form-label {
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] textarea.form-control,
+[data-theme="dark"] input.form-control {
+  background-color: #0f172a !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .form-control::placeholder,
+[data-theme="dark"] textarea.form-control::placeholder,
+[data-theme="dark"] input.form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+  background-color: #111827 !important;
+  border-color: var(--motorx-red, #e31e24) !important;
+  box-shadow: 0 0 0 0.2rem rgba(227, 30, 36, 0.18) !important;
+}
+
+[data-theme="dark"] .table,
+[data-theme="dark"] .dashboard-table {
+  color: #e5e7eb !important;
+  --bs-table-bg: transparent;
+  --bs-table-color: #e5e7eb;
+  --bs-table-border-color: #334155;
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+  --bs-table-hover-bg: rgba(227, 30, 36, 0.1);
+}
+
+[data-theme="dark"] .dashboard-table th,
+[data-theme="dark"] .dashboard-table td,
+[data-theme="dark"] .table th,
+[data-theme="dark"] .table td {
+  background: transparent !important;
+  border-color: #334155 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary,
+[data-theme="dark"] .btn-outline-danger {
+  background: transparent !important;
+  border-color: #64748b !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover,
+[data-theme="dark"] .btn-outline-danger:hover {
+  background: rgba(227, 30, 36, 0.16) !important;
+  border-color: var(--motorx-red, #e31e24) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-primary-custom,
+[data-theme="dark"] .btn-accent-custom {
+  background: var(--motorx-red, #e31e24) !important;
+  border-color: var(--motorx-red, #e31e24) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .alert,
+[data-theme="dark"] .alert-info,
+[data-theme="dark"] .alert-secondary {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #dbeafe !important;
+}
+
+[data-theme="dark"] .text-success {
+  color: #86efac !important;
+}
+
+[data-theme="dark"] .list-group-item-action:hover,
+[data-theme="dark"] .list-group-item-action:focus {
+  background: rgba(227, 30, 36, 0.1) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] a:not(.btn):not(.nav-link):not(.admin-nav-item):not(.motorx-logo):not(.footer-logo-link) {
+  color: #fca5a5;
+}
+
+[data-theme="dark"] a:not(.btn):not(.nav-link):not(.admin-nav-item):not(.motorx-logo):not(.footer-logo-link):hover {
+  color: #fecaca;
+}

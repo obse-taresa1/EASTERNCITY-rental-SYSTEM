@@ -6,7 +6,7 @@ import StatusBadge from "../../components/common/StatusBadge.jsx";
 
 export default function PromotionHistoryPage() {
   const { currentUser } = useAuth();
-  const ownerId = currentUser?.id || "user-lessor";
+  const ownerId = currentUser?.id || "user";
 
   const [history, setHistory] = useState(() => fetchOwnerPromotions(ownerId));
 
@@ -76,3 +76,4 @@ export default function PromotionHistoryPage() {
     </main>
   );
 }
+

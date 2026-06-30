@@ -1,11 +1,11 @@
 import { useState } from "react";
 
 const initialTransactions = [
-  { id: "TX-9081", itemTitle: "Toyota RAV4", owner: "Abebe Rental", package: "VIP Featured", amount: 2000, date: "2026-06-24", status: "completed" },
-  { id: "TX-9082", itemTitle: "Gaming PC", owner: "Tech Hub Rentals", package: "Premium Featured", amount: 1000, date: "2026-06-25", status: "completed" },
-  { id: "TX-9083", itemTitle: "Dewalt Drill Kit", owner: "BuildRight Tools", package: "Basic Featured", amount: 500, date: "2026-06-23", status: "completed" },
-  { id: "TX-9084", itemTitle: "Canon Camera", owner: "Lens House", package: "VIP Featured", amount: 2000, date: "2026-06-22", status: "completed" },
-  { id: "TX-9085", itemTitle: "Sport Bike", owner: "Abebe Rental", package: "Premium Featured", amount: 1000, date: "2026-06-20", status: "completed" },
+  { id: "TX-9081", itemTitle: "Toyota RAV4", owner: "Abebe Rental", package: "Homepage Banner", amount: 2000, date: "2026-06-24", status: "completed" },
+  { id: "TX-9082", itemTitle: "Gaming PC", owner: "Tech Hub Rentals", package: "Top Listing", amount: 1000, date: "2026-06-25", status: "completed" },
+  { id: "TX-9083", itemTitle: "Dewalt Drill Kit", owner: "BuildRight Tools", package: "Featured Listing", amount: 500, date: "2026-06-23", status: "completed" },
+  { id: "TX-9084", itemTitle: "Canon Camera", owner: "Lens House", package: "Homepage Banner", amount: 2000, date: "2026-06-22", status: "completed" },
+  { id: "TX-9085", itemTitle: "Sport Bike", owner: "Abebe Rental", package: "Top Listing", amount: 1000, date: "2026-06-20", status: "completed" },
 ];
 
 export default function SuperPaymentsRevenuePage() {
@@ -13,9 +13,9 @@ export default function SuperPaymentsRevenuePage() {
   const [filter, setFilter] = useState("all");
 
   const totalRevenue = txs.reduce((sum, t) => sum + t.amount, 0);
-  const vipRevenue = txs.filter(t => t.package === "VIP Featured").reduce((sum, t) => sum + t.amount, 0);
-  const premiumRevenue = txs.filter(t => t.package === "Premium Featured").reduce((sum, t) => sum + t.amount, 0);
-  const basicRevenue = txs.filter(t => t.package === "Basic Featured").reduce((sum, t) => sum + t.amount, 0);
+  const homepageBannerRevenue = txs.filter(t => t.package === "Homepage Banner").reduce((sum, t) => sum + t.amount, 0);
+  const topListingRevenue = txs.filter(t => t.package === "Top Listing").reduce((sum, t) => sum + t.amount, 0);
+  const featuredListingRevenue = txs.filter(t => t.package === "Featured Listing").reduce((sum, t) => sum + t.amount, 0);
 
   const filtered = txs.filter(t => {
     if (filter === "all") return true;
@@ -50,20 +50,20 @@ export default function SuperPaymentsRevenuePage() {
         </div>
         <div className="col-md-3 mb-3">
           <div className="p-4 border rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <span className="text-muted"><small>VIP Featured Revenue</small></span>
-            <h2 className="mb-0 fw-bold text-danger">{vipRevenue.toLocaleString()} ETB</h2>
+            <span className="text-muted"><small>Homepage Banner Revenue</small></span>
+            <h2 className="mb-0 fw-bold text-danger">{homepageBannerRevenue.toLocaleString()} ETB</h2>
           </div>
         </div>
         <div className="col-md-3 mb-3">
           <div className="p-4 border rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <span className="text-muted"><small>Premium Revenue</small></span>
-            <h2 className="mb-0 fw-bold text-danger">{premiumRevenue.toLocaleString()} ETB</h2>
+            <span className="text-muted"><small>Top Listing Revenue</small></span>
+            <h2 className="mb-0 fw-bold text-danger">{topListingRevenue.toLocaleString()} ETB</h2>
           </div>
         </div>
         <div className="col-md-3 mb-3">
           <div className="p-4 border rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <span className="text-muted"><small>Basic Featured Revenue</small></span>
-            <h2 className="mb-0 fw-bold text-danger">{basicRevenue.toLocaleString()} ETB</h2>
+            <span className="text-muted"><small>Featured Listing Revenue</small></span>
+            <h2 className="mb-0 fw-bold text-danger">{featuredListingRevenue.toLocaleString()} ETB</h2>
           </div>
         </div>
       </div>
@@ -72,7 +72,7 @@ export default function SuperPaymentsRevenuePage() {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="h5 mb-0">Monthly Revenue Transactions</h2>
           <div className="d-flex gap-2">
-            {["all", "VIP", "Premium", "Basic"].map(opt => (
+            {["all", "Homepage", "Top", "Featured"].map(opt => (
               <button
                 key={opt}
                 type="button"

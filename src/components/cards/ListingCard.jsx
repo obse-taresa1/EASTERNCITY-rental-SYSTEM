@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
+import { getPromotionLabel } from "../../services/itemService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 
 export default function ListingCard({ item }) {
@@ -9,6 +10,7 @@ export default function ListingCard({ item }) {
   if (!item) return null;
 
   const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
+  const promotionLabel = getPromotionLabel(item);
   const specs = item.specs || [
     {
       icon: "bi-geo-alt",
@@ -32,7 +34,7 @@ export default function ListingCard({ item }) {
         />
         <div className="card-badges">
           {item.featured && (
-            <span className="badge-featured">{t("featured")}</span>
+            <span className="badge-featured">{promotionLabel || t("featured")}</span>
           )}
           {item.city && (
             <span className="badge-city">

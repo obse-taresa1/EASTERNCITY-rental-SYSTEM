@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { dashboardForRole, normalizeRole } from "../services/authService.js";
+import { dashboardForRole, coerceRole } from "../services/authService.js";
 
 export default function RoleRoute({ allowedRoles = [], children }) {
   const { user, currentUser } = useAuth();
@@ -13,7 +13,7 @@ export default function RoleRoute({ allowedRoles = [], children }) {
 
   // Normalize allowed roles for comparison
   const normalizedAllowedRoles = allowedRoles.map((role) =>
-    normalizeRole(role),
+    coerceRole(role),
   );
 
   // If no specific role restriction, render children or outlet
@@ -22,7 +22,7 @@ export default function RoleRoute({ allowedRoles = [], children }) {
   }
 
   // Determine the user's role (normalize for consistency)
-  const userRole = normalizeRole(activeUser.role);
+  const userRole = coerceRole(activeUser.role);
 
   // If role not allowed, redirect to appropriate dashboard for that role
   if (!normalizedAllowedRoles.includes(userRole)) {
@@ -32,3 +32,5 @@ export default function RoleRoute({ allowedRoles = [], children }) {
   // Role is allowed – render children or outlet
   return children || <Outlet />;
 }
+
+

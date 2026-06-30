@@ -4,7 +4,93 @@ import { homeListings } from "../data/homeListings.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
 
 const OWNER_LISTINGS_KEY = "easterncity_owner_listings";
+const PUBLIC_LISTING_STATUSES = new Set(["published", "active", "featured", "renewed"]);
+const PROMOTION_PRIORITY = {
+  "homepage-banner": 3,
+  "top-listing": 2,
+  featured: 1,
+};
 export const LISTING_FEE_AMOUNT = 150;
+
+function normalizeListingStatus(status) {
+  return String(status || "")
+    .toLowerCase()
+    .replace(/[_-]/g, " ")
+    .trim();
+}
+
+function normalizePromotionPlacement(placement) {
+  const normalized = String(placement || "")
+    .toLowerCase()
+    .replace(/[_\s]+/g, "-")
+    .trim();
+
+  if (["homepage-banner", "home-banner", "homepage"].includes(normalized)) {
+    return "homepage-banner";
+  }
+  if (["top-listing", "top"].includes(normalized)) {
+    return "top-listing";
+  }
+  if (["featured", "featured-listing"].includes(normalized)) {
+    return "featured";
+  }
+  return "";
+}
+
+export function resolvePromotionPlacement(packageId, promotionText = "") {
+  const text = String(promotionText || "").toLowerCase();
+  if (text.includes("home") || text.includes("banner")) return "homepage-banner";
+  if (text.includes("top")) return "top-listing";
+  if (text.includes("featured")) return "featured";
+
+  switch (Number(packageId)) {
+    case 3:
+      return "homepage-banner";
+    case 2:
+      return "top-listing";
+    case 1:
+      return "featured";
+    default:
+      return "";
+  }
+}
+
+export function getPromotionPlacement(item) {
+  return (
+    normalizePromotionPlacement(item?.promotionPlacement) ||
+    resolvePromotionPlacement(item?.promotionPackageId || item?.packageId, item?.promotionType || item?.promotion)
+  );
+}
+
+export function getPromotionLabel(item) {
+  switch (getPromotionPlacement(item)) {
+    case "homepage-banner":
+      return "Home Banner";
+    case "top-listing":
+      return "Top Listing";
+    case "featured":
+      return "Featured";
+    default:
+      return "";
+  }
+}
+
+export function sortPromotedListingsFirst(listings) {
+  return [...listings].sort((a, b) => {
+    const promotionDelta =
+      (PROMOTION_PRIORITY[getPromotionPlacement(b)] || 0) -
+      (PROMOTION_PRIORITY[getPromotionPlacement(a)] || 0);
+    if (promotionDelta) return promotionDelta;
+
+    return Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+  });
+}
+
+export function isPublicListing(listing) {
+  const status = normalizeListingStatus(listing.status);
+  if (!status) return listing.available !== false;
+  return PUBLIC_LISTING_STATUSES.has(status);
+}
 
 function normalizeOwnerListing(listing) {
   return {
@@ -31,8 +117,21 @@ function writeOwnerListings(listings) {
   setStorageItem(OWNER_LISTINGS_KEY, listings);
 }
 
-export function getAllItems() {
+export function getPublicOwnerListings() {
+  return getOwnerListings().filter(isPublicListing);
+}
+
+export function getManagementItems() {
   return [...getOwnerListings(), ...items, ...categoryListings, ...homeListings];
+}
+
+export function getAllItems() {
+  return sortPromotedListingsFirst([
+    ...getPublicOwnerListings(),
+    ...items,
+    ...categoryListings,
+    ...homeListings,
+  ]);
 }
 
 export function getItemById(id) {
@@ -41,21 +140,22 @@ export function getItemById(id) {
 
 export function getItemsByCategory(category) {
   if (!category) return [];
-  return getAllItems().filter((item) => item.category === category);
+  return sortPromotedListingsFirst(
+    getAllItems().filter((item) => item.category === category),
+  );
 }
 
 export function searchItems(filters = {}) {
   const { search = "", category, city, sefar, maxPrice, status } = filters;
   const searchTerm = search.toLowerCase().trim();
 
-  return getAllItems().filter((item) => {
-    const hiddenStatuses = ["draft", "payment pending", "under review", "rejected"];
-    const normalizedStatus = String(item.status || "").toLowerCase();
+  return sortPromotedListingsFirst(getAllItems().filter((item) => {
+    const hiddenStatuses = ["draft", "payment pending", "under review", "pending", "pending approval", "rejected"];
+    const normalizedStatus = normalizeListingStatus(item.status);
     if ((!status || status === "all") && hiddenStatuses.includes(normalizedStatus)) {
       return false;
     }
 
-    // 1. Text search
     if (searchTerm) {
       const match =
         item.title.toLowerCase().includes(searchTerm) ||
@@ -64,22 +164,18 @@ export function searchItems(filters = {}) {
       if (!match) return false;
     }
 
-    // 2. Category filter
     if (category && category !== "all" && item.category !== category) {
       return false;
     }
 
-    // 3. City filter
     if (city && city !== "all" && item.city !== city) {
       return false;
     }
 
-    // 4. Sefar (Neighbourhood) filter
     if (sefar && sefar !== "all" && item.sefar !== sefar) {
       return false;
     }
 
-    // 5. Max Price filter
     if (
       maxPrice &&
       Number(maxPrice) > 0 &&
@@ -88,14 +184,12 @@ export function searchItems(filters = {}) {
       return false;
     }
 
-    // 6. Status filter
     if (status && status !== "all" && item.status !== status) {
-      // If items don't have status, we assume they pass or we could skip.
       if (item.status && item.status !== status) return false;
     }
 
     return true;
-  });
+  }));
 }
 
 export function saveOwnerListing(listing) {
@@ -143,7 +237,7 @@ export function updateOwnerListing(id, updates) {
 export function getListingPaymentRequests() {
   return getOwnerListings().filter((item) =>
     ["payment pending", "under review", "rejected", "published"].includes(
-      String(item.status || "").toLowerCase(),
+      normalizeListingStatus(item.status),
     ) || item.listingFeeAmount,
   );
 }
@@ -168,10 +262,19 @@ export function renewOwnerListing(id) {
   });
 }
 
-export function promoteOwnerListing(id, promotion = "7 Days Featured") {
+export function promoteOwnerListing(id, promotion = "Featured Listing", metadata = {}) {
+  const promotionType = metadata.promotionType || promotion;
+  const promotionPackageId = metadata.promotionPackageId || metadata.packageId || null;
+  const promotionPlacement =
+    metadata.promotionPlacement ||
+    resolvePromotionPlacement(promotionPackageId, promotionType || promotion);
+
   return updateOwnerListing(id, {
     featured: true,
     status: "featured",
     promotion,
+    promotionType,
+    promotionPackageId,
+    promotionPlacement,
   });
 }

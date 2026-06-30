@@ -3,16 +3,16 @@ import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { getUsers, saveUsers } from "../../services/authService.js";
 
 const initialAdmins = [
-  { id: "adm-1", name: "Kidus Daniel", email: "kidus@cityrent.com", role: "admin", status: "active" },
-  { id: "adm-2", name: "Betty Teshome", email: "betty@cityrent.com", role: "supervisor", status: "active" },
-  { id: "adm-3", name: "Tewodros Assefa", email: "teddy@cityrent.com", role: "admin", status: "deactivated" },
+  { id: "adm-1", name: "Kidus Daniel", email: "kidus@cityrent.com", role: "ADMIN", status: "active" },
+  { id: "adm-2", name: "Betty Teshome", email: "betty@cityrent.com", role: "ADMIN", status: "active" },
+  { id: "adm-3", name: "Tewodros Assefa", email: "teddy@cityrent.com", role: "ADMIN", status: "deactivated" },
 ];
 
 export default function AdminManagementPage() {
   const [admins, setAdmins] = useState(initialAdmins);
   const [editingAdmin, setEditingAdmin] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", role: "admin", password: "" });
+  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", role: "ADMIN", password: "" });
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -40,7 +40,7 @@ export default function AdminManagementPage() {
     };
     saveUsers([newUser, ...existingUsers]);
 
-    setNewAdmin({ name: "", email: "", role: "admin", password: "" });
+    setNewAdmin({ name: "", email: "", role: "ADMIN", password: "" });
     setIsAdding(false);
   };
 
@@ -199,8 +199,7 @@ export default function AdminManagementPage() {
                       value={newAdmin.role}
                       onChange={e => setNewAdmin({ ...newAdmin, role: e.target.value })}
                     >
-                      <option value="admin">Admin</option>
-                      <option value="supervisor">Supervisor</option>
+                      <option value="ADMIN">Admin</option>
                     </select>
                   </div>
                 </div>
@@ -263,8 +262,7 @@ export default function AdminManagementPage() {
                       value={editingAdmin.role}
                       onChange={e => setEditingAdmin({ ...editingAdmin, role: e.target.value })}
                     >
-                      <option value="admin">Admin</option>
-                      <option value="supervisor">Supervisor</option>
+                      <option value="ADMIN">Admin</option>
                     </select>
                   </div>
                 </div>
@@ -288,3 +286,4 @@ export default function AdminManagementPage() {
     </main>
   );
 }
+

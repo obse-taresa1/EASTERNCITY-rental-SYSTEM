@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getAllItems } from "../../services/itemService.js";
+import { getOwnerListings } from "../../services/itemService.js";
 import { getBookingsByOwner } from "../../services/bookingService.js";
 import ListingManagementTable from "../../components/dashboard/ListingManagementTable.jsx";
 import BookingTable from "../../components/dashboard/BookingTable.jsx";
@@ -50,7 +50,7 @@ export default function MyListingsPage() {
     };
   }, []);
   
-  const allItems = getAllItems();
+  const allItems = getOwnerListings();
   
   const ownedItems = useMemo(() => {
     if (!activeUser) return [];

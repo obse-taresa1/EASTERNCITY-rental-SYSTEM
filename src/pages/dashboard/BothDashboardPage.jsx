@@ -7,7 +7,7 @@ import {
   getBookingsByOwner,
   getReviewsByUser,
 } from "../../services/bookingService.js";
-import { getAllItems } from "../../services/itemService.js";
+import { getAllItems, getOwnerListings } from "../../services/itemService.js";
 import { getConversations } from "../../services/messageService.js";
 import { getStorageItem } from "../../services/storageService.js";
 import { formatCurrency } from "../../utils/currency.js";
@@ -33,6 +33,7 @@ export default function BothDashboardPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const allItems = getAllItems();
+  const ownerItems = getOwnerListings();
 
   const renterBookings = activeUser ? getBookingsByUser(activeUser.id) : [];
   const conversations = activeUser ? getConversations(activeUser.id) : [];
@@ -40,7 +41,7 @@ export default function BothDashboardPage() {
   const savedItems = getStorageItem("saved_items", []);
 
   const ownedItems = useMemo(() => {
-    const matches = allItems.filter(
+    const matches = ownerItems.filter(
       (item) =>
         item.owner === activeUser?.name ||
         item.owner === activeUser?.businessName ||
@@ -48,16 +49,26 @@ export default function BothDashboardPage() {
         item.ownerName === activeUser?.businessName,
     );
     return matches.length ? matches : allItems.slice(0, 6);
-  }, [activeUser, allItems]);
+  }, [activeUser, allItems, ownerItems]);
 
-  const ownerBookings = ownedItems.flatMap((item) => getBookingsByOwner(item.owner));
+  const ownerBookingMap = new Map();
+  const ownerIdentifiers = [
+    activeUser?.id,
+    activeUser?.name,
+    activeUser?.businessName,
+    ...ownedItems.flatMap((item) => [item.ownerId, item.owner, item.ownerName]),
+  ].filter(Boolean);
+  ownerIdentifiers.forEach((identifier) => {
+    getBookingsByOwner(identifier).forEach((booking) => ownerBookingMap.set(booking.id, booking));
+  });
+  const ownerBookings = Array.from(ownerBookingMap.values());
 
   const activeListings = ownedItems.filter((item) =>
     ["published", "active", "featured", "renewed"].includes(normalizeStatus(item)),
   ).length;
 
   const activeBookings = renterBookings.filter((b) =>
-    ["pending", "accepted", "active"].includes(b.status),
+    ["PENDING", "ACCEPTED", "ACTIVE"].includes(b.status),
   ).length;
 
   const totalEarnings = ownerBookings.reduce(
@@ -245,3 +256,5 @@ export default function BothDashboardPage() {
     </div>
   );
 }
+
+

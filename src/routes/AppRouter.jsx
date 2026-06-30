@@ -78,15 +78,6 @@ import SuperCategoriesManagementPage from "../pages/super-admin/SuperCategoriesM
 import SuperPlatformMonitoringPage from "../pages/super-admin/SuperPlatformMonitoringPage.jsx";
 import SuperPromotionManagementPage from "../pages/super-admin/SuperPromotionManagementPage.jsx";
 
-import { useAuth } from "../context/AuthContext.jsx";
-
-function DashboardRedirect() {
-  const { currentUser, user, dashboardForRole } = useAuth();
-  const activeUser = user || currentUser;
-
-  return <Navigate to={dashboardForRole(activeUser?.role)} replace />;
-}
-
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -112,32 +103,10 @@ export default function AppRouter() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<DashboardRedirect />} />
-
             <Route
-              path="/renter-dashboard"
+              path="/dashboard"
               element={
-                <RoleRoute allowedRoles={["renter", "lessee"]}>
-                  <BothDashboardPage />
-                </RoleRoute>
-              }
-            />
-
-            <Route
-              path="/lessor-dashboard"
-              element={
-                <RoleRoute allowedRoles={["lessor", "both"]}>
-                  <BothDashboardPage initialMode="owner" />
-                </RoleRoute>
-              }
-            />
-
-            <Route
-              path="/both-dashboard"
-              element={
-                <RoleRoute
-                  allowedRoles={["renter", "lessee", "lessor", "both", "user"]}
-                >
+                <RoleRoute allowedRoles={["USER"]}>
                   <BothDashboardPage />
                 </RoleRoute>
               }
@@ -146,9 +115,7 @@ export default function AppRouter() {
             <Route
               path="/list-item"
               element={
-                <RoleRoute
-                  allowedRoles={["renter", "lessee", "lessor", "both", "user"]}
-                >
+                <RoleRoute allowedRoles={["USER"]}>
                   <ListItemPage />
                 </RoleRoute>
               }
@@ -157,9 +124,7 @@ export default function AppRouter() {
             <Route
               path="/my-listings"
               element={
-                <RoleRoute
-                  allowedRoles={["renter", "lessee", "lessor", "both", "user"]}
-                >
+                <RoleRoute allowedRoles={["USER"]}>
                   <MyListingsPage />
                 </RoleRoute>
               }
@@ -179,7 +144,7 @@ export default function AppRouter() {
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route element={<RoleRoute allowedRoles={["admin", "supervisor"]} />}>
+          <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
               <Route path="/admin-dashboard/categories" element={<AdminCategoriesPage />} />
@@ -193,6 +158,7 @@ export default function AppRouter() {
               <Route path="/admin-dashboard/verification-requests" element={<AdminVerificationPage />} />
               <Route path="/admin-dashboard/analytics" element={<AdminAnalyticsPage />} />
               <Route path="/admin-dashboard/support-tickets" element={<AdminSupportTicketsPage />} />
+              <Route path="/admin-dashboard/contact-messages" element={<ContactMessagesPage />} />
               <Route path="/admin-dashboard/notifications" element={<AdminNotificationsPage />} />
               <Route path="/admin-dashboard/owners" element={<AdminOwnersPage />} />
 <Route path="/admin-dashboard/renters" element={<AdminRentersPage />} />
@@ -209,7 +175,7 @@ export default function AppRouter() {
 
         <Route element={<ProtectedRoute />}>
           <Route
-            element={<RoleRoute allowedRoles={["superadmin", "super-admin"]} />}
+            element={<RoleRoute allowedRoles={["SUPER_ADMIN"]} />}
           >
             <Route element={<SuperAdminLayout />}>
               <Route
@@ -237,6 +203,10 @@ export default function AppRouter() {
                 element={<RoleRequestsPage />}
               />
               <Route
+                path="/super-admin-dashboard/notifications"
+                element={<AdminNotificationsPage />}
+              />
+              <Route
                 path="/super-admin-dashboard/analytics"
                 element={<AnalyticsPage />}
               />
@@ -257,6 +227,7 @@ export default function AppRouter() {
             </Route>
           </Route>
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

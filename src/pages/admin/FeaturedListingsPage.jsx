@@ -22,8 +22,8 @@ export default function FeaturedListingsPage() {
       // Normalise the data so ListingCard gets an `id` prop
       const normalised = (data || []).map((item) => ({
         id: item.listingId,
-        title: item.title,
-        description: `${item.startDate} — ${item.endDate}`,
+        title: item.listingTitle || item.title,
+        description: `${item.promotionType || "Promotion"} | ${item.startDate || "approved"} - ${item.endDate || "ongoing"}`,
         startDate: item.startDate,
         endDate: item.endDate,
       }));

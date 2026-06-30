@@ -2,22 +2,16 @@
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || `${JWT_SECRET}-refresh`;
 
-/**
- * Generate a JSON Web Token for the user
- * @param {Object} payload - User data to store in the token
- * @param {string} expiresIn - Token expiration time
- * @returns {string} Signed JWT
- */
 const generateToken = (payload, expiresIn = '1d') => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn });
 };
 
-/**
- * Verify a JSON Web Token
- * @param {string} token - The token to verify
- * @returns {Object|null} Decoded payload or null if invalid
- */
+const generateRefreshToken = (payload, expiresIn = '7d') => {
+  return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn });
+};
+
 const verifyToken = (token) => {
   try {
     return jwt.verify(token, JWT_SECRET);
@@ -26,7 +20,17 @@ const verifyToken = (token) => {
   }
 };
 
+const verifyRefreshToken = (token) => {
+  try {
+    return jwt.verify(token, JWT_REFRESH_SECRET);
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   generateToken,
+  generateRefreshToken,
   verifyToken,
+  verifyRefreshToken,
 };

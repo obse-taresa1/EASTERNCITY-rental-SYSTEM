@@ -56,15 +56,19 @@ export default function BookingPage() {
 
     try {
       await createBooking({
-        userId: user.id,
+        renterId: user.id,
+        ownerId: item.ownerId || item.ownerName || item.owner || "owner",
+        listingId: item.id,
         itemId: item.id,
         itemTitle: item.title,
         owner: item.ownerName || 'Verified Owner',
         startDate,
         endDate,
+        subtotal,
+        serviceFee,
         totalPrice: totalAmount,
         totalAmount,
-        status: 'pending',
+        status: "PENDING",
         agreementAccepted: agreed,
         createdAt: new Date().toISOString()
       });
@@ -177,3 +181,6 @@ export default function BookingPage() {
     </div>
   );
 }
+
+
+

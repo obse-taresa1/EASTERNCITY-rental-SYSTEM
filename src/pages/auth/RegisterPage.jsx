@@ -52,7 +52,7 @@ export default function RegisterPage() {
     reader.readAsDataURL(file);
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setError("");
 
@@ -64,7 +64,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const registeredUser = register(formData);
+      const registeredUser = await register(formData);
       navigate(getDashboardPath(registeredUser.role), { replace: true });
     } catch (registerError) {
       setError(registerError.message || "Registration failed.");
@@ -188,3 +188,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+

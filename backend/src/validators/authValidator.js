@@ -18,8 +18,8 @@ const validateRegister = (req, res, next) => {
     return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
   }
 
-  if (role && !['USER', 'ADMIN', 'SUPER_ADMIN'].includes(role)) {
-    return res.status(400).json({ success: false, message: 'Invalid user role specified.' });
+  if (role && role !== 'USER') {
+    return res.status(400).json({ success: false, message: 'Public registration only creates USER accounts.' });
   }
 
   next();
@@ -46,3 +46,5 @@ module.exports = {
   validateRegister,
   validateLogin,
 };
+
+
