@@ -5,7 +5,7 @@ A professional, production-ready, and beginner-friendly Node.js + Express backen
 ## Tech Stack
 - **Node.js & Express.js** - Server and Routing framework
 - **Prisma ORM** - Database client management
-- **SQLite** - Relational database (ideal for zero-configuration development)
+- **Neon PostgreSQL** - Hosted PostgreSQL database for shared backend development
 - **JWT (JSON Web Tokens)** - Authentication and Session representation
 - **Bcryptjs** - Secure one-way hashing for user passwords
 - **Dotenv** - Multi-environment configuration loader
@@ -17,8 +17,8 @@ A professional, production-ready, and beginner-friendly Node.js + Express backen
 ```text
 backend/
 ├── prisma/
-│   ├── dev.db                 # Created SQLite database
-│   └── schema.prisma          # Prisma Schema with User model configuration
+│   ├── migrations/            # PostgreSQL migration history
+│   └── schema.prisma          # Prisma Schema configured for Neon PostgreSQL
 │
 ├── src/
 │   ├── config/
@@ -74,15 +74,16 @@ npm install
 Create a `.env` file in the root of the `backend/` folder (a default `.env` is already configured for you):
 ```env
 PORT=5000
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/neondb?sslmode=require&channel_binding=require"
 JWT_SECRET="your_super_secret_jwt_key_here_for_development"
 NODE_ENV="development"
 ```
 
 ### 4. Database Setup & Migrations
-Create/initialize database schema tables and generate the Prisma Client using:
+Apply database migrations to Neon PostgreSQL and generate the Prisma Client using:
 ```bash
-npx prisma migrate dev --name init
+npx prisma migrate deploy
+npx prisma generate
 ```
 
 ### 5. Running the Server
@@ -171,3 +172,5 @@ npm run start
 ## Architecture Plan
 
 See `backend/IMPLEMENTATION_PLAN.md` for the current backend implementation plan, cleanup phase, role rules, booking architecture, developer allocation, and security checklist.
+
+

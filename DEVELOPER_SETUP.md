@@ -37,7 +37,7 @@ Frontend variables:
 
 Backend variables:
 
-- `DATABASE_URL`: Prisma database URL.
+- `DATABASE_URL`: Neon PostgreSQL connection string. Keep this only in local `.env`, never in commits.
 - `JWT_SECRET`: Access-token signing secret.
 - `JWT_REFRESH_SECRET`: Refresh-token signing secret.
 - `PORT`: Backend port.
@@ -51,7 +51,7 @@ Run from `backend/`:
 ```bash
 npx prisma validate
 npx prisma format
-npx prisma migrate dev --name init
+npx prisma migrate deploy
 npx prisma generate
 ```
 
@@ -97,3 +97,4 @@ npx prisma validate
 - Developer 3 owns bookings, messaging, notifications, support tickets, analytics, and dashboard APIs.
 
 Keep shared contracts in Prisma schema, route names, and service abstractions stable before changing feature code.
+
