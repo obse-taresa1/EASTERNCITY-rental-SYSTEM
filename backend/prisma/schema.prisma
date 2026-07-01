@@ -21,14 +21,37 @@ model User {
   updatedSettings               SystemSetting[] @relation("SystemSettingUpdater")
   refreshTokens                 RefreshToken[]
   notifications                 Notification[]
+  listings                      Listing[]       @relation("ListingOwner")
+  approvedListings              Listing[]       @relation("ListingApprover")
+  promotions                    Promotion[]     @relation("PromotionRequester")
+  approvedPromotions            Promotion[]     @relation("PromotionApprover")
+  reviews                       Review[]
 }
 
 model Listing {
-  id            String         @id @default(uuid())
+  id              String    @id @default(uuid())
+  title           String
+  description     String
+  ownerId         String
+  categoryId      String?
+  city            String
+  location        String?
+  pricePerDay     Decimal
+  status          String    @default("PENDING")
+  approvedById    String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  owner         User           @relation("ListingOwner", fields: [ownerId], references: [id])
+  approvedBy    User?          @relation("ListingApprover", fields: [approvedById], references: [id])
+  category      Category?      @relation(fields: [categoryId], references: [id])
   bookings      Booking[]
   conversations Conversation[]
   images        ListingImage[]
-  createdAt     DateTime       @default(now())
+  promotions    Promotion[]
+  reviews       Review[]
 }
 
 model Booking {
@@ -72,6 +95,49 @@ model ListingImage {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   listing   Listing  @relation(fields: [listingId], references: [id])
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  listings    Listing[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Promotion {
+  id              String    @id @default(uuid())
+  userId          String
+  listingId       String
+  packageType     String
+  placement       String
+  amount          Decimal
+  paymentType     String
+  paymentProofUrl String?
+  status          String    @default("PENDING")
+  approvedById    String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user       User    @relation("PromotionRequester", fields: [userId], references: [id])
+  listing    Listing @relation(fields: [listingId], references: [id])
+  approvedBy User?   @relation("PromotionApprover", fields: [approvedById], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  listingId String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  listing Listing @relation(fields: [listingId], references: [id])
 }
 
 model SystemSetting {
