@@ -8,24 +8,27 @@ datasource db {
 }
 
 model User {
-  id                            String          @id @default(uuid())
+  id                            String               @id @default(uuid())
   name                          String
-  email                         String          @unique
+  email                         String               @unique
   password                      String
-  role                          String          @default("USER") // USER, ADMIN, SUPER_ADMIN
-  createdAt                     DateTime        @default(now())
-  rentedBookings                Booking[]       @relation("BookingRenter")
-  ownedBookings                 Booking[]       @relation("BookingOwner")
-  conversationsAsParticipantOne Conversation[]  @relation("ConversationParticipantOne")
-  conversationsAsParticipantTwo Conversation[]  @relation("ConversationParticipantTwo")
-  updatedSettings               SystemSetting[] @relation("SystemSettingUpdater")
+  role                          String               @default("USER") // USER, ADMIN, SUPER_ADMIN
+  createdAt                     DateTime             @default(now())
+  rentedBookings                Booking[]            @relation("BookingRenter")
+  ownedBookings                 Booking[]            @relation("BookingOwner")
+  conversationsAsParticipantOne Conversation[]       @relation("ConversationParticipantOne")
+  conversationsAsParticipantTwo Conversation[]       @relation("ConversationParticipantTwo")
+  updatedSettings               SystemSetting[]      @relation("SystemSettingUpdater")
   refreshTokens                 RefreshToken[]
   notifications                 Notification[]
-  listings                      Listing[]       @relation("ListingOwner")
-  approvedListings              Listing[]       @relation("ListingApprover")
-  promotions                    Promotion[]     @relation("PromotionRequester")
-  approvedPromotions            Promotion[]     @relation("PromotionApprover")
+  listings                      Listing[]            @relation("ListingOwner")
+  approvedListings              Listing[]            @relation("ListingApprover")
+  promotions                    Promotion[]          @relation("PromotionRequester")
+  approvedPromotions            Promotion[]          @relation("PromotionApprover")
   reviews                       Review[]
+  sentMessages                  Message[]            @relation("MessageSender")
+  supportTickets                SupportTicket[]      @relation("SupportTicketUser")
+  supportTicketReplies          SupportTicketReply[] @relation("SupportTicketReplySender")
 }
 
 model Listing {
@@ -54,26 +57,102 @@ model Listing {
   reviews       Review[]
 }
 
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
 model Booking {
-  id                 String    @id @default(uuid())
+  id                 String        @id @default(uuid())
   renterId           String
   ownerId            String
   listingId          String
   startDate          DateTime
   endDate            DateTime
-  subtotal           Decimal
-  serviceFee         Decimal
-  totalAmount        Decimal
-  agreementAccepted  Boolean   @default(false)
+  subtotal           Decimal       @db.Decimal(10, 2)
+  serviceFee         Decimal       @db.Decimal(10, 2)
+  totalAmount        Decimal       @db.Decimal(10, 2)
+  agreementAccepted  Boolean       @default(false)
   cancellationReason String?
   approvedAt         DateTime?
   completedAt        DateTime?
-  status             String    @default("PENDING") // PENDING, ACCEPTED, ACTIVE, COMPLETED, CANCELLED, REJECTED
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  renter             User      @relation("BookingRenter", fields: [renterId], references: [id])
-  owner              User      @relation("BookingOwner", fields: [ownerId], references: [id])
-  listing            Listing   @relation(fields: [listingId], references: [id])
+  status             BookingStatus @default(PENDING)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  renter  User    @relation("BookingRenter", fields: [renterId], references: [id], onDelete: Cascade)
+  owner   User    @relation("BookingOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([renterId])
+  @@index([ownerId])
+  @@index([listingId])
+  @@index([status])
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  body           String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum SupportTicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model SupportTicket {
+  id         String                @id @default(uuid())
+  userId     String
+  subject    String
+  message    String
+  status     SupportTicketStatus   @default(OPEN)
+  priority   SupportTicketPriority @default(MEDIUM)
+  resolvedAt DateTime?
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  user    User                 @relation("SupportTicketUser", fields: [userId], references: [id], onDelete: Cascade)
+  replies SupportTicketReply[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SupportTicketReply {
+  id        String   @id @default(uuid())
+  ticketId  String
+  senderId  String
+  message   String
+  createdAt DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User          @relation("SupportTicketReplySender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([senderId])
 }
 
 model Conversation {
@@ -86,6 +165,7 @@ model Conversation {
   participantOne   User      @relation("ConversationParticipantOne", fields: [participantOneId], references: [id])
   participantTwo   User      @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id])
   listing          Listing   @relation(fields: [listingId], references: [id])
+  Message          Message[]
 }
 
 model ListingImage {
