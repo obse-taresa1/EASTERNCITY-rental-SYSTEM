@@ -139,9 +139,42 @@ const revokeRefreshToken = async (refreshToken) => {
   });
 };
 
+const changePassword = async (userId, currentPassword, newPassword) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!user) {
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const isMatch = await comparePassword(currentPassword, user.password);
+  if (!isMatch) {
+    const error = new Error('Current password is incorrect.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashedPassword },
+  });
+
+  await prisma.refreshToken.updateMany({
+    where: {
+      userId,
+      revokedAt: null,
+    },
+    data: { revokedAt: new Date() },
+  });
+};
+
 module.exports = {
   registerUser,
   loginUser,
   refreshSession,
   revokeRefreshToken,
+  changePassword,
 };

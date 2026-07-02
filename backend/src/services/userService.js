@@ -103,7 +103,36 @@ const deleteUser = async (id) => {
   });
 };
 
+const createAdminUser = async ({ name, email, password, role }) => {
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+
+  if (existingUser) {
+    const error = new Error('Email is already registered.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const hashedPassword = await hashPassword(password);
+
+  return prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+};
+
 module.exports = {
+  createAdminUser,
   getAllUsers,
   getUserById,
   updateUser,

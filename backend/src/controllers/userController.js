@@ -106,7 +106,22 @@ const remove = async (req, res, next) => {
   }
 };
 
+const createAdmin = async (req, res, next) => {
+  try {
+    const user = await userService.createAdminUser(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: 'Admin user created successfully.',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
+  createAdmin,
   getProfile,
   getUsers,
   getUser,

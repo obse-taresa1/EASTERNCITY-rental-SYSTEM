@@ -4,7 +4,7 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
-const { validateUpdateUser } = require('../validators/userValidator');
+const { validateUpdateUser, validateCreateAdmin } = require('../validators/userValidator');
 
 // All user routes require authentication
 router.use(authMiddleware);
@@ -24,6 +24,13 @@ router.get('/me', userController.getProfile);
  */
 router.get('/', authorize('ADMIN', 'SUPER_ADMIN'), userController.getUsers);
 
+
+/**
+ * @route   POST /api/users/admins
+ * @desc    Create an admin account
+ * @access  Private (Super Admin only)
+ */
+router.post('/admins', authorize('SUPER_ADMIN'), validateCreateAdmin, userController.createAdmin);
 /**
  * @route   GET /api/users/:id
  * @desc    Get detailed user details by ID

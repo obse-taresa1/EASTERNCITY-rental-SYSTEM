@@ -58,9 +58,24 @@ const logout = async (req, res, next) => {
   }
 };
 
+const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    await authService.changePassword(req.user.id, currentPassword, newPassword);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password changed successfully. Please log in again.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   refresh,
   logout,
+  changePassword,
 };
