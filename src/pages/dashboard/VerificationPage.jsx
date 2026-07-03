@@ -1,10 +1,24 @@
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getUsers } from "../../services/authService.js";
 
 const STATUS_CONFIG = {
-  verified: { label: "Verified", cls: "verif-verified", icon: "bi-patch-check-fill", desc: "Your identity has been confirmed. You can rent and list items freely." },
-  "pending verification": { label: "Pending Review", cls: "verif-pending", icon: "bi-hourglass-split", desc: "Your National ID has been submitted and is under review. This usually takes 1–3 business days." },
-  rejected: { label: "Rejected", cls: "verif-rejected", icon: "bi-x-circle-fill", desc: "Your ID was not accepted. Please re-register with a valid National ID." },
+  verified: {
+    label: "Verified",
+    cls: "verif-verified",
+    icon: "bi-patch-check-fill",
+    desc: "Your identity has been confirmed. You can rent and list items freely.",
+  },
+  "pending verification": {
+    label: "Pending Review",
+    cls: "verif-pending",
+    icon: "bi-hourglass-split",
+    desc: "Your National ID has been submitted and is under review. This usually takes 1–3 business days.",
+  },
+  rejected: {
+    label: "Rejected",
+    cls: "verif-rejected",
+    icon: "bi-x-circle-fill",
+    desc: "Your ID was not accepted. Please re-register with a valid National ID.",
+  },
 };
 
 function getStatusConfig(status) {
@@ -16,9 +30,7 @@ export default function VerificationPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
 
-  // Fetch full user record (includes nationalId images from registration)
-  const allUsers = getUsers();
-  const fullUser = allUsers.find((u) => u.id === activeUser?.id) || activeUser;
+  const fullUser = activeUser;
 
   const statusCfg = getStatusConfig(fullUser?.verificationStatus);
   const submittedDate = fullUser?.createdAt
@@ -115,9 +127,10 @@ export default function VerificationPage() {
         <div>
           <strong>Why do we verify?</strong>
           <p>
-            Verification ensures a safe, trusted rental community. Verified users can
-            list items, book rentals, and enjoy priority support. All ID documents are
-            stored securely and only reviewed by authorized staff.
+            Verification ensures a safe, trusted rental community. Verified
+            users can list items, book rentals, and enjoy priority support. All
+            ID documents are stored securely and only reviewed by authorized
+            staff.
           </p>
         </div>
       </div>

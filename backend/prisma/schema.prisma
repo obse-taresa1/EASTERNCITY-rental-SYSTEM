@@ -42,6 +42,9 @@ model Listing {
   location        String?
   pricePerDay     Decimal
   status          String         @default("PENDING")
+  paymentMethod   String?
+  paymentProofUrl String?
+  paymentStatus   String         @default("PENDING")
   approvedById    String?
   approvedAt      DateTime?
   rejectionReason String?

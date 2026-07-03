@@ -1,45 +1,67 @@
-const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || "http://localhost:5000";
+import axios from "axios";
 
-function buildHeaders(headers = {}) {
-  const token = localStorage.getItem("accessToken");
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...headers,
-  };
-}
+const API_BASE_URL =
+  import.meta.env?.VITE_API_BASE_URL || "http://localhost:5000";
 
-export async function apiRequest(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: buildHeaders(options.headers),
-  });
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: false,
+});
 
-  const payload = await response.json().catch(() => ({}));
+api.interceptors.request.use((config) => {
+  const token =
+    localStorage.getItem("token") || localStorage.getItem("accessToken");
 
-  if (!response.ok) {
-    throw new Error(payload.message || "Request failed.");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  } else if (!config.headers["Content-Type"]) {
+    config.headers["Content-Type"] = "application/json";
+  }
+
+  return config;
+});
+
+function unwrapResponse(response) {
+  const payload = response?.data || {};
   return payload.data ?? payload;
 }
 
+async function apiRequest(method, path, data, options = {}) {
+  try {
+    const response = await api.request({
+      url: path,
+      method,
+      data,
+      ...options,
+    });
+    return unwrapResponse(response);
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error.message || "Request failed.";
+    throw new Error(message);
+  }
+}
+
+export { api };
+
 export const apiClient = {
   get(path, options) {
-    return apiRequest(path, { ...options, method: "GET" });
+    return apiRequest("GET", path, undefined, options);
   },
   post(path, body, options) {
-    return apiRequest(path, {
-      ...options,
-      method: "POST",
-      body: JSON.stringify(body || {}),
-    });
+    return apiRequest("POST", path, body, options);
   },
   patch(path, body, options) {
-    return apiRequest(path, {
-      ...options,
-      method: "PATCH",
-      body: JSON.stringify(body || {}),
-    });
+    return apiRequest("PATCH", path, body, options);
+  },
+  put(path, body, options) {
+    return apiRequest("PUT", path, body, options);
+  },
+  delete(path, options) {
+    return apiRequest("DELETE", path, undefined, options);
   },
 };

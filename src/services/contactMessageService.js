@@ -1,5 +1,7 @@
-import { getUsers } from "./authService.js";
-import { createNotification, NOTIFICATION_TYPES } from "./notificationService.js";
+import {
+  createNotification,
+  NOTIFICATION_TYPES,
+} from "./notificationService.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
 
 const CONTACT_MESSAGES_KEY = "easterncity_contact_messages";
@@ -12,7 +14,9 @@ function emitContactMessagesUpdate() {
 
 function normalizeMessage(message) {
   return {
-    id: message.id || `contact-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id:
+      message.id ||
+      `contact-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     userId: message.userId || "",
     name: message.name || "Website Visitor",
     email: message.email || "",
@@ -49,10 +53,7 @@ export function createContactMessage(data) {
 function findNotificationUserId(message) {
   if (message.userId) return message.userId;
 
-  const email = String(message.email || "").toLowerCase();
-  if (!email) return "";
-
-  return getUsers().find((user) => user.email?.toLowerCase() === email)?.id || "";
+  return "";
 }
 
 export function replyToContactMessage(id, adminReply) {

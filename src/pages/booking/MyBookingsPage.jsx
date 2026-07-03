@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import {
-  getBookingsByUser,
-  hasReviewForBooking,
-} from "../../services/bookingService.js";
+import { hasReviewForBooking } from "../../services/bookingService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
 import LeaveReviewModal from "../../components/reviews/LeaveReviewModal.jsx";
 
 const STATUS_LABELS = {
@@ -39,13 +37,44 @@ export default function MyBookingsPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const location = useLocation();
-  const [, setRefreshToken] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [reviewBooking, setReviewBooking] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
   const [successMessage, setSuccessMessage] = useState(
     location.state?.successMessage || "",
   );
-  const bookings = activeUser ? getBookingsByUser(activeUser.id) : [];
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadBookings() {
+      if (!activeUser) {
+        setBookings([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const data = await getMyBookings();
+        const renterBookings = data.filter(
+          (booking) =>
+            String(booking.renterId || booking.userId || "") ===
+            String(activeUser.id),
+        );
+        if (active) setBookings(renterBookings);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadBookings();
+    return () => {
+      active = false;
+    };
+  }, [activeUser, refreshKey]);
 
   useEffect(() => {
     if (successMessage) {
@@ -70,6 +99,10 @@ export default function MyBookingsPage() {
   };
 
   const filtered = getFilteredBookings();
+
+  if (loading) {
+    return <div className="dashboard-content">Loading bookings...</div>;
+  }
 
   return (
     <main className="dashboard-content my-bookings-page pb-5">
@@ -159,8 +192,11 @@ export default function MyBookingsPage() {
         <div className="row g-4">
           {filtered.map((booking) => {
             const statusInfo =
-              STATUS_LABELS[booking.status] || STATUS_LABELS.PENDING;
-            const isCompleted = booking.status === "completed";
+              STATUS_LABELS[
+                String(booking.status || "PENDING").toUpperCase()
+              ] || STATUS_LABELS.PENDING;
+            const isCompleted =
+              String(booking.status || "").toUpperCase() === "COMPLETED";
             const alreadyReviewed = hasReviewForBooking(booking.id);
 
             return (
@@ -189,7 +225,11 @@ export default function MyBookingsPage() {
                   <div className="flex-grow-1 w-100">
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <div>
-                        <h4 className="fw-bold m-0">{booking.itemTitle}</h4>
+                        <h4 className="fw-bold m-0">
+                          {booking.itemTitle ||
+                            booking.listing?.title ||
+                            "Booking"}
+                        </h4>
                         <p className="text-muted small m-0">
                           Booking ID: #{booking.id.slice(-8)}
                         </p>
@@ -215,7 +255,10 @@ export default function MyBookingsPage() {
                         <i className="bi bi-person me-2"></i>
                         <strong>Owner:</strong>
                         <br />
-                        {booking.owner}
+                        {booking.owner?.name ||
+                          booking.ownerName ||
+                          booking.ownerId ||
+                          "Owner"}
                       </div>
                       <div className="col-sm-6 col-md-3">
                         <i className="bi bi-info-circle me-2"></i>
@@ -262,7 +305,8 @@ export default function MyBookingsPage() {
                 <div className="alert alert-info mt-3 mb-0">
                   <strong>Payment Information</strong>
                   <p className="mb-0">
-                    This platform does not process rental payments. Payment arrangements are made directly with the listing owner.
+                    This platform does not process rental payments. Payment
+                    arrangements are made directly with the listing owner.
                   </p>
                 </div>
               </div>
@@ -275,10 +319,9 @@ export default function MyBookingsPage() {
         <LeaveReviewModal
           booking={reviewBooking}
           onClose={() => setReviewBooking(null)}
-          onReviewSubmitted={() => setRefreshToken((current) => current + 1)}
+          onReviewSubmitted={() => setRefreshKey((current) => current + 1)}
         />
       )}
     </main>
   );
 }
-

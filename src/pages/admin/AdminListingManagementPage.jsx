@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
-import { getOwnerListings, updateOwnerListing, deleteOwnerListing } from "../../services/itemService.js";
+import {
+  approveListing,
+  deleteListing,
+  getManageListings,
+  rejectListing,
+  updateListing,
+} from "../../services/listingApiService.js";
 
 export default function AdminListingManagementPage() {
   const [listings, setListings] = useState([]);
@@ -8,61 +14,102 @@ export default function AdminListingManagementPage() {
   const [filter, setFilter] = useState("all");
   const [editingItem, setEditingItem] = useState(null);
   const [viewScreenshot, setViewScreenshot] = useState(null);
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const refreshListings = () => {
-    setListings(getOwnerListings());
+  const loadListings = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getManageListings();
+      console.log("Admin listings:", response?.data);
+
+      const listingsData = Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response?.data?.listings)
+          ? response.data.listings
+          : Array.isArray(response)
+            ? response
+            : [];
+
+      setListings(listingsData);
+    } catch (error) {
+      console.error("Failed to load listings:", error);
+      setNotice(error.message || "Unable to load listings.");
+      setListings([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    refreshListings();
-    window.addEventListener("easterncity:listings-updated", refreshListings);
-    return () => window.removeEventListener("easterncity:listings-updated", refreshListings);
+    loadListings();
+    window.addEventListener("easterncity:listings-updated", loadListings);
+    return () =>
+      window.removeEventListener("easterncity:listings-updated", loadListings);
   }, []);
 
-  const handleStatusChange = (id, newStatus, reason = "") => {
-    updateOwnerListing(id, { status: newStatus, rejectionReason: reason, available: newStatus === "PUBLISHED" });
-    if (newStatus === "PUBLISHED") {
-      alert("Notification sent: Your listing has been approved");
-    } else if (newStatus === "REJECTED") {
-      alert(`Notification sent: Your listing has been rejected. Reason: ${reason}`);
+  const handleStatusChange = async (id, newStatus, reason = "") => {
+    try {
+      if (newStatus === "APPROVED") {
+        await approveListing(id);
+      } else {
+        await rejectListing(id, reason);
+      }
+      setNotice(`Listing ${String(newStatus).toLowerCase()} successfully.`);
+    } catch (error) {
+      setNotice(error.message || "Unable to update listing status.");
     }
   };
 
-  const handleRemove = (id) => {
-    if (confirm("Are you sure you want to remove this listing?")) {
-      deleteOwnerListing(id);
+  const handleRemove = async (id) => {
+    if (window.confirm("Are you sure you want to remove this listing?")) {
+      try {
+        await deleteListing(id);
+        setNotice("Listing removed successfully.");
+      } catch (error) {
+        setNotice(error.message || "Unable to remove listing.");
+      }
     }
   };
 
-  const handleSaveEdit = (e) => {
+  const handleSaveEdit = async (e) => {
     e.preventDefault();
-    updateOwnerListing(editingItem.id, {
-      title: editingItem.title,
-      category: editingItem.category,
-      city: editingItem.city,
-      sefar: editingItem.sefar
-    });
-    setEditingItem(null);
+    try {
+      await updateListing(editingItem.id, {
+        title: editingItem.title,
+        categoryId: editingItem.categoryId || editingItem.category,
+        city: editingItem.city,
+        location: editingItem.location,
+        description: editingItem.description,
+      });
+      setEditingItem(null);
+      setNotice("Listing updated successfully.");
+    } catch (error) {
+      setNotice(error.message || "Unable to update listing.");
+    }
   };
 
-  const filtered = listings.filter(item => {
-    const matchesSearch =
-      (item.title || "").toLowerCase().includes(search.toLowerCase()) ||
-      (item.owner || "").toLowerCase().includes(search.toLowerCase()) ||
-      (item.city || "").toLowerCase().includes(search.toLowerCase());
-    
-    // Map legacy pending statuses to under_review
-    let itemStatus = item.status ? item.status.toLowerCase() : (item.available ? "published" : "draft");
-    if (itemStatus === "pending" || itemStatus === "pending approval") {
-      itemStatus = "under_review";
-    }
-    
-    // Map our new uppercase statuses for the filter
-    const normalizedFilter = filter.toLowerCase();
-    const matchesFilter = filter === "all" || itemStatus === normalizedFilter;
-    
-    return matchesSearch && matchesFilter;
-  });
+  const filtered = Array.isArray(listings)
+    ? listings.filter((item) => {
+        const matchesSearch =
+          (item.title || "").toLowerCase().includes(search.toLowerCase()) ||
+          (item.owner?.name || item.ownerName || item.owner?.email || "")
+            .toLowerCase()
+            .includes(search.toLowerCase()) ||
+          (item.city || "").toLowerCase().includes(search.toLowerCase());
+
+        const itemStatus = String(item.status || "PENDING").toLowerCase();
+        const normalizedFilter = filter.toLowerCase();
+        const matchesFilter =
+          filter === "all" || itemStatus === normalizedFilter;
+
+        return matchesSearch && matchesFilter;
+      })
+    : [];
+
+  if (isLoading) {
+    return <div>Loading listings...</div>;
+  }
 
   return (
     <main className="dashboard-content">
@@ -70,14 +117,16 @@ export default function AdminListingManagementPage() {
         <div>
           <span className="section-label">ADMIN</span>
           <h1 className="h3 mb-0">Listings Management</h1>
-          <p className="text-muted mb-0">Approve new listings, reject invalid entries, or edit listing info.</p>
+          <p className="text-muted mb-0">
+            Approve new listings, reject invalid entries, or edit listing info.
+          </p>
         </div>
       </div>
 
       <div className="admin-table-container">
         <div className="d-flex flex-wrap justify-content-between gap-3 mb-4">
           <div className="d-flex gap-2">
-            {["all", "under_review", "published", "rejected"].map(opt => (
+            {["all", "pending", "approved", "rejected"].map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -88,13 +137,16 @@ export default function AdminListingManagementPage() {
               </button>
             ))}
           </div>
-          <div className="search-box" style={{ maxWidth: "300px", width: "100%" }}>
+          <div
+            className="search-box"
+            style={{ maxWidth: "300px", width: "100%" }}
+          >
             <input
               type="text"
               placeholder="Search listings..."
               className="form-control"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
@@ -114,16 +166,30 @@ export default function AdminListingManagementPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(item => (
+              {filtered.map((item) => (
                 <tr key={item.id}>
                   <td className="fw-bold">{item.title}</td>
-                  <td>{item.category}</td>
+                  <td>{item.category?.name || item.categoryName || "-"}</td>
                   <td>{item.city}</td>
-                  <td>{item.owner}</td>
-                  <td>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}</td>
                   <td>
-                    {item.paymentScreenshot ? (
-                      <button className="btn btn-sm btn-outline-secondary" onClick={() => setViewScreenshot(item.paymentScreenshot)}>
+                    {item.owner?.name ||
+                      item.ownerName ||
+                      item.owner?.email ||
+                      "Unknown"}
+                  </td>
+                  <td>
+                    {item.createdAt
+                      ? new Date(item.createdAt).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {item.paymentProofUrl || null ? (
+                      <button
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() =>
+                          setViewScreenshot(item.paymentProofUrl || null)
+                        }
+                      >
                         View
                       </button>
                     ) : (
@@ -131,16 +197,19 @@ export default function AdminListingManagementPage() {
                     )}
                   </td>
                   <td>
-                    <StatusBadge status={item.status || (item.available ? "PUBLISHED" : "DRAFT")} />
+                    <StatusBadge status={item.status || "PENDING"} />
                   </td>
                   <td>
                     <div className="d-flex gap-2">
-                      {["under_review", "pending", "pending approval"].includes(String(item.status).toLowerCase()) && (
+                      {String(item.status || "PENDING").toUpperCase() ===
+                        "PENDING" && (
                         <>
                           <button
                             type="button"
                             className="btn btn-sm btn-success"
-                            onClick={() => handleStatusChange(item.id, "PUBLISHED")}
+                            onClick={() =>
+                              handleStatusChange(item.id, "APPROVED")
+                            }
                           >
                             Approve
                           </button>
@@ -149,18 +218,22 @@ export default function AdminListingManagementPage() {
                             className="btn btn-sm btn-outline-warning"
                             onClick={() => {
                               const reason = prompt("Enter rejection reason:");
-                              if (reason) handleStatusChange(item.id, "REJECTED", reason);
+                              if (reason)
+                                handleStatusChange(item.id, "REJECTED", reason);
                             }}
                           >
                             Reject
                           </button>
                         </>
                       )}
-                      {String(item.status).toLowerCase() === "rejected" && (
+                      {String(item.status || "").toUpperCase() ===
+                        "REJECTED" && (
                         <button
                           type="button"
                           className="btn btn-sm btn-success"
-                          onClick={() => handleStatusChange(item.id, "PUBLISHED")}
+                          onClick={() =>
+                            handleStatusChange(item.id, "APPROVED")
+                          }
                         >
                           Approve
                         </button>
@@ -196,15 +269,29 @@ export default function AdminListingManagementPage() {
       </div>
 
       {viewScreenshot && (
-        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content" style={{ background: "var(--card-bg)" }}>
+            <div
+              className="modal-content"
+              style={{ background: "var(--card-bg)" }}
+            >
               <div className="modal-header border-0">
                 <h5 className="modal-title">Payment Screenshot</h5>
-                <button type="button" className="btn-close" onClick={() => setViewScreenshot(null)} />
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setViewScreenshot(null)}
+                />
               </div>
               <div className="modal-body text-center">
-                <img src={viewScreenshot} alt="Payment Screenshot" className="img-fluid rounded" />
+                <img
+                  src={viewScreenshot}
+                  alt="Payment Screenshot"
+                  className="img-fluid rounded"
+                />
               </div>
             </div>
           </div>
@@ -212,9 +299,15 @@ export default function AdminListingManagementPage() {
       )}
 
       {editingItem && (
-        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content" style={{ background: "var(--card-bg)" }}>
+            <div
+              className="modal-content"
+              style={{ background: "var(--card-bg)" }}
+            >
               <form onSubmit={handleSaveEdit}>
                 <div className="modal-header border-0">
                   <h5 className="modal-title">Edit Listing Details</h5>
@@ -230,8 +323,13 @@ export default function AdminListingManagementPage() {
                     <input
                       type="text"
                       className="form-control"
-                      value={editingItem.title}
-                      onChange={e => setEditingItem({ ...editingItem, title: e.target.value })}
+                      value={editingItem?.title || ""}
+                      onChange={(e) =>
+                        setEditingItem({
+                          ...editingItem,
+                          title: e.target.value,
+                        })
+                      }
                       required
                     />
                   </div>
@@ -240,8 +338,17 @@ export default function AdminListingManagementPage() {
                     <input
                       type="text"
                       className="form-control"
-                      value={editingItem.category}
-                      onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
+                      value={
+                        editingItem?.category?.name ||
+                        editingItem?.categoryName ||
+                        ""
+                      }
+                      onChange={(e) =>
+                        setEditingItem({
+                          ...editingItem,
+                          category: e.target.value,
+                        })
+                      }
                       required
                     />
                   </div>
@@ -251,8 +358,13 @@ export default function AdminListingManagementPage() {
                       <input
                         type="text"
                         className="form-control"
-                        value={editingItem.city}
-                        onChange={e => setEditingItem({ ...editingItem, city: e.target.value })}
+                        value={editingItem?.city || ""}
+                        onChange={(e) =>
+                          setEditingItem({
+                            ...editingItem,
+                            city: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -261,8 +373,13 @@ export default function AdminListingManagementPage() {
                       <input
                         type="text"
                         className="form-control"
-                        value={editingItem.sefar}
-                        onChange={e => setEditingItem({ ...editingItem, sefar: e.target.value })}
+                        value={editingItem?.sefar || ""}
+                        onChange={(e) =>
+                          setEditingItem({
+                            ...editingItem,
+                            sefar: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>

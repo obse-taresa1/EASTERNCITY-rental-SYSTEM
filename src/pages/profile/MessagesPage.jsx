@@ -1,10 +1,12 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import {
   getConversationById,
   getConversations,
-} from "../../services/messageService.js";
+  sendMessage,
+} from "../../services/messageApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 
 export default function MessagesPage() {
@@ -12,10 +14,84 @@ export default function MessagesPage() {
   const activeUser = user || currentUser;
   const [searchParams] = useSearchParams();
   const conversationId = searchParams.get("conversation");
-  const conversations = getConversations(activeUser?.id);
-  const activeConversation = conversationId
-    ? getConversationById(conversationId)
-    : conversations[0];
+  const [conversations, setConversations] = useState([]);
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadConversations() {
+      setLoading(true);
+      try {
+        const data = await getConversations();
+        if (!active) return;
+        const filtered = activeUser
+          ? data.filter((conversation) =>
+              [
+                conversation.participantOneId,
+                conversation.participantTwoId,
+              ].includes(activeUser.id),
+            )
+          : [];
+        setConversations(filtered);
+        const selected = conversationId
+          ? await getConversationById(conversationId)
+          : filtered[0] || null;
+        if (active) setActiveConversation(selected);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadConversations();
+
+    const handleRefresh = () => loadConversations();
+    window.addEventListener("easterncity:messages-updated", handleRefresh);
+    return () => {
+      active = false;
+      window.removeEventListener("easterncity:messages-updated", handleRefresh);
+    };
+  }, [activeUser?.id, conversationId]);
+
+  useEffect(() => {
+    if (!conversationId) return;
+    let active = true;
+
+    getConversationById(conversationId).then((conversation) => {
+      if (active) setActiveConversation(conversation);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [conversationId]);
+
+  const currentConversation = useMemo(
+    () => activeConversation || conversations[0] || null,
+    [activeConversation, conversations],
+  );
+
+  async function handleSendMessage(event) {
+    event.preventDefault();
+    if (!currentConversation || !draft.trim()) return;
+
+    await sendMessage({
+      conversationId: currentConversation.id,
+      body: draft.trim(),
+    });
+    setDraft("");
+    window.dispatchEvent(new Event("easterncity:messages-updated"));
+  }
+
+  if (loading) {
+    return (
+      <main className="dashboard-content messages-workspace">
+        Loading messages...
+      </main>
+    );
+  }
 
   return (
     <main className="dashboard-content messages-workspace">
@@ -30,7 +106,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      {!conversations.length ? (
+      {!conversations.length || !currentConversation ? (
         <EmptyState
           icon="bi-chat-dots"
           title="No messages"
@@ -51,12 +127,18 @@ export default function MessagesPage() {
                 key={conversation.id}
               >
                 <img
-                  src={conversation.listing.image}
-                  alt={conversation.listing.title}
+                  src={conversation.listing?.image}
+                  alt={conversation.listing?.title}
                 />
                 <div>
-                  <strong>{conversation.subject}</strong>
-                  <span>{conversation.context}</span>
+                  <strong>
+                    {conversation.listing?.title ||
+                      conversation.subject ||
+                      "Conversation"}
+                  </strong>
+                  <span>
+                    {conversation.listing?.location || conversation.context}
+                  </span>
                 </div>
               </Link>
             ))}
@@ -66,10 +148,14 @@ export default function MessagesPage() {
             <div className="message-chat-header">
               <div>
                 <span className="section-label">LISTING ATTACHED</span>
-                <h2>{activeConversation.subject}</h2>
+                <h2>
+                  {currentConversation.listing?.title ||
+                    currentConversation.subject ||
+                    "Conversation"}
+                </h2>
               </div>
               <Link
-                to={`/items/${activeConversation.itemId}`}
+                to={`/items/${currentConversation.listing?.id || currentConversation.itemId}`}
                 className="btn btn-outline-danger"
               >
                 View Listing
@@ -78,39 +164,40 @@ export default function MessagesPage() {
 
             <div className="message-listing-context">
               <img
-                src={activeConversation.listing.image}
-                alt={activeConversation.listing.title}
+                src={currentConversation.listing?.image}
+                alt={currentConversation.listing?.title}
               />
               <div>
-                <strong>{activeConversation.listing.title}</strong>
-                <span>{activeConversation.listing.location}</span>
+                <strong>{currentConversation.listing?.title}</strong>
+                <span>{currentConversation.listing?.location}</span>
                 <span>
-                  {activeConversation.listing.price ||
+                  {currentConversation.listing?.price ||
                     formatDailyPrice(
-                      activeConversation.listing.pricePerDay || 0,
+                      currentConversation.listing?.pricePerDay || 0,
                     )}
                 </span>
               </div>
             </div>
 
             <div className="message-bubble-list">
-              {activeConversation.messages.map((message) => (
+              {(currentConversation.messages || []).map((message) => (
                 <div className="message-bubble" key={message.id}>
-                  <strong>{message.senderName}</strong>
+                  <strong>
+                    {message.sender?.name || message.senderName || "User"}
+                  </strong>
                   <p>{message.body}</p>
                   <span>{new Date(message.createdAt).toLocaleString()}</span>
                 </div>
               ))}
             </div>
 
-            <form
-              className="message-compose"
-              onSubmit={(event) => event.preventDefault()}
-            >
+            <form className="message-compose" onSubmit={handleSendMessage}>
               <input
                 type="text"
                 className="form-control"
                 placeholder="Continue the conversation..."
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
               />
               <button type="submit" className="btn btn-accent-custom btn-shine">
                 <i className="bi bi-send"></i>

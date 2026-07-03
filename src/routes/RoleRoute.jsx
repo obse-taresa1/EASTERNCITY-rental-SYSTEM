@@ -3,8 +3,12 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { dashboardForRole, coerceRole } from "../services/authService.js";
 
 export default function RoleRoute({ allowedRoles = [], children }) {
-  const { user, currentUser } = useAuth();
+  const { user, currentUser, isAuthReady } = useAuth();
   const activeUser = user || currentUser;
+
+  if (!isAuthReady) {
+    return <div>Loading...</div>;
+  }
 
   // If no authenticated user, redirect to login
   if (!activeUser) {
@@ -12,9 +16,7 @@ export default function RoleRoute({ allowedRoles = [], children }) {
   }
 
   // Normalize allowed roles for comparison
-  const normalizedAllowedRoles = allowedRoles.map((role) =>
-    coerceRole(role),
-  );
+  const normalizedAllowedRoles = allowedRoles.map((role) => coerceRole(role));
 
   // If no specific role restriction, render children or outlet
   if (normalizedAllowedRoles.length === 0) {
@@ -32,5 +34,3 @@ export default function RoleRoute({ allowedRoles = [], children }) {
   // Role is allowed – render children or outlet
   return children || <Outlet />;
 }
-
-

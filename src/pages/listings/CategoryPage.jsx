@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import SectionHeader from "../../components/common/SectionHeader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
-import { getItemsByCategory } from "../../services/itemService.js";
+import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
 
@@ -15,9 +15,38 @@ export default function CategoryPage() {
   const [city, setCity] = useState("all");
   const [sefar, setSefar] = useState("all");
   const [maxPrice, setMaxPrice] = useState(25000);
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const category = categories.find((item) => item.id === categoryId);
-  const allItems = useMemo(() => getItemsByCategory(categoryId), [categoryId]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadListings() {
+      setLoading(true);
+      try {
+        const data = await getPublicListings();
+        if (active) setListings(data);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadListings();
+    return () => {
+      active = false;
+    };
+  }, [categoryId]);
+
+  const allItems = useMemo(
+    () =>
+      listings.filter(
+        (item) =>
+          item.category === categoryId || item.categoryName === category?.name,
+      ),
+    [listings, categoryId, category],
+  );
 
   const sefarOptions = city !== "all" ? getSefarByCity(city) : [];
 
@@ -31,6 +60,12 @@ export default function CategoryPage() {
       return true;
     });
   }, [allItems, search, city, sefar, maxPrice]);
+
+  if (loading) {
+    return (
+      <div className="container py-5 text-center">Loading listings...</div>
+    );
+  }
 
   if (!category) {
     return (

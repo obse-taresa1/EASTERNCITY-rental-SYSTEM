@@ -1,5 +1,4 @@
 import { apiClient } from "./apiClient.js";
-import { USE_MOCK_AUTH } from "./authService.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
 
 const NOTIFICATIONS_KEY = "easterncity_notifications";
@@ -30,7 +29,9 @@ export function getNotificationsByUser(userId) {
 }
 
 export async function fetchNotifications(userId) {
-  if (USE_MOCK_AUTH) {
+  const accessToken = getStorageItem("accessToken", null);
+
+  if (!accessToken) {
     return getNotificationsByUser(userId);
   }
 
@@ -67,7 +68,9 @@ export function createNotification({
 }
 
 export async function markNotificationRead(id) {
-  if (!USE_MOCK_AUTH) {
+  const accessToken = getStorageItem("accessToken", null);
+
+  if (accessToken) {
     const notification = await apiClient.patch(`/api/notifications/${id}/read`);
     window.dispatchEvent(new Event("easterncity:notifications-updated"));
     return notification;
@@ -82,7 +85,9 @@ export async function markNotificationRead(id) {
 }
 
 export async function markAllNotificationsRead() {
-  if (!USE_MOCK_AUTH) {
+  const accessToken = getStorageItem("accessToken", null);
+
+  if (accessToken) {
     const result = await apiClient.patch("/api/notifications/read-all");
     window.dispatchEvent(new Event("easterncity:notifications-updated"));
     return result;

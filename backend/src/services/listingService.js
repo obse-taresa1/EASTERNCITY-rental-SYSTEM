@@ -1,10 +1,10 @@
-const listingRepository = require('../repositories/listingRepository');
+const listingRepository = require("../repositories/listingRepository");
 
 function ensureOwnerOrAdmin(user, listing) {
-  const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(user.role);
+  const isAdmin = ["ADMIN", "SUPER_ADMIN"].includes(user.role);
 
   if (!isAdmin && listing.ownerId !== user.id) {
-    const error = new Error('You do not own this listing.');
+    const error = new Error("You do not own this listing.");
     error.statusCode = 403;
     throw error;
   }
@@ -17,10 +17,53 @@ function mapUploadedImages(files = []) {
   }));
 }
 
+function getUploadedFiles(files = {}) {
+  if (Array.isArray(files)) {
+    return {
+      images: files,
+      paymentProof: [],
+    };
+  }
+
+  return {
+    images: files.images || [],
+    paymentProof: files.paymentProof || [],
+  };
+}
+
+function paymentProofPath(file) {
+  return file ? `/uploads/listings/${file.filename}` : null;
+}
+
+function toListingData(listing) {
+  if (!listing) return listing;
+
+  return {
+    ...listing,
+    pricePerDay: Number(listing.pricePerDay),
+  };
+}
+
 async function listPublic(query) {
   return listingRepository.findPublic({
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
+    },
+  });
+}
+
+async function listMy(userId) {
+  return listingRepository.findManyByOwner(userId, {
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+async function listManage() {
+  return listingRepository.findMany({
+    orderBy: {
+      createdAt: "desc",
     },
   });
 }
@@ -29,15 +72,18 @@ async function getById(id) {
   const listing = await listingRepository.findById(id);
 
   if (!listing) {
-    const error = new Error('Listing not found.');
+    const error = new Error("Listing not found.");
     error.statusCode = 404;
     throw error;
   }
 
-  return listing;
+  return toListingData(listing);
 }
 
 async function create(ownerId, payload, files) {
+  const uploadedFiles = getUploadedFiles(files);
+  const paymentProofFile = uploadedFiles.paymentProof[0] || null;
+
   return listingRepository.create({
     title: payload.title,
     description: payload.description,
@@ -46,9 +92,13 @@ async function create(ownerId, payload, files) {
     city: payload.city,
     location: payload.location,
     pricePerDay: Number(payload.pricePerDay),
-    status: 'PENDING',
+    paymentMethod: payload.paymentMethod || null,
+    paymentProofUrl:
+      paymentProofPath(paymentProofFile) || payload.paymentProofUrl || null,
+    paymentStatus: payload.paymentStatus || "PENDING",
+    status: String(payload.status || "PENDING").toUpperCase(),
     images: {
-      create: mapUploadedImages(files),
+      create: mapUploadedImages(uploadedFiles.images),
     },
   });
 }
@@ -63,9 +113,7 @@ async function update(user, id, payload) {
     description: payload.description,
     city: payload.city,
     location: payload.location,
-    pricePerDay: payload.pricePerDay
-      ? Number(payload.pricePerDay)
-      : undefined,
+    pricePerDay: payload.pricePerDay ? Number(payload.pricePerDay) : undefined,
   });
 }
 
@@ -79,7 +127,7 @@ async function remove(user, id) {
 
 async function approve(id, adminId) {
   return listingRepository.update(id, {
-    status: 'APPROVED',
+    status: "APPROVED",
     approvedById: adminId,
     approvedAt: new Date(),
   });
@@ -87,8 +135,8 @@ async function approve(id, adminId) {
 
 async function reject(id, reason, adminId) {
   return listingRepository.update(id, {
-    status: 'REJECTED',
-    rejectionReason: reason || 'Rejected by admin.',
+    status: "REJECTED",
+    rejectionReason: reason || "Rejected by admin.",
     approvedById: adminId,
     approvedAt: new Date(),
   });
@@ -96,6 +144,8 @@ async function reject(id, reason, adminId) {
 
 module.exports = {
   listPublic,
+  listMy,
+  listManage,
   getById,
   create,
   update,
