@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getStorageItem, setStorageItem } from "../../services/storageService.js";
-import { getUsers, saveUsers } from "../../services/authService.js";
+import {
+  getStorageItem,
+  setStorageItem,
+} from "../../services/storageService.js";
+import { updateUser } from "../../services/userApiService.js";
 
 const NOTIF_KEY = "ud_notification_prefs";
 
@@ -22,16 +25,16 @@ function ProfileSettings({ user, setCurrentUser }) {
   });
   const [saved, setSaved] = useState(false);
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault();
-    const allUsers = getUsers();
-    const updated = allUsers.map((u) =>
-      u.id === user?.id ? { ...u, ...form } : u,
-    );
-    saveUsers(updated);
-    setCurrentUser({ ...user, ...form });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      const updated = await updateUser(user?.id, form);
+      setCurrentUser({ ...user, ...updated });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {
+      setSaved(false);
+    }
   }
 
   return (
@@ -39,7 +42,8 @@ function ProfileSettings({ user, setCurrentUser }) {
       <h3 className="ud-settings-section-title">Profile Information</h3>
       {saved && (
         <div className="ud-alert ud-alert-success">
-          <i className="bi bi-check-circle-fill" /> Profile updated successfully.
+          <i className="bi bi-check-circle-fill" /> Profile updated
+          successfully.
         </div>
       )}
       <div className="ud-form-grid">
@@ -86,7 +90,9 @@ function ProfileSettings({ user, setCurrentUser }) {
           >
             <option value="">Select city…</option>
             {["Jigjiga", "Harar", "Dire Dawa"].map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         </div>
@@ -102,37 +108,42 @@ function PasswordSettings({ user }) {
   const [form, setForm] = useState({ current: "", next: "", confirm: "" });
   const [msg, setMsg] = useState(null);
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault();
-    const allUsers = getUsers();
-    const fullUser = allUsers.find((u) => u.id === user?.id);
-    if (!fullUser || fullUser.password !== form.current) {
-      setMsg({ type: "error", text: "Current password is incorrect." });
-      return;
-    }
     if (form.next !== form.confirm) {
       setMsg({ type: "error", text: "New passwords do not match." });
       return;
     }
     if (form.next.length < 6) {
-      setMsg({ type: "error", text: "Password must be at least 6 characters." });
+      setMsg({
+        type: "error",
+        text: "Password must be at least 6 characters.",
+      });
       return;
     }
-    const updated = allUsers.map((u) =>
-      u.id === user?.id ? { ...u, password: form.next } : u,
-    );
-    saveUsers(updated);
-    setMsg({ type: "success", text: "Password changed successfully." });
-    setForm({ current: "", next: "", confirm: "" });
-    setTimeout(() => setMsg(null), 4000);
+
+    try {
+      await updateUser(user?.id, {
+        password: form.next,
+      });
+      setMsg({ type: "success", text: "Password changed successfully." });
+      setForm({ current: "", next: "", confirm: "" });
+      setTimeout(() => setMsg(null), 4000);
+    } catch {
+      setMsg({ type: "error", text: "Unable to change password." });
+    }
   }
 
   return (
     <form className="ud-settings-form" onSubmit={handleSave}>
       <h3 className="ud-settings-section-title">Change Password</h3>
       {msg && (
-        <div className={`ud-alert ${msg.type === "success" ? "ud-alert-success" : "ud-alert-error"}`}>
-          <i className={`bi ${msg.type === "success" ? "bi-check-circle-fill" : "bi-exclamation-circle-fill"}`} />
+        <div
+          className={`ud-alert ${msg.type === "success" ? "ud-alert-success" : "ud-alert-error"}`}
+        >
+          <i
+            className={`bi ${msg.type === "success" ? "bi-check-circle-fill" : "bi-exclamation-circle-fill"}`}
+          />
           {msg.text}
         </div>
       )}
@@ -140,7 +151,11 @@ function PasswordSettings({ user }) {
         {[
           { id: "sett-cur-pass", label: "Current Password", field: "current" },
           { id: "sett-new-pass", label: "New Password", field: "next" },
-          { id: "sett-conf-pass", label: "Confirm New Password", field: "confirm" },
+          {
+            id: "sett-conf-pass",
+            label: "Confirm New Password",
+            field: "confirm",
+          },
         ].map(({ id, label, field }) => (
           <div className="ud-form-group" key={field}>
             <label htmlFor={id}>{label}</label>
@@ -182,11 +197,31 @@ function NotificationSettings() {
   }
 
   const items = [
-    { key: "bookings", label: "Booking Updates", desc: "Notifications about your booking status changes" },
-    { key: "messages", label: "New Messages", desc: "When someone sends you a message" },
-    { key: "reviews", label: "Review Reminders", desc: "Reminders to review completed rentals" },
-    { key: "payments", label: "Payment Alerts", desc: "Payment confirmations and reminders" },
-    { key: "promotions", label: "Promotions", desc: "Featured listings and special offers" },
+    {
+      key: "bookings",
+      label: "Booking Updates",
+      desc: "Notifications about your booking status changes",
+    },
+    {
+      key: "messages",
+      label: "New Messages",
+      desc: "When someone sends you a message",
+    },
+    {
+      key: "reviews",
+      label: "Review Reminders",
+      desc: "Reminders to review completed rentals",
+    },
+    {
+      key: "payments",
+      label: "Payment Alerts",
+      desc: "Payment confirmations and reminders",
+    },
+    {
+      key: "promotions",
+      label: "Promotions",
+      desc: "Featured listings and special offers",
+    },
   ];
 
   return (
@@ -226,8 +261,8 @@ function LanguageSettings() {
     { code: "so", label: "Somali (Soomaali)", flag: "🇸🇴" },
     { code: "om", label: "Oromo (Afaan Oromo)", flag: "🇪🇹" },
   ];
-  const [selected, setSelected] = useState(
-    () => getStorageItem("easterncity_lang", "en"),
+  const [selected, setSelected] = useState(() =>
+    getStorageItem("easterncity_lang", "en"),
   );
 
   function handleSelect(code) {
@@ -248,7 +283,9 @@ function LanguageSettings() {
           >
             <span className="ud-lang-flag">{lang.flag}</span>
             <span>{lang.label}</span>
-            {selected === lang.code && <i className="bi bi-check-circle-fill text-danger" />}
+            {selected === lang.code && (
+              <i className="bi bi-check-circle-fill text-danger" />
+            )}
           </button>
         ))}
       </div>
@@ -273,16 +310,26 @@ function DarkModeSettings() {
     <div className="ud-settings-form">
       <h3 className="ud-settings-section-title">Appearance</h3>
       <div className="ud-theme-selector">
-        <div className={`ud-theme-option ${!isDark ? "active" : ""}`} onClick={() => isDark && toggle()}>
+        <div
+          className={`ud-theme-option ${!isDark ? "active" : ""}`}
+          onClick={() => isDark && toggle()}
+        >
           <div className="ud-theme-preview ud-theme-light">
-            <div /><div /><div />
+            <div />
+            <div />
+            <div />
           </div>
           <span>Light Mode</span>
           {!isDark && <i className="bi bi-check-circle-fill text-danger" />}
         </div>
-        <div className={`ud-theme-option ${isDark ? "active" : ""}`} onClick={() => !isDark && toggle()}>
+        <div
+          className={`ud-theme-option ${isDark ? "active" : ""}`}
+          onClick={() => !isDark && toggle()}
+        >
           <div className="ud-theme-preview ud-theme-dark">
-            <div /><div /><div />
+            <div />
+            <div />
+            <div />
           </div>
           <span>Dark Mode</span>
           {isDark && <i className="bi bi-check-circle-fill text-danger" />}
@@ -301,7 +348,9 @@ export default function DashboardSettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
 
   const tabContent = {
-    profile: <ProfileSettings user={activeUser} setCurrentUser={setCurrentUser} />,
+    profile: (
+      <ProfileSettings user={activeUser} setCurrentUser={setCurrentUser} />
+    ),
     password: <PasswordSettings user={activeUser} />,
     notifications: <NotificationSettings />,
     language: <LanguageSettings />,
@@ -314,7 +363,9 @@ export default function DashboardSettingsPage() {
         <div>
           <span className="ud-label">ACCOUNT</span>
           <h1 className="ud-page-title">Settings</h1>
-          <p className="ud-page-sub">Manage your profile, security and preferences.</p>
+          <p className="ud-page-sub">
+            Manage your profile, security and preferences.
+          </p>
         </div>
       </div>
 
