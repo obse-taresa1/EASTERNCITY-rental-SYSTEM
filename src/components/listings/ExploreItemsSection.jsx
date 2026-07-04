@@ -1,13 +1,35 @@
 import ListingCard from "../cards/ListingCard.jsx";
+import { useEffect, useState } from "react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getAllItems } from "../../services/itemService.js";
+import { getPublicListings } from "../../services/listingApiService.js";
 
 export default function ExploreItemsSection() {
   const { t } = useLanguage();
-  const listings = getAllItems()
+  const [listings, setListings] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadListings() {
+      try {
+        const data = await getPublicListings();
+        if (active) setListings(data);
+      } catch {
+        if (active) setListings(getAllItems());
+      }
+    }
+
+    loadListings();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const visibleListings = listings
     .filter(
       (item) =>
-        !["draft", "rejected", "expired"].includes(
+        !["draft", "rejected", "expired", "pending"].includes(
           String(item.status || "").toLowerCase(),
         ),
     )
@@ -55,7 +77,7 @@ export default function ExploreItemsSection() {
         </div>
 
         <div className="row g-4 listings-grid">
-          {listings.map((item) => (
+          {visibleListings.map((item) => (
             <div
               className="col-sm-6 col-lg-3 listing-col"
               data-status={item.status}

@@ -1,6 +1,7 @@
 // src/app.js
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const dotenv = require('dotenv');
 const apiRoutes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
@@ -11,6 +12,8 @@ const logger = require('./config/logger');
 dotenv.config();
 
 const app = express();
+
+app.use(helmet());
 
 const corsAllowlist = (process.env.CORS_ORIGIN || process.env.CORS_ORIGINS || 'http://localhost:5173')
   .split(',')

@@ -10135,3 +10135,88 @@ html[data-theme="dark"] main.auth-page .listing-form-notice {
     grid-template-columns: 1fr;
   }
 }
+
+/* Admin dashboard brand/color refinement: reuse public header logo and soften crimson palette */
+.admin-red-shell .admin-sidebar {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(255, 118, 118, 0.34), transparent 28%),
+    linear-gradient(170deg, #b91c1c 0%, #8f1d22 48%, #461114 100%) !important;
+  box-shadow: 24px 0 58px rgba(127, 29, 29, 0.28) !important;
+}
+
+[data-theme="dark"] .admin-red-shell .admin-sidebar {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(248, 113, 113, 0.22), transparent 30%),
+    linear-gradient(170deg, #8f1d22 0%, #64161a 50%, #2a0b0e 100%) !important;
+  box-shadow: 24px 0 58px rgba(0, 0, 0, 0.34) !important;
+}
+
+.admin-red-shell .admin-brand-logo {
+  min-width: 0 !important;
+  max-width: 162px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+}
+
+.admin-red-shell .admin-brand-logo-img {
+  display: block;
+  width: auto;
+  max-width: 158px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
+}
+
+[data-theme="dark"] .admin-red-shell .admin-brand-logo-img {
+  filter: brightness(1.08) contrast(1.08) drop-shadow(0 0 10px rgba(255, 109, 109, 0.28));
+}
+
+.admin-red-shell .admin-nav-item:hover,
+.admin-red-shell .admin-nav-item.active {
+  background: linear-gradient(135deg, #ef4444, #be123c) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 12px 24px rgba(190, 18, 60, 0.28) !important;
+}
+
+.admin-red-shell .admin-nav-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.admin-red-shell .admin-flag,
+.admin-red-shell .text-primary-custom,
+.admin-red-shell .section-label {
+  color: #dc2626 !important;
+}
+
+.admin-red-shell .btn-accent-custom,
+.admin-red-shell .btn-primary-custom,
+.admin-red-shell .ud-btn-red {
+  background: linear-gradient(135deg, #ef4444, #be123c) !important;
+  border-color: rgba(190, 18, 60, 0.72) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 26px rgba(190, 18, 60, 0.22) !important;
+}
+
+.admin-red-shell .btn-accent-custom:hover,
+.admin-red-shell .btn-primary-custom:hover,
+.admin-red-shell .ud-btn-red:hover {
+  background: linear-gradient(135deg, #f05252, #dc2626) !important;
+  color: #ffffff !important;
+}
+
+.admin-red-shell .admin-theme-switch span,
+.admin-red-shell .admin-notification-button span,
+.admin-red-shell .red-overview-card,
+.admin-red-shell .red-stat-card .red-stat-icon {
+  background-color: #dc2626 !important;
+}
+
+.admin-red-shell .admin-topbar {
+  border-color: rgba(220, 38, 38, 0.13) !important;
+  box-shadow: 0 18px 45px rgba(127, 29, 29, 0.08) !important;
+}
+
+[data-theme="dark"] .admin-red-shell .admin-topbar {
+  border-color: rgba(248, 113, 113, 0.14) !important;
+}

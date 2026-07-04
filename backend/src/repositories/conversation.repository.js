@@ -14,4 +14,11 @@ function create(data) {
   return prisma.conversation.create({ data });
 }
 
-module.exports = { findManyByUser, create };
+function findById(id) {
+  return prisma.conversation.findUnique({
+    where: { id },
+    include: { listing: true, participantOne: true, participantTwo: true },
+  });
+}
+
+module.exports = { findManyByUser, create, findById };

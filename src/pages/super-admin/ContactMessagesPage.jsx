@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  fetchContactMessages,
   getContactMessages,
   replyToContactMessage,
   resolveContactMessage,
@@ -15,12 +16,27 @@ export default function ContactMessagesPage() {
   const [selectedId, setSelectedId] = useState(() => messages[0]?.id || "");
   const [reply, setReply] = useState("");
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  async function refreshMessages() {
+    try {
+      const data = await fetchContactMessages();
+      setMessages(data);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Could not load contact messages.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    const refreshMessages = () => setMessages(getContactMessages());
-    window.addEventListener("easterncity:contact-messages-updated", refreshMessages);
+    refreshMessages();
+    const onUpdate = () => refreshMessages();
+    window.addEventListener("easterncity:contact-messages-updated", onUpdate);
     return () => {
-      window.removeEventListener("easterncity:contact-messages-updated", refreshMessages);
+      window.removeEventListener("easterncity:contact-messages-updated", onUpdate);
     };
   }, []);
 
@@ -39,20 +55,34 @@ export default function ContactMessagesPage() {
     setSelectedId(message.id);
     setReply(message.adminReply || "");
     setNotice("");
+    setError("");
   }
 
-  function handleReply(event) {
+  async function handleReply(event) {
     event.preventDefault();
     if (!selectedMessage || !reply.trim()) return;
 
-    replyToContactMessage(selectedMessage.id, reply.trim());
-    setNotice("Reply sent to the user's notifications.");
+    try {
+      await replyToContactMessage(selectedMessage.id, reply.trim());
+      await refreshMessages();
+      setNotice("Reply sent to the user's notifications.");
+      setError("");
+    } catch (err) {
+      setError(err.message || "Could not send reply.");
+    }
   }
 
-  function handleResolve() {
+  async function handleResolve() {
     if (!selectedMessage) return;
-    resolveContactMessage(selectedMessage.id);
-    setNotice("Contact message marked as resolved.");
+
+    try {
+      await resolveContactMessage(selectedMessage.id);
+      await refreshMessages();
+      setNotice("Contact message marked as resolved.");
+      setError("");
+    } catch (err) {
+      setError(err.message || "Could not resolve contact message.");
+    }
   }
 
   return (
@@ -65,6 +95,7 @@ export default function ContactMessagesPage() {
       </div>
 
       {notice && <div className="alert alert-info">{notice}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="row g-4">
         <div className="col-lg-7">
@@ -108,7 +139,7 @@ export default function ContactMessagesPage() {
                   {!messages.length && (
                     <tr>
                       <td colSpan="5" className="text-center text-muted py-4">
-                        No contact messages submitted yet.
+                        {isLoading ? "Loading contact messages..." : "No contact messages submitted yet."}
                       </td>
                     </tr>
                   )}

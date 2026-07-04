@@ -1,52 +1,56 @@
-import axios from "axios";
+import { getStorageItem } from "./storageService.js";
 
 const API_BASE_URL =
   import.meta.env?.VITE_API_BASE_URL || "http://localhost:5000";
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: false,
-});
-
-api.interceptors.request.use((config) => {
+function buildHeaders(body, headers = {}) {
   const token =
-    localStorage.getItem("token") || localStorage.getItem("accessToken");
+    getStorageItem("token", null) || getStorageItem("accessToken", null);
+  const nextHeaders = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...headers,
+  };
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (!(body instanceof FormData) && !nextHeaders["Content-Type"]) {
+    nextHeaders["Content-Type"] = "application/json";
   }
 
-  if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"];
-  } else if (!config.headers["Content-Type"]) {
-    config.headers["Content-Type"] = "application/json";
+  return nextHeaders;
+}
+
+async function parseResponse(response) {
+  const text = await response.text();
+
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
+async function apiRequest(method, path, body, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    method,
+    headers: buildHeaders(body, options.headers),
+    body:
+      body instanceof FormData
+        ? body
+        : body === undefined
+          ? undefined
+          : JSON.stringify(body),
+  });
+
+  const payload = await parseResponse(response);
+
+  if (!response.ok) {
+    throw new Error(payload.message || "Request failed.");
   }
 
-  return config;
-});
-
-function unwrapResponse(response) {
-  const payload = response?.data || {};
   return payload.data ?? payload;
 }
-
-async function apiRequest(method, path, data, options = {}) {
-  try {
-    const response = await api.request({
-      url: path,
-      method,
-      data,
-      ...options,
-    });
-    return unwrapResponse(response);
-  } catch (error) {
-    const message =
-      error?.response?.data?.message || error.message || "Request failed.";
-    throw new Error(message);
-  }
-}
-
-export { api };
 
 export const apiClient = {
   get(path, options) {

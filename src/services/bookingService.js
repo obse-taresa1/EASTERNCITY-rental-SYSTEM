@@ -1,5 +1,10 @@
-import { createNotification, NOTIFICATION_TYPES } from "./notificationService.js";
+import {
+  createNotification,
+  NOTIFICATION_TYPES,
+} from "./notificationService.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
+import { apiClient } from "./apiClient.js";
+import { getAuthTokens } from "./authService.js";
 
 const BOOKINGS_KEY = "rental_bookings";
 const REVIEWS_KEY = "rental_reviews";
@@ -24,6 +29,56 @@ export function getBookings() {
   return getStorageItem(BOOKINGS_KEY, []);
 }
 
+export async function fetchBookings() {
+  const accessToken = getAuthTokens().accessToken;
+  const useMock = import.meta.env.VITE_USE_MOCK_AUTH === "true";
+  if (useMock || !accessToken) {
+    return getBookings();
+  }
+
+  const data = await apiClient.get("/api/bookings");
+  return Array.isArray(data) ? data : [];
+}
+
+export async function fetchBookingById(id) {
+  const accessToken = getAuthTokens().accessToken;
+  const useMock = import.meta.env.VITE_USE_MOCK_AUTH === "true";
+  if (useMock || !accessToken) {
+    return getBookingById(id);
+  }
+  return await apiClient.get(`/api/bookings/${id}`);
+}
+
+export async function createBookingAsync(bookingData) {
+  const accessToken = getAuthTokens().accessToken;
+  const useMock = import.meta.env.VITE_USE_MOCK_AUTH === "true";
+  if (useMock || !accessToken) {
+    return Promise.resolve(createBooking(bookingData));
+  }
+  const data = await apiClient.post("/api/bookings", bookingData);
+  return data;
+}
+
+export async function updateBookingStatusAsync(id, status) {
+  const accessToken = getAuthTokens().accessToken;
+  const useMock = import.meta.env.VITE_USE_MOCK_AUTH === "true";
+  if (useMock || !accessToken) {
+    return Promise.resolve(updateBookingStatus(id, status));
+  }
+  const data = await apiClient.patch(`/api/bookings/${id}/status`, { status });
+  return data;
+}
+
+export async function deleteBookingAsync(id) {
+  const accessToken = getAuthTokens().accessToken;
+  const useMock = import.meta.env.VITE_USE_MOCK_AUTH === "true";
+  if (useMock || !accessToken) {
+    return Promise.resolve(deleteBooking(id));
+  }
+  const data = await apiClient.delete(`/api/bookings/${id}`);
+  return data;
+}
+
 export function getBookingById(id) {
   if (!id) return null;
   return getBookings().find((booking) => booking.id === id) || null;
@@ -42,7 +97,11 @@ export function getBookingsByOwner(ownerIdentifier) {
   if (!ownerIdentifier) return [];
   const lookup = String(ownerIdentifier).toLowerCase();
   return getBookings().filter((booking) => {
-    const ownerValues = [booking.ownerId, booking.owner, booking.ownerName].filter(Boolean);
+    const ownerValues = [
+      booking.ownerId,
+      booking.owner,
+      booking.ownerName,
+    ].filter(Boolean);
     return ownerValues.some((value) => String(value).toLowerCase() === lookup);
   });
 }
@@ -107,8 +166,14 @@ export function updateBookingStatus(id, status) {
   bookings[index] = {
     ...bookings[index],
     status: nextStatus,
-    approvedAt: nextStatus === "ACCEPTED" ? new Date().toISOString() : bookings[index].approvedAt,
-    completedAt: nextStatus === "COMPLETED" ? new Date().toISOString() : bookings[index].completedAt,
+    approvedAt:
+      nextStatus === "ACCEPTED"
+        ? new Date().toISOString()
+        : bookings[index].approvedAt,
+    completedAt:
+      nextStatus === "COMPLETED"
+        ? new Date().toISOString()
+        : bookings[index].completedAt,
     updatedAt: new Date().toISOString(),
   };
 
@@ -117,13 +182,15 @@ export function updateBookingStatus(id, status) {
   if (nextStatus === "ACCEPTED" || nextStatus === "REJECTED") {
     createNotification({
       userId: bookings[index].renterId || bookings[index].userId,
-      title: nextStatus === "ACCEPTED"
-        ? "Your booking request was accepted"
-        : "Your booking request was rejected",
+      title:
+        nextStatus === "ACCEPTED"
+          ? "Your booking request was accepted"
+          : "Your booking request was rejected",
       body: `${bookings[index].itemTitle || "Your booking"} was ${nextStatus.toLowerCase()}.`,
-      type: nextStatus === "ACCEPTED"
-        ? NOTIFICATION_TYPES.BOOKING_ACCEPTED
-        : NOTIFICATION_TYPES.BOOKING_REJECTED,
+      type:
+        nextStatus === "ACCEPTED"
+          ? NOTIFICATION_TYPES.BOOKING_ACCEPTED
+          : NOTIFICATION_TYPES.BOOKING_REJECTED,
       referenceId: bookings[index].id,
       referenceType: "BOOKING",
     });
@@ -155,7 +222,9 @@ export function getBookingsByDateRange(startDate, endDate) {
 
 export function getActiveBookings() {
   return getBookings().filter((booking) =>
-    ["PENDING", "ACCEPTED", "ACTIVE"].includes(normalizeBookingStatus(booking.status)),
+    ["PENDING", "ACCEPTED", "ACTIVE"].includes(
+      normalizeBookingStatus(booking.status),
+    ),
   );
 }
 
@@ -197,7 +266,9 @@ export function createReview({
   }
   if (rating < 1 || rating > 5) throw new Error("Rating must be 1-5.");
 
-  const existing = getReviews().find((review) => review.bookingId === bookingId);
+  const existing = getReviews().find(
+    (review) => review.bookingId === bookingId,
+  );
   if (existing) throw new Error("Review already submitted for this booking.");
 
   const review = {

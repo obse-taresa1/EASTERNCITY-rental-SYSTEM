@@ -1,4 +1,5 @@
 const repository = require("../repositories/supportTicket.repository");
+const notificationService = require("../services/notificationService");
 
 async function createTicket(req, res, next) {
   try {
@@ -35,6 +36,38 @@ async function getAllTickets(req, res, next) {
   }
 }
 
+async function replyToTicket(req, res, next) {
+  try {
+    const ticket = await repository.findById(req.params.id);
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: "Support ticket not found." });
+    }
+
+    const reply = await repository.createReply({
+      ticketId: ticket.id,
+      userId: req.user.id,
+      message: req.body.message,
+    });
+
+    await notificationService.createNotification({
+      userId: ticket.userId,
+      title: `Reply: ${ticket.subject}`,
+      body: req.body.message,
+      type: notificationService.NOTIFICATION_TYPES.SUPPORT_REPLY,
+      referenceId: ticket.id,
+      referenceType: "SUPPORT_TICKET",
+    });
+
+    const data = await repository.update(ticket.id, {
+      status: "REPLIED",
+    });
+
+    res.status(201).json({ success: true, message: "Support reply sent.", data: { ...data, reply } });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function resolveTicket(req, res, next) {
   try {
     const data = await repository.update(req.params.id, {
@@ -48,4 +81,4 @@ async function resolveTicket(req, res, next) {
   }
 }
 
-module.exports = { createTicket, getMyTickets, getAllTickets, resolveTicket };
+module.exports = { createTicket, getMyTickets, getAllTickets, replyToTicket, resolveTicket };

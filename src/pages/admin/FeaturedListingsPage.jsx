@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchActivePromotions } from "../../services/promotionService.js";
+import { fetchActivePromotions } from "../../services/promotionApiService.js";
 import ListingCard from "../../components/common/ListingCard.jsx";
 
 /**
@@ -17,23 +17,31 @@ export default function FeaturedListingsPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    try {
-      const data = fetchActivePromotions();
-      // Normalise the data so ListingCard gets an `id` prop
-      const normalised = (data || []).map((item) => ({
-        id: item.listingId,
-        title: item.listingTitle || item.title,
-        description: `${item.promotionType || "Promotion"} | ${item.startDate || "approved"} - ${item.endDate || "ongoing"}`,
-        startDate: item.startDate,
-        endDate: item.endDate,
-      }));
-      setListings(normalised);
-    } catch (err) {
-      console.error("Failed to load featured listings", err);
-      setError("Unable to load featured listings.");
-    } finally {
-      setLoading(false);
+    let active = true;
+    async function load() {
+      try {
+        const data = await fetchActivePromotions();
+        if (!active) return;
+        const normalised = (data || []).map((item) => ({
+          id: item.listingId,
+          title: item.listingTitle || item.title,
+          description: `${item.promotionType || "Promotion"} | ${item.startDate || "approved"} - ${item.endDate || "ongoing"}`,
+          startDate: item.startDate,
+          endDate: item.endDate,
+        }));
+        setListings(normalised);
+      } catch (err) {
+        console.error("Failed to load featured listings", err);
+        setError("Unable to load featured listings.");
+      } finally {
+        if (active) setLoading(false);
+      }
     }
+
+    load();
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (

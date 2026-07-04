@@ -9,20 +9,24 @@ export default function ContactPage() {
   const activeUser = user || currentUser;
   const { t } = useLanguage();
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
-    createContactMessage({
-      userId: activeUser?.id || "",
-      name: String(formData.get("name") || "").trim(),
-      email: String(formData.get("email") || "").trim(),
-      subject: String(formData.get("subject") || "").trim(),
-      message: String(formData.get("message") || "").trim(),
-    });
+    try {
+      await createContactMessage({
+        userId: activeUser?.id || "",
+        name: String(formData.get("name") || "").trim(),
+        email: String(formData.get("email") || "").trim(),
+        subject: String(formData.get("subject") || "").trim(),
+        message: String(formData.get("message") || "").trim(),
+      });
 
-    setMessage(t("messageSent") || "Your message was sent successfully.");
-    event.currentTarget.reset();
+      setMessage(t("messageSent") || "Your message was sent successfully.");
+      event.currentTarget.reset();
+    } catch (error) {
+      setMessage(error.message || "Could not send your message.");
+    }
   }
 
   return (

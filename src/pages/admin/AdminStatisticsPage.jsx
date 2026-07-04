@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminStatGrid from "../../components/admin/AdminStatGrid.jsx";
-import { getBookings } from "../../services/bookingService.js";
+import { getBookings, fetchBookings } from "../../services/bookingService.js";
 import { getUsers } from "../../services/userApiService.js";
 import { items } from "../../data/items.js";
 import { formatCurrency } from "../../utils/currency.js";
@@ -20,7 +20,23 @@ export default function AdminStatisticsPage() {
     };
   }, []);
 
-  const bookings = getBookings();
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      try {
+        const data = await fetchBookings();
+        if (active) setBookings(data || []);
+      } catch (err) {
+        if (active) setBookings([]);
+      }
+    }
+    load();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const totalRevenue = bookings.reduce(
     (sum, booking) => sum + Number(booking.totalAmount || 0),

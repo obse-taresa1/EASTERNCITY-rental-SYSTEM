@@ -1,4 +1,5 @@
 const listingRepository = require("../repositories/listingRepository");
+const notificationService = require("./notificationService");
 
 function ensureOwnerOrAdmin(user, listing) {
   const isAdmin = ["ADMIN", "SUPER_ADMIN"].includes(user.role);
@@ -126,20 +127,28 @@ async function remove(user, id) {
 }
 
 async function approve(id, adminId) {
-  return listingRepository.update(id, {
+  const listing = await listingRepository.update(id, {
     status: "APPROVED",
     approvedById: adminId,
     approvedAt: new Date(),
   });
+
+  await notificationService.notifyListingApproved(listing);
+
+  return listing;
 }
 
 async function reject(id, reason, adminId) {
-  return listingRepository.update(id, {
+  const listing = await listingRepository.update(id, {
     status: "REJECTED",
     rejectionReason: reason || "Rejected by admin.",
     approvedById: adminId,
     approvedAt: new Date(),
   });
+
+  await notificationService.notifyListingRejected(listing, reason);
+
+  return listing;
 }
 
 module.exports = {

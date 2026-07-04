@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SimilarListingsCarousel from "../../components/listings/SimilarListingsCarousel.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { categories, items as seededItems } from "../../data/items.js";
-import { getReviewsByItem } from "../../services/bookingService.js";
 import { getListingById } from "../../services/listingApiService.js";
+import { getReviewsByListing } from "../../services/reviewApiService.js";
 import { startListingConversation } from "../../services/messageApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 
@@ -47,6 +47,7 @@ export default function ItemDetailsPage() {
   );
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     let active = true;
@@ -68,9 +69,25 @@ export default function ItemDetailsPage() {
     };
   }, [itemId]);
 
-  const reviews = useMemo(() => {
-    const storedReviews = getReviewsByItem(itemId);
-    return storedReviews.length ? storedReviews : fallbackReviews;
+  useEffect(() => {
+    let active = true;
+
+    async function loadReviews() {
+      try {
+        const data = await getReviewsByListing(itemId);
+        if (!active) return;
+        setReviews(data.length ? data : fallbackReviews);
+      } catch {
+        if (!active) return;
+        setReviews(fallbackReviews);
+      }
+    }
+
+    loadReviews();
+
+    return () => {
+      active = false;
+    };
   }, [itemId]);
 
   if (loading) {
@@ -112,7 +129,9 @@ export default function ItemDetailsPage() {
 
   async function handleContactOwner() {
     if (!activeUser) {
-      localStorage.setItem("pendingContactUrl", `/items/${item.id}`);
+      const { setStorageItem } =
+        await import("../../services/storageService.js");
+      setStorageItem("pendingContactUrl", `/items/${item.id}`);
       navigate("/login", {
         state: {
           from: { pathname: `/items/${item.id}` },

@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id                            String               @id @default(uuid())
+  name                          String
+  email                         String               @unique
+  password                      String
+  role                          String               @default("USER")
+  createdAt                     DateTime             @default(now())
+  ownedBookings                 Booking[]            @relation("BookingOwner")
+  rentedBookings                Booking[]            @relation("BookingRenter")
+  conversationsAsParticipantOne Conversation[]       @relation("ConversationParticipantOne")
+  conversationsAsParticipantTwo Conversation[]       @relation("ConversationParticipantTwo")
+  approvedListings              Listing[]            @relation("ListingApprover")
+  listings                      Listing[]            @relation("ListingOwner")
+  messages                      Message[]            @relation("MessageSender")
+  notifications                 Notification[]
+  approvedPromotions            Promotion[]          @relation("PromotionApprover")
+  promotions                    Promotion[]          @relation("PromotionRequester")
+  refreshTokens                 RefreshToken[]
+  reviews                       Review[]
+  supportTicketReplies          SupportTicketReply[]
+  supportTickets                SupportTicket[]
+  updatedSettings               SystemSetting[]      @relation("SystemSettingUpdater")
+}
+
+model Listing {
+  id              String         @id @default(uuid())
+  createdAt       DateTime       @default(now())
+  title           String
+  description     String
+  ownerId         String
+  categoryId      String?
+  city            String
+  location        String?
+  pricePerDay     Decimal
+  status          String         @default("PENDING")
+  paymentMethod   String?
+  paymentProofUrl String?
+  paymentStatus   String         @default("PENDING")
+  approvedById    String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  updatedAt       DateTime       @updatedAt
+  bookings        Booking[]
+  conversations   Conversation[]
+  approvedBy      User?          @relation("ListingApprover", fields: [approvedById], references: [id])
+  category        Category?      @relation(fields: [categoryId], references: [id])
+  owner           User           @relation("ListingOwner", fields: [ownerId], references: [id])
+  images          ListingImage[]
+  promotions      Promotion[]
+  reviews         Review[]
+}
+
+model Booking {
+  id                 String    @id @default(uuid())
+  renterId           String
+  ownerId            String
+  listingId          String
+  startDate          DateTime
+  endDate            DateTime
+  subtotal           Decimal
+  serviceFee         Decimal
+  totalAmount        Decimal
+  agreementAccepted  Boolean   @default(false)
+  cancellationReason String?
+  approvedAt         DateTime?
+  completedAt        DateTime?
+  status             String    @default("PENDING")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  listing            Listing   @relation(fields: [listingId], references: [id])
+  owner              User      @relation("BookingOwner", fields: [ownerId], references: [id])
+  renter             User      @relation("BookingRenter", fields: [renterId], references: [id])
+  review             Review?
+}
+
+model Conversation {
+  id               String    @id @default(uuid())
+  participantOneId String
+  participantTwoId String
+  listingId        String
+  lastMessageAt    DateTime?
+  createdAt        DateTime  @default(now())
+  listing          Listing   @relation(fields: [listingId], references: [id])
+  messages         Message[]
+  participantOne   User      @relation("ConversationParticipantOne", fields: [participantOneId], references: [id])
+  participantTwo   User      @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderId       String
+  body           String
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+}
+
+model ListingImage {
+  id        String   @id @default(uuid())
+  listingId String
+  imageUrl  String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id])
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  listings    Listing[]
+}
+
+model Promotion {
+  id              String    @id @default(uuid())
+  userId          String
+  listingId       String
+  packageType     String
+  placement       String
+  amount          Decimal
+  paymentType     String
+  paymentProofUrl String?
+  status          String    @default("PENDING")
+  approvedById    String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  approvedBy      User?     @relation("PromotionApprover", fields: [approvedById], references: [id])
+  listing         Listing   @relation(fields: [listingId], references: [id])
+  user            User      @relation("PromotionRequester", fields: [userId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  listingId String
+  bookingId String   @unique
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   User?    @relation("SystemSettingUpdater", fields: [updatedById], references: [id])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String
+  body          String
+  type          String
+  referenceId   String?
+  referenceType String?
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model SupportTicket {
+  id         String               @id @default(uuid())
+  userId     String
+  subject    String
+  message    String
+  priority   String               @default("MEDIUM")
+  status     String               @default("OPEN")
+  resolvedAt DateTime?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  replies    SupportTicketReply[]
+  user       User                 @relation(fields: [userId], references: [id])
+}
+
+model SupportTicketReply {
+  id        String        @id @default(uuid())
+  ticketId  String
+  userId    String
+  message   String
+  createdAt DateTime      @default(now())
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
+}

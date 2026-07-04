@@ -23,4 +23,15 @@ function update(id, data) {
   return prisma.supportTicket.update({ where: { id }, data });
 }
 
-module.exports = { create, findManyByUser, findAll, update };
+function createReply(data) {
+  return prisma.supportTicketReply.create({ data });
+}
+
+function findById(id) {
+  return prisma.supportTicket.findUnique({
+    where: { id },
+    include: { user: true, replies: true },
+  });
+}
+
+module.exports = { create, findManyByUser, findAll, update, createReply, findById };

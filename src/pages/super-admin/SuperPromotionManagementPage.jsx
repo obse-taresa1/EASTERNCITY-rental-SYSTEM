@@ -4,54 +4,71 @@ import {
   approvePromotionRequest,
   fetchPromotionRequests,
   rejectPromotionRequest,
-} from "../../services/promotionService.js";
+} from "../../services/promotionApiService.js";
 
 const filters = ["all", "Pending", "Approved", "Rejected"];
 
 export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
-  const [promotions, setPromotions] = useState(() => fetchPromotionRequests());
+  const [promotions, setPromotions] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [loading, setLoading] = useState(true);
   const sectionLabel = scope === "admin" ? "ADMIN" : "SUPER ADMIN";
 
   useEffect(() => {
-    const refreshPromotions = () => {
-      const requests = fetchPromotionRequests();
-      console.log("Promotion Management Requests:", requests);
-      setPromotions(requests);
-    };
+    let active = true;
+
+    async function refreshPromotions() {
+      setLoading(true);
+      try {
+        const requests = await fetchPromotionRequests();
+        if (!active) return;
+        setPromotions(requests);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
 
     refreshPromotions();
-    window.addEventListener("easterncity:promotions-updated", refreshPromotions);
-    return () =>
-      window.removeEventListener(
-        "easterncity:promotions-updated",
-        refreshPromotions,
-      );
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const handleApprove = (id) => {
-    const updated = approvePromotionRequest(id);
-    setPromotions(fetchPromotionRequests());
+  const handleApprove = async (id) => {
+    const updated = await approvePromotionRequest(id);
+    setPromotions(await fetchPromotionRequests());
     if (selectedRequest?.id === id && updated) {
       setSelectedRequest(updated);
     }
   };
 
-  const handleReject = (id) => {
-    const updated = rejectPromotionRequest(id);
-    setPromotions(fetchPromotionRequests());
+  const handleReject = async (id) => {
+    const updated = await rejectPromotionRequest(id);
+    setPromotions(await fetchPromotionRequests());
     if (selectedRequest?.id === id && updated) {
       setSelectedRequest(updated);
     }
   };
 
-  const filtered = promotions.filter((promotion) => {
+  const visiblePromotions =
+    filter === "Pending"
+      ? promotions.filter(
+          (promotion) =>
+            String(promotion.status || "").toLowerCase() === "pending",
+        )
+      : promotions;
+
+  const filtered = visiblePromotions.filter((promotion) => {
     const searchTerm = search.toLowerCase();
     const matchesSearch =
-      String(promotion.listingTitle || "").toLowerCase().includes(searchTerm) ||
-      String(promotion.userName || promotion.ownerName || "").toLowerCase().includes(searchTerm);
+      String(promotion.listingTitle || "")
+        .toLowerCase()
+        .includes(searchTerm) ||
+      String(promotion.userName || promotion.ownerName || "")
+        .toLowerCase()
+        .includes(searchTerm);
     const matchesFilter =
       filter === "all" ||
       String(promotion.status || "").toLowerCase() === filter.toLowerCase();
@@ -88,13 +105,16 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
               </button>
             ))}
           </div>
-          <div className="search-box" style={{ maxWidth: "300px", width: "100%" }}>
+          <div
+            className="search-box"
+            style={{ maxWidth: "300px", width: "100%" }}
+          >
             <input
               type="text"
               placeholder="Search listing or user..."
               className="form-control"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
@@ -166,7 +186,9 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan="7" className="text-center text-muted py-4">
-                    No promotion requests matching criteria.
+                    {loading
+                      ? "Loading promotion requests..."
+                      : "No promotion requests matching criteria."}
                   </td>
                 </tr>
               )}
@@ -176,11 +198,19 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
       </div>
 
       {selectedRequest && (
-        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content" style={{ background: "var(--card-bg)" }}>
+            <div
+              className="modal-content"
+              style={{ background: "var(--card-bg)" }}
+            >
               <div className="modal-header border-0">
-                <h5 className="modal-title">Promotion Request - {selectedRequest.listingTitle}</h5>
+                <h5 className="modal-title">
+                  Promotion Request - {selectedRequest.listingTitle}
+                </h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -204,22 +234,39 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
                       style={{ maxHeight: "220px" }}
                     />
                   ) : (
-                    <i className="bi bi-file-earmark-image text-danger" style={{ fontSize: "3rem" }} />
+                    <i
+                      className="bi bi-file-earmark-image text-danger"
+                      style={{ fontSize: "3rem" }}
+                    />
                   )}
-                  <p className="mt-2 mb-0 fw-bold">{selectedRequest.screenshotName}</p>
-                  <span className="text-muted">Bank Transfer Receipt uploaded by User</span>
+                  <p className="mt-2 mb-0 fw-bold">
+                    {selectedRequest.screenshotName}
+                  </p>
+                  <span className="text-muted">
+                    Bank Transfer Receipt uploaded by User
+                  </span>
                 </div>
                 <div className="text-muted">
-                  User: <strong>{selectedRequest.userName || selectedRequest.ownerName}</strong> | Package:{" "}
-                  <strong className="text-danger">{selectedRequest.promotionType}</strong> | Amount:{" "}
-                  <strong className="text-success">{selectedRequest.amount} ETB</strong>
+                  User:{" "}
+                  <strong>
+                    {selectedRequest.userName || selectedRequest.ownerName}
+                  </strong>{" "}
+                  | Package:{" "}
+                  <strong className="text-danger">
+                    {selectedRequest.promotionType}
+                  </strong>{" "}
+                  | Amount:{" "}
+                  <strong className="text-success">
+                    {selectedRequest.amount} ETB
+                  </strong>
                 </div>
                 <div className="mt-2">
                   Status: <StatusBadge status={selectedRequest.status} />
                 </div>
               </div>
               <div className="modal-footer border-0">
-                {selectedRequest.status === "Pending" && (
+                {String(selectedRequest.status || "").toLowerCase() ===
+                  "pending" && (
                   <>
                     <button
                       type="button"

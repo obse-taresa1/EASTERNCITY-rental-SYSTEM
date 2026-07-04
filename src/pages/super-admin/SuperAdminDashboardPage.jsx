@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import AdminOverviewDashboard from "../../components/admin/AdminOverviewDashboard.jsx";
 import { coerceRole } from "../../services/authService.js";
 import { getUsers } from "../../services/userApiService.js";
-import { getManagementItems } from "../../services/itemService.js";
-import { getBookings } from "../../services/bookingService.js";
+import { getManageListings } from "../../services/listingApiService.js";
+import { getBookings, fetchBookings } from "../../services/bookingService.js";
 import { getContactMessages } from "../../services/contactMessageService.js";
-import { getNotifications } from "../../services/notificationService.js";
+import {
+  getNotifications,
+  fetchNotifications,
+} from "../../services/notificationService.js";
 import {
   fetchActivePromotions,
   fetchPromotionRequests,
-} from "../../services/promotionService.js";
+} from "../../services/promotionApiService.js";
+import { useRef } from "react";
 import { roleRequests } from "../../data/roleRequests.js";
 import { formatCurrency } from "../../utils/currency.js";
 
@@ -78,6 +82,12 @@ function createBreakdown(items, key, fallback = "Unknown") {
 export default function SuperAdminDashboardPage() {
   const [users, setUsers] = useState([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [promotions, setPromotions] = useState([]);
+  const [activePromotions, setActivePromotions] = useState([]);
+  const promotionsLoaded = useRef(false);
+  const [bookings, setBookings] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     let active = true;
@@ -97,12 +107,72 @@ export default function SuperAdminDashboardPage() {
     };
   }, []);
 
-  const bookings = getBookings();
-  const items = getManagementItems();
-  const promotions = fetchPromotionRequests();
-  const activePromotions = fetchActivePromotions();
+  useEffect(() => {
+    let active = true;
+
+    async function loadPromotions() {
+      try {
+        const p = await fetchPromotionRequests();
+        const a = await fetchActivePromotions();
+        if (active) {
+          setPromotions(p || []);
+          setActivePromotions(a || []);
+          promotionsLoaded.current = true;
+        }
+      } catch (err) {
+        if (active) {
+          setPromotions([]);
+          setActivePromotions([]);
+        }
+      }
+    }
+
+    loadPromotions();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadBookings() {
+      try {
+        const b = await fetchBookings();
+        if (active) setBookings(b || []);
+      } catch (err) {
+        if (active) setBookings([]);
+      }
+    }
+
+    async function loadListings() {
+      try {
+        const data = await getManageListings();
+        if (active) setItems(data || []);
+      } catch (err) {
+        if (active) setItems([]);
+      }
+    }
+
+    async function loadNotifications() {
+      try {
+        const n = await fetchNotifications();
+        if (active) setNotifications(n || []);
+      } catch (err) {
+        if (active) setNotifications([]);
+      }
+    }
+
+    loadBookings();
+    loadListings();
+    loadNotifications();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // promotions and activePromotions loaded asynchronously via effect
   const contactMessages = getContactMessages();
-  const notifications = getNotifications();
 
   const admins = users.filter((user) => coerceRole(user.role) === "ADMIN");
   const totalOwners = uniqueCount(
@@ -191,51 +261,41 @@ export default function SuperAdminDashboardPage() {
   ];
 
   const rows = [
-    ...notifications
-      .slice(0, 2)
-      .map((notification) => ({
-        id: notification.id,
-        type: "Recent Activity",
-        detail: notification.title,
-        status: notification.isRead ? "Read" : "Unread",
-        date: formatDate(notification.createdAt),
-      })),
-    ...roleRequests
-      .slice(0, 2)
-      .map((request) => ({
-        id: request.id,
-        type: "Recent Verification",
-        detail: request.name,
-        status: request.status,
-        date: "-",
-      })),
-    ...admins
-      .slice(0, 2)
-      .map((admin) => ({
-        id: `admin-${admin.id}`,
-        type: "Recent Admin Action",
-        detail: admin.email,
-        status: coerceRole(admin.role),
-        date: formatDate(admin.createdAt),
-      })),
-    ...promotions
-      .slice(0, 2)
-      .map((promotion) => ({
-        id: promotion.id,
-        type: "Recent Payment",
-        detail: promotion.listingTitle,
-        status: promotion.status,
-        date: formatDate(promotion.requestDate),
-      })),
-    ...contactMessages
-      .slice(0, 2)
-      .map((message) => ({
-        id: message.id,
-        type: "Recent Report",
-        detail: message.subject,
-        status: message.status,
-        date: formatDate(message.createdAt),
-      })),
+    ...notifications.slice(0, 2).map((notification) => ({
+      id: notification.id,
+      type: "Recent Activity",
+      detail: notification.title,
+      status: notification.isRead ? "Read" : "Unread",
+      date: formatDate(notification.createdAt),
+    })),
+    ...roleRequests.slice(0, 2).map((request) => ({
+      id: request.id,
+      type: "Recent Verification",
+      detail: request.name,
+      status: request.status,
+      date: "-",
+    })),
+    ...admins.slice(0, 2).map((admin) => ({
+      id: `admin-${admin.id}`,
+      type: "Recent Admin Action",
+      detail: admin.email,
+      status: coerceRole(admin.role),
+      date: formatDate(admin.createdAt),
+    })),
+    ...promotions.slice(0, 2).map((promotion) => ({
+      id: promotion.id,
+      type: "Recent Payment",
+      detail: promotion.listingTitle,
+      status: promotion.status,
+      date: formatDate(promotion.requestDate),
+    })),
+    ...contactMessages.slice(0, 2).map((message) => ({
+      id: message.id,
+      type: "Recent Report",
+      detail: message.subject,
+      status: message.status,
+      date: formatDate(message.createdAt),
+    })),
   ];
 
   return (

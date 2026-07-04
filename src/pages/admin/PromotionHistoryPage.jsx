@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchOwnerPromotions } from "../../services/promotionService.js";
+import { fetchOwnerPromotions } from "../../services/promotionApiService.js";
 import { promotionPackages } from "../../data/promotions.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
@@ -8,10 +8,26 @@ export default function PromotionHistoryPage() {
   const { currentUser } = useAuth();
   const ownerId = currentUser?.id || "user";
 
-  const [history, setHistory] = useState(() => fetchOwnerPromotions(ownerId));
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    const refreshHistory = () => setHistory(fetchOwnerPromotions(ownerId));
+    let active = true;
+
+    async function loadHistory() {
+      try {
+        const data = await fetchOwnerPromotions(ownerId);
+        if (active) setHistory(data || []);
+      } catch (err) {
+        if (active) setHistory([]);
+      }
+    }
+
+    loadHistory();
+
+    function refreshHistory() {
+      loadHistory();
+    }
+
     window.addEventListener("easterncity:promotions-updated", refreshHistory);
     return () =>
       window.removeEventListener(
@@ -76,4 +92,3 @@ export default function PromotionHistoryPage() {
     </main>
   );
 }
-

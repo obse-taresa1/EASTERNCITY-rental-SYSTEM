@@ -75,7 +75,6 @@ export default function AdminManagementPage() {
       const updated = await updateUser(editingAdmin.id, {
         name: editingAdmin.name,
         email: editingAdmin.email,
-        role: editingAdmin.role,
       });
       setAdmins((prev) =>
         prev.map((admin) =>

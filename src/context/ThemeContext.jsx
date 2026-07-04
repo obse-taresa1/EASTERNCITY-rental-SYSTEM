@@ -1,16 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { getStorageItem, setStorageItem } from "../services/storageService.js";
 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "light",
-  );
+  const [theme, setTheme] = useState(() => getStorageItem("theme", "light"));
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem("theme", theme);
+    setStorageItem("theme", theme);
   }, [theme]);
 
   const value = useMemo(

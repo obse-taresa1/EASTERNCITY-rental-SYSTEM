@@ -1,4 +1,8 @@
 import { useState } from "react";
+import {
+  sendBroadcastNotification,
+  sendDirectNotification,
+} from "../../services/notificationService.js";
 
 export default function AdminNotificationsPage() {
   const [announcementText, setAnnouncementText] = useState("");
@@ -6,22 +10,56 @@ export default function AdminNotificationsPage() {
   const [targetUser, setTargetUser] = useState("");
   const [notifText, setNotifText] = useState("");
   const [notifTitle, setNotifTitle] = useState("");
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSendAnnouncement = (e) => {
+  const handleSendAnnouncement = async (e) => {
     e.preventDefault();
     if (!announcementTitle.trim() || !announcementText.trim()) return;
-    alert(`Global Announcement Broadcasted successfully!\nTitle: ${announcementTitle}\nBody: ${announcementText}`);
-    setAnnouncementTitle("");
-    setAnnouncementText("");
+
+    setIsSubmitting(true);
+    setNotice("");
+    setError("");
+
+    try {
+      await sendBroadcastNotification({
+        title: announcementTitle.trim(),
+        body: announcementText.trim(),
+      });
+      setNotice("Global announcement sent successfully.");
+      setAnnouncementTitle("");
+      setAnnouncementText("");
+    } catch (err) {
+      setError(err.message || "Could not send announcement.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSendDirect = (e) => {
+  const handleSendDirect = async (e) => {
     e.preventDefault();
     if (!targetUser.trim() || !notifTitle.trim() || !notifText.trim()) return;
-    alert(`Direct Notification sent to User ${targetUser} successfully!\nTitle: ${notifTitle}\nBody: ${notifText}`);
-    setTargetUser("");
-    setNotifTitle("");
-    setNotifText("");
+
+    setIsSubmitting(true);
+    setNotice("");
+    setError("");
+
+    try {
+      await sendDirectNotification({
+        recipient: targetUser.trim(),
+        title: notifTitle.trim(),
+        body: notifText.trim(),
+      });
+      setNotice("Direct notification sent successfully.");
+      setTargetUser("");
+      setNotifTitle("");
+      setNotifText("");
+    } catch (err) {
+      setError(err.message || "Could not send notification.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -35,6 +73,9 @@ export default function AdminNotificationsPage() {
           </p>
         </div>
       </div>
+
+      {notice && <div className="alert alert-success">{notice}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="row">
         <div className="col-lg-6 mb-4">
@@ -65,8 +106,8 @@ export default function AdminNotificationsPage() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-accent-custom w-100">
-                Send Global Announcement
+              <button type="submit" className="btn btn-accent-custom w-100" disabled={isSubmitting}>
+                {isSubmitting ? "Sending..." : "Send Global Announcement"}
               </button>
             </form>
           </div>
@@ -111,8 +152,8 @@ export default function AdminNotificationsPage() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-outline-danger w-100">
-                Send Direct Notification
+              <button type="submit" className="btn btn-outline-danger w-100" disabled={isSubmitting}>
+                {isSubmitting ? "Sending..." : "Send Direct Notification"}
               </button>
             </form>
           </div>

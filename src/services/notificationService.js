@@ -1,5 +1,8 @@
 import { apiClient } from "./apiClient.js";
+import { getAuthTokens } from "./authService.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
+
+const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
 
 const NOTIFICATIONS_KEY = "easterncity_notifications";
 
@@ -15,10 +18,13 @@ export const NOTIFICATION_TYPES = {
   PROMOTION_REJECTED: "PROMOTION_REJECTED",
   MESSAGE_RECEIVED: "MESSAGE_RECEIVED",
   SUPPORT_REPLY: "SUPPORT_REPLY",
+  REVIEW_ADDED: "REVIEW_ADDED",
+  ADMIN_NOTICE: "ADMIN_NOTICE",
+  SYSTEM_ANNOUNCEMENT: "SYSTEM_ANNOUNCEMENT",
 };
 
 export function getNotifications() {
-  return getStorageItem(NOTIFICATIONS_KEY, []);
+  return useMockAuth ? getStorageItem(NOTIFICATIONS_KEY, []) : [];
 }
 
 export function getNotificationsByUser(userId) {
@@ -29,13 +35,14 @@ export function getNotificationsByUser(userId) {
 }
 
 export async function fetchNotifications(userId) {
-  const accessToken = getStorageItem("accessToken", null);
+  const accessToken = getAuthTokens().accessToken;
 
-  if (!accessToken) {
+  if (useMockAuth || !accessToken) {
     return getNotificationsByUser(userId);
   }
 
-  return apiClient.get("/api/notifications");
+  const data = await apiClient.get("/api/notifications");
+  return Array.isArray(data) ? data : [];
 }
 
 export function createNotification({
@@ -62,15 +69,55 @@ export function createNotification({
     createdAt: new Date().toISOString(),
   };
 
-  setStorageItem(NOTIFICATIONS_KEY, [notification, ...getNotifications()]);
+  if (useMockAuth) {
+    setStorageItem(NOTIFICATIONS_KEY, [notification, ...getNotifications()]);
+  }
   window.dispatchEvent(new Event("easterncity:notifications-updated"));
   return notification;
 }
 
-export async function markNotificationRead(id) {
-  const accessToken = getStorageItem("accessToken", null);
+export async function sendDirectNotification({ recipient, title, body }) {
+  const accessToken = getAuthTokens().accessToken;
 
-  if (accessToken) {
+  if (!useMockAuth && accessToken) {
+    const notification = await apiClient.post("/api/notifications", {
+      recipient,
+      title,
+      body,
+    });
+    window.dispatchEvent(new Event("easterncity:notifications-updated"));
+    return notification;
+  }
+
+  const notification = createNotification({
+    userId: recipient,
+    title,
+    body,
+    type: NOTIFICATION_TYPES.ADMIN_NOTICE,
+    referenceType: "ADMIN",
+  });
+  return notification;
+}
+
+export async function sendBroadcastNotification({ title, body }) {
+  const accessToken = getAuthTokens().accessToken;
+
+  if (!useMockAuth && accessToken) {
+    const result = await apiClient.post("/api/notifications/broadcast", {
+      title,
+      body,
+    });
+    window.dispatchEvent(new Event("easterncity:notifications-updated"));
+    return result;
+  }
+
+  return { count: 0 };
+}
+
+export async function markNotificationRead(id) {
+  const accessToken = getAuthTokens().accessToken;
+
+  if (!useMockAuth && accessToken) {
     const notification = await apiClient.patch(`/api/notifications/${id}/read`);
     window.dispatchEvent(new Event("easterncity:notifications-updated"));
     return notification;
@@ -79,15 +126,15 @@ export async function markNotificationRead(id) {
   const notifications = getNotifications().map((notification) =>
     notification.id === id ? { ...notification, isRead: true } : notification,
   );
-  setStorageItem(NOTIFICATIONS_KEY, notifications);
+  if (useMockAuth) setStorageItem(NOTIFICATIONS_KEY, notifications);
   window.dispatchEvent(new Event("easterncity:notifications-updated"));
   return notifications.find((notification) => notification.id === id) || null;
 }
 
 export async function markAllNotificationsRead() {
-  const accessToken = getStorageItem("accessToken", null);
+  const accessToken = getAuthTokens().accessToken;
 
-  if (accessToken) {
+  if (!useMockAuth && accessToken) {
     const result = await apiClient.patch("/api/notifications/read-all");
     window.dispatchEvent(new Event("easterncity:notifications-updated"));
     return result;
@@ -97,7 +144,7 @@ export async function markAllNotificationsRead() {
     ...notification,
     isRead: true,
   }));
-  setStorageItem(NOTIFICATIONS_KEY, notifications);
+  if (useMockAuth) setStorageItem(NOTIFICATIONS_KEY, notifications);
   window.dispatchEvent(new Event("easterncity:notifications-updated"));
   return notifications;
 }

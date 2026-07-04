@@ -1,36 +1,68 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
-
-const initialTickets = [
-  { id: "ST-8092", name: "Almaz Belay", type: "User Request", subject: "Refund on promotion", date: "2026-06-25", status: "open", message: "I uploaded the wrong receipt screenshot for the VIP promotion. Can I get a refund or switch listings?" },
-  { id: "ST-8093", name: "Yonas Kassa", type: "Contact Message", subject: "Partnership Inquiry", date: "2026-06-24", status: "open", message: "Hi, we are a tools supply warehouse and want to discuss listing bulk assets." },
-  { id: "ST-8094", name: "Fatuma Mohammed", type: "User Request", subject: "Cannot upload ID", date: "2026-06-23", status: "closed", message: "The verification screen throws errors when uploading my national ID scan." },
-];
+import {
+  fetchSupportTickets,
+  replyToSupportTicket,
+  resolveSupportTicket,
+} from "../../services/supportTicketService.js";
 
 export default function AdminSupportTicketsPage() {
-  const [tickets, setTickets] = useState(initialTickets);
+  const [tickets, setTickets] = useState([]);
   const [filter, setFilter] = useState("all");
   const [replyTicket, setReplyTicket] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSendReply = (e) => {
+  async function loadTickets() {
+    try {
+      const data = await fetchSupportTickets();
+      setTickets(data);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Could not load support tickets.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadTickets();
+  }, []);
+
+  const handleSendReply = async (e) => {
     e.preventDefault();
-    if (!replyText.trim()) return;
-    alert(`Reply sent to ${replyTicket.name}: "${replyText}"`);
-    setReplyText("");
-    setReplyTicket(null);
+    if (!replyText.trim() || !replyTicket) return;
+
+    try {
+      await replyToSupportTicket(replyTicket.id, replyText.trim());
+      await loadTickets();
+      setNotice(`Reply sent to ${replyTicket.name}.`);
+      setError("");
+      setReplyText("");
+      setReplyTicket(null);
+    } catch (err) {
+      setError(err.message || "Could not send reply.");
+    }
   };
 
-  const handleClose = (id) => {
-    setTickets(prev =>
-      prev.map(t => (t.id === id ? { ...t, status: "closed" } : t))
-    );
+  const handleClose = async (id) => {
+    try {
+      await resolveSupportTicket(id);
+      await loadTickets();
+      setNotice("Support ticket closed.");
+      setError("");
+    } catch (err) {
+      setError(err.message || "Could not close support ticket.");
+    }
   };
 
   const filtered = tickets.filter(t => {
+    const status = String(t.status || "").toLowerCase();
     if (filter === "all") return true;
-    if (filter === "open") return t.status === "open";
-    if (filter === "closed") return t.status === "closed";
+    if (filter === "open") return !["closed", "resolved"].includes(status);
+    if (filter === "closed") return ["closed", "resolved"].includes(status);
     return t.type === filter;
   });
 
@@ -45,6 +77,9 @@ export default function AdminSupportTicketsPage() {
           </p>
         </div>
       </div>
+
+      {notice && <div className="alert alert-success">{notice}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="admin-table-container">
         <div className="d-flex gap-2 mb-4">
@@ -97,7 +132,7 @@ export default function AdminSupportTicketsPage() {
                       >
                         Reply
                       </button>
-                      {t.status === "open" && (
+                      {!["resolved", "closed"].includes(String(t.status || "").toLowerCase()) && (
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-danger"
@@ -113,7 +148,7 @@ export default function AdminSupportTicketsPage() {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan="7" className="text-center text-muted py-4">
-                    No support tickets matching criteria.
+                    {isLoading ? "Loading support tickets..." : "No support tickets matching criteria."}
                   </td>
                 </tr>
               )}

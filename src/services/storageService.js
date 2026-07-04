@@ -1,4 +1,7 @@
+const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
+
 export function getStorageItem(key, fallbackValue = null) {
+  if (!useMockAuth) return fallbackValue;
   try {
     const storedValue = localStorage.getItem(key);
 
@@ -13,10 +16,12 @@ export function getStorageItem(key, fallbackValue = null) {
 }
 
 export function setStorageItem(key, value) {
+  if (!useMockAuth) return;
   localStorage.setItem(key, JSON.stringify(value));
 }
 
 export function removeStorageItem(key) {
+  if (!useMockAuth) return;
   localStorage.removeItem(key);
 }
 

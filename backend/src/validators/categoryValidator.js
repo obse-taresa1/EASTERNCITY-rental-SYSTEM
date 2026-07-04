@@ -1,14 +1,12 @@
-function validateCategory(req, res, next) {
-  if (!req.body.name || !req.body.slug) {
-    return res.status(400).json({
-      success: false,
-      message: 'Category name and slug are required.',
-    });
-  }
+const { z } = require('zod');
+const { parseWithSchema } = require('./validationHelpers');
 
-  next();
-}
+const categorySchema = z.object({
+  name: z.string().trim().min(1, 'Category name and slug are required.'),
+  slug: z.string().trim().min(1, 'Category name and slug are required.'),
+  description: z.string().optional().default(''),
+});
 
 module.exports = {
-  validateCategory,
+  validateCategory: (req, res, next) => parseWithSchema(categorySchema, req, res, next),
 };

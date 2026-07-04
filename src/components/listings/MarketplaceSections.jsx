@@ -7,7 +7,8 @@ import {
   getPromotionPlacement,
   sortPromotedListingsFirst,
 } from "../../services/itemService.js";
-import { fetchActivePromotions } from "../../services/promotionService.js";
+import { getPublicListings } from "../../services/listingApiService.js";
+import { fetchActivePromotions } from "../../services/promotionApiService.js";
 
 const sectionDefinitions = [
   {
@@ -33,12 +34,14 @@ const sectionDefinitions = [
   {
     title: "Verified Owner Picks",
     label: "Trusted owners",
-    filter: (item) => item.verifiedOwner !== false || item.verificationStatus === "verified",
+    filter: (item) =>
+      item.verifiedOwner !== false || item.verificationStatus === "verified",
   },
   {
     title: "Most Contacted Listings",
     label: "High response",
-    filter: (item) => Number(item.inquiries || 0) >= 10 || Number(item.messages || 0) >= 5,
+    filter: (item) =>
+      Number(item.inquiries || 0) >= 10 || Number(item.messages || 0) >= 5,
   },
   {
     title: "Popular This Week",
@@ -48,13 +51,19 @@ const sectionDefinitions = [
   {
     title: "Staff Recommendations",
     label: "EasternCity picks",
-    filter: (item) => ["electronics-cameras", "construction-diy", "party-wedding", "vehicles"].includes(item.category) || item.featured,
+    filter: (item) =>
+      [
+        "electronics-cameras",
+        "construction-diy",
+        "party-wedding",
+        "vehicles",
+      ].includes(item.category) || item.featured,
   },
 ];
 
-function findHomepageBanner(listings) {
+function findHomepageBanner(listings, promotions) {
   const listingsById = new Map(listings.map((item) => [String(item.id), item]));
-  const homepagePromotion = fetchActivePromotions().find(
+  const homepagePromotion = (promotions || []).find(
     (promotion) =>
       getPromotionPlacement(promotion) === "homepage-banner" &&
       listingsById.has(String(promotion.listingId)),
@@ -69,30 +78,74 @@ function findHomepageBanner(listings) {
 }
 
 export default function MarketplaceSections() {
-  const [savedListings, setSavedListings] = useState(() => getAllItems());
+  const [savedListings, setSavedListings] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const marketplaceListings = useMemo(() => {
     const savedById = new Map(savedListings.map((item) => [item.id, item]));
-    const merged = [...savedById.values(), ...homeListings.filter((item) => !savedById.has(item.id))];
+    const merged = savedListings.length
+      ? [...savedById.values()]
+      : [
+          ...savedById.values(),
+          ...homeListings.filter((item) => !savedById.has(item.id)),
+        ];
     return sortPromotedListingsFirst(
-      merged.filter((item) => !["draft", "rejected", "expired"].includes(String(item.status || "").toLowerCase())),
+      merged.filter(
+        (item) =>
+          !["draft", "rejected", "expired", "pending"].includes(
+            String(item.status || "").toLowerCase(),
+          ),
+      ),
     );
   }, [savedListings]);
 
   const homepageBanner = useMemo(
-    () => findHomepageBanner(marketplaceListings),
-    [marketplaceListings],
+    () => findHomepageBanner(marketplaceListings, promotions),
+    [marketplaceListings, promotions],
   );
+
+  async function loadListings() {
+    try {
+      const data = await getPublicListings();
+      setSavedListings(data || []);
+    } catch {
+      setSavedListings(getAllItems());
+    }
+  }
+
+  useEffect(() => {
+    let active = true;
+    async function loadPromotions() {
+      try {
+        const data = await fetchActivePromotions();
+        if (active) setPromotions(data || []);
+      } catch {
+        if (active) setPromotions([]);
+      }
+    }
+
+    loadListings();
+    loadPromotions();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     function refreshListings() {
-      setSavedListings(getAllItems());
+      loadListings();
     }
 
     window.addEventListener("easterncity:listings-updated", refreshListings);
     window.addEventListener("easterncity:promotions-updated", refreshListings);
     return () => {
-      window.removeEventListener("easterncity:listings-updated", refreshListings);
-      window.removeEventListener("easterncity:promotions-updated", refreshListings);
+      window.removeEventListener(
+        "easterncity:listings-updated",
+        refreshListings,
+      );
+      window.removeEventListener(
+        "easterncity:promotions-updated",
+        refreshListings,
+      );
     };
   }, []);
 
@@ -111,20 +164,28 @@ export default function MarketplaceSections() {
             </h2>
             {homepageBanner && (
               <p className="text-muted mb-0">
-                {homepageBanner.promotion.promotionType} is active until {homepageBanner.promotion.endDate || "the campaign ends"}.
+                {homepageBanner.promotion.promotionType} is active until{" "}
+                {homepageBanner.promotion.endDate || "the campaign ends"}.
               </p>
             )}
           </div>
           <Link
-            to={homepageBanner ? `/items/${homepageBanner.listing.id}` : "/my-listings"}
+            to={
+              homepageBanner
+                ? `/items/${homepageBanner.listing.id}`
+                : "/my-listings"
+            }
             className="btn btn-accent-custom btn-shine"
           >
-            <i className="bi bi-badge-ad" /> {homepageBanner ? "View Banner Listing" : "Advertise"}
+            <i className="bi bi-badge-ad" />{" "}
+            {homepageBanner ? "View Banner Listing" : "Advertise"}
           </Link>
         </div>
 
         {sectionDefinitions.map((section) => {
-          const listings = sortPromotedListingsFirst(marketplaceListings.filter(section.filter)).slice(0, 4);
+          const listings = sortPromotedListingsFirst(
+            marketplaceListings.filter(section.filter),
+          ).slice(0, 4);
           if (!listings.length) return null;
 
           return (
@@ -137,7 +198,10 @@ export default function MarketplaceSections() {
               </div>
               <div className="row g-4">
                 {listings.map((item) => (
-                  <div className="col-sm-6 col-lg-3" key={`${section.title}-${item.id}`}>
+                  <div
+                    className="col-sm-6 col-lg-3"
+                    key={`${section.title}-${item.id}`}
+                  >
                     <ListingCard item={item} />
                   </div>
                 ))}

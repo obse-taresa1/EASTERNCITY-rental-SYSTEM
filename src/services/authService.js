@@ -4,6 +4,7 @@ import { readStorage, removeStorage, writeStorage } from "./storageService.js";
 const TOKEN_KEY = "token";
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
+const CURRENT_USER_KEY = "currentUser";
 
 function persistAuthSession({ user, accessToken, refreshToken }) {
   if (accessToken) {
@@ -13,6 +14,10 @@ function persistAuthSession({ user, accessToken, refreshToken }) {
 
   if (refreshToken) {
     writeStorage(REFRESH_TOKEN_KEY, refreshToken);
+  }
+
+  if (user) {
+    writeStorage(CURRENT_USER_KEY, toSafeUser(user));
   }
 
   return user || null;
@@ -32,14 +37,22 @@ export function clearAuthSession() {
   removeStorage(TOKEN_KEY);
   removeStorage(ACCESS_TOKEN_KEY);
   removeStorage(REFRESH_TOKEN_KEY);
+  removeStorage(CURRENT_USER_KEY);
 }
 
 export function getCurrentUser() {
-  return null;
+  return toSafeUser(readStorage(CURRENT_USER_KEY, null));
 }
 
 export function setCurrentUser(user) {
-  return user || null;
+  if (!user) {
+    removeStorage(CURRENT_USER_KEY);
+    return null;
+  }
+
+  const safeUser = toSafeUser(user);
+  writeStorage(CURRENT_USER_KEY, safeUser);
+  return safeUser;
 }
 
 function toSafeUser(user) {

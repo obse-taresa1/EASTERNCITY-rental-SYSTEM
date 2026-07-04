@@ -1,61 +1,64 @@
-function validateCreateListing(req, res, next) {
-  const required = [
-    "title",
-    "description",
-    "categoryId",
-    "city",
-    "location",
-    "pricePerDay",
-  ];
+const { z } = require('zod');
+const { cleanupUploadedFiles } = require('../utils/uploadCleanup');
+const { firstZodMessage } = require('./validationHelpers');
 
-  const missing = required.filter((field) => !req.body[field]);
-  const status = String(req.body.status || "PENDING").toUpperCase();
+function rejectWithCleanup(req, res, message) {
+  cleanupUploadedFiles(req);
+  return res.status(400).json({ success: false, message });
+}
+
+const createListingSchema = z.object({
+  title: z.string().trim().min(1, 'title is required.'),
+  description: z.string().trim().min(1, 'description is required.'),
+  categoryId: z.string().uuid('categoryId is required.'),
+  city: z.string().trim().min(1, 'city is required.'),
+  location: z.string().trim().min(1, 'location is required.'),
+  pricePerDay: z.coerce.number().positive('pricePerDay must be greater than 0.'),
+  status: z.string().optional().default('PENDING'),
+  paymentMethod: z.string().optional(),
+  paymentProofUrl: z.string().optional(),
+  paymentStatus: z.string().optional(),
+});
+
+const updateListingSchema = z.object({
+  title: z.string().trim().min(1).optional(),
+  description: z.string().trim().min(1).optional(),
+  city: z.string().trim().min(1).optional(),
+  location: z.string().trim().min(1).optional(),
+  pricePerDay: z.coerce.number().positive('pricePerDay must be greater than 0.').optional(),
+});
+
+function validateCreateListing(req, res, next) {
+  const result = createListingSchema.safeParse(req.body);
+  if (!result.success) {
+    return rejectWithCleanup(req, res, firstZodMessage(result.error));
+  }
+
+  req.body = result.data;
+
+  const status = String(req.body.status || 'PENDING').toUpperCase();
   const paymentFiles = req.files?.paymentProof || [];
-  const hasPaymentProof =
-    paymentFiles.length > 0 || Boolean(req.body.paymentProofUrl);
+  const hasPaymentProof = paymentFiles.length > 0 || Boolean(req.body.paymentProofUrl);
   const hasPaymentMethod = Boolean(req.body.paymentMethod);
 
-  if (missing.length > 0) {
-    return res.status(400).json({
-      success: false,
-      message: `Missing required fields: ${missing.join(", ")}`,
-    });
+  if (status !== 'DRAFT' && !hasPaymentMethod) {
+    return rejectWithCleanup(req, res, 'paymentMethod is required.');
   }
 
-  if (status !== "DRAFT") {
-    if (!hasPaymentMethod) {
-      return res.status(400).json({
-        success: false,
-        message: "paymentMethod is required.",
-      });
-    }
-
-    if (!hasPaymentProof) {
-      return res.status(400).json({
-        success: false,
-        message: "paymentProof is required.",
-      });
-    }
-  }
-
-  if (Number(req.body.pricePerDay) <= 0) {
-    return res.status(400).json({
-      success: false,
-      message: "pricePerDay must be greater than 0.",
-    });
+  if (status !== 'DRAFT' && !hasPaymentProof) {
+    return rejectWithCleanup(req, res, 'paymentProof is required.');
   }
 
   next();
 }
 
 function validateUpdateListing(req, res, next) {
-  if (req.body.pricePerDay !== undefined && Number(req.body.pricePerDay) <= 0) {
-    return res.status(400).json({
-      success: false,
-      message: "pricePerDay must be greater than 0.",
-    });
+  const result = updateListingSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ success: false, message: firstZodMessage(result.error) });
   }
 
+  req.body = result.data;
   next();
 }
 

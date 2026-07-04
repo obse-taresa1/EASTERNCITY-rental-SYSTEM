@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
 
 function NavItem({ link }) {
   const hasChevron = /Management|Center|Monitoring|Reports|Users|Listings|Categories|Promotion|Verification|Support|Settings/.test(link.label);
@@ -21,14 +22,8 @@ export default function AdminSidebar({ variant = "admin" }) {
   return (
     <aside className="admin-sidebar admin-red-sidebar">
       <div className="admin-sidebar-header">
-        <NavLink to={isSuperAdmin ? "/super-admin-dashboard" : "/admin-dashboard"} className="admin-brand">
-          <span className="admin-brand-mark">
-            <i className="bi bi-house-door-fill" />
-          </span>
-          <span className="admin-brand-text">
-            CITYWIDE
-            <small>JIGJIGA</small>
-          </span>
+        <NavLink to={isSuperAdmin ? "/super-admin-dashboard" : "/admin-dashboard"} className="admin-brand admin-brand-logo" aria-label="Eastern Cities dashboard home">
+          <img src={logo} alt="Eastern Cities" className="admin-brand-logo-img" />
         </NavLink>
         <button className="admin-sidebar-menu" type="button" aria-label="Collapse menu">
           <i className="bi bi-list" />
@@ -91,3 +86,4 @@ const superAdminLinks = [
   { to: "/super-admin-dashboard/activity-logs", label: "Activity Logs", icon: "bi-file-earmark" },
   { to: "/super-admin-dashboard/system-settings", label: "Settings", icon: "bi-gear" },
 ];
+

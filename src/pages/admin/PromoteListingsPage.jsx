@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { promotionPackages } from "../../data/promotions.js";
 import {
   fetchOwnerListings,
   requestPromotion,
-} from "../../services/promotionService.js";
+} from "../../services/promotionApiService.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 // Fee per package (ETB)
@@ -22,29 +22,63 @@ export default function PromoteListingsPage() {
   const { currentUser } = useAuth();
   const ownerId = currentUser?.id || "user";
 
-  const [listings] = useState(() => fetchOwnerListings(ownerId));
+  const [listings, setListings] = useState([]);
   const [selectedListing, setSelectedListing] = useState("");
   const [selectedPackage, setSelectedPackage] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Telebirr");
   const [screenshot, setScreenshot] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null); // { success, message }
+  const [loading, setLoading] = useState(true);
 
-  const currentPkg = promotionPackages.find((p) => p.id === Number(selectedPackage));
+  useEffect(() => {
+    let active = true;
+
+    async function loadListings() {
+      setLoading(true);
+      try {
+        const data = await fetchOwnerListings(ownerId);
+        if (active) {
+          setListings(data);
+        }
+      } catch {
+        if (active) {
+          setListings([]);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadListings();
+
+    return () => {
+      active = false;
+    };
+  }, [ownerId]);
+
+  const currentPkg = promotionPackages.find(
+    (p) => p.id === Number(selectedPackage),
+  );
   const fee = currentPkg ? (packageFees[currentPkg.id] ?? 500) : null;
 
   async function handleScreenshot(e) {
     const file = e.target.files[0];
     if (!file) return;
     const dataUrl = await fileToDataUrl(file);
-    setScreenshot({ name: file.name, preview: dataUrl });
+    setScreenshot({ name: file.name, preview: dataUrl, file });
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedListing || !selectedPackage) return;
     if (!screenshot) {
-      setResult({ success: false, message: "Please upload a payment screenshot." });
+      setResult({
+        success: false,
+        message: "Please upload a payment screenshot.",
+      });
       return;
     }
 
@@ -53,24 +87,38 @@ export default function PromoteListingsPage() {
 
     try {
       const listing = listings.find((item) => item.id === selectedListing);
-      await requestPromotion(selectedListing, Number(selectedPackage), screenshot, {
-        listingTitle: listing?.title,
-        ownerId,
-        userId: ownerId,
-        userName: currentUser?.businessName || currentUser?.name || "User",
-        ownerName: currentUser?.businessName || currentUser?.name || listing?.ownerName,
-        packageName: currentPkg?.name,
-        promotionType: currentPkg?.name,
-        durationDays: currentPkg?.days,
-        amount: fee,
-        paymentMethod,
+      await requestPromotion(
+        selectedListing,
+        Number(selectedPackage),
+        screenshot,
+        {
+          listingTitle: listing?.title,
+          ownerId,
+          userId: ownerId,
+          userName: currentUser?.businessName || currentUser?.name || "User",
+          ownerName:
+            currentUser?.businessName ||
+            currentUser?.name ||
+            listing?.ownerName,
+          packageName: currentPkg?.name,
+          promotionType: currentPkg?.name,
+          durationDays: currentPkg?.days,
+          amount: fee,
+          paymentMethod,
+        },
+      );
+      setResult({
+        success: true,
+        message: "Promotion request submitted. Status: Pending.",
       });
-      setResult({ success: true, message: "Promotion request submitted. Status: Pending." });
       setSelectedListing("");
       setSelectedPackage("");
       setScreenshot(null);
     } catch {
-      setResult({ success: false, message: "Failed to submit promotion request." });
+      setResult({
+        success: false,
+        message: "Failed to submit promotion request.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -87,7 +135,9 @@ export default function PromoteListingsPage() {
       </div>
 
       {result && (
-        <div className={`alert ${result.success ? "alert-success" : "alert-danger"}`}>
+        <div
+          className={`alert ${result.success ? "alert-success" : "alert-danger"}`}
+        >
           {result.message}
         </div>
       )}
@@ -105,8 +155,11 @@ export default function PromoteListingsPage() {
                 value={selectedListing}
                 onChange={(e) => setSelectedListing(e.target.value)}
                 required
+                disabled={loading}
               >
-                <option value="">-- Choose a listing --</option>
+                <option value="">
+                  {loading ? "Loading listings..." : "-- Choose a listing --"}
+                </option>
                 {listings.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.title}
@@ -146,10 +199,15 @@ export default function PromoteListingsPage() {
                 </div>
                 <div
                   className="d-flex justify-content-between fw-bold"
-                  style={{ borderTop: "1px solid #dee2e6", paddingTop: "0.5rem" }}
+                  style={{
+                    borderTop: "1px solid #dee2e6",
+                    paddingTop: "0.5rem",
+                  }}
                 >
                   <span>Amount</span>
-                  <span style={{ color: "var(--primary-color)" }}>{fee} ETB</span>
+                  <span style={{ color: "var(--primary-color)" }}>
+                    {fee} ETB
+                  </span>
                 </div>
               </div>
             )}
@@ -160,7 +218,10 @@ export default function PromoteListingsPage() {
                 <label className="form-label fw-bold">Payment Method</label>
                 <div className="d-flex gap-3">
                   {["Telebirr", "CBE Birr", "Bank Transfer"].map((method) => (
-                    <label key={method} className="d-flex align-items-center gap-2">
+                    <label
+                      key={method}
+                      className="d-flex align-items-center gap-2"
+                    >
                       <input
                         type="radio"
                         name="promoPaymentMethod"
@@ -178,10 +239,14 @@ export default function PromoteListingsPage() {
             {/* ── Screenshot Upload ───────────────────────────────────── */}
             {currentPkg && (
               <div className="mb-3">
-                <label className="form-label fw-bold">Upload Payment Screenshot</label>
+                <label className="form-label fw-bold">
+                  Upload Payment Screenshot
+                </label>
                 <label className="btn btn-outline-danger d-block">
                   <i className="bi bi-upload me-2" />
-                  {screenshot ? screenshot.name : "Choose Screenshot (JPG, PNG)"}
+                  {screenshot
+                    ? screenshot.name
+                    : "Choose Screenshot (JPG, PNG)"}
                   <input
                     type="file"
                     accept=".jpg,.jpeg,.png,image/jpeg,image/png"
@@ -207,8 +272,9 @@ export default function PromoteListingsPage() {
             {currentPkg && (
               <div className="alert alert-info mb-3">
                 <i className="bi bi-info-circle me-2" />
-                After submitting, your promotion request will be reviewed. Status will show as{" "}
-                <strong>Pending Review</strong> until approved by an admin.
+                After submitting, your promotion request will be reviewed.
+                Status will show as <strong>Pending Review</strong> until
+                approved by an admin.
               </div>
             )}
 
@@ -225,4 +291,3 @@ export default function PromoteListingsPage() {
     </main>
   );
 }
-

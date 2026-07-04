@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchPromotionPayments } from "../../services/paymentService.js";
-import { fetchActivePromotions } from "../../services/promotionService.js";
+import { fetchActivePromotions } from "../../services/promotionApiService.js";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 
 export default function AdminPaymentsPage() {
@@ -10,27 +10,65 @@ export default function AdminPaymentsPage() {
   const [revenue, setRevenue] = useState(0);
 
   useEffect(() => {
-    const active = fetchActivePromotions();
-    const payments = fetchPromotionPayments();
-    setFeaturedPayments(active.map(p => ({
-      listingId: p.listingId,
-      title: p.title,
-      packageId: p.packageId,
-      amount: payments.find(pay => pay.listingId === p.listingId)?.amount || 0,
-      date: payments.find(pay => pay.listingId === p.listingId)?.timestamp?.split("T")[0] || "-",
-    })));
-    setPromotionPayments(payments);
-    const total = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-    setRevenue(total);
+    let active = true;
+    async function load() {
+      try {
+        const a = await fetchActivePromotions();
+        const payments = await fetchPromotionPayments();
+        if (!active) return;
+        setFeaturedPayments(
+          (a || []).map((p) => ({
+            listingId: p.listingId,
+            title: p.listingTitle || p.title,
+            packageId: p.packageId,
+            amount:
+              payments.find((pay) => pay.listingId === p.listingId)?.amount ||
+              0,
+            date:
+              payments
+                .find((pay) => pay.listingId === p.listingId)
+                ?.timestamp?.split("T")[0] || "-",
+          })),
+        );
+        setPromotionPayments(payments || []);
+        const total = (payments || []).reduce(
+          (sum, p) => sum + (p.amount || 0),
+          0,
+        );
+        setRevenue(total);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    load();
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
     <div className="admin-payments-page">
       <h2 className="admin-page-title">Payments Management</h2>
       <div className="admin-tabs">
-        <button className={`admin-tab ${activeTab === "featured" ? "active" : ""}`} onClick={() => setActiveTab("featured")}>Featured Listing Payments</button>
-        <button className={`admin-tab ${activeTab === "promotion" ? "active" : ""}`} onClick={() => setActiveTab("promotion")}>Promotion Payments</button>
-        <button className={`admin-tab ${activeTab === "revenue" ? "active" : ""}`} onClick={() => setActiveTab("revenue")}>Promotion Revenue</button>
+        <button
+          className={`admin-tab ${activeTab === "featured" ? "active" : ""}`}
+          onClick={() => setActiveTab("featured")}
+        >
+          Featured Listing Payments
+        </button>
+        <button
+          className={`admin-tab ${activeTab === "promotion" ? "active" : ""}`}
+          onClick={() => setActiveTab("promotion")}
+        >
+          Promotion Payments
+        </button>
+        <button
+          className={`admin-tab ${activeTab === "revenue" ? "active" : ""}`}
+          onClick={() => setActiveTab("revenue")}
+        >
+          Promotion Revenue
+        </button>
       </div>
 
       {activeTab === "featured" && (
@@ -45,7 +83,7 @@ export default function AdminPaymentsPage() {
               </tr>
             </thead>
             <tbody>
-              {featuredPayments.map(p => (
+              {featuredPayments.map((p) => (
                 <tr key={p.listingId}>
                   <td>{p.title}</td>
                   <td>{p.packageId}</td>
@@ -71,12 +109,14 @@ export default function AdminPaymentsPage() {
               </tr>
             </thead>
             <tbody>
-              {promotionPayments.map(p => (
+              {promotionPayments.map((p) => (
                 <tr key={p.transactionId}>
                   <td>{p.listingId}</td>
                   <td>{p.packageId}</td>
                   <td>{p.amount}</td>
-                  <td><StatusBadge status={p.success ? "success" : "failed"} /></td>
+                  <td>
+                    <StatusBadge status={p.success ? "success" : "failed"} />
+                  </td>
                   <td>{p.timestamp?.split("T")[0] || "-"}</td>
                 </tr>
               ))}

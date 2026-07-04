@@ -9,7 +9,7 @@ import StatusBadge from "../../components/common/StatusBadge.jsx";
 import {
   fetchOwnerPromotions,
   requestPromotion,
-} from "../../services/promotionService.js";
+} from "../../services/promotionApiService.js";
 
 const promotionPackages = [
   {
@@ -40,6 +40,7 @@ export default function MyListingsPage() {
   const [listings, setListings] = useState([]);
   const [isLoadingListings, setIsLoadingListings] = useState(true);
   const [ownerBookings, setOwnerBookings] = useState([]);
+  const [ownerPromotions, setOwnerPromotions] = useState([]);
   const [notice, setNotice] = useState("");
   const [promotionListing, setPromotionListing] = useState(null);
   const [selectedPromotionPackage, setSelectedPromotionPackage] = useState(1);
@@ -130,11 +131,34 @@ export default function MyListingsPage() {
     };
   }, [activeUser, refresh]);
 
-  const ownerPromotions = useMemo(() => {
-    if (!activeUser) return [];
-    return fetchOwnerPromotions(
-      activeUser.id || activeUser.name || activeUser.businessName,
-    );
+  useEffect(() => {
+    let active = true;
+
+    async function loadOwnerPromotions() {
+      if (!activeUser) {
+        setOwnerPromotions([]);
+        return;
+      }
+
+      try {
+        const data = await fetchOwnerPromotions(
+          activeUser.id || activeUser.name || activeUser.businessName,
+        );
+        if (active) {
+          setOwnerPromotions(data);
+        }
+      } catch {
+        if (active) {
+          setOwnerPromotions([]);
+        }
+      }
+    }
+
+    loadOwnerPromotions();
+
+    return () => {
+      active = false;
+    };
   }, [activeUser, refresh]);
 
   const getFilteredItems = () => {
@@ -191,6 +215,7 @@ export default function MyListingsPage() {
     setPromotionScreenshot({
       name: file.name,
       preview,
+      file,
     });
   }
 
@@ -231,6 +256,7 @@ export default function MyListingsPage() {
     );
     setPromotionListing(null);
     setPromotionScreenshot(null);
+    setRefresh((value) => value + 1);
   }
 
   return (

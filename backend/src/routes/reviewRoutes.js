@@ -1,10 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const auth = require('../middleware/auth');
-const controller = require('../controllers/reviewController');
-const { validateReview } = require('../validators/reviewValidator');
+const auth = require("../middleware/auth");
+const controller = require("../controllers/reviewController");
+const { validateReview } = require("../validators/reviewValidator");
 
-router.get('/listing/:listingId', controller.listByListing);
-router.post('/', auth, validateReview, controller.create);
+router.get("/my", auth, controller.listMine);
+router.get("/:listingId", controller.listByListing);
+router.post("/", auth, validateReview, controller.create);
 
 module.exports = router;
+

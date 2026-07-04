@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { hasReviewForBooking } from "../../services/bookingService.js";
 import { getMyBookings } from "../../services/bookingApiService.js";
+import { getReviewsByListings } from "../../services/reviewApiService.js";
 import LeaveReviewModal from "../../components/reviews/LeaveReviewModal.jsx";
 
 const STATUS_LABELS = {
@@ -44,6 +44,7 @@ export default function MyBookingsPage() {
     location.state?.successMessage || "",
   );
   const [bookings, setBookings] = useState([]);
+  const [reviewsByListing, setReviewsByListing] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,7 +65,21 @@ export default function MyBookingsPage() {
             String(booking.renterId || booking.userId || "") ===
             String(activeUser.id),
         );
-        if (active) setBookings(renterBookings);
+
+        const completedListingIds = renterBookings
+          .filter(
+            (booking) =>
+              String(booking.status || "").toUpperCase() === "COMPLETED",
+          )
+          .map((booking) => booking.listingId || booking.itemId)
+          .filter(Boolean);
+
+        const listingReviews = await getReviewsByListings(completedListingIds);
+
+        if (active) {
+          setBookings(renterBookings);
+          setReviewsByListing(listingReviews);
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -99,6 +114,18 @@ export default function MyBookingsPage() {
   };
 
   const filtered = getFilteredBookings();
+
+  function hasReviewForBooking(booking) {
+    const listingId = booking.listingId || booking.itemId;
+    const bookingReviews = reviewsByListing[String(listingId)] || [];
+
+    return bookingReviews.some(
+      (review) =>
+        String(review.bookingId || "") === String(booking.id) &&
+        String(review.reviewerId || review.userId || "") ===
+          String(activeUser?.id || ""),
+    );
+  }
 
   if (loading) {
     return <div className="dashboard-content">Loading bookings...</div>;
@@ -197,7 +224,7 @@ export default function MyBookingsPage() {
               ] || STATUS_LABELS.PENDING;
             const isCompleted =
               String(booking.status || "").toUpperCase() === "COMPLETED";
-            const alreadyReviewed = hasReviewForBooking(booking.id);
+            const alreadyReviewed = hasReviewForBooking(booking);
 
             return (
               <div className="col-12" key={booking.id}>

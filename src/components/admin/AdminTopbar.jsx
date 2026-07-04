@@ -3,7 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { useTheme } from "../../context/ThemeContext.jsx";
-import { fetchNotifications } from "../../services/notificationService.js";
+import {
+  fetchNotifications,
+  markNotificationRead,
+} from "../../services/notificationService.js";
 import { getInitials } from "../../utils/user.js";
 
 const LANGUAGES = [
@@ -231,6 +234,8 @@ export default function AdminTopbar({ title }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const menuRef = useRef(null);
 
   const currentLanguage = useMemo(
@@ -246,6 +251,7 @@ export default function AdminTopbar({ title }) {
         () => [],
       );
       if (!active) return;
+      setNotifications((notifications || []).slice(0, 5));
       setUnreadCount(
         (notifications || []).filter((notification) => !notification.isRead)
           .length,
@@ -273,6 +279,7 @@ export default function AdminTopbar({ title }) {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuOpen(false);
+        setNotificationMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -311,6 +318,14 @@ export default function AdminTopbar({ title }) {
 
   const handleProfileClick = () => {
     navigate("/profile");
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification.isRead) {
+      await markNotificationRead(notification.id).catch(() => null);
+    }
+    setNotificationMenuOpen(false);
+    navigate(notificationsPath);
   };
 
   return (
@@ -400,13 +415,66 @@ export default function AdminTopbar({ title }) {
           className="admin-icon-button admin-notification-button"
           type="button"
           title="Notifications"
-          onClick={() => navigate(notificationsPath)}
+          onClick={() => {
+            setMenuOpen(false);
+            setNotificationMenuOpen((open) => !open);
+          }}
         >
           <i className="bi bi-bell" />
           {unreadCount > 0 && (
             <span>{unreadCount > 99 ? "99+" : unreadCount}</span>
           )}
         </button>
+
+        {notificationMenuOpen && (
+          <div
+            className="admin-profile-menu"
+            style={{ minWidth: "340px", maxWidth: "420px", right: "140px" }}
+          >
+            <div className="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+              <strong>Notifications</strong>
+              <span className="text-muted small">{unreadCount} unread</span>
+            </div>
+            <div style={{ maxHeight: "320px", overflowY: "auto" }}>
+              {notifications.length === 0 ? (
+                <div className="px-3 py-4 text-center text-muted">
+                  No notifications yet.
+                </div>
+              ) : (
+                notifications.map((notification) => (
+                  <button
+                    key={notification.id}
+                    type="button"
+                    className={`dropdown-item text-start py-3 ${notification.isRead ? "" : "fw-bold"}`}
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <div className="d-flex justify-content-between gap-3">
+                      <span>{notification.title}</span>
+                      <small className="text-muted">
+                        {new Date(notification.createdAt).toLocaleDateString()}
+                      </small>
+                    </div>
+                    <div className="text-muted small mt-1">
+                      {notification.body}
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="px-3 py-2 border-top">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-danger w-100"
+                onClick={() => {
+                  setNotificationMenuOpen(false);
+                  navigate(notificationsPath);
+                }}
+              >
+                View all notifications
+              </button>
+            </div>
+          </div>
+        )}
 
         <button
           className="admin-profile-button"

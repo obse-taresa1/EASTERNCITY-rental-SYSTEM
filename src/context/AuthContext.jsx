@@ -10,17 +10,26 @@ import {
   registerUser,
 } from "../services/authService.js";
 
+const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUserState] = useState(() => getCurrentUser());
   const [tokens, setTokens] = useState(() => getAuthTokens());
   const [isAuthReady, setIsAuthReady] = useState(
-    () => !getAuthTokens().accessToken,
+    () => useMockAuth || !getAuthTokens().accessToken,
   );
 
   useEffect(() => {
     let isMounted = true;
+
+    if (useMockAuth) {
+      setIsAuthReady(true);
+      return () => {
+        isMounted = false;
+      };
+    }
 
     const { accessToken } = getAuthTokens();
 

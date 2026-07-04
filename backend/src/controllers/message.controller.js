@@ -1,12 +1,8 @@
-const repository = require("../repositories/message.repository");
+const service = require("../services/message.service");
 
 async function sendMessage(req, res, next) {
   try {
-    const data = await repository.create({
-      conversationId: req.body.conversationId,
-      senderId: req.user.id,
-      body: req.body.body,
-    });
+    const data = await service.sendMessage(req.user.id, req.body);
 
     res.status(201).json({
       success: true,
@@ -20,12 +16,10 @@ async function sendMessage(req, res, next) {
 
 async function getConversationMessages(req, res, next) {
   try {
-    await repository.markConversationMessagesRead(
-      req.params.conversationId,
+    const data = await service.getConversationMessages(
       req.user.id,
+      req.params.conversationId
     );
-
-    const data = await repository.findByConversation(req.params.conversationId);
 
     res.json({
       success: true,
@@ -36,7 +30,18 @@ async function getConversationMessages(req, res, next) {
   }
 }
 
+async function getInbox(req, res, next) {
+  try {
+    const data = await service.getInbox(req.user.id);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   sendMessage,
   getConversationMessages,
+  getInbox,
 };
+
