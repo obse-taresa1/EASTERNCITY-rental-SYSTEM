@@ -1,0 +1,31 @@
+export const promotionPackages = [
+  {
+    id: 1,
+    name: "Featured Listing",
+    label: "Featured Listing",
+    badge: true,
+    placement: "featured",
+    days: 3,
+    amount: 100,
+  },
+  {
+    id: 2,
+    name: "Top Listing",
+    label: "Top Listing",
+    badge: true,
+    topSearch: true,
+    placement: "top-listing",
+    days: 7,
+    amount: 200,
+  },
+  {
+    id: 3,
+    name: "Homepage Banner",
+    label: "Homepage Banner",
+    badge: true,
+    homepage: true,
+    placement: "homepage-banner",
+    days: 30,
+    amount: 500,
+  },
+];

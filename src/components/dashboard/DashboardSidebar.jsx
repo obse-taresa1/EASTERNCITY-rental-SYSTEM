@@ -1,0 +1,163 @@
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
+import {
+  getBookingsByUser,
+  getReviewsByUser,
+} from "../../services/bookingService.js";
+import { getStorageItem } from "../../services/storageService.js";
+
+function getInitials(name) {
+  if (!name) return "U";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+}
+
+const NAV_SECTIONS = [
+  {
+    label: "OVERVIEW",
+    items: [
+      { to: "/dashboard", label: "Dashboard", icon: "bi-speedometer2", end: true },
+    ],
+  },
+  {
+    label: "LISTINGS",
+    items: [
+      { to: "/my-listings", label: "My Listings", icon: "bi-card-checklist" },
+      { to: "/list-item", label: "Add New Listing", icon: "bi-plus-circle-fill", accent: true },
+    ],
+  },
+  {
+    label: "ACTIVITY",
+    items: [
+      { to: "/my-bookings", label: "My Bookings", icon: "bi-calendar-check" },
+      { to: "/messages", label: "Messages", icon: "bi-chat-dots" },
+      { to: "/saved-items", label: "Saved Items", icon: "bi-heart" },
+    ],
+  },
+  {
+    label: "ACCOUNT",
+    items: [
+      { to: "/reviews", label: "Reviews & Ratings", icon: "bi-star" },
+      { to: "/verification", label: "Verification Center", icon: "bi-shield-check" },
+      { to: "/dashboard-settings", label: "Settings", icon: "bi-gear" },
+      { to: "/help-center", label: "Help Center", icon: "bi-question-circle" },
+    ],
+  },
+];
+
+export default function DashboardSidebar() {
+  const { currentUser, user, logout } = useAuth();
+  const { language } = useLanguage();
+  const navigate = useNavigate();
+  const activeUser = user || currentUser;
+
+  const memberSince = activeUser?.createdAt
+    ? new Date(activeUser.createdAt).getFullYear()
+    : new Date().getFullYear();
+
+  const bookings = activeUser ? getBookingsByUser(activeUser.id) : [];
+  const activeBookings = bookings.filter((b) =>
+    ["PENDING", "ACCEPTED", "ACTIVE"].includes(String(b.status || "").toUpperCase()),
+  ).length;
+  const reviews = activeUser ? getReviewsByUser(activeUser.id).length : 0;
+  const savedItems = getStorageItem("saved_items", []).length;
+
+  const isVerified = String(activeUser?.verificationStatus || "")
+    .toLowerCase()
+    .includes("verified");
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
+
+  return (
+    <aside className="ud-sidebar">
+      {/* Profile Card */}
+      <div className="ud-sidebar-profile">
+        <div className="ud-sidebar-avatar">
+          {activeUser?.profileImage ? (
+            <img src={activeUser.profileImage} alt="Profile" />
+          ) : (
+            <span>{getInitials(activeUser?.name)}</span>
+          )}
+          <span
+            className={`ud-avatar-badge ${isVerified ? "ud-badge-verified" : "ud-badge-pending"}`}
+            title={isVerified ? "Verified" : "Pending"}
+          >
+            <i className={`bi ${isVerified ? "bi-check-lg" : "bi-clock"}`} />
+          </span>
+        </div>
+
+        <div className="ud-sidebar-user-info">
+          <h5 className="ud-sidebar-name">{activeUser?.name || "EasternCity User"}</h5>
+          <span className={`ud-verification-tag ${isVerified ? "verified" : "pending"}`}> 
+            <i className={`bi ${isVerified ? "bi-shield-check" : "bi-shield-exclamation"}`} />
+            {activeUser?.verificationStatus || "Pending Verification"}
+          </span>
+          <div className="ud-sidebar-meta">
+            <span>
+              <i className="bi bi-geo-alt" />
+              {activeUser?.city || "Jigjiga"}
+            </span>
+            <span>
+              <i className="bi bi-calendar3" />
+              Since {memberSince}
+            </span>
+          </div>
+        </div>
+
+        <div className="ud-sidebar-mini-stats">
+          <div className="ud-mini-stat">
+            <strong>{activeBookings}</strong>
+            <span>Bookings</span>
+          </div>
+          <div className="ud-mini-stat">
+            <strong>{savedItems}</strong>
+            <span>Saved</span>
+          </div>
+          <div className="ud-mini-stat">
+            <strong>{reviews}</strong>
+            <span>Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="ud-sidebar-nav">
+        {NAV_SECTIONS.map((section) => (
+          <div className="ud-nav-section" key={section.label}>
+            <span className="ud-nav-section-label">{section.label}</span>
+            {section.items.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  `ud-nav-link${isActive ? " ud-nav-link--active" : ""}${item.accent ? " ud-nav-link--accent" : ""}`
+                }
+              >
+                <i className={`bi ${item.icon}`} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        ))}
+      </nav>
+
+      {/* Logout */}
+      <div className="ud-sidebar-footer">
+        <button type="button" className="ud-logout-btn" onClick={handleLogout}>
+          <i className="bi bi-box-arrow-right" />
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
