@@ -5,6 +5,7 @@ const userSelect = {
   name: true,
   email: true,
   role: true,
+  status: true,
   createdAt: true,
 };
 

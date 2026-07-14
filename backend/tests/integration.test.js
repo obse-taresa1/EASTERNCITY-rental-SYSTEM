@@ -185,6 +185,24 @@ test('core rental marketplace backend flow works against configured database', a
   });
   assert.equal(listing.status, 'PENDING');
 
+  const slugListingForm = new FormData();
+  slugListingForm.append('title', `Integration Slug Listing ${stamp}`);
+  slugListingForm.append('description', 'Integration slug listing description');
+  slugListingForm.append('categorySlug', `integration-slug-category-${stamp}`);
+  slugListingForm.append('categoryName', `Integration Slug Category ${stamp}`);
+  slugListingForm.append('city', 'Jigjiga');
+  slugListingForm.append('location', 'City Center');
+  slugListingForm.append('pricePerDay', '750');
+  slugListingForm.append('paymentMethod', 'Telebirr');
+  slugListingForm.append('paymentProof', new Blob(['proof'], { type: 'image/png' }), 'slug-proof.png');
+
+  const slugListing = await api(base, 'POST', '/api/listings', {
+    token: ownerLogin.accessToken,
+    form: slugListingForm,
+  });
+  assert.equal(slugListing.status, 'PENDING');
+  assert.equal(slugListing.category.slug, `integration-slug-category-${stamp}`);
+
   const approvedListing = await api(base, 'PATCH', `/api/listings/${listing.id}/approve`, {
     token: adminLogin.accessToken,
   });

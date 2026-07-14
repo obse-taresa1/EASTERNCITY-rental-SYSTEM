@@ -1,28 +1,63 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { deleteUser, getUsers, updateUser } from "../../services/userApiService.js";
 
-const initialUsers = [
-  { id: "u-1", name: "Almaz Belay", email: "almaz@example.com", city: "Jigjiga", date: "2026-05-12", status: "active" },
-  { id: "u-2", name: "Yonas Kassa", email: "yonas@example.com", city: "Dire Dawa", date: "2026-05-18", status: "suspended" },
-  { id: "u-3", name: "Fatuma Mohammed", email: "fatuma@example.com", city: "Harar", date: "2026-06-01", status: "active" },
-  { id: "u-4", name: "Kebede Alemu", email: "kebede@example.com", city: "Jigjiga", date: "2026-06-10", status: "active" },
-  { id: "u-5", name: "Selamawit Girma", email: "selam@example.com", city: "Dire Dawa", date: "2026-06-15", status: "suspended" },
-];
+function formatDate(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+}
 
 export default function UserManagementPage() {
-  const [usersList, setUsersList] = useState(initialUsers);
+  const [usersList, setUsersList] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState("");
 
-  const handleStatusChange = (id, newStatus) => {
-    setUsersList(prev =>
-      prev.map(u => (u.id === id ? { ...u, status: newStatus } : u))
-    );
+  useEffect(() => {
+    let active = true;
+
+    async function loadUsers() {
+      setLoading(true);
+      setNotice("");
+      try {
+        const users = await getUsers();
+        if (active) setUsersList(users);
+      } catch (error) {
+        if (active) setNotice(error.message || "Unable to load users.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadUsers();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleStatusChange = async (id, newStatus) => {
+    setNotice("");
+    try {
+      const updated = await updateUser(id, { status: newStatus.toUpperCase() });
+      setUsersList(prev =>
+        prev.map(u => (u.id === id ? { ...u, ...updated } : u))
+      );
+    } catch (error) {
+      setNotice(error.message || "Unable to update user status.");
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this user?")) {
-      setUsersList(prev => prev.filter(u => u.id !== id));
+      setNotice("");
+      try {
+        await deleteUser(id);
+        setUsersList(prev => prev.filter(u => u.id !== id));
+      } catch (error) {
+        setNotice(error.message || "Unable to delete user.");
+      }
     }
   };
 
@@ -30,7 +65,7 @@ export default function UserManagementPage() {
     const matchesSearch =
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase()) ||
-      u.city.toLowerCase().includes(search.toLowerCase());
+      String(u.city || "").toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === "all" || u.status === filter;
     return matchesSearch && matchesFilter;
   });
@@ -46,6 +81,7 @@ export default function UserManagementPage() {
       </div>
 
       <div className="admin-table-container">
+        {notice && <div className="alert alert-warning">{notice}</div>}
         <div className="d-flex flex-wrap justify-content-between gap-3 mb-4">
           <div className="d-flex gap-2">
             {["all", "active", "suspended"].map(status => (
@@ -87,8 +123,8 @@ export default function UserManagementPage() {
                 <tr key={u.id}>
                   <td className="fw-bold">{u.name}</td>
                   <td>{u.email}</td>
-                  <td>{u.city}</td>
-                  <td>{u.date}</td>
+                  <td>{u.city || "-"}</td>
+                  <td>{formatDate(u.createdAt || u.date)}</td>
                   <td>
                     <StatusBadge status={u.status} />
                   </td>
@@ -125,7 +161,7 @@ export default function UserManagementPage() {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan="6" className="text-center text-muted py-4">
-                    No users found matching criteria.
+                    {loading ? "Loading users..." : "No users found matching criteria."}
                   </td>
                 </tr>
               )}

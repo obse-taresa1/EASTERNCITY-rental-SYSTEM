@@ -1,7 +1,22 @@
 const prisma = require('../config/db');
 
 function findMany() {
-  return prisma.category.findMany({ orderBy: { name: 'asc' } });
+  return prisma.category.findMany({
+    orderBy: { name: 'asc' },
+    include: {
+      _count: {
+        select: { listings: true },
+      },
+    },
+  });
+}
+
+function findById(id) {
+  return prisma.category.findUnique({ where: { id } });
+}
+
+function findBySlug(slug) {
+  return prisma.category.findUnique({ where: { slug } });
 }
 
 function create(data) {
@@ -18,6 +33,8 @@ function remove(id) {
 
 module.exports = {
   findMany,
+  findById,
+  findBySlug,
   create,
   update,
   remove,

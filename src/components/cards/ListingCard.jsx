@@ -3,6 +3,7 @@ import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
 import { getPromotionLabel } from "../../services/itemService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
+import fallbackListingImage from "../../assets/images/pc.png";
 
 export default function ListingCard({ item }) {
   const { t } = useLanguage();
@@ -21,6 +22,7 @@ export default function ListingCard({ item }) {
     { icon: "bi-clock", label: t("perDay") },
   ];
   const categoryName =
+    item.categoryName ||
     categories.find((category) => category.id === item.category)?.name ||
     item.category;
 
@@ -28,7 +30,7 @@ export default function ListingCard({ item }) {
     <article className="premium-glass-card listing-card-premium">
       <div className="card-img-wrapper">
         <img
-          src={item.image}
+          src={item.image || item.coverImage || fallbackListingImage}
           alt={item.imageAlt || item.title}
           className="card-img"
         />

@@ -1,11 +1,13 @@
-import { getStorageItem } from "./storageService.js";
+import { readStorage } from "./storageService.js";
 
 const API_BASE_URL =
-  import.meta.env?.VITE_API_BASE_URL || "http://localhost:5000";
+  import.meta.env?.VITE_API_BASE_URL ||
+  import.meta.env?.VITE_API_URL ||
+  "http://localhost:5000";
 
 function buildHeaders(body, headers = {}) {
   const token =
-    getStorageItem("token", null) || getStorageItem("accessToken", null);
+    readStorage("token", null) || readStorage("accessToken", null);
   const nextHeaders = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...headers,

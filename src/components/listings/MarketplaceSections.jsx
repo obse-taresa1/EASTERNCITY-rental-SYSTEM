@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import ListingCard from "../cards/ListingCard.jsx";
-import { homeListings } from "../../data/homeListings.js";
 import {
-  getAllItems,
   getPromotionPlacement,
   sortPromotedListingsFirst,
 } from "../../services/itemService.js";
@@ -82,18 +80,13 @@ export default function MarketplaceSections() {
   const [promotions, setPromotions] = useState([]);
   const marketplaceListings = useMemo(() => {
     const savedById = new Map(savedListings.map((item) => [item.id, item]));
-    const merged = savedListings.length
-      ? [...savedById.values()]
-      : [
-          ...savedById.values(),
-          ...homeListings.filter((item) => !savedById.has(item.id)),
-        ];
+    const merged = [...savedById.values()];
     return sortPromotedListingsFirst(
       merged.filter(
         (item) =>
-          !["draft", "rejected", "expired", "pending"].includes(
+          ["approved", "active", "featured"].includes(
             String(item.status || "").toLowerCase(),
-          ),
+          ) || item.featured,
       ),
     );
   }, [savedListings]);
@@ -108,7 +101,7 @@ export default function MarketplaceSections() {
       const data = await getPublicListings();
       setSavedListings(data || []);
     } catch {
-      setSavedListings(getAllItems());
+      setSavedListings([]);
     }
   }
 

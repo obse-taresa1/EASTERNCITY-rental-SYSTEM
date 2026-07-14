@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
+const path = require('path');
 const apiRoutes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
 const auditLogger = require('./middleware/auditLogger');
@@ -13,12 +14,26 @@ dotenv.config();
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+);
 
-const corsAllowlist = (process.env.CORS_ORIGIN || process.env.CORS_ORIGINS || 'http://localhost:5173')
+const defaultCorsOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+];
+
+const corsAllowlist = [
+  ...(process.env.CORS_ORIGIN || process.env.CORS_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim())
-  .filter(Boolean);
+    .filter(Boolean),
+  ...defaultCorsOrigins,
+];
 
 app.use(cors({
   origin(origin, callback) {
@@ -29,6 +44,7 @@ app.use(cors({
   },
 }));
 app.use(express.json({ limit: '1mb' }));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use(rateLimit());
 app.use(auditLogger);
 

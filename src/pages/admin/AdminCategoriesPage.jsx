@@ -1,48 +1,89 @@
-import { useState } from "react";
-
-const initialCategories = [
-  { id: "cat-1", name: "Vehicles", slug: "vehicles", listingsCount: 24, activeRentals: 8 },
-  { id: "cat-2", name: "Electronics & Cameras", slug: "electronics-cameras", listingsCount: 42, activeRentals: 15 },
-  { id: "cat-3", name: "Construction & DIY Tools", slug: "construction-diy", listingsCount: 19, activeRentals: 4 },
-  { id: "cat-4", name: "Furniture & Decor", slug: "furniture-decor", listingsCount: 31, activeRentals: 11 },
-];
+import { useEffect, useState } from "react";
+import {
+  createCategory,
+  deleteCategory,
+  fetchCategories,
+  updateCategory,
+} from "../../services/categoryApiService.js";
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState([]);
   const [editingCategory, setEditingCategory] = useState(null);
   const [newCatName, setNewCatName] = useState("");
   const [newCatSlug, setNewCatSlug] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState("");
 
-  const handleAdd = (e) => {
+  useEffect(() => {
+    let active = true;
+
+    async function loadCategories() {
+      setLoading(true);
+      setNotice("");
+      try {
+        const data = await fetchCategories();
+        if (active) setCategories(data);
+      } catch (error) {
+        if (active) setNotice(error.message || "Unable to load categories.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadCategories();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newCatName || !newCatSlug) return;
-    
-    const newCat = {
-      id: `cat-${Date.now()}`,
+
+    setNotice("");
+    try {
+      const newCat = await createCategory({
       name: newCatName,
       slug: newCatSlug,
-      listingsCount: 0,
-      activeRentals: 0,
-    };
-    
-    setCategories(prev => [...prev, newCat]);
-    setNewCatName("");
-    setNewCatSlug("");
-    setIsAdding(false);
+      });
+
+      setCategories(prev => [...prev, newCat].sort((a, b) => a.name.localeCompare(b.name)));
+      setNewCatName("");
+      setNewCatSlug("");
+      setIsAdding(false);
+    } catch (error) {
+      setNotice(error.message || "Unable to add category.");
+    }
   };
 
-  const handleSaveEdit = (e) => {
+  const handleSaveEdit = async (e) => {
     e.preventDefault();
-    setCategories(prev =>
-      prev.map(c => (c.id === editingCategory.id ? editingCategory : c))
-    );
-    setEditingCategory(null);
+    setNotice("");
+    try {
+      const updated = await updateCategory(editingCategory.id, {
+        name: editingCategory.name,
+        slug: editingCategory.slug,
+        description: editingCategory.description || "",
+      });
+      setCategories(prev =>
+        prev.map(c => (c.id === editingCategory.id ? { ...c, ...updated } : c))
+      );
+      setEditingCategory(null);
+    } catch (error) {
+      setNotice(error.message || "Unable to update category.");
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this category? All listings in this category might be affected.")) {
-      setCategories(prev => prev.filter(c => c.id !== id));
+      setNotice("");
+      try {
+        await deleteCategory(id);
+        setCategories(prev => prev.filter(c => c.id !== id));
+      } catch (error) {
+        setNotice(error.message || "Unable to delete category.");
+      }
     }
   };
 
@@ -66,6 +107,7 @@ export default function AdminCategoriesPage() {
       <div className="row mb-4">
         <div className="col-12">
           <div className="admin-table-container">
+            {notice && <div className="alert alert-warning">{notice}</div>}
             <h2 className="h5 mb-3">Category Statistics</h2>
             <div className="table-responsive">
               <table className="table table-hover align-middle">
@@ -105,6 +147,13 @@ export default function AdminCategoriesPage() {
                       </td>
                     </tr>
                   ))}
+                  {categories.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="text-center text-muted py-4">
+                        {loading ? "Loading categories..." : "No categories found."}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

@@ -5,6 +5,7 @@ function normalizeUser(user) {
   return {
     ...user,
     role: String(user.role || "USER").toUpperCase(),
+    status: String(user.status || "ACTIVE").toLowerCase(),
   };
 }
 
