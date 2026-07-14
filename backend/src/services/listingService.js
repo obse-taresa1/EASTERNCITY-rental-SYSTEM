@@ -1,4 +1,5 @@
 const listingRepository = require("../repositories/listingRepository");
+const categoryRepository = require("../repositories/categoryRepository");
 const notificationService = require("./notificationService");
 
 function ensureOwnerOrAdmin(user, listing) {
@@ -45,6 +46,33 @@ function toListingData(listing) {
   };
 }
 
+async function resolveCategoryId(payload) {
+  if (payload.categoryId) {
+    const category = await categoryRepository.findById(payload.categoryId);
+    if (!category) {
+      const error = new Error("Category not found.");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    return category.id;
+  }
+
+  const slug = String(payload.categorySlug || "").trim();
+  if (!slug) return null;
+
+  const existingCategory = await categoryRepository.findBySlug(slug);
+  if (existingCategory) return existingCategory.id;
+
+  const createdCategory = await categoryRepository.create({
+    name: payload.categoryName || slug,
+    slug,
+    description: "",
+  });
+
+  return createdCategory.id;
+}
+
 async function listPublic(query) {
   return listingRepository.findPublic({
     orderBy: {
@@ -84,11 +112,12 @@ async function getById(id) {
 async function create(ownerId, payload, files) {
   const uploadedFiles = getUploadedFiles(files);
   const paymentProofFile = uploadedFiles.paymentProof[0] || null;
+  const categoryId = await resolveCategoryId(payload);
 
   return listingRepository.create({
     title: payload.title,
     description: payload.description,
-    categoryId: payload.categoryId,
+    categoryId,
     ownerId,
     city: payload.city,
     location: payload.location,

@@ -1,6 +1,12 @@
 import { apiClient } from "./apiClient.js";
 import { getMyListings } from "./listingApiService.js";
 
+const PLACEMENT_BY_PACKAGE = {
+  1: "FEATURED",
+  2: "TOP_LISTING",
+  3: "HOME_BANNER",
+};
+
 function normalizeStatus(status) {
   const value = String(status || "pending").toLowerCase();
   if (value === "approved") return "Approved";
@@ -71,7 +77,10 @@ export async function requestPromotion(
     "packageType",
     metadata.packageName || metadata.promotionType || "Promotion Package",
   );
-  formData.append("placement", metadata.promotionPlacement || "featured");
+  formData.append(
+    "placement",
+    metadata.promotionPlacement || PLACEMENT_BY_PACKAGE[Number(packageId)] || "FEATURED",
+  );
   formData.append("amount", String(metadata.amount || 0));
   formData.append("paymentType", metadata.paymentMethod || "PROMOTION_FEE");
 
@@ -80,6 +89,9 @@ export async function requestPromotion(
   }
 
   const data = await apiClient.post("/api/promotions", formData);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("easterncity:promotions-updated"));
+  }
   return normalizePromotion(data);
 }
 
@@ -105,6 +117,10 @@ export async function fetchOwnerPromotions(ownerId) {
 
 export async function approvePromotionRequest(id) {
   const data = await apiClient.patch(`/api/promotions/${id}/approve`);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("easterncity:promotions-updated"));
+    window.dispatchEvent(new Event("easterncity:listings-updated"));
+  }
   return normalizePromotion(data);
 }
 
@@ -112,6 +128,9 @@ export async function rejectPromotionRequest(id) {
   const data = await apiClient.patch(`/api/promotions/${id}/reject`, {
     reason: "Rejected by admin.",
   });
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("easterncity:promotions-updated"));
+  }
   return normalizePromotion(data);
 }
 

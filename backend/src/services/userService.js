@@ -13,6 +13,7 @@ const getAllUsers = async () => {
       name: true,
       email: true,
       role: true,
+      status: true,
       createdAt: true,
     },
   });
@@ -31,6 +32,7 @@ const getUserById = async (id) => {
       name: true,
       email: true,
       role: true,
+      status: true,
       createdAt: true,
     },
   });
@@ -79,6 +81,7 @@ const updateUser = async (id, updateData) => {
       name: true,
       email: true,
       role: true,
+      status: true,
       createdAt: true,
     },
   });
@@ -99,6 +102,7 @@ const deleteUser = async (id) => {
       name: true,
       email: true,
       role: true,
+      status: true,
     },
   });
 };
@@ -126,6 +130,7 @@ const createAdminUser = async ({ name, email, password, role }) => {
       name: true,
       email: true,
       role: true,
+      status: true,
       createdAt: true,
     },
   });

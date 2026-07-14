@@ -192,10 +192,6 @@ export default function MyListingsPage() {
   const filteredItems = getFilteredItems();
 
   function handlePromote(item) {
-    if (!String(item.id || "").startsWith("owner-listing-")) {
-      setNotice(`${item.title} already demonstrates the promotion workflow.`);
-      return;
-    }
     setPromotionListing(item);
     setSelectedPromotionPackage(1);
     setSelectedPromotionDuration(7);

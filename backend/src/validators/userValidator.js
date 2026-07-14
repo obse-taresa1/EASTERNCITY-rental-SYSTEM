@@ -6,6 +6,7 @@ const updateUserSchema = z.object({
   name: z.string().trim().min(1, 'Name is required.').optional(),
   email: z.string().email('A valid email is required.').trim().toLowerCase().optional(),
   password: z.string().min(6, 'Password must be at least 6 characters long.').optional(),
+  status: z.enum(['ACTIVE', 'SUSPENDED']).optional(),
 }).strict({ message: 'Cannot update restricted fields.' });
 
 const createAdminSchema = z.object({

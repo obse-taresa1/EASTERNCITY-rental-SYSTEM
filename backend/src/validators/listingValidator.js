@@ -10,7 +10,9 @@ function rejectWithCleanup(req, res, message) {
 const createListingSchema = z.object({
   title: z.string().trim().min(1, 'title is required.'),
   description: z.string().trim().min(1, 'description is required.'),
-  categoryId: z.string().uuid('categoryId is required.'),
+  categoryId: z.string().uuid('categoryId must be a valid category id.').optional(),
+  categorySlug: z.string().trim().min(1).optional(),
+  categoryName: z.string().trim().min(1).optional(),
   city: z.string().trim().min(1, 'city is required.'),
   location: z.string().trim().min(1, 'location is required.'),
   pricePerDay: z.coerce.number().positive('pricePerDay must be greater than 0.'),
@@ -35,6 +37,10 @@ function validateCreateListing(req, res, next) {
   }
 
   req.body = result.data;
+
+  if (!req.body.categoryId && !req.body.categorySlug) {
+    return rejectWithCleanup(req, res, 'category is required.');
+  }
 
   const status = String(req.body.status || 'PENDING').toUpperCase();
   const paymentFiles = req.files?.paymentProof || [];
