@@ -47,6 +47,8 @@ export default function ItemDetailsPage() {
   );
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactError, setContactError] = useState("");
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -128,6 +130,8 @@ export default function ItemDetailsPage() {
     : "New";
 
   async function handleContactOwner() {
+    setContactError("");
+
     if (!activeUser) {
       const { setStorageItem } =
         await import("../../services/storageService.js");
@@ -141,11 +145,18 @@ export default function ItemDetailsPage() {
       return;
     }
 
-    const conversation = await startListingConversation({
-      renter: activeUser,
-      item,
-    });
-    navigate(`/messages?conversation=${conversation.id}`);
+    setContactLoading(true);
+    try {
+      const conversation = await startListingConversation({
+        renter: activeUser,
+        item,
+      });
+      navigate(`/messages?conversation=${conversation.id}`);
+    } catch (error) {
+      setContactError(error.message || "Could not open a conversation.");
+    } finally {
+      setContactLoading(false);
+    }
   }
 
   return (
@@ -202,9 +213,16 @@ export default function ItemDetailsPage() {
               type="button"
               className="btn btn-outline-danger details-contact-button"
               onClick={handleContactOwner}
+              disabled={contactLoading}
             >
-              <i className="bi bi-chat-dots"></i> Contact Owner
+              <i className="bi bi-chat-dots"></i>{" "}
+              {contactLoading ? "Opening..." : "Contact Owner"}
             </button>
+            {contactError && (
+              <div className="alert alert-danger py-2 mt-2" role="alert">
+                {contactError}
+              </div>
+            )}
             <p className="details-contact-helper">
               Discuss availability, rental duration, pickup, delivery, pricing,
               and payment arrangements directly with the owner.

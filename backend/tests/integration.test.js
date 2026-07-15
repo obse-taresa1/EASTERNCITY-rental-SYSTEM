@@ -267,6 +267,13 @@ test('core rental marketplace backend flow works against configured database', a
     body: { participantTwoId: ownerLogin.user.id, listingId: listing.id },
   });
   assert.ok(conversation.id);
+  assert.equal(conversation.unreadCount, 0);
+
+  const duplicateConversation = await api(base, 'POST', '/api/conversations', {
+    token: renterLogin.accessToken,
+    body: { participantTwoId: ownerLogin.user.id, listingId: listing.id },
+  });
+  assert.equal(duplicateConversation.id, conversation.id);
 
   const message = await api(base, 'POST', '/api/messages', {
     token: renterLogin.accessToken,
@@ -274,11 +281,46 @@ test('core rental marketplace backend flow works against configured database', a
   });
   assert.ok(message.id);
 
+  const ownerConversations = await api(base, 'GET', '/api/conversations', {
+    token: ownerLogin.accessToken,
+  });
+  const ownerConversation = ownerConversations.find((item) => item.id === conversation.id);
+  assert.ok(ownerConversation);
+  assert.equal(ownerConversation.unreadCount, 1);
+  assert.equal(ownerConversation.lastMessage.body, 'Hello from automated test.');
+
+  const ownerHistory = await api(base, 'GET', `/api/messages/${conversation.id}`, {
+    token: ownerLogin.accessToken,
+  });
+  assert.ok(ownerHistory.some((item) => item.id === message.id));
+
+  const ownerConversationsAfterRead = await api(base, 'GET', '/api/conversations', {
+    token: ownerLogin.accessToken,
+  });
+  assert.equal(
+    ownerConversationsAfterRead.find((item) => item.id === conversation.id).unreadCount,
+    0,
+  );
+
+  const reply = await api(base, 'POST', '/api/messages', {
+    token: ownerLogin.accessToken,
+    body: { conversationId: conversation.id, body: 'Reply from owner.' },
+  });
+  assert.ok(reply.id);
+
+  const renterHistory = await api(base, 'GET', `/api/messages/${conversation.id}`, {
+    token: renterLogin.accessToken,
+  });
+  assert.deepEqual(
+    renterHistory.map((item) => item.body).slice(-2),
+    ['Hello from automated test.', 'Reply from owner.'],
+  );
+
   const notifications = await api(base, 'GET', '/api/notifications', {
     token: ownerLogin.accessToken,
   });
   assert.ok(Array.isArray(notifications));
-  assert.ok(notifications.length > 0);
+  assert.ok(notifications.some((item) => item.referenceId === conversation.id));
 });
 
 

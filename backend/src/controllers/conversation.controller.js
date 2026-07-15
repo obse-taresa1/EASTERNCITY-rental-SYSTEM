@@ -1,8 +1,20 @@
-const repository = require("../repositories/conversation.repository");
+const service = require("../services/conversation.service");
 
 async function getMyConversations(req, res, next) {
   try {
-    const data = await repository.findManyByUser(req.user.id);
+    const data = await service.getMyConversations(req.user.id);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getConversation(req, res, next) {
+  try {
+    const data = await service.getConversationForUser(
+      req.user.id,
+      req.params.id,
+    );
     res.json({ success: true, data });
   } catch (error) {
     next(error);
@@ -11,19 +23,14 @@ async function getMyConversations(req, res, next) {
 
 async function createConversation(req, res, next) {
   try {
-    const data = await repository.create({
-      participantOneId: req.user.id,
-      participantTwoId: req.body.participantTwoId,
-      listingId: req.body.listingId,
-      lastMessageAt: new Date(),
-    });
+    const data = await service.findOrCreateConversation(req.user.id, req.body);
 
     res
       .status(201)
-      .json({ success: true, message: "Conversation created.", data });
+      .json({ success: true, message: "Conversation ready.", data });
   } catch (error) {
     next(error);
   }
 }
 
-module.exports = { getMyConversations, createConversation };
+module.exports = { getMyConversations, getConversation, createConversation };

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import {
@@ -9,6 +10,7 @@ import {
 export default function NotificationsPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
@@ -35,10 +37,17 @@ export default function NotificationsPage() {
     };
   }, [activeUser?.id]);
 
-  async function handleMarkRead(id) {
-    await markNotificationRead(id);
+  async function handleMarkRead(notification) {
+    await markNotificationRead(notification.id);
     const items = await fetchNotifications(activeUser?.id);
     setNotifications(items || []);
+
+    if (
+      notification.referenceType === "CONVERSATION" &&
+      notification.referenceId
+    ) {
+      navigate(`/messages?conversation=${notification.referenceId}`);
+    }
   }
 
   return (
@@ -57,7 +66,7 @@ export default function NotificationsPage() {
             <button
               className={`list-group-item list-group-item-action text-start ${notification.isRead ? "" : "fw-bold"}`}
               key={notification.id}
-              onClick={() => handleMarkRead(notification.id)}
+              onClick={() => handleMarkRead(notification)}
               type="button"
             >
               <div className="d-flex w-100 justify-content-between gap-3">

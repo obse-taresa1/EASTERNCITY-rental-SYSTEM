@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import {
@@ -13,58 +13,79 @@ export default function MessagesPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const conversationId = searchParams.get("conversation");
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [conversationLoading, setConversationLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
   const [draft, setDraft] = useState("");
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     let active = true;
 
-    async function loadConversations() {
-      setLoading(true);
+    async function loadConversations({ initial = false } = {}) {
+      if (initial) setLoading(true);
       try {
         const data = await getConversations();
         if (!active) return;
-        const filtered = activeUser
-          ? data.filter((conversation) =>
-              [
-                conversation.participantOneId,
-                conversation.participantTwoId,
-              ].includes(activeUser.id),
-            )
-          : [];
-        setConversations(filtered);
-        const selected = conversationId
-          ? await getConversationById(conversationId)
-          : filtered[0] || null;
-        if (active) setActiveConversation(selected);
+        setConversations(data);
+
+        if (!conversationId && data[0]?.id) {
+          navigate(`/messages?conversation=${data[0].id}`, { replace: true });
+        }
+      } catch (err) {
+        if (active) setError(err.message || "Could not load messages.");
       } finally {
-        if (active) setLoading(false);
+        if (active && initial) setLoading(false);
       }
     }
 
-    loadConversations();
+    loadConversations({ initial: true });
 
+    const interval = window.setInterval(() => loadConversations(), 5000);
     const handleRefresh = () => loadConversations();
     window.addEventListener("easterncity:messages-updated", handleRefresh);
     return () => {
       active = false;
+      window.clearInterval(interval);
       window.removeEventListener("easterncity:messages-updated", handleRefresh);
     };
-  }, [activeUser?.id, conversationId]);
+  }, [activeUser?.id, conversationId, navigate]);
 
   useEffect(() => {
     if (!conversationId) return;
     let active = true;
 
-    getConversationById(conversationId).then((conversation) => {
-      if (active) setActiveConversation(conversation);
-    });
+    async function loadConversation({ showLoading = false } = {}) {
+      if (showLoading) setConversationLoading(true);
+      try {
+        const conversation = await getConversationById(conversationId);
+        if (!active) return;
+        setActiveConversation(conversation);
+        setConversations((items) =>
+          items.map((item) =>
+            item.id === conversation?.id
+              ? { ...item, unreadCount: 0, lastMessage: conversation.lastMessage }
+              : item,
+          ),
+        );
+      } catch (err) {
+        if (active) setError(err.message || "Could not load this conversation.");
+      } finally {
+        if (active && showLoading) setConversationLoading(false);
+      }
+    }
+
+    loadConversation({ showLoading: true });
+    const interval = window.setInterval(() => loadConversation(), 3000);
 
     return () => {
       active = false;
+      window.clearInterval(interval);
     };
   }, [conversationId]);
 
@@ -77,12 +98,52 @@ export default function MessagesPage() {
     event.preventDefault();
     if (!currentConversation || !draft.trim()) return;
 
-    await sendMessage({
-      conversationId: currentConversation.id,
-      body: draft.trim(),
-    });
+    const body = draft.trim();
     setDraft("");
-    window.dispatchEvent(new Event("easterncity:messages-updated"));
+    setSending(true);
+    setError("");
+    try {
+      const message = await sendMessage({
+        conversationId: currentConversation.id,
+        body,
+      });
+      setActiveConversation((conversation) =>
+        conversation?.id === currentConversation.id
+          ? {
+              ...conversation,
+              messages: [...(conversation.messages || []), message],
+              lastMessage: message,
+            }
+          : conversation,
+      );
+      window.dispatchEvent(new Event("easterncity:messages-updated"));
+    } catch (err) {
+      setDraft(body);
+      setError(err.message || "Could not send message.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [currentConversation?.messages?.length, currentConversation?.id]);
+
+  function getOtherParticipant(conversation) {
+    if (!conversation || !activeUser) return null;
+    return conversation.participantOneId === activeUser.id
+      ? conversation.participantTwo
+      : conversation.participantOne;
+  }
+
+  function formatMessageTime(value) {
+    if (!value) return "";
+    return new Date(value).toLocaleString([], {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
   }
 
   if (loading) {
@@ -106,6 +167,12 @@ export default function MessagesPage() {
         </div>
       </div>
 
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+
       {!conversations.length || !currentConversation ? (
         <EmptyState
           icon="bi-chat-dots"
@@ -126,19 +193,38 @@ export default function MessagesPage() {
                 className={`message-thread ${activeConversation?.id === conversation.id ? "is-active" : ""}`}
                 key={conversation.id}
               >
-                <img
-                  src={conversation.listing?.image}
-                  alt={conversation.listing?.title}
-                />
-                <div>
+                <div className="message-thread-avatar">
+                  {getOtherParticipant(conversation)?.profileImage ? (
+                    <img
+                      src={getOtherParticipant(conversation).profileImage}
+                      alt={getOtherParticipant(conversation)?.name || "User"}
+                    />
+                  ) : (
+                    <span>
+                      {(getOtherParticipant(conversation)?.name || "U")
+                        .charAt(0)
+                        .toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div className="message-thread-copy">
                   <strong>
-                    {conversation.listing?.title ||
-                      conversation.subject ||
-                      "Conversation"}
+                    {getOtherParticipant(conversation)?.name || "Owner"}
                   </strong>
                   <span>
-                    {conversation.listing?.location || conversation.context}
+                    {conversation.listing?.title || "Rental conversation"}
                   </span>
+                  <small>
+                    {conversation.lastMessage?.body || "No messages yet."}
+                  </small>
+                </div>
+                <div className="message-thread-meta">
+                  <time>{formatMessageTime(conversation.lastMessage?.createdAt)}</time>
+                  {conversation.unreadCount > 0 && (
+                    <span className="message-unread-count">
+                      {conversation.unreadCount}
+                    </span>
+                  )}
                 </div>
               </Link>
             ))}
@@ -147,12 +233,14 @@ export default function MessagesPage() {
           <article className="message-chat premium-glass-card">
             <div className="message-chat-header">
               <div>
-                <span className="section-label">LISTING ATTACHED</span>
+                <span className="section-label">CHAT WITH OWNER</span>
                 <h2>
-                  {currentConversation.listing?.title ||
-                    currentConversation.subject ||
-                    "Conversation"}
+                  {getOtherParticipant(currentConversation)?.name ||
+                    "Rental conversation"}
                 </h2>
+                <p className="owner-muted mb-0">
+                  {currentConversation.listing?.title}
+                </p>
               </div>
               <Link
                 to={`/items/${currentConversation.listing?.id || currentConversation.itemId}`}
@@ -180,15 +268,24 @@ export default function MessagesPage() {
             </div>
 
             <div className="message-bubble-list">
+              {conversationLoading && (
+                <div className="owner-muted">Loading conversation...</div>
+              )}
               {(currentConversation.messages || []).map((message) => (
-                <div className="message-bubble" key={message.id}>
+                <div
+                  className={`message-bubble ${
+                    message.senderId === activeUser?.id ? "sent" : "received"
+                  }`}
+                  key={message.id}
+                >
                   <strong>
                     {message.sender?.name || message.senderName || "User"}
                   </strong>
                   <p>{message.body}</p>
-                  <span>{new Date(message.createdAt).toLocaleString()}</span>
+                  <span>{formatMessageTime(message.createdAt)}</span>
                 </div>
               ))}
+              <div ref={bottomRef} />
             </div>
 
             <form className="message-compose" onSubmit={handleSendMessage}>
@@ -198,8 +295,14 @@ export default function MessagesPage() {
                 placeholder="Continue the conversation..."
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
+                disabled={sending}
               />
-              <button type="submit" className="btn btn-accent-custom btn-shine">
+              <button
+                type="submit"
+                className="btn btn-accent-custom btn-shine"
+                disabled={sending || !draft.trim()}
+                aria-label="Send message"
+              >
                 <i className="bi bi-send"></i>
               </button>
             </form>
