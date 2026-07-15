@@ -88,6 +88,11 @@ export default function LoginPage() {
               required
             />
           </div>
+          <div className="auth-form-row text-end mb-3">
+            <Link to="/contact" className="auth-forgot-link">
+              Forgot Password?
+            </Link>
+          </div>
           <button type="submit" className="btn btn-accent-custom w-100">
             Login
           </button>

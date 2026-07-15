@@ -1,5 +1,8 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { getStorageItem, setStorageItem } from "../../services/storageService.js";
 import { categories } from "../../data/items.js";
 import { getPromotionLabel } from "../../services/itemService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
@@ -7,6 +10,49 @@ import fallbackListingImage from "../../assets/images/pc.png";
 
 export default function ListingCard({ item }) {
   const { t } = useLanguage();
+  const { currentUser, user } = useAuth();
+  const activeUser = user || currentUser;
+  const navigate = useNavigate();
+
+  const [isSaved, setIsSaved] = useState(() => {
+    if (!activeUser) return false;
+    const savedList = getStorageItem("saved_items", []);
+    return savedList.some((i) => i.id === item.id);
+  });
+
+  useEffect(() => {
+    if (!activeUser) {
+      setIsSaved(false);
+      return;
+    }
+    const savedList = getStorageItem("saved_items", []);
+    setIsSaved(savedList.some((i) => i.id === item.id));
+  }, [activeUser, item.id]);
+
+  function handleToggleSave() {
+    if (!activeUser) {
+      navigate("/login");
+      return;
+    }
+
+    const savedList = getStorageItem("saved_items", []);
+    const alreadySaved = savedList.some((i) => i.id === item.id);
+
+    let updated;
+    if (alreadySaved) {
+      updated = savedList.filter((i) => i.id !== item.id);
+    } else {
+      const itemToSave = {
+        ...item,
+        image: item.image || item.coverImage || "",
+        location: item.location || (item.sefar ? `${item.city} • ${item.sefar}` : item.city || ""),
+      };
+      updated = [...savedList, itemToSave];
+    }
+
+    setStorageItem("saved_items", updated);
+    setIsSaved(!alreadySaved);
+  }
 
   if (!item) return null;
 
@@ -115,8 +161,9 @@ export default function ListingCard({ item }) {
               type="button"
               className="btn-icon-soft"
               aria-label={t("wishlist")}
+              onClick={handleToggleSave}
             >
-              <i className="bi bi-heart"></i>
+              <i className={`bi ${isSaved ? "bi-heart-fill text-danger" : "bi-heart"}`}></i>
             </button>
           </div>
         </div>

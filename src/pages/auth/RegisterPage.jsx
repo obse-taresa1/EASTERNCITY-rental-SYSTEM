@@ -17,6 +17,7 @@ export default function RegisterPage() {
 
   const [error, setError] = useState("");
   const [fileNotice, setFileNotice] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -117,16 +118,27 @@ export default function RegisterPage() {
             <label htmlFor="password" className="form-label">
               Password
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              className="form-control"
-              value={formData.password}
-              onChange={handleChange}
-              minLength="6"
-              required
-            />
+            <div className="auth-password-field">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                className="form-control"
+                value={formData.password}
+                onChange={handleChange}
+                minLength="6"
+                required
+              />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                onClick={() => setShowPassword((current) => !current)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+              >
+                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+              </button>
+            </div>
           </div>
 
           <section className="national-id-verification mb-4">

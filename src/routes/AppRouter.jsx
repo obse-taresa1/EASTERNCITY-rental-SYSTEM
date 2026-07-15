@@ -28,6 +28,11 @@ import MyBookingsPage from "../pages/booking/MyBookingsPage.jsx";
 import BothDashboardPage from "../pages/dashboard/BothDashboardPage.jsx";
 import ListItemPage from "../pages/dashboard/ListItemPage.jsx";
 import MyListingsPage from "../pages/dashboard/MyListingsPage.jsx";
+import SavedItemsPage from "../pages/dashboard/SavedItemsPage.jsx";
+import ReviewsPage from "../pages/dashboard/ReviewsPage.jsx";
+import VerificationPage from "../pages/dashboard/VerificationPage.jsx";
+import DashboardSettingsPage from "../pages/dashboard/DashboardSettingsPage.jsx";
+import HelpCenterPage from "../pages/dashboard/HelpCenterPage.jsx";
 
 import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import MessagesPage from "../pages/profile/MessagesPage.jsx";
@@ -126,6 +131,51 @@ export default function AppRouter() {
               element={
                 <RoleRoute allowedRoles={["USER"]}>
                   <MyListingsPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/saved-items"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <SavedItemsPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/reviews"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <ReviewsPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/verification"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <VerificationPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/dashboard-settings"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <DashboardSettingsPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/help-center"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <HelpCenterPage />
                 </RoleRoute>
               }
             />

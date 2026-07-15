@@ -1,15 +1,30 @@
 import { apiClient } from "./apiClient.js";
 
+const API_BASE_URL =
+  import.meta.env?.VITE_API_BASE_URL ||
+  import.meta.env?.VITE_API_URL ||
+  "http://localhost:5000";
+
+function resolveAssetUrl(value) {
+  if (!value) return "";
+  if (/^(https?:|data:|blob:)/i.test(value)) return value;
+  return `${API_BASE_URL}${value.startsWith("/") ? value : `/${value}`}`;
+}
+
 function normalizeListing(listing) {
   if (!listing) return null;
 
+  const images = Array.isArray(listing.images) ? listing.images : [];
+  const image =
+    listing.image ||
+    listing.coverImage ||
+    images[0]?.imageUrl ||
+    "";
+
   return {
     ...listing,
-    image:
-      listing.image ||
-      listing.coverImage ||
-      listing.images?.[0]?.imageUrl ||
-      "",
+    image: resolveAssetUrl(image),
+    coverImage: resolveAssetUrl(image),
   };
 }
 
@@ -20,6 +35,7 @@ function normalizeUser(user) {
     name: user.name,
     role: user.role,
     email: user.email,
+    profileImage: resolveAssetUrl(user.profileImage || user.avatarUrl || ""),
   };
 }
 
@@ -31,6 +47,8 @@ function normalizeConversation(conversation) {
     listing: normalizeListing(conversation.listing),
     participantOne: normalizeUser(conversation.participantOne),
     participantTwo: normalizeUser(conversation.participantTwo),
+    lastMessage: normalizeMessage(conversation.lastMessage),
+    unreadCount: Number(conversation.unreadCount || 0),
   };
 }
 
@@ -49,9 +67,9 @@ export async function getConversations() {
 
 export async function getConversationById(conversationId) {
   if (!conversationId) return null;
-  const conversations = await getConversations();
-  const conversation =
-    conversations.find((entry) => entry.id === conversationId) || null;
+  const conversation = normalizeConversation(
+    await apiClient.get(`/api/conversations/${conversationId}`),
+  );
   if (!conversation) return null;
 
   try {
@@ -94,11 +112,6 @@ export async function startListingConversation({ renter, item }) {
   const conversation = await createConversation({
     participantTwoId: item.ownerId,
     listingId: item.id,
-  });
-
-  await sendMessage({
-    conversationId: conversation.id,
-    body: "I am interested in this listing.",
   });
 
   return getConversationById(conversation.id);

@@ -11,7 +11,8 @@ export default function ContactPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
     try {
       await createContactMessage({
@@ -23,7 +24,7 @@ export default function ContactPage() {
       });
 
       setMessage(t("messageSent") || "Your message was sent successfully.");
-      event.currentTarget.reset();
+      form.reset();
     } catch (error) {
       setMessage(error.message || "Could not send your message.");
     }
