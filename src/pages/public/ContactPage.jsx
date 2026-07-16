@@ -1,13 +1,16 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { createContactMessage } from "../../services/contactMessageService.js";
 
 export default function ContactPage() {
+  const location = useLocation();
   const [message, setMessage] = useState("");
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const { t } = useLanguage();
+  const subject = location.state?.subject || "";
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -88,6 +91,7 @@ export default function ContactPage() {
                   id="contact-subject"
                   name="subject"
                   className="form-control"
+                  defaultValue={subject}
                   required
                 />
               </div>

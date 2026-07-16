@@ -57,7 +57,10 @@ export default function MessagesPage() {
   }, [activeUser?.id, conversationId, navigate]);
 
   useEffect(() => {
-    if (!conversationId) return;
+    if (!conversationId) {
+      setActiveConversation(null);
+      return;
+    }
     let active = true;
 
     async function loadConversation({ showLoading = false } = {}) {
@@ -89,10 +92,17 @@ export default function MessagesPage() {
     };
   }, [conversationId]);
 
-  const currentConversation = useMemo(
-    () => activeConversation || conversations[0] || null,
-    [activeConversation, conversations],
-  );
+  const currentConversation = useMemo(() => {
+    if (activeConversation?.id === conversationId) {
+      return activeConversation;
+    }
+
+    return (
+      conversations.find((conversation) => conversation.id === conversationId) ||
+      conversations[0] ||
+      null
+    );
+  }, [activeConversation, conversationId, conversations]);
 
   async function handleSendMessage(event) {
     event.preventDefault();
@@ -114,7 +124,23 @@ export default function MessagesPage() {
               messages: [...(conversation.messages || []), message],
               lastMessage: message,
             }
-          : conversation,
+          : {
+              ...currentConversation,
+              messages: [...(currentConversation.messages || []), message],
+              lastMessage: message,
+              unreadCount: 0,
+            },
+      );
+      setConversations((items) =>
+        items.map((conversation) =>
+          conversation.id === currentConversation.id
+            ? {
+                ...conversation,
+                lastMessage: message,
+                unreadCount: 0,
+              }
+            : conversation,
+        ),
       );
       window.dispatchEvent(new Event("easterncity:messages-updated"));
     } catch (err) {
@@ -190,7 +216,7 @@ export default function MessagesPage() {
             {conversations.map((conversation) => (
               <Link
                 to={`/messages?conversation=${conversation.id}`}
-                className={`message-thread ${activeConversation?.id === conversation.id ? "is-active" : ""}`}
+                className={`message-thread ${conversationId === conversation.id ? "is-active" : ""}`}
                 key={conversation.id}
               >
                 <div className="message-thread-avatar">

@@ -1,8 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
 import { getSefarByCity } from "../../data/sefar.js";
+import { fetchCategories } from "../../services/categoryApiService.js";
+
+function mergeCategoryOptions(apiCategories = []) {
+  const merged = new Map();
+
+  categories.forEach((category) => {
+    merged.set(category.id, category);
+  });
+
+  apiCategories.forEach((category) => {
+    const key = category.slug || category.id;
+    if (!key) return;
+    merged.set(key, {
+      id: key,
+      name: category.name,
+    });
+  });
+
+  return [...merged.values()];
+}
 
 export default function HomeSearchForm() {
   const navigate = useNavigate();
@@ -12,9 +32,29 @@ export default function HomeSearchForm() {
   const [city, setCity] = useState("all");
   const [sefar, setSefar] = useState("all");
   const [maxPrice, setMaxPrice] = useState(15000);
+  const [isPriceFilterActive, setIsPriceFilterActive] = useState(false);
   const [status, setStatus] = useState("all");
+  const [categoryOptions, setCategoryOptions] = useState(categories);
 
   const sefarOptions = city !== "all" ? getSefarByCity(city) : [];
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCategories() {
+      try {
+        const data = await fetchCategories();
+        if (active) setCategoryOptions(mergeCategoryOptions(data));
+      } catch {
+        if (active) setCategoryOptions(categories);
+      }
+    }
+
+    loadCategories();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function handleCityChange(e) {
     setCity(e.target.value);
@@ -28,7 +68,7 @@ export default function HomeSearchForm() {
     if (category !== "all") params.set("category", category);
     if (city !== "all") params.set("city", city);
     if (sefar !== "all") params.set("sefar", sefar);
-    params.set("maxPrice", maxPrice);
+    if (isPriceFilterActive) params.set("maxPrice", maxPrice);
     if (status !== "all") params.set("status", status);
 
     navigate(`/items?${params.toString()}`);
@@ -134,7 +174,7 @@ export default function HomeSearchForm() {
                 <option value="all">
                   {t("allCategories") || "All Categories"}
                 </option>
-                {categories.map((item) => (
+                {categoryOptions.map((item) => (
                   <option value={item.id} key={item.id}>
                     {item.name}
                   </option>
@@ -166,7 +206,10 @@ export default function HomeSearchForm() {
                 max="25000"
                 step="500"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                onChange={(e) => {
+                  setMaxPrice(e.target.value);
+                  setIsPriceFilterActive(true);
+                }}
                 style={{ height: "24px" }}
               />
             </div>

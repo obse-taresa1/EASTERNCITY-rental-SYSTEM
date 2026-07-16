@@ -39,6 +39,33 @@ function normalizeCategory(category) {
   };
 }
 
+function buildQueryString(filters = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "" || value === "all") {
+      return;
+    }
+    params.set(key, value);
+  });
+
+  const queryString = params.toString();
+  return queryString ? `?${queryString}` : "";
+}
+
+function deriveSefar(listing) {
+  if (listing.sefar) return listing.sefar;
+
+  const location = String(listing.location || "").trim();
+  const city = String(listing.city || "").trim();
+  if (!location) return "";
+
+  const [firstPart] = location.split(",").map((part) => part.trim());
+  if (!firstPart || firstPart === city) return "";
+
+  return firstPart;
+}
+
 function emitListingUpdate() {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("easterncity:listings-updated"));
@@ -58,6 +85,7 @@ export function normalizeListing(listing) {
 
   const category =
     categoryData?.slug || categoryData?.id || listing.category || "";
+  const sefar = deriveSefar(listing);
 
   return {
     ...listing,
@@ -76,12 +104,13 @@ export function normalizeListing(listing) {
     categoryData,
     categoryName:
       categoryData?.name || listing.categoryName || listing.category || "",
+    sefar,
     paymentProofUrl: resolveAssetUrl(listing.paymentProofUrl),
   };
 }
 
-export async function getPublicListings() {
-  const data = await apiClient.get("/api/listings");
+export async function getPublicListings(filters = {}) {
+  const data = await apiClient.get(`/api/listings${buildQueryString(filters)}`);
   return Array.isArray(data) ? data.map(normalizeListing) : [];
 }
 

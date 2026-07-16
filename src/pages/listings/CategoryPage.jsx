@@ -3,9 +3,53 @@ import { Link, useParams } from "react-router-dom";
 import SectionHeader from "../../components/common/SectionHeader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
+import { fetchCategories } from "../../services/categoryApiService.js";
 import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
+
+function normalizeFilterValue(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function getCategoryTokens(value) {
+  return normalizeFilterValue(value)
+    .replace(/&/g, " ")
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token.length > 2);
+}
+
+function getCategoryKey(category) {
+  return category?.slug || category?.id || "";
+}
+
+function categoryMatches(item, selectedCategory) {
+  const selectedValues = [
+    selectedCategory?.id,
+    selectedCategory?.slug,
+    selectedCategory?.name,
+  ].map(normalizeFilterValue);
+
+  const itemValues = [
+    item.category,
+    item.categoryName,
+    item.categoryData?.id,
+    item.categoryData?.slug,
+    item.categoryData?.name,
+  ].map(normalizeFilterValue);
+
+  return selectedValues.some(
+    (selected) => selected && itemValues.includes(selected),
+  ) || selectedValues.some((selected) => {
+    const selectedTokens = getCategoryTokens(selected);
+    if (!selectedTokens.length) return false;
+
+    return itemValues.some((value) => {
+      const itemTokens = getCategoryTokens(value);
+      return itemTokens.some((token) => selectedTokens.includes(token));
+    });
+  });
+}
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -15,25 +59,46 @@ export default function CategoryPage() {
   const [city, setCity] = useState("all");
   const [sefar, setSefar] = useState("all");
   const [maxPrice, setMaxPrice] = useState(25000);
+  const [isPriceFilterActive, setIsPriceFilterActive] = useState(false);
   const [listings, setListings] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState(categories);
   const [loading, setLoading] = useState(true);
 
-  const category = categories.find((item) => item.id === categoryId);
+  const category =
+    categoryOptions.find(
+      (item) =>
+        normalizeFilterValue(item.id) === normalizeFilterValue(categoryId) ||
+        normalizeFilterValue(item.slug) === normalizeFilterValue(categoryId),
+    ) || null;
 
   useEffect(() => {
     let active = true;
 
-    async function loadListings() {
+    async function loadData() {
       setLoading(true);
       try {
-        const data = await getPublicListings();
-        if (active) setListings(data);
+        const [listingData, categoryData] = await Promise.all([
+          getPublicListings(),
+          fetchCategories().catch(() => []),
+        ]);
+        if (!active) return;
+        setListings(listingData);
+        setCategoryOptions([
+          ...categories,
+          ...categoryData.map((item) => ({
+            ...item,
+            id: getCategoryKey(item),
+            icon:
+              categories.find((category) => category.id === item.slug)?.icon ||
+              "bi-grid",
+          })),
+        ]);
       } finally {
         if (active) setLoading(false);
       }
     }
 
-    loadListings();
+    loadData();
     return () => {
       active = false;
     };
@@ -41,10 +106,9 @@ export default function CategoryPage() {
 
   const allItems = useMemo(
     () =>
-      listings.filter(
-        (item) =>
-          item.category === categoryId || item.categoryName === category?.name,
-      ),
+      category
+        ? listings.filter((item) => categoryMatches(item, category))
+        : [],
     [listings, categoryId, category],
   );
 
@@ -55,11 +119,21 @@ export default function CategoryPage() {
       if (search && !item.title.toLowerCase().includes(search.toLowerCase()))
         return false;
       if (city !== "all" && item.city !== city) return false;
-      if (sefar !== "all" && item.sefar !== sefar) return false;
-      if (item.pricePerDay > maxPrice) return false;
+      if (sefar !== "all") {
+        const itemSefar = String(item.sefar || "").toLowerCase();
+        const itemLocation = String(item.location || "").toLowerCase();
+        const selectedSefar = String(sefar).toLowerCase();
+        if (
+          itemSefar !== selectedSefar &&
+          !itemLocation.includes(selectedSefar)
+        ) {
+          return false;
+        }
+      }
+      if (isPriceFilterActive && item.pricePerDay > maxPrice) return false;
       return true;
     });
-  }, [allItems, search, city, sefar, maxPrice]);
+  }, [allItems, search, city, sefar, maxPrice, isPriceFilterActive]);
 
   if (loading) {
     return (
@@ -195,7 +269,10 @@ export default function CategoryPage() {
                 max="25000"
                 step="500"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                onChange={(e) => {
+                  setMaxPrice(Number(e.target.value));
+                  setIsPriceFilterActive(true);
+                }}
               />
             </div>
             <div className="col-md-2">

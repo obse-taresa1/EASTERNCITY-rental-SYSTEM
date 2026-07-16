@@ -72,18 +72,11 @@ export async function getConversationById(conversationId) {
   );
   if (!conversation) return null;
 
-  try {
-    const messages = await apiClient.get(`/api/messages/${conversationId}`);
-    return {
-      ...conversation,
-      messages: Array.isArray(messages) ? messages.map(normalizeMessage) : [],
-    };
-  } catch {
-    return {
-      ...conversation,
-      messages: [],
-    };
-  }
+  const messages = await apiClient.get(`/api/messages/${conversationId}`);
+  return {
+    ...conversation,
+    messages: Array.isArray(messages) ? messages.map(normalizeMessage) : [],
+  };
 }
 
 export async function createConversation({ participantTwoId, listingId }) {
