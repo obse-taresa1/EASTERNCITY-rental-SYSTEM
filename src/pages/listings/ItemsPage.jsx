@@ -5,6 +5,25 @@ import SectionHeader from "../../components/common/SectionHeader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getPublicListings } from "../../services/listingApiService.js";
 
+function normalizeFilterValue(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function listingMatchesCategory(item, category) {
+  if (!category || category === "all") return true;
+
+  const selectedCategory = normalizeFilterValue(category);
+  const itemCategories = [
+    item.category,
+    item.categoryName,
+    item.categoryData?.id,
+    item.categoryData?.slug,
+    item.categoryData?.name,
+  ].map(normalizeFilterValue);
+
+  return itemCategories.includes(selectedCategory);
+}
+
 export default function ItemsPage() {
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
@@ -38,11 +57,14 @@ export default function ItemsPage() {
     };
   }, []);
 
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
+
   const filteredItems = useMemo(() => {
     const searchTerm = search.toLowerCase().trim();
 
     return listings.filter((item) => {
-      const itemCategory = item.category || item.categoryName || "";
       const itemStatus = String(item.status || "").toLowerCase();
 
       if (
@@ -56,13 +78,14 @@ export default function ItemsPage() {
       if (searchTerm) {
         const match =
           (item.title || "").toLowerCase().includes(searchTerm) ||
-          itemCategory.toLowerCase().includes(searchTerm) ||
+          (item.category || "").toLowerCase().includes(searchTerm) ||
+          (item.categoryName || "").toLowerCase().includes(searchTerm) ||
           (item.city || "").toLowerCase().includes(searchTerm) ||
           (item.location || "").toLowerCase().includes(searchTerm);
         if (!match) return false;
       }
 
-      if (category && category !== "all" && itemCategory !== category) {
+      if (!listingMatchesCategory(item, category)) {
         return false;
       }
 
@@ -70,8 +93,16 @@ export default function ItemsPage() {
         return false;
       }
 
-      if (sefar && sefar !== "all" && item.sefar !== sefar) {
-        return false;
+      if (sefar && sefar !== "all") {
+        const itemSefar = String(item.sefar || "").toLowerCase();
+        const itemLocation = String(item.location || "").toLowerCase();
+        const selectedSefar = String(sefar).toLowerCase();
+        if (
+          itemSefar !== selectedSefar &&
+          !itemLocation.includes(selectedSefar)
+        ) {
+          return false;
+        }
       }
 
       if (

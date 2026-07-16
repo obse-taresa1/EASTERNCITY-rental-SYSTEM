@@ -19,6 +19,9 @@ export default function RegisterPage() {
   const [fileNotice, setFileNotice] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const passwordType = showPassword ? "text" : "password";
+  const passwordToggleLabel = showPassword ? "Hide password" : "Show password";
+
   function handleChange(event) {
     const { name, value } = event.target;
 
@@ -122,7 +125,7 @@ export default function RegisterPage() {
               <input
                 id="password"
                 name="password"
-                type={showPassword ? "text" : "password"}
+                type={passwordType}
                 className="form-control"
                 value={formData.password}
                 onChange={handleChange}
@@ -133,7 +136,9 @@ export default function RegisterPage() {
                 type="button"
                 className="auth-password-toggle"
                 onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={passwordToggleLabel}
+                title={passwordToggleLabel}
+                aria-controls="password"
                 aria-pressed={showPassword}
               >
                 <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>

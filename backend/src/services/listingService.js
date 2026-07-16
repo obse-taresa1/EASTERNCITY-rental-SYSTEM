@@ -74,7 +74,46 @@ async function resolveCategoryId(payload) {
 }
 
 async function listPublic(query) {
+  const search = String(query.search || query.q || "").trim();
+  const category = String(query.category || "").trim();
+  const city = String(query.city || "").trim();
+  const sefar = String(query.sefar || "").trim();
+  const maxPrice = Number(query.maxPrice || 0);
+  const where = {};
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search } },
+      { description: { contains: search } },
+      { city: { contains: search } },
+      { location: { contains: search } },
+      { category: { is: { slug: { contains: search } } } },
+      { category: { is: { name: { contains: search } } } },
+    ];
+  }
+
+  if (category && category !== "all") {
+    where.category = {
+      is: {
+        OR: [{ slug: category }, { id: category }, { name: category }],
+      },
+    };
+  }
+
+  if (city && city !== "all") {
+    where.city = city;
+  }
+
+  if (sefar && sefar !== "all") {
+    where.location = { contains: sefar };
+  }
+
+  if (maxPrice > 0) {
+    where.pricePerDay = { lte: maxPrice };
+  }
+
   return listingRepository.findPublic({
+    where,
     orderBy: {
       createdAt: "desc",
     },

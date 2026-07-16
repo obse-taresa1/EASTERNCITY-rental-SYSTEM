@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
 
+const PASSWORD_RECOVERY_PATH = "/contact";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +91,11 @@ export default function LoginPage() {
             />
           </div>
           <div className="auth-form-row text-end mb-3">
-            <Link to="/contact" className="auth-forgot-link">
+            <Link
+              to={PASSWORD_RECOVERY_PATH}
+              className="auth-forgot-link"
+              state={{ subject: "Forgot Password" }}
+            >
               Forgot Password?
             </Link>
           </div>
