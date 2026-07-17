@@ -29,8 +29,23 @@ const changePasswordSchema = z.object({
   path: ['newPassword'],
 });
 
+const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().trim().min(32, 'Reset token is required.'),
+  newPassword: passwordSchema,
+  confirmPassword: z.string().min(1, 'Confirm password is required.'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords do not match.',
+  path: ['confirmPassword'],
+});
+
 module.exports = {
   validateRegister: (req, res, next) => parseWithSchema(registerSchema, req, res, next),
   validateLogin: (req, res, next) => parseWithSchema(loginSchema, req, res, next),
   validateChangePassword: (req, res, next) => parseWithSchema(changePasswordSchema, req, res, next),
+  validateForgotPassword: (req, res, next) => parseWithSchema(forgotPasswordSchema, req, res, next),
+  validateResetPassword: (req, res, next) => parseWithSchema(resetPasswordSchema, req, res, next),
 };

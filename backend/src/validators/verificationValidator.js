@@ -2,15 +2,10 @@ const { z } = require('zod');
 const { VERIFICATION_STATUSES } = require('../utils/constants');
 const { parseWithSchema } = require('./validationHelpers');
 
-const fileUrlSchema = (fieldName) =>
-  z.string().trim().min(1, `${fieldName} file URL is required.`).refine(
-    (value) => !value.startsWith('data:'),
-    `${fieldName} must be a file path or URL, not base64 data.`,
-  );
-
 const verificationSubmissionSchema = z.object({
-  nationalIdFrontUrl: fileUrlSchema('nationalIdFrontUrl'),
-  nationalIdBackUrl: fileUrlSchema('nationalIdBackUrl'),
+  city: z.string().trim().min(1, 'City is required.'),
+  sefer: z.string().trim().min(1, 'Sefer is required.'),
+  address: z.string().trim().optional().default(''),
 });
 
 const verificationDecisionSchema = z.object({

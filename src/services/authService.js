@@ -1,5 +1,6 @@
-import { apiClient } from "./apiClient.js";
+import { apiClient, resolveAssetUrl } from "./apiClient.js";
 import { readStorage, removeStorage, writeStorage } from "./storageService.js";
+import { normalizeVerificationStatus } from "../utils/verificationStatus.js";
 
 const TOKEN_KEY = "token";
 const ACCESS_TOKEN_KEY = "accessToken";
@@ -62,8 +63,17 @@ function toSafeUser(user) {
     name: user.name,
     email: user.email,
     role: coerceRole(user.role),
+    status: user.status || "",
+    createdAt: user.createdAt || "",
     businessName: user.businessName || "",
-    verificationStatus: user.verificationStatus || "Pending Verification",
+    city: user.city || "",
+    sefer: user.sefer || "",
+    address: user.address || "",
+    nationalIdFront: resolveAssetUrl(user.nationalIdFront || user.nationalIdFrontUrl),
+    nationalIdBack: resolveAssetUrl(user.nationalIdBack || user.nationalIdBackUrl),
+    nationalIdFrontUrl: resolveAssetUrl(user.nationalIdFrontUrl || user.nationalIdFront),
+    nationalIdBackUrl: resolveAssetUrl(user.nationalIdBackUrl || user.nationalIdBack),
+    verificationStatus: normalizeVerificationStatus(user.verificationStatus),
   };
 }
 
@@ -120,6 +130,18 @@ export async function logoutUser() {
   }
 
   clearAuthSession();
+}
+
+export async function requestPasswordReset(email) {
+  return apiClient.post("/api/auth/forgot-password", { email });
+}
+
+export async function resetPassword({ token, newPassword, confirmPassword }) {
+  return apiClient.post("/api/auth/reset-password", {
+    token,
+    newPassword,
+    confirmPassword,
+  });
 }
 
 export function dashboardForRole(role) {

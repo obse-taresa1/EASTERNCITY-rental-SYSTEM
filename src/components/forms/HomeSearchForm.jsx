@@ -68,8 +68,8 @@ export default function HomeSearchForm() {
     if (category !== "all") params.set("category", category);
     if (city !== "all") params.set("city", city);
     if (sefar !== "all") params.set("sefar", sefar);
-    if (isPriceFilterActive) params.set("maxPrice", maxPrice);
-    if (status !== "all") params.set("status", status);
+    params.set("maxPrice", maxPrice);
+    if (status !== "all") params.set("condition", status);
 
     navigate(`/items?${params.toString()}`);
   }

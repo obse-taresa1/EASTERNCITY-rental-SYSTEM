@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getBookingsByUser } from "../../services/bookingService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
 import { Link } from "react-router-dom";
 
 const PAYMENT_STATUS_MAP = {
@@ -14,7 +15,27 @@ const PAYMENT_STATUS_MAP = {
 export default function PaymentsPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
-  const bookings = activeUser ? getBookingsByUser(activeUser.id) : [];
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadBookings() {
+      if (!activeUser?.id) {
+        setBookings([]);
+        return;
+      }
+
+      const data = await getMyBookings().catch(() => []);
+      if (active) setBookings(data);
+    }
+
+    loadBookings();
+
+    return () => {
+      active = false;
+    };
+  }, [activeUser?.id]);
 
   const pending = bookings.filter((b) =>
     ["pending", "screenshot_uploaded", "awaiting_verification"].includes(b.paymentStatus || b.status),

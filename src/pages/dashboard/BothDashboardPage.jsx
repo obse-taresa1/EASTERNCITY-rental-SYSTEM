@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import BookingTable from "../../components/dashboard/BookingTable.jsx";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { fetchBookings } from "../../services/bookingService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
 import { getMyListings } from "../../services/listingApiService.js";
 import { getConversations } from "../../services/messageApiService.js";
 import { getMyReviews } from "../../services/reviewApiService.js";
 import { getStorageItem } from "../../services/storageService.js";
 import { formatCurrency } from "../../utils/currency.js";
+import {
+  isVerificationApproved,
+  normalizeVerificationStatus,
+} from "../../utils/verificationStatus.js";
 
 function getInitials(name) {
   if (!name) return "U";
@@ -86,7 +90,7 @@ export default function BothDashboardPage() {
         const [conversationData, bookingData, listingData, reviewData] =
           await Promise.all([
             getConversations().catch(() => []),
-            fetchBookings().catch(() => []),
+            getMyBookings().catch(() => []),
             getMyListings().catch(() => []),
             getMyReviews().catch(() => []),
           ]);
@@ -126,7 +130,11 @@ export default function BothDashboardPage() {
   const ownerBookings = activeUser
     ? bookings.filter((booking) => booking.ownerId === activeUser.id)
     : [];
-  const savedItems = getStorageItem("saved_items", []);
+  const savedItems = activeUser
+    ? getStorageItem("saved_items", []).filter(
+        (item) => String(item.userId || "") === String(activeUser.id),
+      )
+    : [];
 
   const activeListings = ownedItems.filter((item) =>
     ["approved", "published", "active", "featured", "renewed"].includes(
@@ -143,16 +151,17 @@ export default function BothDashboardPage() {
     0,
   );
 
-  const isVerified = String(activeUser?.verificationStatus || "")
-    .toLowerCase()
-    .includes("verified");
+  const verificationStatus = normalizeVerificationStatus(
+    activeUser?.verificationStatus,
+  );
+  const isVerified = isVerificationApproved(verificationStatus);
 
   const memberSince = activeUser?.createdAt
     ? new Date(activeUser.createdAt).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
       })
-    : "2024";
+    : "N/A";
 
   const recentActivity = useMemo(
     () =>
@@ -244,7 +253,7 @@ export default function BothDashboardPage() {
     {
       icon: "bi-shield-check",
       label: "Verification",
-      value: isVerified ? "Verified" : "Pending",
+      value: verificationStatus,
       color: isVerified ? "stat-verified" : "stat-pending",
       to: "/verification",
     },
@@ -264,7 +273,7 @@ export default function BothDashboardPage() {
         <div className="ud-welcome-info">
           <p className="ud-welcome-greeting">Welcome back,</p>
           <h1 className="ud-welcome-name">
-            {activeUser?.name || "EasternCity User"}
+            {activeUser?.name || "User"}
           </h1>
           <div className="ud-welcome-tags">
             <span
@@ -273,11 +282,11 @@ export default function BothDashboardPage() {
               <i
                 className={`bi ${isVerified ? "bi-shield-check" : "bi-shield-exclamation"}`}
               />
-              {activeUser?.verificationStatus || "Pending Verification"}
+              {verificationStatus}
             </span>
             <span className="ud-welcome-tag tag-location">
               <i className="bi bi-geo-alt" />
-              {activeUser?.city || "Jigjiga"}
+              {activeUser?.city || "Location not set"}
             </span>
             <span className="ud-welcome-tag tag-since">
               <i className="bi bi-calendar3" />

@@ -1,55 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import SectionHeader from "../../components/common/SectionHeader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
 import { fetchCategories } from "../../services/categoryApiService.js";
 import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
-
-function normalizeFilterValue(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function getCategoryTokens(value) {
-  return normalizeFilterValue(value)
-    .replace(/&/g, " ")
-    .split(/[^a-z0-9]+/)
-    .filter((token) => token.length > 2);
-}
-
-function getCategoryKey(category) {
-  return category?.slug || category?.id || "";
-}
-
-function categoryMatches(item, selectedCategory) {
-  const selectedValues = [
-    selectedCategory?.id,
-    selectedCategory?.slug,
-    selectedCategory?.name,
-  ].map(normalizeFilterValue);
-
-  const itemValues = [
-    item.category,
-    item.categoryName,
-    item.categoryData?.id,
-    item.categoryData?.slug,
-    item.categoryData?.name,
-  ].map(normalizeFilterValue);
-
-  return selectedValues.some(
-    (selected) => selected && itemValues.includes(selected),
-  ) || selectedValues.some((selected) => {
-    const selectedTokens = getCategoryTokens(selected);
-    if (!selectedTokens.length) return false;
-
-    return itemValues.some((value) => {
-      const itemTokens = getCategoryTokens(value);
-      return itemTokens.some((token) => selectedTokens.includes(token));
-    });
-  });
-}
+import { listingMatchesRentalCategory } from "../../utils/categoryMapping.js";
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -63,6 +20,12 @@ export default function CategoryPage() {
   const [listings, setListings] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState(categories);
   const [loading, setLoading] = useState(true);
+
+  const normalizeFilterValue = (value) => {
+    return String(value || "")
+      .toLowerCase()
+      .trim();
+  };
 
   const category =
     categoryOptions.find(
@@ -106,31 +69,56 @@ export default function CategoryPage() {
 
   const allItems = useMemo(
     () =>
-      category
-        ? listings.filter((item) => categoryMatches(item, category))
-        : [],
-    [listings, categoryId, category],
+      listings.filter((item) => listingMatchesRentalCategory(item, categoryId)),
+    [listings, categoryId],
   );
 
   const sefarOptions = city !== "all" ? getSefarByCity(city) : [];
 
   const filteredItems = useMemo(() => {
     return allItems.filter((item) => {
-      if (search && !item.title.toLowerCase().includes(search.toLowerCase()))
+      const searchTerm = search.toLowerCase().trim();
+
+      // Search filter
+      if (
+        searchTerm &&
+        ![
+          item.title,
+          item.description,
+          item.categoryName,
+          item.category,
+          item.city,
+          item.location,
+        ]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(searchTerm))
+      ) {
         return false;
-      if (city !== "all" && item.city !== city) return false;
-      if (sefar !== "all") {
-        const itemSefar = String(item.sefar || "").toLowerCase();
-        const itemLocation = String(item.location || "").toLowerCase();
-        const selectedSefar = String(sefar).toLowerCase();
-        if (
-          itemSefar !== selectedSefar &&
-          !itemLocation.includes(selectedSefar)
-        ) {
-          return false;
-        }
       }
-      if (isPriceFilterActive && item.pricePerDay > maxPrice) return false;
+
+      // City filter
+      if (
+        city !== "all" &&
+        String(item.city || "").toLowerCase() !== city.toLowerCase()
+      ) {
+        return false;
+      }
+
+      // Sefar filter
+      if (
+        sefar !== "all" &&
+        !String(item.sefar || item.location || "")
+          .toLowerCase()
+          .includes(sefar.toLowerCase())
+      ) {
+        return false;
+      }
+
+      // Price filter
+      if (item.pricePerDay > maxPrice) {
+        return false;
+      }
+
       return true;
     });
   }, [allItems, search, city, sefar, maxPrice, isPriceFilterActive]);
@@ -308,6 +296,12 @@ export default function CategoryPage() {
 
 function CategoryListingCard({ item, t }) {
   const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
+  const ownerName =
+    item.ownerName ||
+    item.owner?.businessName ||
+    item.owner?.name ||
+    (typeof item.owner === "string" ? item.owner : "") ||
+    "Verified Owner";
 
   return (
     <article className="premium-glass-card listing-card-premium">
@@ -356,12 +350,8 @@ function CategoryListingCard({ item, t }) {
 
         {/* Owner */}
         <div className="card-owner-info">
-          <div className="owner-avatar">
-            {(item.owner || item.ownerName || "V").charAt(0)}
-          </div>
-          <span className="owner-name">
-            {item.owner || item.ownerName || "Verified Owner"}
-          </span>
+          <div className="owner-avatar">{String(ownerName).charAt(0)}</div>
+          <span className="owner-name">{String(ownerName)}</span>
           <i
             className="bi bi-patch-check-fill text-success"
             title="Verified Owner"
@@ -380,4 +370,9 @@ function CategoryListingCard({ item, t }) {
       </div>
     </article>
   );
+}
+
+// Helper function - make sure this is defined or imported
+function getCategoryKey(item) {
+  return item.slug || item.id || item.name?.toLowerCase().replace(/\s+/g, "-");
 }

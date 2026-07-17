@@ -88,16 +88,24 @@ export default function AdminManagementPage() {
     }
   };
 
-  const handleToggleStatus = (id) => {
-    setAdmins((prev) =>
-      prev.map((a) => {
-        if (a.id === id) {
-          const newStatus = a.status === "active" ? "deactivated" : "active";
-          return { ...a, status: newStatus };
-        }
-        return a;
-      }),
-    );
+  const handleToggleStatus = async (admin) => {
+    const nextStatus = admin.status === "active" ? "SUSPENDED" : "ACTIVE";
+
+    try {
+      const updated = await updateUser(admin.id, { status: nextStatus });
+      setAdmins((prev) =>
+        prev.map((item) =>
+          item.id === updated.id ? { ...item, ...updated } : item,
+        ),
+      );
+      setNotice(
+        nextStatus === "ACTIVE"
+          ? "Admin account activated."
+          : "Admin account suspended.",
+      );
+    } catch (error) {
+      setNotice(error.message || "Unable to update admin status.");
+    }
   };
 
   const handleRemove = async (id) => {
@@ -173,9 +181,9 @@ export default function AdminManagementPage() {
                         <button
                           type="button"
                           className={`btn btn-sm ${a.status === "active" ? "btn-warning text-white" : "btn-success"}`}
-                          onClick={() => handleToggleStatus(a.id)}
+                          onClick={() => handleToggleStatus(a)}
                         >
-                          {a.status === "active" ? "Deactivate" : "Activate"}
+                          {a.status === "active" ? "Suspend" : "Activate"}
                         </button>
                         <button
                           type="button"

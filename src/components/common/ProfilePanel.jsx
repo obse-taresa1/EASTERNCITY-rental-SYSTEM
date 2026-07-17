@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
 import { getInitials } from "../../utils/user.js";
+import {
+  isVerificationApproved,
+  normalizeVerificationStatus,
+} from "../../utils/verificationStatus.js";
 
 export default function ProfilePanel({ user, open, onClose, onLogout, dashboardPath = "/dashboard" }) {
   if (!open) return null;
@@ -20,7 +24,8 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
       ];
 
   const initials = getInitials(user?.name);
-  const isVerified = String(user?.verificationStatus || "").toLowerCase().includes("verified");
+  const verificationStatus = normalizeVerificationStatus(user?.verificationStatus);
+  const isVerified = isVerificationApproved(verificationStatus);
 
   return (
     <div
@@ -47,8 +52,8 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
         <div className="profile-panel-header">
           <div className="profile-panel-avatar">{initials}</div>
           <div>
-            <strong>{user?.name || "EasternCity Member"}</strong>
-            <span>{user?.email || "member@easterncity.com"}</span>
+            <strong>{user?.name || "User"}</strong>
+            <span>{user?.email || "Email not available"}</span>
           </div>
         </div>
 
@@ -56,7 +61,7 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
           <div className="profile-panel-verification">
             <i className={`bi ${isVerified ? "bi-shield-check text-success" : "bi-shield-exclamation text-warning"}`} />
             <div>
-              <strong>{user?.verificationStatus || "Pending Verification"}</strong>
+              <strong>{verificationStatus}</strong>
               <span>National ID review protects renters and owners.</span>
             </div>
           </div>

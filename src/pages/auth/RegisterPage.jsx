@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
 
 export default function RegisterPage() {
@@ -121,29 +122,15 @@ export default function RegisterPage() {
             <label htmlFor="password" className="form-label">
               Password
             </label>
-            <div className="auth-password-field">
-              <input
-                id="password"
-                name="password"
-                type={passwordType}
-                className="form-control"
-                value={formData.password}
-                onChange={handleChange}
-                minLength="6"
-                required
-              />
-              <button
-                type="button"
-                className="auth-password-toggle"
-                onClick={() => setShowPassword((current) => !current)}
-                aria-label={passwordToggleLabel}
-                title={passwordToggleLabel}
-                aria-controls="password"
-                aria-pressed={showPassword}
-              >
-                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
-              </button>
-            </div>
+            <PasswordInput
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              minLength="6"
+              autoComplete="new-password"
+              required
+            />
           </div>
 
           <section className="national-id-verification mb-4">
@@ -205,4 +192,3 @@ export default function RegisterPage() {
     </main>
   );
 }
-

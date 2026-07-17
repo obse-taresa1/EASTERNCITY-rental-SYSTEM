@@ -27,7 +27,7 @@ export default function ContactPage() {
       });
 
       setMessage(t("messageSent") || "Your message was sent successfully.");
-      form.reset();
+      form?.reset?.();
     } catch (error) {
       setMessage(error.message || "Could not send your message.");
     }

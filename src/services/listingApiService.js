@@ -1,4 +1,5 @@
 import { apiClient } from "./apiClient.js";
+import fallbackListingImage from "../assets/images/pc.png";
 
 const API_BASE_URL =
   import.meta.env?.VITE_API_BASE_URL ||
@@ -43,7 +44,12 @@ function buildQueryString(filters = {}) {
   const params = new URLSearchParams();
 
   Object.entries(filters).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === "" || value === "all") {
+    if (
+      value === undefined ||
+      value === null ||
+      value === "" ||
+      value === "all"
+    ) {
       return;
     }
     params.set(key, value);
@@ -81,7 +87,8 @@ export function normalizeListing(listing) {
   const firstImage =
     images[0]?.imageUrl ||
     resolveAssetUrl(listing.imageUrl) ||
-    resolveAssetUrl(listing.coverImage);
+    resolveAssetUrl(listing.coverImage) ||
+    fallbackListingImage;
 
   const category =
     categoryData?.slug || categoryData?.id || listing.category || "";
@@ -104,13 +111,13 @@ export function normalizeListing(listing) {
     categoryData,
     categoryName:
       categoryData?.name || listing.categoryName || listing.category || "",
-    sefar,
+    sefar: listing.sefar || listing.location || "",
     paymentProofUrl: resolveAssetUrl(listing.paymentProofUrl),
   };
 }
 
-export async function getPublicListings(filters = {}) {
-  const data = await apiClient.get(`/api/listings${buildQueryString(filters)}`);
+export async function getPublicListings() {
+  const data = await apiClient.get("/api/listings");
   return Array.isArray(data) ? data.map(normalizeListing) : [];
 }
 

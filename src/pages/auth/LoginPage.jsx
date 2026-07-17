@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
 
 const PASSWORD_RECOVERY_PATH = "/contact";
@@ -80,24 +81,17 @@ export default function LoginPage() {
             <label htmlFor="password" className="form-label">
               Password
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
-              className="form-control"
               value={formData.password}
               onChange={handleChange}
+              autoComplete="current-password"
               required
             />
           </div>
-          <div className="auth-form-row text-end mb-3">
-            <Link
-              to={PASSWORD_RECOVERY_PATH}
-              className="auth-forgot-link"
-              state={{ subject: "Forgot Password" }}
-            >
-              Forgot Password?
-            </Link>
+          <div className="text-end mb-3">
+            <Link to="/forgot-password">Forgot Password?</Link>
           </div>
           <button type="submit" className="btn btn-accent-custom w-100">
             Login

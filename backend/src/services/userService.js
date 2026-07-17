@@ -2,6 +2,23 @@
 const prisma = require('../config/db');
 const { hashPassword } = require('../utils/hash');
 
+const USER_UPDATE_FIELDS = new Set([
+  'name',
+  'email',
+  'password',
+  'role',
+  'status',
+  'city',
+  'sefer',
+  'address',
+]);
+
+function pickUserUpdateFields(updateData = {}) {
+  return Object.fromEntries(
+    Object.entries(updateData).filter(([key]) => USER_UPDATE_FIELDS.has(key)),
+  );
+}
+
 /**
  * Fetch all users from the database (passwords excluded)
  * @returns {Promise<Array>} List of users
@@ -14,6 +31,12 @@ const getAllUsers = async () => {
       email: true,
       role: true,
       status: true,
+      verificationStatus: true,
+      city: true,
+      sefer: true,
+      address: true,
+      nationalIdFrontUrl: true,
+      nationalIdBackUrl: true,
       createdAt: true,
     },
   });
@@ -33,6 +56,12 @@ const getUserById = async (id) => {
       email: true,
       role: true,
       status: true,
+      verificationStatus: true,
+      city: true,
+      sefer: true,
+      address: true,
+      nationalIdFrontUrl: true,
+      nationalIdBackUrl: true,
       createdAt: true,
     },
   });
@@ -55,16 +84,17 @@ const getUserById = async (id) => {
 const updateUser = async (id, updateData) => {
   // Check if user exists
   await getUserById(id);
+  const safeUpdateData = pickUserUpdateFields(updateData);
 
   // If password is being updated, hash it
-  if (updateData.password) {
-    updateData.password = await hashPassword(updateData.password);
+  if (safeUpdateData.password) {
+    safeUpdateData.password = await hashPassword(safeUpdateData.password);
   }
 
   // Ensure email uniqueness check if email is updated
-  if (updateData.email) {
+  if (safeUpdateData.email) {
     const existing = await prisma.user.findUnique({
-      where: { email: updateData.email },
+      where: { email: safeUpdateData.email },
     });
     if (existing && existing.id !== id) {
       const error = new Error('Email is already in use by another user.');
@@ -73,18 +103,36 @@ const updateUser = async (id, updateData) => {
     }
   }
 
-  return prisma.user.update({
+  const updatedUser = await prisma.user.update({
     where: { id },
-    data: updateData,
+    data: safeUpdateData,
     select: {
       id: true,
       name: true,
       email: true,
       role: true,
       status: true,
+      verificationStatus: true,
+      city: true,
+      sefer: true,
+      address: true,
+      nationalIdFrontUrl: true,
+      nationalIdBackUrl: true,
       createdAt: true,
     },
   });
+
+  if (safeUpdateData.status === 'SUSPENDED') {
+    await prisma.refreshToken.updateMany({
+      where: {
+        userId: id,
+        revokedAt: null,
+      },
+      data: { revokedAt: new Date() },
+    });
+  }
+
+  return updatedUser;
 };
 
 /**
@@ -131,6 +179,12 @@ const createAdminUser = async ({ name, email, password, role }) => {
       email: true,
       role: true,
       status: true,
+      verificationStatus: true,
+      city: true,
+      sefer: true,
+      address: true,
+      nationalIdFrontUrl: true,
+      nationalIdBackUrl: true,
       createdAt: true,
     },
   });

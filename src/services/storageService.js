@@ -1,26 +1,12 @@
-const MOCK_DATA_KEYS = [
-  "rental_bookings",
-  "rental_reviews",
-  "easterncity_contact_messages",
-  "easterncity_listings",
-  "easterncity_notifications",
-  "support_tickets"
-];
-
-const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
-
 export function getStorageItem(key, fallbackValue = null) {
-  if (!useMockAuth && MOCK_DATA_KEYS.includes(key)) return fallbackValue;
   return readLocalStorage(key, fallbackValue);
 }
 
 export function setStorageItem(key, value) {
-  if (!useMockAuth && MOCK_DATA_KEYS.includes(key)) return;
   writeLocalStorage(key, value);
 }
 
 export function removeStorageItem(key) {
-  if (!useMockAuth && MOCK_DATA_KEYS.includes(key)) return;
   removeLocalStorage(key);
 }
 
