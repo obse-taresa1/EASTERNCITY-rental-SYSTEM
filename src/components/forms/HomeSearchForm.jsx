@@ -29,7 +29,7 @@ export default function HomeSearchForm() {
     if (city !== "all") params.set("city", city);
     if (sefar !== "all") params.set("sefar", sefar);
     params.set("maxPrice", maxPrice);
-    if (status !== "all") params.set("status", status);
+    if (status !== "all") params.set("condition", status);
 
     navigate(`/items?${params.toString()}`);
   }

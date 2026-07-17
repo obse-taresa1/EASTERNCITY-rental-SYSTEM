@@ -1,12 +1,57 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
 import { getPromotionLabel } from "../../services/itemService.js";
+import { getStorageItem, setStorageItem } from "../../services/storageService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import fallbackListingImage from "../../assets/images/pc.png";
 
+const SAVED_KEY = "saved_items";
+
+function toSavedItem(item, userId) {
+  return {
+    id: item.id,
+    userId,
+    title: item.title,
+    image: item.image || item.coverImage || "",
+    location: item.location || item.sefar || item.city || "",
+    price: item.price || "",
+    pricePerDay: item.pricePerDay || 0,
+  };
+}
+
 export default function ListingCard({ item }) {
   const { t } = useLanguage();
+  const { currentUser, isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isSaved, setIsSaved] = useState(false);
+  const activeUser = user || currentUser;
+
+  useEffect(() => {
+    if (!item?.id) return;
+    function refreshSavedState() {
+      const savedItems = getStorageItem(SAVED_KEY, []);
+      setIsSaved(
+        savedItems.some(
+          (savedItem) =>
+            savedItem.id === item.id &&
+            String(savedItem.userId || "") === String(activeUser?.id || ""),
+        ),
+      );
+    }
+
+    refreshSavedState();
+    window.addEventListener("easterncity:saved-items-updated", refreshSavedState);
+    return () => {
+      window.removeEventListener(
+        "easterncity:saved-items-updated",
+        refreshSavedState,
+      );
+    };
+  }, [activeUser?.id, item?.id]);
 
   if (!item) return null;
 
@@ -26,6 +71,35 @@ export default function ListingCard({ item }) {
     categories.find((category) => category.id === item.category)?.name ||
     item.category;
 
+  function handleToggleSaved() {
+    if (!isAuthenticated || !activeUser?.id) {
+      navigate("/login", {
+        state: { from: location },
+      });
+      return;
+    }
+
+    const savedItems = getStorageItem(SAVED_KEY, []);
+    const nextSavedState = !savedItems.some(
+      (savedItem) =>
+        savedItem.id === item.id &&
+        String(savedItem.userId || "") === String(activeUser?.id || ""),
+    );
+    const updatedItems = nextSavedState
+      ? [toSavedItem(item, activeUser.id), ...savedItems]
+      : savedItems.filter(
+          (savedItem) =>
+            !(
+              savedItem.id === item.id &&
+              String(savedItem.userId || "") === String(activeUser.id)
+            ),
+        );
+
+    setStorageItem(SAVED_KEY, updatedItems);
+    setIsSaved(nextSavedState);
+    window.dispatchEvent(new Event("easterncity:saved-items-updated"));
+  }
+
   return (
     <article className="premium-glass-card listing-card-premium">
       <div className="card-img-wrapper">
@@ -33,6 +107,11 @@ export default function ListingCard({ item }) {
           src={item.image || item.coverImage || fallbackListingImage}
           alt={item.imageAlt || item.title}
           className="card-img"
+          onError={(event) => {
+            if (event.currentTarget.src !== fallbackListingImage) {
+              event.currentTarget.src = fallbackListingImage;
+            }
+          }}
         />
         <div className="card-badges">
           {item.featured && (
@@ -115,8 +194,9 @@ export default function ListingCard({ item }) {
               type="button"
               className="btn-icon-soft"
               aria-label={t("wishlist")}
+              onClick={handleToggleSaved}
             >
-              <i className="bi bi-heart"></i>
+              <i className={`bi ${isSaved ? "bi-heart-fill" : "bi-heart"}`}></i>
             </button>
           </div>
         </div>

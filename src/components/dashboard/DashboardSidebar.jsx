@@ -1,11 +1,14 @@
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import {
-  getBookingsByUser,
-  getReviewsByUser,
-} from "../../services/bookingService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
+import { getMyReviews } from "../../services/reviewApiService.js";
 import { getStorageItem } from "../../services/storageService.js";
+import {
+  isVerificationApproved,
+  normalizeVerificationStatus,
+} from "../../utils/verificationStatus.js";
 
 function getInitials(name) {
   if (!name) return "U";
@@ -58,18 +61,74 @@ export default function DashboardSidebar() {
 
   const memberSince = activeUser?.createdAt
     ? new Date(activeUser.createdAt).getFullYear()
-    : new Date().getFullYear();
+    : "N/A";
 
-  const bookings = activeUser ? getBookingsByUser(activeUser.id) : [];
-  const activeBookings = bookings.filter((b) =>
-    ["PENDING", "ACCEPTED", "ACTIVE"].includes(String(b.status || "").toUpperCase()),
-  ).length;
-  const reviews = activeUser ? getReviewsByUser(activeUser.id).length : 0;
-  const savedItems = getStorageItem("saved_items", []).length;
+  const [activeBookings, setActiveBookings] = useState(0);
+  const [reviews, setReviews] = useState(0);
+  const [savedItems, setSavedItems] = useState(
+    () =>
+      getStorageItem("saved_items", []).filter(
+        (item) => String(item.userId || "") === String(activeUser?.id || ""),
+      ).length,
+  );
 
-  const isVerified = String(activeUser?.verificationStatus || "")
-    .toLowerCase()
-    .includes("verified");
+  useEffect(() => {
+    function refreshSavedCount() {
+      setSavedItems(
+        getStorageItem("saved_items", []).filter(
+          (item) => String(item.userId || "") === String(activeUser?.id || ""),
+        ).length,
+      );
+    }
+
+    refreshSavedCount();
+    window.addEventListener("easterncity:saved-items-updated", refreshSavedCount);
+    return () => {
+      window.removeEventListener(
+        "easterncity:saved-items-updated",
+        refreshSavedCount,
+      );
+    };
+  }, [activeUser?.id]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadUserStats() {
+      if (!activeUser?.id) {
+        setActiveBookings(0);
+        setReviews(0);
+        return;
+      }
+
+      const [bookingData, reviewData] = await Promise.all([
+        getMyBookings().catch(() => []),
+        getMyReviews().catch(() => []),
+      ]);
+
+      if (!active) return;
+
+      setActiveBookings(
+        bookingData.filter((booking) =>
+          ["PENDING", "ACCEPTED", "ACTIVE"].includes(
+            String(booking.status || "").toUpperCase(),
+          ),
+        ).length,
+      );
+      setReviews(reviewData.length);
+    }
+
+    loadUserStats();
+
+    return () => {
+      active = false;
+    };
+  }, [activeUser?.id]);
+
+  const verificationStatus = normalizeVerificationStatus(
+    activeUser?.verificationStatus,
+  );
+  const isVerified = isVerificationApproved(verificationStatus);
 
   function handleLogout() {
     logout();
@@ -88,22 +147,22 @@ export default function DashboardSidebar() {
           )}
           <span
             className={`ud-avatar-badge ${isVerified ? "ud-badge-verified" : "ud-badge-pending"}`}
-            title={isVerified ? "Verified" : "Pending"}
+            title={verificationStatus}
           >
             <i className={`bi ${isVerified ? "bi-check-lg" : "bi-clock"}`} />
           </span>
         </div>
 
         <div className="ud-sidebar-user-info">
-          <h5 className="ud-sidebar-name">{activeUser?.name || "EasternCity User"}</h5>
+          <h5 className="ud-sidebar-name">{activeUser?.name || "User"}</h5>
           <span className={`ud-verification-tag ${isVerified ? "verified" : "pending"}`}> 
             <i className={`bi ${isVerified ? "bi-shield-check" : "bi-shield-exclamation"}`} />
-            {activeUser?.verificationStatus || "Pending Verification"}
+            {verificationStatus}
           </span>
           <div className="ud-sidebar-meta">
             <span>
               <i className="bi bi-geo-alt" />
-              {activeUser?.city || "Jigjiga"}
+              {activeUser?.city || "Location not set"}
             </span>
             <span>
               <i className="bi bi-calendar3" />

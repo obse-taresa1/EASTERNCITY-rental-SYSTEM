@@ -46,6 +46,113 @@ function toListingData(listing) {
   };
 }
 
+function normalizeQueryValue(value) {
+  const normalized = String(value || "").trim();
+  return normalized && normalized.toLowerCase() !== "all" ? normalized : "";
+}
+
+function buildPublicListingWhere(query = {}) {
+  const search = normalizeQueryValue(query.search || query.keyword || query.q);
+  const category = normalizeQueryValue(
+    query.category || query.categoryId || query.categorySlug,
+  );
+  const city = normalizeQueryValue(query.city);
+  const sefar = normalizeQueryValue(
+    query.sefar || query.sefer || query.neighborhood || query.location,
+  );
+  const minPrice = Number(
+    query.minPrice || query.priceMin || query.minimumPrice || 0,
+  );
+  const maxPrice = Number(
+    query.maxPrice || query.priceMax || query.maximumPrice || 0,
+  );
+  const condition = normalizeQueryValue(query.condition || query.itemCondition);
+  const listingType = normalizeQueryValue(query.listingType || query.type);
+  const propertyType = normalizeQueryValue(query.propertyType);
+  const bedrooms = normalizeQueryValue(query.bedrooms || query.bedroom);
+  const bathrooms = normalizeQueryValue(query.bathrooms || query.bathroom);
+
+  const where = {};
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { description: { contains: search, mode: "insensitive" } },
+      { city: { contains: search, mode: "insensitive" } },
+      { location: { contains: search, mode: "insensitive" } },
+      {
+        category: {
+          is: { name: { contains: search, mode: "insensitive" } },
+        },
+      },
+      {
+        category: {
+          is: { slug: { contains: search, mode: "insensitive" } },
+        },
+      },
+    ];
+  }
+
+  if (category) {
+    where.category = {
+      is: {
+        OR: [
+          { id: category },
+          { slug: { equals: category, mode: "insensitive" } },
+          { name: { equals: category, mode: "insensitive" } },
+        ],
+      },
+    };
+  }
+
+  if (city) {
+    where.city = { equals: city, mode: "insensitive" };
+  }
+
+  if (sefar) {
+    where.location = { contains: sefar, mode: "insensitive" };
+  }
+
+  if (minPrice > 0 || maxPrice > 0) {
+    where.pricePerDay = {};
+    if (minPrice > 0) where.pricePerDay.gte = minPrice;
+    if (maxPrice > 0) where.pricePerDay.lte = maxPrice;
+  }
+
+  const textFilters = [
+    condition,
+    listingType,
+    propertyType,
+    bedrooms ? `${bedrooms} bedroom` : "",
+    bathrooms ? `${bathrooms} bathroom` : "",
+  ].filter(Boolean);
+
+  if (textFilters.length > 0) {
+    where.AND = [
+      ...(where.AND || []),
+      ...textFilters.map((value) => ({
+        OR: [
+          { title: { contains: value, mode: "insensitive" } },
+          { description: { contains: value, mode: "insensitive" } },
+          { location: { contains: value, mode: "insensitive" } },
+          {
+            category: {
+              is: { name: { contains: value, mode: "insensitive" } },
+            },
+          },
+          {
+            category: {
+              is: { slug: { contains: value, mode: "insensitive" } },
+            },
+          },
+        ],
+      })),
+    ];
+  }
+
+  return where;
+}
+
 async function resolveCategoryId(payload) {
   if (payload.categoryId) {
     const category = await categoryRepository.findById(payload.categoryId);
@@ -75,6 +182,7 @@ async function resolveCategoryId(payload) {
 
 async function listPublic(query) {
   return listingRepository.findPublic({
+    where: buildPublicListingWhere(query),
     orderBy: {
       createdAt: "desc",
     },

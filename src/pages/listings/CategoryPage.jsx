@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import SectionHeader from "../../components/common/SectionHeader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
 import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
+import { listingMatchesRentalCategory } from "../../utils/categoryMapping.js";
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -41,21 +41,46 @@ export default function CategoryPage() {
 
   const allItems = useMemo(
     () =>
-      listings.filter(
-        (item) =>
-          item.category === categoryId || item.categoryName === category?.name,
+      listings.filter((item) =>
+        listingMatchesRentalCategory(item, categoryId),
       ),
-    [listings, categoryId, category],
+    [listings, categoryId],
   );
 
   const sefarOptions = city !== "all" ? getSefarByCity(city) : [];
 
   const filteredItems = useMemo(() => {
     return allItems.filter((item) => {
-      if (search && !item.title.toLowerCase().includes(search.toLowerCase()))
+      const searchTerm = search.toLowerCase().trim();
+      if (
+        searchTerm &&
+        ![
+          item.title,
+          item.description,
+          item.categoryName,
+          item.category,
+          item.city,
+          item.location,
+        ]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(searchTerm))
+      ) {
         return false;
-      if (city !== "all" && item.city !== city) return false;
-      if (sefar !== "all" && item.sefar !== sefar) return false;
+      }
+      if (
+        city !== "all" &&
+        String(item.city || "").toLowerCase() !== city.toLowerCase()
+      ) {
+        return false;
+      }
+      if (
+        sefar !== "all" &&
+        !String(item.sefar || item.location || "")
+          .toLowerCase()
+          .includes(sefar.toLowerCase())
+      ) {
+        return false;
+      }
       if (item.pricePerDay > maxPrice) return false;
       return true;
     });
@@ -231,6 +256,12 @@ export default function CategoryPage() {
 
 function CategoryListingCard({ item, t }) {
   const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
+  const ownerName =
+    item.ownerName ||
+    item.owner?.businessName ||
+    item.owner?.name ||
+    (typeof item.owner === "string" ? item.owner : "") ||
+    "Verified Owner";
 
   return (
     <article className="premium-glass-card listing-card-premium">
@@ -280,11 +311,9 @@ function CategoryListingCard({ item, t }) {
         {/* Owner */}
         <div className="card-owner-info">
           <div className="owner-avatar">
-            {(item.owner || item.ownerName || "V").charAt(0)}
+            {String(ownerName).charAt(0)}
           </div>
-          <span className="owner-name">
-            {item.owner || item.ownerName || "Verified Owner"}
-          </span>
+          <span className="owner-name">{String(ownerName)}</span>
           <i
             className="bi bi-patch-check-fill text-success"
             title="Verified Owner"

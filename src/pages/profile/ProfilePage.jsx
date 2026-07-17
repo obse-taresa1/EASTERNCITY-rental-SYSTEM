@@ -13,10 +13,10 @@ export default function ProfilePage() {
         </div>
 
         <div>
-          {/* Error 1: Fixed missing || operator */}
           <h2 className="h4">{user?.name || "User"}</h2>
-          {/* Error 2: Fixed missing || operator */}
-          <p className="text-muted mb-1">{user?.email || "user@example.com"}</p>
+          <p className="text-muted mb-1">
+            {user?.email || "Email not available"}
+          </p>
           <p className="mb-0">
             <strong>Role:</strong> {user?.role || "USER"}
           </p>

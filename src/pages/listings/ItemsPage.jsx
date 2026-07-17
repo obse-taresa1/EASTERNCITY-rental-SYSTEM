@@ -4,6 +4,7 @@ import ItemGrid from "../../components/listings/ItemGrid.jsx";
 import SectionHeader from "../../components/common/SectionHeader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getPublicListings } from "../../services/listingApiService.js";
+import { listingMatchesRentalCategory } from "../../utils/categoryMapping.js";
 
 export default function ItemsPage() {
   const { t } = useLanguage();
@@ -12,12 +13,18 @@ export default function ItemsPage() {
   const category = searchParams.get("category") || "all";
   const city = searchParams.get("city") || "all";
   const sefar = searchParams.get("sefar") || "all";
+  const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
-  const status = searchParams.get("status") || "all";
+  const condition =
+    searchParams.get("condition") || searchParams.get("status") || "all";
 
   const [search, setSearch] = useState(initialSearch);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
 
   useEffect(() => {
     let active = true;
@@ -25,7 +32,14 @@ export default function ItemsPage() {
     async function loadListings() {
       setLoading(true);
       try {
-        const data = await getPublicListings();
+        const data = await getPublicListings({
+          search: initialSearch,
+          city,
+          sefar,
+          minPrice,
+          maxPrice,
+          condition,
+        });
         if (active) setListings(data);
       } finally {
         if (active) setLoading(false);
@@ -36,21 +50,39 @@ export default function ItemsPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [initialSearch, category, city, sefar, minPrice, maxPrice, condition]);
 
   const filteredItems = useMemo(() => {
     const searchTerm = search.toLowerCase().trim();
 
     return listings.filter((item) => {
       const itemCategory = item.category || item.categoryName || "";
-      const itemStatus = String(item.status || "").toLowerCase();
+      const itemCondition = String(item.condition || item.itemCondition || "").toLowerCase();
 
       if (
-        status !== "all" &&
-        itemStatus &&
-        itemStatus !== String(status).toLowerCase()
+        condition !== "all" &&
+        itemCondition &&
+        itemCondition !== String(condition).toLowerCase()
       ) {
         return false;
+      }
+
+      if (condition !== "all" && !itemCondition) {
+        const conditionTerm = String(condition).toLowerCase();
+        const conditionFields = [
+          item.title,
+          item.description,
+          item.categoryName,
+          item.category,
+          ...(Array.isArray(item.features) ? item.features : []),
+        ];
+        if (
+          !conditionFields
+            .filter(Boolean)
+            .some((value) => String(value).toLowerCase().includes(conditionTerm))
+        ) {
+          return false;
+        }
       }
 
       if (searchTerm) {
@@ -62,7 +94,7 @@ export default function ItemsPage() {
         if (!match) return false;
       }
 
-      if (category && category !== "all" && itemCategory !== category) {
+      if (!listingMatchesRentalCategory(item, category)) {
         return false;
       }
 
@@ -71,6 +103,14 @@ export default function ItemsPage() {
       }
 
       if (sefar && sefar !== "all" && item.sefar !== sefar) {
+        return false;
+      }
+
+      if (
+        minPrice &&
+        Number(minPrice) > 0 &&
+        Number(item.pricePerDay || 0) < Number(minPrice)
+      ) {
         return false;
       }
 
@@ -84,7 +124,7 @@ export default function ItemsPage() {
 
       return true;
     });
-  }, [search, category, city, sefar, maxPrice, status, listings]);
+  }, [search, category, city, sefar, minPrice, maxPrice, condition, listings]);
 
   if (loading) {
     return <div className="container py-5">Loading items...</div>;

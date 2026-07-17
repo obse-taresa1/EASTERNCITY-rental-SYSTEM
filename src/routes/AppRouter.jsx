@@ -28,6 +28,10 @@ import MyBookingsPage from "../pages/booking/MyBookingsPage.jsx";
 import BothDashboardPage from "../pages/dashboard/BothDashboardPage.jsx";
 import ListItemPage from "../pages/dashboard/ListItemPage.jsx";
 import MyListingsPage from "../pages/dashboard/MyListingsPage.jsx";
+import SavedItemsPage from "../pages/dashboard/SavedItemsPage.jsx";
+import DashboardSettingsPage from "../pages/dashboard/DashboardSettingsPage.jsx";
+import ReviewsPage from "../pages/dashboard/ReviewsPage.jsx";
+import VerificationPage from "../pages/dashboard/VerificationPage.jsx";
 
 import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import MessagesPage from "../pages/profile/MessagesPage.jsx";
@@ -35,6 +39,8 @@ import NotificationsPage from "../pages/profile/NotificationsPage.jsx";
 
 import LoginPage from "../pages/auth/LoginPage.jsx";
 import RegisterPage from "../pages/auth/RegisterPage.jsx";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage.jsx";
 
 
 import AdminPaymentsPage from "../pages/admin/AdminPaymentsPage.jsx";
@@ -99,6 +105,8 @@ export default function AppRouter() {
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
@@ -140,6 +148,10 @@ export default function AppRouter() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/saved-items" element={<SavedItemsPage />} />
+            <Route path="/dashboard-settings" element={<DashboardSettingsPage />} />
+            <Route path="/reviews" element={<ReviewsPage />} />
+            <Route path="/verification" element={<VerificationPage />} />
           </Route>
         </Route>
 

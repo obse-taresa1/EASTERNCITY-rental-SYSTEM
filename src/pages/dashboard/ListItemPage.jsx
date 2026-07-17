@@ -481,9 +481,6 @@ export default function ListItemPage() {
           <h1>List an Item for Rent</h1>
           <p>Complete the details renters need before contacting you.</p>
         </div>
-        <div className="free-listing-note">
-          You have used 2 of your 3 free listings.
-        </div>
       </div>
 
       {notice && <div className="listing-form-notice">{notice}</div>}

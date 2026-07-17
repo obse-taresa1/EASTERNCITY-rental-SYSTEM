@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const multer = require("multer");
 
 const IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -17,7 +18,9 @@ function safeFilename(filename) {
 function createStorage(folder) {
   return multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, path.join(process.cwd(), "uploads", folder));
+      const uploadPath = path.join(process.cwd(), "uploads", folder);
+      fs.mkdirSync(uploadPath, { recursive: true });
+      cb(null, uploadPath);
     },
     filename(req, file, cb) {
       cb(null, `${Date.now()}-${safeFilename(file.originalname)}`);
@@ -55,10 +58,22 @@ const paymentUpload = multer({
   },
 });
 
+const verificationUpload = multer({
+  storage: createStorage("verification"),
+  fileFilter: imageFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
 module.exports = {
   listingImages: listingUpload.fields([
     { name: "images", maxCount: 8 },
     { name: "paymentProof", maxCount: 1 },
   ]),
   paymentProof: paymentUpload.single("paymentProof"),
+  verificationDocuments: verificationUpload.fields([
+    { name: "nationalIdFront", maxCount: 1 },
+    { name: "nationalIdBack", maxCount: 1 },
+  ]),
 };

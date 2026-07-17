@@ -1,17 +1,12 @@
-const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
-
 export function getStorageItem(key, fallbackValue = null) {
-  if (!useMockAuth) return fallbackValue;
   return readLocalStorage(key, fallbackValue);
 }
 
 export function setStorageItem(key, value) {
-  if (!useMockAuth) return;
   writeLocalStorage(key, value);
 }
 
 export function removeStorageItem(key) {
-  if (!useMockAuth) return;
   removeLocalStorage(key);
 }
 

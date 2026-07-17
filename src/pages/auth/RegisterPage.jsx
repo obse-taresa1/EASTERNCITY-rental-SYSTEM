@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
 
 export default function RegisterPage() {
@@ -117,14 +118,13 @@ export default function RegisterPage() {
             <label htmlFor="password" className="form-label">
               Password
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
-              className="form-control"
               value={formData.password}
               onChange={handleChange}
               minLength="6"
+              autoComplete="new-password"
               required
             />
           </div>
