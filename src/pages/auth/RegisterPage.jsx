@@ -18,6 +18,10 @@ export default function RegisterPage() {
 
   const [error, setError] = useState("");
   const [fileNotice, setFileNotice] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const passwordType = showPassword ? "text" : "password";
+  const passwordToggleLabel = showPassword ? "Hide password" : "Show password";
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -188,4 +192,3 @@ export default function RegisterPage() {
     </main>
   );
 }
-

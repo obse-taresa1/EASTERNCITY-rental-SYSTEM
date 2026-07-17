@@ -1,17 +1,21 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { createContactMessage } from "../../services/contactMessageService.js";
 
 export default function ContactPage() {
+  const location = useLocation();
   const [message, setMessage] = useState("");
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const { t } = useLanguage();
+  const subject = location.state?.subject || "";
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
     try {
       await createContactMessage({
@@ -23,7 +27,7 @@ export default function ContactPage() {
       });
 
       setMessage(t("messageSent") || "Your message was sent successfully.");
-      event.currentTarget.reset();
+      form.reset();
     } catch (error) {
       setMessage(error.message || "Could not send your message.");
     }
@@ -87,6 +91,7 @@ export default function ContactPage() {
                   id="contact-subject"
                   name="subject"
                   className="form-control"
+                  defaultValue={subject}
                   required
                 />
               </div>

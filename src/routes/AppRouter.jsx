@@ -42,7 +42,6 @@ import RegisterPage from "../pages/auth/RegisterPage.jsx";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "../pages/auth/ResetPasswordPage.jsx";
 
-
 import AdminPaymentsPage from "../pages/admin/AdminPaymentsPage.jsx";
 import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage.jsx";
 import FeaturedListingsPage from "../pages/admin/FeaturedListingsPage.jsx";
@@ -138,6 +137,51 @@ export default function AppRouter() {
               }
             />
 
+            <Route
+              path="/saved-items"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <SavedItemsPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/reviews"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <ReviewsPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/verification"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <VerificationPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/dashboard-settings"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <DashboardSettingsPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/help-center"
+              element={
+                <RoleRoute allowedRoles={["USER"]}>
+                  <HelpCenterPage />
+                </RoleRoute>
+              }
+            />
+
             <Route path="/booking/:itemId" element={<BookingPage />} />
             <Route
               path="/booking/success/:bookingId"
@@ -149,7 +193,10 @@ export default function AppRouter() {
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/saved-items" element={<SavedItemsPage />} />
-            <Route path="/dashboard-settings" element={<DashboardSettingsPage />} />
+            <Route
+              path="/dashboard-settings"
+              element={<DashboardSettingsPage />}
+            />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/verification" element={<VerificationPage />} />
           </Route>
@@ -159,36 +206,88 @@ export default function AppRouter() {
           <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
-              <Route path="/admin-dashboard/categories" element={<AdminCategoriesPage />} />
-              <Route path="/admin-dashboard/payments" element={<AdminPaymentsPage />} />
+              <Route
+                path="/admin-dashboard/categories"
+                element={<AdminCategoriesPage />}
+              />
+              <Route
+                path="/admin-dashboard/payments"
+                element={<AdminPaymentsPage />}
+              />
               <Route
                 path="/admin-dashboard/promotion-management"
                 element={<SuperPromotionManagementPage scope="admin" />}
               />
-              <Route path="/admin-dashboard/featured-listings" element={<FeaturedListingsPage />} />
-              <Route path="/admin-dashboard/promotion-history" element={<PromotionHistoryPage />} />
-              <Route path="/admin-dashboard/verification-requests" element={<AdminVerificationPage />} />
-              <Route path="/admin-dashboard/analytics" element={<AdminAnalyticsPage />} />
-              <Route path="/admin-dashboard/support-tickets" element={<AdminSupportTicketsPage />} />
-              <Route path="/admin-dashboard/contact-messages" element={<ContactMessagesPage />} />
-              <Route path="/admin-dashboard/notifications" element={<AdminNotificationsPage />} />
-              <Route path="/admin-dashboard/owners" element={<AdminOwnersPage />} />
-<Route path="/admin-dashboard/renters" element={<AdminRentersPage />} />
-<Route path="/admin-dashboard/bookings" element={<AdminBookingsPage />} />
-<Route path="/admin-dashboard/reviews" element={<AdminReviewsPage />} />
-<Route path="/admin-dashboard/users" element={<UserManagementPage />} />
-              <Route path="/admin-dashboard/listings" element={<AdminListingManagementPage />} />
-              <Route path="/admin-dashboard/reports" element={<AdminReportsPage />} />
-              <Route path="/admin-dashboard/statistics" element={<AdminStatisticsPage />} />
-              <Route path="/admin-dashboard/settings" element={<AdminSettingsPage />} />
+              <Route
+                path="/admin-dashboard/featured-listings"
+                element={<FeaturedListingsPage />}
+              />
+              <Route
+                path="/admin-dashboard/promotion-history"
+                element={<PromotionHistoryPage />}
+              />
+              <Route
+                path="/admin-dashboard/verification-requests"
+                element={<AdminVerificationPage />}
+              />
+              <Route
+                path="/admin-dashboard/analytics"
+                element={<AdminAnalyticsPage />}
+              />
+              <Route
+                path="/admin-dashboard/support-tickets"
+                element={<AdminSupportTicketsPage />}
+              />
+              <Route
+                path="/admin-dashboard/contact-messages"
+                element={<ContactMessagesPage />}
+              />
+              <Route
+                path="/admin-dashboard/notifications"
+                element={<AdminNotificationsPage />}
+              />
+              <Route
+                path="/admin-dashboard/owners"
+                element={<AdminOwnersPage />}
+              />
+              <Route
+                path="/admin-dashboard/renters"
+                element={<AdminRentersPage />}
+              />
+              <Route
+                path="/admin-dashboard/bookings"
+                element={<AdminBookingsPage />}
+              />
+              <Route
+                path="/admin-dashboard/reviews"
+                element={<AdminReviewsPage />}
+              />
+              <Route
+                path="/admin-dashboard/users"
+                element={<UserManagementPage />}
+              />
+              <Route
+                path="/admin-dashboard/listings"
+                element={<AdminListingManagementPage />}
+              />
+              <Route
+                path="/admin-dashboard/reports"
+                element={<AdminReportsPage />}
+              />
+              <Route
+                path="/admin-dashboard/statistics"
+                element={<AdminStatisticsPage />}
+              />
+              <Route
+                path="/admin-dashboard/settings"
+                element={<AdminSettingsPage />}
+              />
             </Route>
           </Route>
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route
-            element={<RoleRoute allowedRoles={["SUPER_ADMIN"]} />}
-          >
+          <Route element={<RoleRoute allowedRoles={["SUPER_ADMIN"]} />}>
             <Route element={<SuperAdminLayout />}>
               <Route
                 path="/super-admin-dashboard"
@@ -226,16 +325,46 @@ export default function AppRouter() {
                 path="/super-admin-dashboard/activity-logs"
                 element={<ActivityLogsPage />}
               />
-              <Route path="/super-admin-dashboard/platform-overview" element={<PlatformOverviewPage />} />
-              <Route path="/super-admin-dashboard/payments-revenue" element={<SuperPaymentsRevenuePage />} />
-              <Route path="/super-admin-dashboard/verification-center" element={<SuperVerificationCenterPage />} />
-              <Route path="/super-admin-dashboard/security-center" element={<SecurityCenterPage />} />
-              <Route path="/super-admin-dashboard/reports-complaints" element={<SuperReportsComplaintsPage />} />
-              <Route path="/super-admin-dashboard/support-center" element={<SuperSupportCenterPage />} />
-              <Route path="/super-admin-dashboard/categories-management" element={<SuperCategoriesManagementPage />} />
-              <Route path="/super-admin-dashboard/platform-monitoring" element={<SuperPlatformMonitoringPage />} />
-              <Route path="/super-admin-dashboard/promotion-management" element={<SuperPromotionManagementPage />} />
-              <Route path="/super-admin-dashboard/system-settings" element={<SystemSettingsPage />} />
+              <Route
+                path="/super-admin-dashboard/platform-overview"
+                element={<PlatformOverviewPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/payments-revenue"
+                element={<SuperPaymentsRevenuePage />}
+              />
+              <Route
+                path="/super-admin-dashboard/verification-center"
+                element={<SuperVerificationCenterPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/security-center"
+                element={<SecurityCenterPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/reports-complaints"
+                element={<SuperReportsComplaintsPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/support-center"
+                element={<SuperSupportCenterPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/categories-management"
+                element={<SuperCategoriesManagementPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/platform-monitoring"
+                element={<SuperPlatformMonitoringPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/promotion-management"
+                element={<SuperPromotionManagementPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/system-settings"
+                element={<SystemSettingsPage />}
+              />
             </Route>
           </Route>
         </Route>

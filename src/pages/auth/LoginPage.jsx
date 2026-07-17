@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
 
+const PASSWORD_RECOVERY_PATH = "/contact";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();

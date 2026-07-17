@@ -50,14 +50,14 @@ export default function ItemsPage() {
     return () => {
       active = false;
     };
-  }, [initialSearch, category, city, sefar, minPrice, maxPrice, condition]);
+  }, []);
 
   const filteredItems = useMemo(() => {
     const searchTerm = search.toLowerCase().trim();
 
     return listings.filter((item) => {
       const itemCategory = item.category || item.categoryName || "";
-      const itemCondition = String(item.condition || item.itemCondition || "").toLowerCase();
+      const itemStatus = String(item.status || "").toLowerCase();
 
       if (
         condition !== "all" &&
@@ -79,7 +79,9 @@ export default function ItemsPage() {
         if (
           !conditionFields
             .filter(Boolean)
-            .some((value) => String(value).toLowerCase().includes(conditionTerm))
+            .some((value) =>
+              String(value).toLowerCase().includes(conditionTerm),
+            )
         ) {
           return false;
         }
@@ -88,13 +90,14 @@ export default function ItemsPage() {
       if (searchTerm) {
         const match =
           (item.title || "").toLowerCase().includes(searchTerm) ||
-          itemCategory.toLowerCase().includes(searchTerm) ||
+          (item.category || "").toLowerCase().includes(searchTerm) ||
+          (item.categoryName || "").toLowerCase().includes(searchTerm) ||
           (item.city || "").toLowerCase().includes(searchTerm) ||
           (item.location || "").toLowerCase().includes(searchTerm);
         if (!match) return false;
       }
 
-      if (!listingMatchesRentalCategory(item, category)) {
+      if (category && category !== "all" && itemCategory !== category) {
         return false;
       }
 
@@ -102,8 +105,16 @@ export default function ItemsPage() {
         return false;
       }
 
-      if (sefar && sefar !== "all" && item.sefar !== sefar) {
-        return false;
+      if (sefar && sefar !== "all") {
+        const itemSefar = String(item.sefar || "").toLowerCase();
+        const itemLocation = String(item.location || "").toLowerCase();
+        const selectedSefar = String(sefar).toLowerCase();
+        if (
+          itemSefar !== selectedSefar &&
+          !itemLocation.includes(selectedSefar)
+        ) {
+          return false;
+        }
       }
 
       if (

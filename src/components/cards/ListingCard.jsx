@@ -2,9 +2,17 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import {
+  getStorageItem,
+  setStorageItem,
+} from "../../services/storageService.js";
 import { categories } from "../../data/items.js";
 import { getPromotionLabel } from "../../services/itemService.js";
-import { getStorageItem, setStorageItem } from "../../services/storageService.js";
+import {
+  getStorageItem,
+  setStorageItem,
+} from "../../services/storageService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import fallbackListingImage from "../../assets/images/pc.png";
 
@@ -44,7 +52,10 @@ export default function ListingCard({ item }) {
     }
 
     refreshSavedState();
-    window.addEventListener("easterncity:saved-items-updated", refreshSavedState);
+    window.addEventListener(
+      "easterncity:saved-items-updated",
+      refreshSavedState,
+    );
     return () => {
       window.removeEventListener(
         "easterncity:saved-items-updated",
@@ -115,7 +126,9 @@ export default function ListingCard({ item }) {
         />
         <div className="card-badges">
           {item.featured && (
-            <span className="badge-featured">{promotionLabel || t("featured")}</span>
+            <span className="badge-featured">
+              {promotionLabel || t("featured")}
+            </span>
           )}
           {item.city && (
             <span className="badge-city">

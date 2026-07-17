@@ -1,5 +1,6 @@
 const repository = require("../repositories/message.repository");
 const conversationRepository = require("../repositories/conversation.repository");
+const conversationService = require("./conversation.service");
 const notificationService = require("./notificationService");
 
 async function sendMessage(userId, payload) {
@@ -7,7 +8,7 @@ async function sendMessage(userId, payload) {
     payload.conversationId,
   );
 
-  if (!conversation) {
+  if (!conversation || !conversationService.isParticipant(conversation, userId)) {
     const error = new Error("Conversation not found.");
     error.statusCode = 404;
     throw error;
@@ -18,6 +19,11 @@ async function sendMessage(userId, payload) {
     senderId: userId,
     body: payload.body,
   });
+
+  await conversationRepository.updateLastMessageAt(
+    payload.conversationId,
+    message.createdAt,
+  );
 
   const recipientId =
     conversation.participantOneId === userId
@@ -34,6 +40,14 @@ async function sendMessage(userId, payload) {
 }
 
 async function getConversationMessages(userId, conversationId) {
+  const conversation = await conversationRepository.findById(conversationId);
+
+  if (!conversation || !conversationService.isParticipant(conversation, userId)) {
+    const error = new Error("Conversation not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+
   await repository.markConversationMessagesRead(conversationId, userId);
   return repository.findByConversation(conversationId);
 }
