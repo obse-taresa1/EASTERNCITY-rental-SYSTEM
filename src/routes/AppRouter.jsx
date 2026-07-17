@@ -32,6 +32,7 @@ import SavedItemsPage from "../pages/dashboard/SavedItemsPage.jsx";
 import DashboardSettingsPage from "../pages/dashboard/DashboardSettingsPage.jsx";
 import ReviewsPage from "../pages/dashboard/ReviewsPage.jsx";
 import VerificationPage from "../pages/dashboard/VerificationPage.jsx";
+import HelpCenterPage from "../pages/dashboard/HelpCenterPage.jsx";
 
 import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import MessagesPage from "../pages/profile/MessagesPage.jsx";
