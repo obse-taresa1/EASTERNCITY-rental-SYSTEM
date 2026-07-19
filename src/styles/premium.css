@@ -2069,3 +2069,38 @@ section.motorx-hero .hero-slider-controls {
 [data-theme="dark"] a:not(.btn):not(.nav-link):not(.admin-nav-item):not(.motorx-logo):not(.footer-logo-link):hover {
   color: #fecaca;
 }
+
+/* Restore original public logo rendering */
+.app-public-header .motorx-nav-flex {
+  min-height: initial;
+  padding: 1rem 0;
+}
+
+.app-public-header .motorx-logo img,
+.app-public-header .navbar-brand img {
+  height: 72px !important;
+  width: auto !important;
+  max-height: 72px !important;
+  object-fit: contain;
+  filter: none !important;
+}
+
+@media (max-width: 575px) {
+  .app-public-header .motorx-logo img,
+  .app-public-header .navbar-brand img {
+    height: 56px !important;
+    max-height: 56px !important;
+  }
+}
+
+.footer-premium .footer-logo-link {
+  margin-bottom: 1rem !important;
+}
+
+.footer-premium .footer-logo-img {
+  height: 40px !important;
+  width: auto !important;
+  max-height: none !important;
+  object-fit: contain;
+  filter: brightness(1.1) !important;
+}

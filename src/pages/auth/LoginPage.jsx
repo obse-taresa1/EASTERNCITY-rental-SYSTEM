@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
+
+const PASSWORD_RECOVERY_PATH = "/contact";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -27,13 +30,17 @@ export default function LoginPage() {
     setError("");
     try {
       const loggedInUser = await login(formData.email, formData.password);
-      const pendingContactUrl = localStorage.getItem("pendingContactUrl");
+      const { getStorageItem, removeStorageItem } =
+        await import("../../services/storageService.js");
+
+      const pendingContactUrl = getStorageItem("pendingContactUrl", null);
       if (pendingContactUrl) {
-        localStorage.removeItem("pendingContactUrl");
+        removeStorageItem("pendingContactUrl");
         navigate(pendingContactUrl, {
           replace: true,
           state: {
-            contactReadyMessage: "You are signed in. Click Contact Owner to start the conversation.",
+            contactReadyMessage:
+              "You are signed in. Click Contact Owner to start the conversation.",
           },
         });
         return;
@@ -51,22 +58,49 @@ export default function LoginPage() {
       <section className="auth-card">
         <span className="section-label">WELCOME BACK</span>
         <h1>Login</h1>
-        <p className="text-muted">Access your rental account and continue managing your activity.</p>
+        <p className="text-muted">
+          Access your rental account and continue managing your activity.
+        </p>
         {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email Address</label>
-            <input id="email" name="email" type="email" className="form-control" value={formData.email} onChange={handleChange} required />
+            <label htmlFor="email" className="form-label">
+              Email Address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              className="form-control"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">Password</label>
-            <input id="password" name="password" type="password" className="form-control" value={formData.password} onChange={handleChange} required />
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <PasswordInput
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="current-password"
+              required
+            />
           </div>
-          <button type="submit" className="btn btn-accent-custom w-100">Login</button>
+          <div className="text-end mb-3">
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </div>
+          <button type="submit" className="btn btn-accent-custom w-100">
+            Login
+          </button>
         </form>
-        <p className="mt-4 mb-0 text-center">Do not have an account? <Link to="/register">Register</Link></p>
+        <p className="mt-4 mb-0 text-center">
+          Do not have an account? <Link to="/register">Register</Link>
+        </p>
       </section>
     </main>
   );
 }
-

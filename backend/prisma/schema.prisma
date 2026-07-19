@@ -32,13 +32,38 @@ model User {
   approvedPromotions            Promotion[]          @relation("PromotionApprover")
   promotions                    Promotion[]          @relation("PromotionRequester")
   refreshTokens                 RefreshToken[]
+  passwordResetTokens           PasswordResetToken[]
   reviews                       Review[]
   supportTicketReplies          SupportTicketReply[]
   contactMessages               ContactMessage[]
   reports                       Report[]
   activityLogs                  ActivityLog[]
   supportTickets                SupportTicket[]
+  contactMessages               ContactMessage[]
   updatedSettings               SystemSetting[]      @relation("SystemSettingUpdater")
+  verificationRequests          VerificationRequest[] @relation("VerificationRequester")
+  reviewedVerificationRequests  VerificationRequest[] @relation("VerificationReviewer")
+}
+
+model VerificationRequest {
+  id                 String   @id @default(uuid())
+  userId             String
+  city               String
+  sefer              String
+  address            String?
+  nationalIdFrontUrl String
+  nationalIdBackUrl  String
+  status             String   @default("PENDING")
+  rejectionReason    String?
+  reviewedById       String?
+  reviewedAt         DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation("VerificationRequester", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy         User?    @relation("VerificationReviewer", fields: [reviewedById], references: [id])
+
+  @@index([userId])
+  @@index([status])
 }
 
 model Listing {
@@ -52,6 +77,9 @@ model Listing {
   location        String?
   pricePerDay     Decimal
   status          String         @default("PENDING")
+  paymentMethod   String?
+  paymentProofUrl String?
+  paymentStatus   String         @default("PENDING")
   approvedById    String?
   approvedAt      DateTime?
   rejectionReason String?
@@ -184,6 +212,19 @@ model RefreshToken {
   revokedAt DateTime?
   createdAt DateTime  @default(now())
   user      User      @relation(fields: [userId], references: [id])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Notification {

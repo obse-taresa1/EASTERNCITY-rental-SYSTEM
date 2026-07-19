@@ -1,18 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { getStorageItem, setStorageItem } from "../../services/storageService.js";
 
 const SAVED_KEY = "saved_items";
 
+function getSavedItemsForUser(userId) {
+  return getStorageItem(SAVED_KEY, []).filter(
+    (item) => String(item.userId || "") === String(userId || ""),
+  );
+}
+
 export default function SavedItemsPage() {
+  const { currentUser, user } = useAuth();
+  const activeUser = user || currentUser;
   const [savedItems, setSavedItems] = useState(() =>
-    getStorageItem(SAVED_KEY, []),
+    getSavedItemsForUser(activeUser?.id),
   );
 
+  useEffect(() => {
+    function refreshSavedItems() {
+      setSavedItems(getSavedItemsForUser(activeUser?.id));
+    }
+
+    refreshSavedItems();
+    window.addEventListener("easterncity:saved-items-updated", refreshSavedItems);
+    return () => {
+      window.removeEventListener(
+        "easterncity:saved-items-updated",
+        refreshSavedItems,
+      );
+    };
+  }, [activeUser?.id]);
+
   function handleRemove(itemId) {
-    const updated = savedItems.filter((item) => item.id !== itemId);
+    const allSavedItems = getStorageItem(SAVED_KEY, []);
+    const updated = allSavedItems.filter(
+      (item) =>
+        !(
+          item.id === itemId &&
+          String(item.userId || "") === String(activeUser?.id || "")
+        ),
+    );
     setStorageItem(SAVED_KEY, updated);
-    setSavedItems(updated);
+    setSavedItems(getSavedItemsForUser(activeUser?.id));
+    window.dispatchEvent(new Event("easterncity:saved-items-updated"));
   }
 
   return (

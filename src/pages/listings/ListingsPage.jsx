@@ -1,5 +1,3 @@
-function ListingsPage() {
-  return <h1>Listings Page</h1>
-}
+import ItemsPage from "./ItemsPage.jsx";
 
-export default ListingsPage
+export default ItemsPage;

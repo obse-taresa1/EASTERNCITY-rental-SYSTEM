@@ -2,7 +2,11 @@ const verificationService = require('../services/verificationService');
 
 const submit = async (req, res, next) => {
   try {
-    const result = await verificationService.submitVerification(req.user.id, req.body);
+    const result = await verificationService.submitVerification(
+      req.user.id,
+      req.body,
+      req.files,
+    );
     res.status(202).json({
       success: true,
       message: 'Verification submitted successfully.',

@@ -6,7 +6,14 @@ export default function AdminManagementPage() {
   const [admins, setAdmins] = useState([]);
   const [editingAdmin, setEditingAdmin] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", role: "ADMIN", password: "" });
+  const [newAdmin, setNewAdmin] = useState({
+    name: "",
+    email: "",
+    role: "ADMIN",
+    password: "",
+  });
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   async function loadAdmins() { setAdmins(await adminApi.users({ role: "ADMIN" })); }
   useEffect(() => { loadAdmins().catch(console.error); }, []);

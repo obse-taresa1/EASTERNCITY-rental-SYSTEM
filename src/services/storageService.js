@@ -1,4 +1,16 @@
 export function getStorageItem(key, fallbackValue = null) {
+  return readLocalStorage(key, fallbackValue);
+}
+
+export function setStorageItem(key, value) {
+  writeLocalStorage(key, value);
+}
+
+export function removeStorageItem(key) {
+  removeLocalStorage(key);
+}
+
+function readLocalStorage(key, fallbackValue = null) {
   try {
     const storedValue = localStorage.getItem(key);
 
@@ -12,14 +24,14 @@ export function getStorageItem(key, fallbackValue = null) {
   }
 }
 
-export function setStorageItem(key, value) {
+function writeLocalStorage(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function removeStorageItem(key) {
+function removeLocalStorage(key) {
   localStorage.removeItem(key);
 }
 
-export const readStorage = getStorageItem;
-export const writeStorage = setStorageItem;
-export const removeStorage = removeStorageItem;
+export const readStorage = readLocalStorage;
+export const writeStorage = writeLocalStorage;
+export const removeStorage = removeLocalStorage;

@@ -8,6 +8,8 @@ export default function AdminListingManagementPage() {
   const [filter, setFilter] = useState("all");
   const [editingItem, setEditingItem] = useState(null);
   const [viewScreenshot, setViewScreenshot] = useState(null);
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const refreshListings = async () => setListings(await adminApi.listings({ search, status: filter === "all" ? "" : filter }));
   useEffect(() => { refreshListings().catch(console.error); }, [search, filter]);

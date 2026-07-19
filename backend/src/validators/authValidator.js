@@ -1,68 +1,51 @@
 // src/validators/authValidator.js
+const { z } = require('zod');
+const { parseWithSchema } = require('./validationHelpers');
 
-/**
- * Validate Registration Input
- */
-const validateRegister = (req, res, next) => {
-  const { name, email, password, role } = req.body;
+const emailSchema = z.string().email('A valid email is required.').trim().toLowerCase();
+const passwordSchema = z.string().min(6, 'Password must be at least 6 characters long.');
 
-  if (!name || name.trim() === '') {
-    return res.status(400).json({ success: false, message: 'Name is required.' });
+const registerSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required.'),
+  email: emailSchema,
+  password: passwordSchema,
+  role: z.literal('USER').optional(),
+}).passthrough().superRefine((data, ctx) => {
+  if (data.role && data.role !== 'USER') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Public registration only creates USER accounts.', path: ['role'] });
   }
+});
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ success: false, message: 'A valid email is required.' });
-  }
+const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, 'Password is required.'),
+});
 
-  if (!password || password.length < 6) {
-    return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
-  }
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required.'),
+  newPassword: z.string().min(6, 'New password must be at least 6 characters long.'),
+}).refine((data) => data.currentPassword !== data.newPassword, {
+  message: 'New password must be different from current password.',
+  path: ['newPassword'],
+});
 
-  if (role && role !== 'USER') {
-    return res.status(400).json({ success: false, message: 'Public registration only creates USER accounts.' });
-  }
+const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
 
-  next();
-};
+const resetPasswordSchema = z.object({
+  token: z.string().trim().min(32, 'Reset token is required.'),
+  newPassword: passwordSchema,
+  confirmPassword: z.string().min(1, 'Confirm password is required.'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords do not match.',
+  path: ['confirmPassword'],
+});
 
-/**
- * Validate Login Input
- */
-const validateLogin = (req, res, next) => {
-  const { email, password } = req.body;
-
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ success: false, message: 'A valid email is required.' });
-  }
-
-  if (!password) {
-    return res.status(400).json({ success: false, message: 'Password is required.' });
-  }
-
-  next();
-};
-
-const validateChangePassword = (req, res, next) => {
-  const { currentPassword, newPassword } = req.body;
-
-  if (!currentPassword) {
-    return res.status(400).json({ success: false, message: 'Current password is required.' });
-  }
-
-  if (!newPassword || newPassword.length < 6) {
-    return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long.' });
-  }
-
-  if (currentPassword === newPassword) {
-    return res.status(400).json({ success: false, message: 'New password must be different from current password.' });
-  }
-
-  next();
-};
 module.exports = {
-  validateRegister,
-  validateLogin,
-  validateChangePassword,
+  validateRegister: (req, res, next) => parseWithSchema(registerSchema, req, res, next),
+  validateLogin: (req, res, next) => parseWithSchema(loginSchema, req, res, next),
+  validateChangePassword: (req, res, next) => parseWithSchema(changePasswordSchema, req, res, next),
+  validateForgotPassword: (req, res, next) => parseWithSchema(forgotPasswordSchema, req, res, next),
+  validateResetPassword: (req, res, next) => parseWithSchema(resetPasswordSchema, req, res, next),
 };
-
-

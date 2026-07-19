@@ -1,18 +1,23 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getOwnerListings } from "../../services/itemService.js";
-import { getBookingsByOwner } from "../../services/bookingService.js";
+import { getMyListings } from "../../services/listingApiService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
 import ListingManagementTable from "../../components/dashboard/ListingManagementTable.jsx";
 import BookingTable from "../../components/dashboard/BookingTable.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import {
   fetchOwnerPromotions,
   requestPromotion,
-} from "../../services/promotionService.js";
+} from "../../services/promotionApiService.js";
 
 const promotionPackages = [
-  { id: 1, label: "Featured Listing", baseRate: 100, icon: "bi-lightning-charge" },
+  {
+    id: 1,
+    label: "Featured Listing",
+    baseRate: 100,
+    icon: "bi-lightning-charge",
+  },
   { id: 2, label: "Top Listing", baseRate: 200, icon: "bi-stars" },
   { id: 3, label: "Homepage Banner", baseRate: 500, icon: "bi-gem" },
 ];
@@ -32,6 +37,10 @@ export default function MyListingsPage() {
   const activeUser = user || currentUser;
   const [activeTab, setActiveTab] = useState("all");
   const [refresh, setRefresh] = useState(0);
+  const [listings, setListings] = useState([]);
+  const [isLoadingListings, setIsLoadingListings] = useState(true);
+  const [ownerBookings, setOwnerBookings] = useState([]);
+  const [ownerPromotions, setOwnerPromotions] = useState([]);
   const [notice, setNotice] = useState("");
   const [promotionListing, setPromotionListing] = useState(null);
   const [selectedPromotionPackage, setSelectedPromotionPackage] = useState(1);
@@ -39,53 +48,141 @@ export default function MyListingsPage() {
   const [promotionScreenshot, setPromotionScreenshot] = useState(null);
 
   useEffect(() => {
-    const handleUpdate = () => setRefresh(r => r + 1);
+    const handleUpdate = () => setRefresh((r) => r + 1);
     window.addEventListener("easterncity:listings-updated", handleUpdate);
     window.addEventListener("easterncity:bookings-updated", handleUpdate);
     window.addEventListener("easterncity:promotions-updated", handleUpdate);
     return () => {
       window.removeEventListener("easterncity:listings-updated", handleUpdate);
       window.removeEventListener("easterncity:bookings-updated", handleUpdate);
-      window.removeEventListener("easterncity:promotions-updated", handleUpdate);
+      window.removeEventListener(
+        "easterncity:promotions-updated",
+        handleUpdate,
+      );
     };
   }, []);
-  
-  const allItems = getOwnerListings();
-  
-  const ownedItems = useMemo(() => {
-    if (!activeUser) return [];
-    return allItems.filter(
-      (item) =>
-        item.owner === activeUser.name ||
-        item.owner === activeUser.businessName ||
-        item.ownerName === activeUser.name ||
-        item.ownerName === activeUser.businessName,
-    );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeUser, allItems, refresh]);
-  
-  const ownerBookings = useMemo(() => {
-    if (!activeUser) return [];
-    const nameBookings = getBookingsByOwner(activeUser.name);
-    const bizBookings = activeUser.businessName ? getBookingsByOwner(activeUser.businessName) : [];
-    const all = [...nameBookings, ...bizBookings];
-    return Array.from(new Map(all.map(b => [b.id, b])).values());
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadListings() {
+      if (!activeUser) {
+        setListings([]);
+        setIsLoadingListings(false);
+        return;
+      }
+
+      setIsLoadingListings(true);
+      try {
+        const data = await getMyListings();
+        if (!active) return;
+        setListings(data);
+      } catch (error) {
+        if (!active) return;
+        setNotice(error.message || "Unable to load your listings.");
+        setListings([]);
+      } finally {
+        if (active) setIsLoadingListings(false);
+      }
+    }
+
+    loadListings();
+
+    return () => {
+      active = false;
+    };
   }, [activeUser, refresh]);
 
-  const ownerPromotions = useMemo(() => {
-    if (!activeUser) return [];
-    return fetchOwnerPromotions(activeUser.id || activeUser.name || activeUser.businessName);
+  const ownedItems = useMemo(() => listings, [listings]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadOwnerBookings() {
+      if (!activeUser) {
+        setOwnerBookings([]);
+        return;
+      }
+
+      try {
+        const data = await getMyBookings();
+        const ownerBookingsData = data.filter(
+          (booking) => String(booking.ownerId || "") === String(activeUser.id),
+        );
+        if (active) {
+          setOwnerBookings(
+            ownerBookingsData.sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+            ),
+          );
+        }
+      } catch (error) {
+        if (active) {
+          setNotice(error.message || "Unable to load bookings.");
+          setOwnerBookings([]);
+        }
+      }
+    }
+
+    loadOwnerBookings();
+
+    return () => {
+      active = false;
+    };
+  }, [activeUser, refresh]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadOwnerPromotions() {
+      if (!activeUser) {
+        setOwnerPromotions([]);
+        return;
+      }
+
+      try {
+        const data = await fetchOwnerPromotions(
+          activeUser.id || activeUser.name || activeUser.businessName,
+        );
+        if (active) {
+          setOwnerPromotions(data);
+        }
+      } catch {
+        if (active) {
+          setOwnerPromotions([]);
+        }
+      }
+    }
+
+    loadOwnerPromotions();
+
+    return () => {
+      active = false;
+    };
   }, [activeUser, refresh]);
 
   const getFilteredItems = () => {
     switch (activeTab) {
       case "pending":
-        return ownedItems.filter((i) => ["pending", "under review", "under_review", "payment pending", "draft"].includes(String(i.status || "").toLowerCase()));
+        return ownedItems.filter((i) =>
+          [
+            "pending",
+            "draft",
+            "under review",
+            "under_review",
+            "payment pending",
+          ].includes(String(i.status || "").toLowerCase()),
+        );
       case "approved":
-        return ownedItems.filter((i) => ["published", "active", "featured", "renewed"].includes(String(i.status || "").toLowerCase()));
+        return ownedItems.filter((i) =>
+          ["approved", "published", "active", "featured", "renewed"].includes(
+            String(i.status || "").toLowerCase(),
+          ),
+        );
       case "rejected":
-        return ownedItems.filter((i) => ["rejected"].includes(String(i.status || "").toLowerCase()));
+        return ownedItems.filter((i) =>
+          ["rejected"].includes(String(i.status || "").toLowerCase()),
+        );
       case "all":
       default:
         return ownedItems;
@@ -95,10 +192,6 @@ export default function MyListingsPage() {
   const filteredItems = getFilteredItems();
 
   function handlePromote(item) {
-    if (!String(item.id || "").startsWith("owner-listing-")) {
-      setNotice(`${item.title} already demonstrates the promotion workflow.`);
-      return;
-    }
     setPromotionListing(item);
     setSelectedPromotionPackage(1);
     setSelectedPromotionDuration(7);
@@ -118,6 +211,7 @@ export default function MyListingsPage() {
     setPromotionScreenshot({
       name: file.name,
       preview,
+      file,
     });
   }
 
@@ -143,16 +237,22 @@ export default function MyListingsPage() {
         ownerId: activeUser?.id || activeUser?.name || activeUser?.businessName,
         userId: activeUser?.id || activeUser?.name || activeUser?.businessName,
         userName: activeUser?.businessName || activeUser?.name || "User",
-        ownerName: activeUser?.businessName || activeUser?.name || promotionListing.ownerName,
+        ownerName:
+          activeUser?.businessName ||
+          activeUser?.name ||
+          promotionListing.ownerName,
         packageName: selectedPackage?.label,
         promotionType: selectedPackage?.label,
         durationDays: selectedPromotionDuration,
         amount,
       },
     );
-    setNotice(`${promotionListing.title} promotion request was submitted for review.`);
+    setNotice(
+      `${promotionListing.title} promotion request was submitted for review.`,
+    );
     setPromotionListing(null);
     setPromotionScreenshot(null);
+    setRefresh((value) => value + 1);
   }
 
   return (
@@ -283,37 +383,46 @@ export default function MyListingsPage() {
             </div>
           </div>
         )
+      ) : isLoadingListings ? (
+        <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
+          <div className="spinner-border text-danger" role="status" />
+          <p className="mt-3 text-muted mb-0">Loading your listings...</p>
+        </div>
+      ) : filteredItems.length === 0 ? (
+        <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
+          <div className="mb-3">
+            <i
+              className="bi bi-card-list text-danger opacity-50"
+              style={{ fontSize: "4rem" }}
+            ></i>
+          </div>
+          <h3 className="fw-bold">No listings found</h3>
+          <p className="text-muted">
+            You don't have any listings in this category.
+          </p>
+          {activeTab === "all" && (
+            <Link
+              to="/list-item"
+              className="btn btn-outline-danger rounded-pill fw-bold mt-3 px-4"
+            >
+              Create your first listing
+            </Link>
+          )}
+        </div>
       ) : (
-        filteredItems.length === 0 ? (
-          <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
-            <div className="mb-3">
-              <i
-                className="bi bi-card-list text-danger opacity-50"
-                style={{ fontSize: "4rem" }}
-              ></i>
-            </div>
-            <h3 className="fw-bold">No listings found</h3>
-            <p className="text-muted">
-              You don't have any listings in this category.
-            </p>
-            {activeTab === "all" && (
-              <Link
-                to="/list-item"
-                className="btn btn-outline-danger rounded-pill fw-bold mt-3 px-4"
-              >
-                Create your first listing
-              </Link>
-            )}
-          </div>
-        ) : (
-          <div className="premium-glass-card bg-white p-4">
-            <ListingManagementTable items={filteredItems} onPromote={handlePromote} />
-          </div>
-        )
+        <div className="premium-glass-card bg-white p-4">
+          <ListingManagementTable
+            items={filteredItems}
+            onPromote={handlePromote}
+          />
+        </div>
       )}
 
       {promotionListing && (
-        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
               <div className="modal-header bg-light border-0 py-3">
@@ -329,7 +438,8 @@ export default function MyListingsPage() {
               </div>
               <div className="modal-body p-4">
                 <p className="text-muted mb-4">
-                  Boost visibility for <strong>{promotionListing.title}</strong> by selecting a promotion package.
+                  Boost visibility for <strong>{promotionListing.title}</strong>{" "}
+                  by selecting a promotion package.
                 </p>
                 <form onSubmit={submitPromotionRequest}>
                   <div className="mb-4">
@@ -345,13 +455,19 @@ export default function MyListingsPage() {
                               name="promotionPackage"
                               value={pkg.id}
                               checked={selectedPromotionPackage === pkg.id}
-                              onChange={() => setSelectedPromotionPackage(pkg.id)}
+                              onChange={() =>
+                                setSelectedPromotionPackage(pkg.id)
+                              }
                               className="form-check-input me-3 mt-0"
                             />
-                            <i className={`bi ${pkg.icon} fs-4 me-3 ${selectedPromotionPackage === pkg.id ? "text-danger" : "text-secondary"}`}></i>
+                            <i
+                              className={`bi ${pkg.icon} fs-4 me-3 ${selectedPromotionPackage === pkg.id ? "text-danger" : "text-secondary"}`}
+                            ></i>
                             <div className="flex-grow-1">
                               <h6 className="mb-0 fw-bold">{pkg.label}</h6>
-                              <small className="text-muted">{pkg.baseRate} ETB / day</small>
+                              <small className="text-muted">
+                                {pkg.baseRate} ETB / day
+                              </small>
                             </div>
                           </label>
                         </div>
@@ -360,15 +476,23 @@ export default function MyListingsPage() {
                   </div>
 
                   <div className="mb-4">
-                    <label className="form-label fw-bold">Duration (Days)</label>
+                    <label className="form-label fw-bold">
+                      Duration (Days)
+                    </label>
                     <select
                       className="form-select form-select-lg"
                       value={selectedPromotionDuration}
-                      onChange={(e) => setSelectedPromotionDuration(Number(e.target.value))}
+                      onChange={(e) =>
+                        setSelectedPromotionDuration(Number(e.target.value))
+                      }
                     >
                       {durationOptions.map((d) => (
                         <option key={d} value={d}>
-                          {d} Days - {(promotionPackages.find(p => p.id === selectedPromotionPackage)?.baseRate || 100) * d} ETB
+                          {d} Days -{" "}
+                          {(promotionPackages.find(
+                            (p) => p.id === selectedPromotionPackage,
+                          )?.baseRate || 100) * d}{" "}
+                          ETB
                         </option>
                       ))}
                     </select>
@@ -378,11 +502,20 @@ export default function MyListingsPage() {
                     <label className="form-label fw-bold">Payment Upload</label>
                     <div className="p-3 bg-light rounded-3">
                       <p className="small text-muted mb-2">
-                        Please pay <strong>{(promotionPackages.find(p => p.id === selectedPromotionPackage)?.baseRate || 100) * selectedPromotionDuration} ETB</strong> via Telebirr or CBE Birr and upload the receipt.
+                        Please pay{" "}
+                        <strong>
+                          {(promotionPackages.find(
+                            (p) => p.id === selectedPromotionPackage,
+                          )?.baseRate || 100) * selectedPromotionDuration}{" "}
+                          ETB
+                        </strong>{" "}
+                        via Telebirr or CBE Birr and upload the receipt.
                       </p>
                       <label className="btn btn-outline-danger w-100 d-flex justify-content-center align-items-center gap-2">
                         <i className="bi bi-upload"></i>
-                        {promotionScreenshot ? promotionScreenshot.name : "Upload Payment Screenshot"}
+                        {promotionScreenshot
+                          ? promotionScreenshot.name
+                          : "Upload Payment Screenshot"}
                         <input
                           type="file"
                           accept=".jpg,.jpeg,.png,image/jpeg,image/png"
@@ -404,7 +537,10 @@ export default function MyListingsPage() {
                   </div>
 
                   <div className="d-grid mt-4">
-                    <button type="submit" className="btn btn-danger btn-lg rounded-pill fw-bold">
+                    <button
+                      type="submit"
+                      className="btn btn-danger btn-lg rounded-pill fw-bold"
+                    >
                       Submit Promotion Request
                     </button>
                   </div>

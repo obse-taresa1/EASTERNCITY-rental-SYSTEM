@@ -13,6 +13,7 @@ const bookingRoutes = require("./booking.routes");
 const conversationRoutes = require("./conversation.routes");
 const supportTicketRoutes = require("./supportTicket.routes");
 const messageRoutes = require("./message.routes");
+const contactMessageRoutes = require("./contactMessage.routes");
 
 const router = express.Router();
 
@@ -30,6 +31,7 @@ router.use("/bookings", bookingRoutes);
 router.use("/conversations", conversationRoutes);
 router.use("/support-tickets", supportTicketRoutes);
 router.use("/messages", messageRoutes);
+router.use("/contact-messages", contactMessageRoutes);
 router.get("/health", (req, res) => {
   res.status(200).json({
     success: true,

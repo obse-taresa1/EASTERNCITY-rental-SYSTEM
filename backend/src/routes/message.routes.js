@@ -8,6 +8,7 @@ const router = express.Router();
 router.use(auth);
 
 router.post("/", validateSendMessage, controller.sendMessage);
+router.get("/", controller.getInbox);
 router.get("/:conversationId", controller.getConversationMessages);
 
 module.exports = router;

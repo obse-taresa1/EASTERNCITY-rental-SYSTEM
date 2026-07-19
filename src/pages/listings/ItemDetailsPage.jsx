@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SimilarListingsCarousel from "../../components/listings/SimilarListingsCarousel.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { categories, items as seededItems } from "../../data/items.js";
-import { getReviewsByItem } from "../../services/bookingService.js";
-import { getItemById } from "../../services/itemService.js";
-import { startListingConversation } from "../../services/messageService.js";
+import { getListingById } from "../../services/listingApiService.js";
+import { getReviewsByListing } from "../../services/reviewApiService.js";
+import { startListingConversation } from "../../services/messageApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 
 const fallbackReviews = [
@@ -45,12 +45,60 @@ export default function ItemDetailsPage() {
   const [notice, setNotice] = useState(
     location.state?.contactReadyMessage || "",
   );
-  const item = useMemo(() => getItemById(itemId), [itemId]);
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactError, setContactError] = useState("");
+  const [reviews, setReviews] = useState([]);
 
-  const reviews = useMemo(() => {
-    const storedReviews = getReviewsByItem(itemId);
-    return storedReviews.length ? storedReviews : fallbackReviews;
+  useEffect(() => {
+    let active = true;
+
+    async function loadItem() {
+      setLoading(true);
+      try {
+        const data = await getListingById(itemId);
+        if (active) setItem(data);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadItem();
+
+    return () => {
+      active = false;
+    };
   }, [itemId]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadReviews() {
+      try {
+        const data = await getReviewsByListing(itemId);
+        if (!active) return;
+        setReviews(data.length ? data : fallbackReviews);
+      } catch {
+        if (!active) return;
+        setReviews(fallbackReviews);
+      }
+    }
+
+    loadReviews();
+
+    return () => {
+      active = false;
+    };
+  }, [itemId]);
+
+  if (loading) {
+    return (
+      <main className="container py-5 text-center">
+        <h1 className="h4 text-muted">Loading item...</h1>
+      </main>
+    );
+  }
 
   if (!item) {
     return (
@@ -66,7 +114,8 @@ export default function ItemDetailsPage() {
     );
   }
 
-  const category = categories.find((entry) => entry.id === item.category);
+  const category =
+    categories.find((entry) => entry.id === item.category) || item.categoryData;
   const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
   const features =
     item.features ||
@@ -80,9 +129,13 @@ export default function ItemDetailsPage() {
       ).toFixed(1)
     : "New";
 
-  function handleContactOwner() {
+  async function handleContactOwner() {
+    setContactError("");
+
     if (!activeUser) {
-      localStorage.setItem("pendingContactUrl", `/items/${item.id}`);
+      const { setStorageItem } =
+        await import("../../services/storageService.js");
+      setStorageItem("pendingContactUrl", `/items/${item.id}`);
       navigate("/login", {
         state: {
           from: { pathname: `/items/${item.id}` },
@@ -92,8 +145,18 @@ export default function ItemDetailsPage() {
       return;
     }
 
-    const conversation = startListingConversation({ renter: activeUser, item });
-    navigate(`/messages?conversation=${conversation.id}`);
+    setContactLoading(true);
+    try {
+      const conversation = await startListingConversation({
+        renter: activeUser,
+        item,
+      });
+      navigate(`/messages?conversation=${conversation.id}`);
+    } catch (error) {
+      setContactError(error.message || "Could not open a conversation.");
+    } finally {
+      setContactLoading(false);
+    }
   }
 
   return (
@@ -118,7 +181,7 @@ export default function ItemDetailsPage() {
 
           <aside className="details-contact-card premium-glass-card">
             <span className="section-label">
-              {category?.name || item.category}
+              {category?.name || item.categoryName || item.category}
             </span>
             <h1>{item.title}</h1>
             <p className="details-location">
@@ -150,9 +213,16 @@ export default function ItemDetailsPage() {
               type="button"
               className="btn btn-outline-danger details-contact-button"
               onClick={handleContactOwner}
+              disabled={contactLoading}
             >
-              <i className="bi bi-chat-dots"></i> Contact Owner
+              <i className="bi bi-chat-dots"></i>{" "}
+              {contactLoading ? "Opening..." : "Contact Owner"}
             </button>
+            {contactError && (
+              <div className="alert alert-danger py-2 mt-2" role="alert">
+                {contactError}
+              </div>
+            )}
             <p className="details-contact-helper">
               Discuss availability, rental duration, pickup, delivery, pricing,
               and payment arrangements directly with the owner.

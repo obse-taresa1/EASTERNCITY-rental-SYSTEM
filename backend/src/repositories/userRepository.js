@@ -5,6 +5,13 @@ const userSelect = {
   name: true,
   email: true,
   role: true,
+  status: true,
+  verificationStatus: true,
+  city: true,
+  sefer: true,
+  address: true,
+  nationalIdFrontUrl: true,
+  nationalIdBackUrl: true,
   createdAt: true,
 };
 

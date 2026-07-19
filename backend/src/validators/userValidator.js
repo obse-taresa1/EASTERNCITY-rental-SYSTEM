@@ -1,51 +1,24 @@
+const { z } = require('zod');
 const { ROLES } = require('../utils/constants');
+const { parseWithSchema } = require('./validationHelpers');
 
-function validateUpdateUser(req, res, next) {
-  const allowedFields = ['name', 'email', 'password'];
-  const forbiddenFields = Object.keys(req.body).filter((field) => !allowedFields.includes(field));
+const updateUserSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required.').optional(),
+  email: z.string().email('A valid email is required.').trim().toLowerCase().optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters long.').optional(),
+  status: z.enum(['ACTIVE', 'SUSPENDED']).optional(),
+}).strict({ message: 'Cannot update restricted fields.' });
 
-  if (forbiddenFields.length > 0) {
-    return res.status(400).json({
-      success: false,
-      message: `Cannot update restricted fields: ${forbiddenFields.join(', ')}.`,
-    });
-  }
-
-  if (req.body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email)) {
-    return res.status(400).json({ success: false, message: 'A valid email is required.' });
-  }
-
-  if (req.body.password && req.body.password.length < 6) {
-    return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
-  }
-
-  next();
-}
-
-function validateCreateAdmin(req, res, next) {
-  const { name, email, password, role } = req.body;
-  const allowedRoles = [ROLES.ADMIN, ROLES.SUPER_ADMIN];
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ success: false, message: 'Name, email, and password are required.' });
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ success: false, message: 'A valid email is required.' });
-  }
-
-  if (password.length < 6) {
-    return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
-  }
-
-  if (!allowedRoles.includes(role)) {
-    return res.status(400).json({ success: false, message: 'Admin creation role must be ADMIN or SUPER_ADMIN.' });
-  }
-
-  next();
-}
+const createAdminSchema = z.object({
+  name: z.string().trim().min(1, 'Name, email, and password are required.'),
+  email: z.string().email('A valid email is required.').trim().toLowerCase(),
+  password: z.string().min(6, 'Password must be at least 6 characters long.'),
+  role: z.enum([ROLES.ADMIN, ROLES.SUPER_ADMIN], {
+    errorMap: () => ({ message: 'Admin creation role must be ADMIN or SUPER_ADMIN.' }),
+  }),
+});
 
 module.exports = {
-  validateUpdateUser,
-  validateCreateAdmin,
+  validateUpdateUser: (req, res, next) => parseWithSchema(updateUserSchema, req, res, next),
+  validateCreateAdmin: (req, res, next) => parseWithSchema(createAdminSchema, req, res, next),
 };

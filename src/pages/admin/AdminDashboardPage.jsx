@@ -12,7 +12,11 @@ function formatDate(value) {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
 }
 
 function useLiveDashboard(loader, filters) {
@@ -109,11 +113,17 @@ export default function AdminDashboardPage() {
       miniCards={miniCards}
       chart={{
         title: "Marketplace Growth",
-        legends: ["User Growth", "Listing Growth", "Promotion Revenue", "Listings by City"],
+        legends: [
+          "User Growth",
+          "Listing Growth",
+          "Promotion Revenue",
+          "Listings by City",
+        ],
         primaryFilter: "Rental marketplace",
         values: data?.charts?.listingGrowth || [],
       }}
       rows={rows}
+      loading={isLoadingUsers}
     />
   );
 }

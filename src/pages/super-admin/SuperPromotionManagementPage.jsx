@@ -8,6 +8,7 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [loading, setLoading] = useState(true);
   const sectionLabel = scope === "admin" ? "ADMIN" : "SUPER ADMIN";
   async function load() { setPromotions(await adminApi.promotions({ status: filter })); }
   useEffect(() => { load().catch(console.error); }, [filter]);

@@ -9,6 +9,15 @@ exports.listByListing = async (req, res, next) => {
   }
 };
 
+exports.listMine = async (req, res, next) => {
+  try {
+    const data = await service.listByUser(req.user.id);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.create = async (req, res, next) => {
   try {
     const data = await service.create(req.user.id, req.body);

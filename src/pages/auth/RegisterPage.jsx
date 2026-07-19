@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
 
 export default function RegisterPage() {
@@ -17,6 +18,10 @@ export default function RegisterPage() {
 
   const [error, setError] = useState("");
   const [fileNotice, setFileNotice] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const passwordType = showPassword ? "text" : "password";
+  const passwordToggleLabel = showPassword ? "Hide password" : "Show password";
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -117,14 +122,13 @@ export default function RegisterPage() {
             <label htmlFor="password" className="form-label">
               Password
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
-              className="form-control"
               value={formData.password}
               onChange={handleChange}
               minLength="6"
+              autoComplete="new-password"
               required
             />
           </div>
@@ -188,4 +192,3 @@ export default function RegisterPage() {
     </main>
   );
 }
-

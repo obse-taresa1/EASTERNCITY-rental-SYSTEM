@@ -1,8 +1,12 @@
-import { getUsers } from "./authService.js";
-import { createNotification, NOTIFICATION_TYPES } from "./notificationService.js";
+import {
+  createNotification,
+  NOTIFICATION_TYPES,
+} from "./notificationService.js";
+import { apiClient } from "./apiClient.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
 
 const CONTACT_MESSAGES_KEY = "easterncity_contact_messages";
+const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
 
 function emitContactMessagesUpdate() {
   if (typeof window !== "undefined") {
@@ -12,13 +16,15 @@ function emitContactMessagesUpdate() {
 
 function normalizeMessage(message) {
   return {
-    id: message.id || `contact-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id:
+      message.id ||
+      `contact-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     userId: message.userId || "",
-    name: message.name || "Website Visitor",
-    email: message.email || "",
+    name: message.name || message.user?.name || "Website Visitor",
+    email: message.email || message.user?.email || "",
     subject: message.subject || "Contact message",
     message: message.message || "",
-    status: message.status || "Open",
+    status: message.status || "OPEN",
     adminReply: message.adminReply || "",
     repliedAt: message.repliedAt || "",
     resolvedAt: message.resolvedAt || "",
@@ -30,15 +36,30 @@ export function getContactMessages() {
   return getStorageItem(CONTACT_MESSAGES_KEY, []).map(normalizeMessage);
 }
 
+export async function fetchContactMessages() {
+  if (useMockAuth) {
+    return getContactMessages();
+  }
+
+  const data = await apiClient.get("/api/contact-messages");
+  return Array.isArray(data) ? data.map(normalizeMessage) : [];
+}
+
 function saveContactMessages(messages) {
   setStorageItem(CONTACT_MESSAGES_KEY, messages.map(normalizeMessage));
   emitContactMessagesUpdate();
 }
 
-export function createContactMessage(data) {
+export async function createContactMessage(data) {
+  if (!useMockAuth) {
+    const message = await apiClient.post("/api/contact-messages", data);
+    emitContactMessagesUpdate();
+    return normalizeMessage(message);
+  }
+
   const message = normalizeMessage({
     ...data,
-    status: "Open",
+    status: "OPEN",
     createdAt: new Date().toISOString(),
   });
 
@@ -49,13 +70,18 @@ export function createContactMessage(data) {
 function findNotificationUserId(message) {
   if (message.userId) return message.userId;
 
-  const email = String(message.email || "").toLowerCase();
-  if (!email) return "";
-
-  return getUsers().find((user) => user.email?.toLowerCase() === email)?.id || "";
+  return "";
 }
 
-export function replyToContactMessage(id, adminReply) {
+export async function replyToContactMessage(id, adminReply) {
+  if (!useMockAuth) {
+    const message = await apiClient.patch(`/api/contact-messages/${id}/reply`, {
+      adminReply,
+    });
+    emitContactMessagesUpdate();
+    return normalizeMessage(message);
+  }
+
   let updatedMessage = null;
   const repliedAt = new Date().toISOString();
   const messages = getContactMessages().map((message) => {
@@ -64,7 +90,7 @@ export function replyToContactMessage(id, adminReply) {
       ...message,
       adminReply,
       repliedAt,
-      status: "Replied",
+      status: "REPLIED",
     });
     return updatedMessage;
   });
@@ -86,14 +112,20 @@ export function replyToContactMessage(id, adminReply) {
   return updatedMessage;
 }
 
-export function resolveContactMessage(id) {
+export async function resolveContactMessage(id) {
+  if (!useMockAuth) {
+    const message = await apiClient.patch(`/api/contact-messages/${id}/resolve`);
+    emitContactMessagesUpdate();
+    return normalizeMessage(message);
+  }
+
   let updatedMessage = null;
   const resolvedAt = new Date().toISOString();
   const messages = getContactMessages().map((message) => {
     if (message.id !== id) return message;
     updatedMessage = normalizeMessage({
       ...message,
-      status: "Resolved",
+      status: "RESOLVED",
       resolvedAt,
     });
     return updatedMessage;

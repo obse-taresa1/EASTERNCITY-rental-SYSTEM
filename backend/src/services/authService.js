@@ -2,6 +2,7 @@
 const crypto = require('crypto');
 const prisma = require('../config/db');
 const { hashPassword, comparePassword } = require('../utils/hash');
+const { sendPasswordResetEmail } = require('./emailService');
 const {
   generateToken,
   generateRefreshToken,
@@ -12,8 +13,20 @@ function hashRefreshToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 
+function hashResetToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
 function addDays(days) {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+}
+
+function addMinutes(minutes) {
+  return new Date(Date.now() + minutes * 60 * 1000);
+}
+
+function getClientUrl() {
+  return process.env.CLIENT_URL || process.env.CORS_ORIGIN || 'http://localhost:5173';
 }
 
 function publicUser(user) {
@@ -22,6 +35,12 @@ function publicUser(user) {
 }
 
 async function createSession(user) {
+  if (String(user.status || 'ACTIVE').toUpperCase() === 'SUSPENDED') {
+    const error = new Error('Account is suspended.');
+    error.statusCode = 403;
+    throw error;
+  }
+
   const accessToken = generateToken({
     id: user.id,
     email: user.email,
@@ -178,10 +197,81 @@ const changePassword = async (userId, currentPassword, newPassword) => {
   });
 };
 
+const requestPasswordReset = async (email) => {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+
+  if (!user) {
+    return;
+  }
+
+  await prisma.passwordResetToken.updateMany({
+    where: {
+      userId: user.id,
+      usedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+    data: { usedAt: new Date() },
+  });
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  const tokenHash = hashResetToken(resetToken);
+
+  await prisma.passwordResetToken.create({
+    data: {
+      userId: user.id,
+      tokenHash,
+      expiresAt: addMinutes(30),
+    },
+  });
+
+  const resetUrl = `${getClientUrl().replace(/\/$/, '')}/reset-password?token=${resetToken}`;
+  await sendPasswordResetEmail({
+    to: user.email,
+    resetUrl,
+  });
+};
+
+const resetPassword = async (token, newPassword) => {
+  const tokenHash = hashResetToken(token);
+  const storedToken = await prisma.passwordResetToken.findUnique({
+    where: { tokenHash },
+    include: { user: true },
+  });
+
+  if (!storedToken || storedToken.usedAt || storedToken.expiresAt <= new Date()) {
+    const error = new Error('Password reset link is invalid or expired.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: storedToken.userId },
+      data: { password: hashedPassword },
+    }),
+    prisma.passwordResetToken.update({
+      where: { id: storedToken.id },
+      data: { usedAt: new Date() },
+    }),
+    prisma.refreshToken.updateMany({
+      where: {
+        userId: storedToken.userId,
+        revokedAt: null,
+      },
+      data: { revokedAt: new Date() },
+    }),
+  ]);
+};
+
 module.exports = {
   registerUser,
   loginUser,
   refreshSession,
   revokeRefreshToken,
   changePassword,
+  requestPasswordReset,
+  resetPassword,
 };

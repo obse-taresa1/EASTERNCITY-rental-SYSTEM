@@ -8,28 +8,52 @@ import {
   logoutUser,
   refreshCurrentUser,
   registerUser,
-  setCurrentUser as saveCurrentUser,
 } from "../services/authService.js";
+
+const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUserState] = useState(() => getCurrentUser());
   const [tokens, setTokens] = useState(() => getAuthTokens());
+  const [isAuthReady, setIsAuthReady] = useState(
+    () => useMockAuth || !getAuthTokens().accessToken,
+  );
 
   useEffect(() => {
     let isMounted = true;
 
+    if (useMockAuth) {
+      setIsAuthReady(true);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const { accessToken } = getAuthTokens();
+
+    if (!accessToken) {
+      setIsAuthReady(true);
+      return () => {
+        isMounted = false;
+      };
+    }
+
     refreshCurrentUser()
       .then((user) => {
         if (!isMounted) return;
-        setCurrentUserState(user || getCurrentUser());
+        setCurrentUserState(user || null);
         setTokens(getAuthTokens());
       })
       .catch(() => {
         if (!isMounted) return;
-        setCurrentUserState(getCurrentUser());
+        setCurrentUserState(null);
         setTokens(getAuthTokens());
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setIsAuthReady(true);
       });
 
     return () => {
@@ -39,13 +63,13 @@ export function AuthProvider({ children }) {
 
   function setCurrentUser(user) {
     setCurrentUserState(user || null);
-    saveCurrentUser(user || null);
   }
 
   async function login(email, password) {
     const user = await loginUser(email, password);
     setCurrentUserState(user || null);
     setTokens(getAuthTokens());
+    setIsAuthReady(true);
     return user;
   }
 
@@ -53,6 +77,7 @@ export function AuthProvider({ children }) {
     const user = await registerUser(formData);
     setCurrentUserState(user || null);
     setTokens(getAuthTokens());
+    setIsAuthReady(true);
     return user;
   }
 
@@ -60,6 +85,7 @@ export function AuthProvider({ children }) {
     await logoutUser();
     setCurrentUserState(null);
     setTokens(getAuthTokens());
+    setIsAuthReady(true);
   }
 
   const value = useMemo(
@@ -69,6 +95,7 @@ export function AuthProvider({ children }) {
       accessToken: tokens.accessToken || null,
       refreshToken: tokens.refreshToken || null,
       isAuthenticated: Boolean(currentUser && tokens.accessToken),
+      isAuthReady,
       role: currentUser?.role?.toLowerCase() || "",
       login,
       register,
@@ -76,7 +103,7 @@ export function AuthProvider({ children }) {
       setCurrentUser,
       dashboardForRole,
     }),
-    [currentUser, tokens],
+    [currentUser, tokens, isAuthReady],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

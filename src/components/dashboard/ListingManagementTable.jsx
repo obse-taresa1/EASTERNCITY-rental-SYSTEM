@@ -33,9 +33,9 @@ export default function ListingManagementTable({ items, onPromote }) {
             <button className="btn btn-sm btn-outline-danger" title="Delete">
               <i className="bi bi-trash" />
             </button>
-            {onPromote && ["published", "active", "renewed", "featured"].includes(
+            {onPromote && ["approved", "published", "active", "renewed"].includes(
               String(item.status || (item.available ? "active" : "inactive")).toLowerCase()
-            ) && (
+            ) && !item.featured && (
               <button
                 className="btn btn-sm btn-accent-custom"
                 onClick={() => onPromote(item)}

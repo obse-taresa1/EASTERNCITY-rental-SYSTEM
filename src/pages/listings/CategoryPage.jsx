@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import SectionHeader from "../../components/common/SectionHeader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
-import { getItemsByCategory } from "../../services/itemService.js";
+import { fetchCategories } from "../../services/categoryApiService.js";
+import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
+import { listingMatchesRentalCategory } from "../../utils/categoryMapping.js";
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -15,22 +16,118 @@ export default function CategoryPage() {
   const [city, setCity] = useState("all");
   const [sefar, setSefar] = useState("all");
   const [maxPrice, setMaxPrice] = useState(25000);
+  const [isPriceFilterActive, setIsPriceFilterActive] = useState(false);
+  const [listings, setListings] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState(categories);
+  const [loading, setLoading] = useState(true);
 
-  const category = categories.find((item) => item.id === categoryId);
-  const allItems = useMemo(() => getItemsByCategory(categoryId), [categoryId]);
+  const normalizeFilterValue = (value) => {
+    return String(value || "")
+      .toLowerCase()
+      .trim();
+  };
+
+  const category =
+    categoryOptions.find(
+      (item) =>
+        normalizeFilterValue(item.id) === normalizeFilterValue(categoryId) ||
+        normalizeFilterValue(item.slug) === normalizeFilterValue(categoryId),
+    ) || null;
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadData() {
+      setLoading(true);
+      try {
+        const [listingData, categoryData] = await Promise.all([
+          getPublicListings(),
+          fetchCategories().catch(() => []),
+        ]);
+        if (!active) return;
+        setListings(listingData);
+        setCategoryOptions([
+          ...categories,
+          ...categoryData.map((item) => ({
+            ...item,
+            id: getCategoryKey(item),
+            icon:
+              categories.find((category) => category.id === item.slug)?.icon ||
+              "bi-grid",
+          })),
+        ]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadData();
+    return () => {
+      active = false;
+    };
+  }, [categoryId]);
+
+  const allItems = useMemo(
+    () =>
+      listings.filter((item) => listingMatchesRentalCategory(item, categoryId)),
+    [listings, categoryId],
+  );
 
   const sefarOptions = city !== "all" ? getSefarByCity(city) : [];
 
   const filteredItems = useMemo(() => {
     return allItems.filter((item) => {
-      if (search && !item.title.toLowerCase().includes(search.toLowerCase()))
+      const searchTerm = search.toLowerCase().trim();
+
+      // Search filter
+      if (
+        searchTerm &&
+        ![
+          item.title,
+          item.description,
+          item.categoryName,
+          item.category,
+          item.city,
+          item.location,
+        ]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(searchTerm))
+      ) {
         return false;
-      if (city !== "all" && item.city !== city) return false;
-      if (sefar !== "all" && item.sefar !== sefar) return false;
-      if (item.pricePerDay > maxPrice) return false;
+      }
+
+      // City filter
+      if (
+        city !== "all" &&
+        String(item.city || "").toLowerCase() !== city.toLowerCase()
+      ) {
+        return false;
+      }
+
+      // Sefar filter
+      if (
+        sefar !== "all" &&
+        !String(item.sefar || item.location || "")
+          .toLowerCase()
+          .includes(sefar.toLowerCase())
+      ) {
+        return false;
+      }
+
+      // Price filter
+      if (item.pricePerDay > maxPrice) {
+        return false;
+      }
+
       return true;
     });
-  }, [allItems, search, city, sefar, maxPrice]);
+  }, [allItems, search, city, sefar, maxPrice, isPriceFilterActive]);
+
+  if (loading) {
+    return (
+      <div className="container py-5 text-center">Loading listings...</div>
+    );
+  }
 
   if (!category) {
     return (
@@ -160,7 +257,10 @@ export default function CategoryPage() {
                 max="25000"
                 step="500"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                onChange={(e) => {
+                  setMaxPrice(Number(e.target.value));
+                  setIsPriceFilterActive(true);
+                }}
               />
             </div>
             <div className="col-md-2">
@@ -196,6 +296,12 @@ export default function CategoryPage() {
 
 function CategoryListingCard({ item, t }) {
   const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
+  const ownerName =
+    item.ownerName ||
+    item.owner?.businessName ||
+    item.owner?.name ||
+    (typeof item.owner === "string" ? item.owner : "") ||
+    "Verified Owner";
 
   return (
     <article className="premium-glass-card listing-card-premium">
@@ -244,12 +350,8 @@ function CategoryListingCard({ item, t }) {
 
         {/* Owner */}
         <div className="card-owner-info">
-          <div className="owner-avatar">
-            {(item.owner || item.ownerName || "V").charAt(0)}
-          </div>
-          <span className="owner-name">
-            {item.owner || item.ownerName || "Verified Owner"}
-          </span>
+          <div className="owner-avatar">{String(ownerName).charAt(0)}</div>
+          <span className="owner-name">{String(ownerName)}</span>
           <i
             className="bi bi-patch-check-fill text-success"
             title="Verified Owner"
@@ -268,4 +370,9 @@ function CategoryListingCard({ item, t }) {
       </div>
     </article>
   );
+}
+
+// Helper function - make sure this is defined or imported
+function getCategoryKey(item) {
+  return item.slug || item.id || item.name?.toLowerCase().replace(/\s+/g, "-");
 }

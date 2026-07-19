@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { createSupportTicket } from "../../services/supportTicketService.js";
 
 const FAQS = [
   {
@@ -38,14 +39,21 @@ const FAQS = [
 
 export default function HelpCenterPage() {
   const [openFaq, setOpenFaq] = useState(null);
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
   const [submitted, setSubmitted] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const tickets = JSON.parse(localStorage.getItem("support_tickets") || "[]");
-    tickets.unshift({ ...form, id: Date.now(), createdAt: new Date().toISOString() });
-    localStorage.setItem("support_tickets", JSON.stringify(tickets));
+    await createSupportTicket({
+      subject: form.subject,
+      message: form.message,
+      priority: "MEDIUM",
+    });
     setSubmitted(true);
     setForm({ name: "", email: "", subject: "", message: "" });
     setTimeout(() => setSubmitted(false), 5000);
@@ -57,7 +65,9 @@ export default function HelpCenterPage() {
         <div>
           <span className="ud-label">SUPPORT</span>
           <h1 className="ud-page-title">Help Center</h1>
-          <p className="ud-page-sub">Find answers and get support from the EasternCity team.</p>
+          <p className="ud-page-sub">
+            Find answers and get support from the EasternCity team.
+          </p>
         </div>
       </div>
 
@@ -65,12 +75,24 @@ export default function HelpCenterPage() {
       <div className="help-quick-links">
         {[
           { to: "/dashboard", icon: "bi-speedometer2", label: "Dashboard" },
-          { to: "/my-bookings", icon: "bi-calendar-check", label: "My Bookings" },
+          {
+            to: "/my-bookings",
+            icon: "bi-calendar-check",
+            label: "My Bookings",
+          },
           { to: "/messages", icon: "bi-chat-dots", label: "Messages" },
-          { to: "/verification", icon: "bi-shield-check", label: "Verification" },
+          {
+            to: "/verification",
+            icon: "bi-shield-check",
+            label: "Verification",
+          },
           { to: "/contact", icon: "bi-envelope", label: "Contact Us" },
         ].map((link) => (
-          <Link key={link.to} to={link.to} className="help-quick-link ud-glass-card">
+          <Link
+            key={link.to}
+            to={link.to}
+            className="help-quick-link ud-glass-card"
+          >
             <i className={`bi ${link.icon}`} />
             <span>{link.label}</span>
           </Link>
@@ -95,7 +117,9 @@ export default function HelpCenterPage() {
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 >
                   <span>{faq.q}</span>
-                  <i className={`bi ${openFaq === i ? "bi-chevron-up" : "bi-chevron-down"}`} />
+                  <i
+                    className={`bi ${openFaq === i ? "bi-chevron-up" : "bi-chevron-down"}`}
+                  />
                 </button>
                 {openFaq === i && <p className="help-faq-a">{faq.a}</p>}
               </div>
@@ -127,7 +151,9 @@ export default function HelpCenterPage() {
                       type="text"
                       className="ud-input"
                       value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      onChange={(e) =>
+                        setForm({ ...form, name: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -138,7 +164,9 @@ export default function HelpCenterPage() {
                       type="email"
                       className="ud-input"
                       value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      onChange={(e) =>
+                        setForm({ ...form, email: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -150,7 +178,9 @@ export default function HelpCenterPage() {
                     type="text"
                     className="ud-input"
                     value={form.subject}
-                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, subject: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -161,7 +191,9 @@ export default function HelpCenterPage() {
                     className="ud-input"
                     rows={5}
                     value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, message: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -176,3 +208,4 @@ export default function HelpCenterPage() {
     </div>
   );
 }
+

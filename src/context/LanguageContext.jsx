@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { getStorageItem, setStorageItem } from "../services/storageService.js";
 
 const LanguageContext = createContext(null);
 
@@ -1106,13 +1107,13 @@ const translations = {
 };
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(
-    () => localStorage.getItem("language") || "en",
+  const [language, setLanguage] = useState(() =>
+    getStorageItem("language", "en"),
   );
 
   useEffect(() => {
     document.documentElement.lang = language;
-    localStorage.setItem("language", language);
+    setStorageItem("language", language);
   }, [language]);
 
   const t = useCallback(

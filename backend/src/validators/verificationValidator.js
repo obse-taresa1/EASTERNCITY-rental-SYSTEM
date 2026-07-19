@@ -1,57 +1,24 @@
+const { z } = require('zod');
 const { VERIFICATION_STATUSES } = require('../utils/constants');
+const { parseWithSchema } = require('./validationHelpers');
 
-function requireVerifiedFileUrl(value, fieldName) {
-  if (!value || typeof value !== 'string') {
-    return `${fieldName} file URL is required.`;
-  }
+const verificationSubmissionSchema = z.object({
+  city: z.string().trim().min(1, 'City is required.'),
+  sefer: z.string().trim().min(1, 'Sefer is required.'),
+  address: z.string().trim().optional().default(''),
+});
 
-  if (value.startsWith('data:')) {
-    return `${fieldName} must be a file path or URL, not base64 data.`;
-  }
-
-  return null;
-}
-
-function validateVerificationSubmission(req, res, next) {
-  const { nationalIdFrontUrl, nationalIdBackUrl } = req.body;
-  const errors = [
-    requireVerifiedFileUrl(nationalIdFrontUrl, 'nationalIdFrontUrl'),
-    requireVerifiedFileUrl(nationalIdBackUrl, 'nationalIdBackUrl'),
-  ].filter(Boolean);
-
-  if (errors.length > 0) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid verification submission.',
-      errors,
-    });
-  }
-
-  next();
-}
-
-function validateVerificationDecision(req, res, next) {
-  const { status, reason } = req.body;
-  const allowedStatuses = [VERIFICATION_STATUSES.APPROVED, VERIFICATION_STATUSES.REJECTED];
-
-  if (!allowedStatuses.includes(status)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Verification status must be APPROVED or REJECTED.',
-    });
-  }
-
-  if (status === VERIFICATION_STATUSES.REJECTED && (!reason || !reason.trim())) {
-    return res.status(400).json({
-      success: false,
-      message: 'Rejection reason is required.',
-    });
-  }
-
-  next();
-}
+const verificationDecisionSchema = z.object({
+  status: z.enum([VERIFICATION_STATUSES.APPROVED, VERIFICATION_STATUSES.REJECTED], {
+    errorMap: () => ({ message: 'Verification status must be APPROVED or REJECTED.' }),
+  }),
+  reason: z.string().optional().default(''),
+}).refine(
+  (data) => data.status !== VERIFICATION_STATUSES.REJECTED || data.reason.trim().length > 0,
+  { message: 'Rejection reason is required.', path: ['reason'] },
+);
 
 module.exports = {
-  validateVerificationSubmission,
-  validateVerificationDecision,
+  validateVerificationSubmission: (req, res, next) => parseWithSchema(verificationSubmissionSchema, req, res, next),
+  validateVerificationDecision: (req, res, next) => parseWithSchema(verificationDecisionSchema, req, res, next),
 };

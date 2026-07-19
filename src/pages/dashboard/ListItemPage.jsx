@@ -5,7 +5,7 @@ import FormSelect from "../../components/forms/FormSelect.jsx";
 import FormTextarea from "../../components/forms/FormTextarea.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { categories } from "../../data/items.js";
-import { saveOwnerListing } from "../../services/itemService.js";
+import { createListing } from "../../services/listingApiService.js";
 
 const cities = ["Jigjiga", "Harar", "Dire Dawa"];
 const priceTypes = ["Per Hour", "Per Day", "Per Week", "Per Month"];
@@ -26,6 +26,8 @@ const contactMethods = [
   "WhatsApp",
   "All Methods",
 ];
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const initialFormData = {
   title: "",
@@ -110,6 +112,7 @@ export default function ListItemPage() {
         id: `${file.name}-${file.lastModified}-${crypto.randomUUID?.() || Date.now()}`,
         name: file.name,
         size: file.size,
+        file,
         preview: await fileToDataUrl(file),
       })),
     );
@@ -161,75 +164,83 @@ export default function ListItemPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function buildListing(status, screenshot) {
-    const selectedCategoryName = selectedCategory?.name || formData.category;
-    return {
-      title: formData.title || "Untitled rental listing",
-      category: formData.category || "construction-diy",
-      subcategory: formData.subcategory,
-      city: formData.city || "Jigjiga",
-      location: [formData.area, formData.city].filter(Boolean).join(", "),
-      description: formData.description,
-      pricePerDay: Number(formData.rentalPrice || 0),
-      priceType: formData.priceType,
-      securityDeposit: formData.securityDeposit,
-      availableFrom: formData.availableFrom,
-      availableUntil: formData.availableUntil,
-      quantity: Number(formData.quantity || 1),
-      image: images[0]?.preview,
-      coverImage: images[0]?.preview,
-      images,
-      status: status,
-      available: status === "PUBLISHED" || status === "active",
-      featured: false,
-      owner:
-        activeUser?.businessName || activeUser?.name || "EasternCity Owner",
-      ownerName:
-        activeUser?.businessName || activeUser?.name || "EasternCity Owner",
-      subscriptionPlan: "Free Plan",
-      verificationStatus: activeUser?.verified ? "verified" : "pending",
-      contactPreference: formData.contactPreference,
-      pickupOption: formData.pickupOption,
-      deliveryFee: formData.deliveryFee,
-      deliveryCoverage: formData.deliveryCoverage,
-      requirements: {
-        documents: [
-          ...formData.requiredDocuments.filter(
-            (document) => document !== "Other",
-          ),
-          ...(formData.otherDocument ? [formData.otherDocument] : []),
-        ],
-        minimumPeriod:
-          formData.customRentalPeriod || formData.minimumRentalPeriod,
-        age: formData.ageRequirement,
-        conditions:
-          formData.additionalRequirements || formData.securityConditions,
-      },
-      specs: [
-        { icon: "bi-tags", label: selectedCategoryName },
-        { icon: "bi-geo-alt", label: formData.city || "Jigjiga" },
-      ],
-      paymentScreenshot: screenshot?.preview,
-      createdAt: new Date().toISOString()
-    };
-  }
+  async function finishListing(status, screenshot = null) {
+    try {
+      const payload = new FormData();
+      payload.append("title", formData.title || "Untitled rental listing");
+      if (uuidPattern.test(formData.category)) {
+        payload.append("categoryId", formData.category);
+      } else {
+        payload.append("categorySlug", formData.category || "construction-diy");
+        payload.append(
+          "categoryName",
+          selectedCategory?.name || formData.category || "Construction & DIY",
+        );
+      }
+      payload.append("city", formData.city || "Jigjiga");
+      payload.append(
+        "location",
+        [formData.area, formData.city].filter(Boolean).join(", "),
+      );
+      payload.append("description", formData.description || "");
+      payload.append("pricePerDay", String(Number(formData.rentalPrice || 0)));
+      payload.append("status", status === "draft" ? "DRAFT" : "PENDING");
+      payload.append("paymentMethod", paymentMethod);
+      payload.append(
+        "paymentStatus",
+        status === "draft" ? "PENDING" : "PENDING",
+      );
+      payload.append("priceType", formData.priceType);
+      payload.append("securityDeposit", formData.securityDeposit || "");
+      payload.append("availableFrom", formData.availableFrom || "");
+      payload.append("availableUntil", formData.availableUntil || "");
+      payload.append("quantity", String(Number(formData.quantity || 1)));
+      payload.append("subcategory", formData.subcategory || "");
+      payload.append("pickupOption", formData.pickupOption || "");
+      payload.append("deliveryFee", formData.deliveryFee || "");
+      payload.append("deliveryCoverage", formData.deliveryCoverage || "");
+      payload.append("contactPreference", formData.contactPreference || "");
+      payload.append(
+        "requiredDocuments",
+        JSON.stringify(formData.requiredDocuments || []),
+      );
+      payload.append("otherDocument", formData.otherDocument || "");
+      payload.append("minimumRentalPeriod", formData.minimumRentalPeriod || "");
+      payload.append("customRentalPeriod", formData.customRentalPeriod || "");
+      payload.append("ageRequirement", formData.ageRequirement || "");
+      payload.append("securityConditions", formData.securityConditions || "");
+      payload.append(
+        "additionalRequirements",
+        formData.additionalRequirements || "",
+      );
 
-  function finishListing(status, screenshot = null) {
-    const listingStatus = status === "draft" ? "draft" : "UNDER_REVIEW";
-    saveOwnerListing(buildListing(listingStatus, screenshot));
-    setNotice(
-      status === "draft"
-        ? "Listing saved as draft."
-        : "Listing submitted. Waiting for admin review after payment verification.",
-    );
-    setTimeout(() => navigate("/dashboard"), 500);
+      images.forEach((image) => {
+        if (image.file) {
+          payload.append("images", image.file);
+        }
+      });
+
+      if (screenshot?.file) {
+        payload.append("paymentProof", screenshot.file);
+      }
+
+      await createListing(payload);
+      setNotice(
+        status === "draft"
+          ? "Listing saved as draft in the database."
+          : "Listing submitted. Waiting for admin review after payment verification.",
+      );
+      setTimeout(() => navigate("/my-listings"), 500);
+    } catch (error) {
+      setNotice(error.message || "Unable to submit listing.");
+    }
   }
 
   async function handleScreenshotUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
     const dataUrl = await fileToDataUrl(file);
-    setPaymentScreenshot({ name: file.name, preview: dataUrl });
+    setPaymentScreenshot({ name: file.name, preview: dataUrl, file });
   }
 
   function handlePaymentSubmit(e) {
@@ -322,7 +333,7 @@ export default function ListItemPage() {
           </p>
         </section>
 
-      <div className="listing-form-actions">
+        <div className="listing-form-actions">
           <button
             type="button"
             className="btn btn-outline-secondary"
@@ -334,19 +345,32 @@ export default function ListItemPage() {
             <button
               type="button"
               className="btn btn-accent-custom btn-shine"
-              onClick={() => { setIsPaymentStep(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              onClick={() => {
+                setIsPaymentStep(true);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
             >
               <i className="bi bi-credit-card" /> Proceed to Payment
             </button>
           ) : (
             <div style={{ width: "100%" }}>
               {/* ── Listing Fee Payment Step ─────────────────────────── */}
-              <div className="listing-form-section" style={{ border: "2px solid var(--primary-color)", borderRadius: "12px", padding: "1.5rem", marginBottom: "1rem" }}>
+              <div
+                className="listing-form-section"
+                style={{
+                  border: "2px solid var(--primary-color)",
+                  borderRadius: "12px",
+                  padding: "1.5rem",
+                  marginBottom: "1rem",
+                }}
+              >
                 <h2 style={{ color: "var(--primary-color)" }}>
-                  <i className="bi bi-credit-card me-2" />Listing Fee Payment
+                  <i className="bi bi-credit-card me-2" />
+                  Listing Fee Payment
                 </h2>
                 <p className="text-muted mb-3">
-                  Your listing becomes visible after payment verification and admin approval.
+                  Your listing becomes visible after payment verification and
+                  admin approval.
                 </p>
 
                 <div className="bg-light p-3 rounded mb-3">
@@ -354,23 +378,34 @@ export default function ListItemPage() {
                     <span className="fw-bold">Listing Fee</span>
                     <span>500 ETB</span>
                   </div>
-                  <div className="d-flex justify-content-between fw-bold" style={{ borderTop: "1px solid #dee2e6", paddingTop: "0.5rem" }}>
+                  <div
+                    className="d-flex justify-content-between fw-bold"
+                    style={{
+                      borderTop: "1px solid #dee2e6",
+                      paddingTop: "0.5rem",
+                    }}
+                  >
                     <span>Total</span>
-                    <span style={{ color: "var(--primary-color)" }}>500 ETB</span>
+                    <span style={{ color: "var(--primary-color)" }}>
+                      500 ETB
+                    </span>
                   </div>
                 </div>
 
                 <div className="mb-3">
                   <label className="form-label fw-bold">Payment Method</label>
                   <div className="d-flex gap-3">
-                    {["Telebirr", "CBE Birr", "Bank Transfer"].map(method => (
-                      <label key={method} className="d-flex align-items-center gap-2 cursor-pointer">
+                    {["Telebirr", "CBE Birr", "Bank Transfer"].map((method) => (
+                      <label
+                        key={method}
+                        className="d-flex align-items-center gap-2 cursor-pointer"
+                      >
                         <input
                           type="radio"
                           name="paymentMethod"
                           value={method}
                           checked={paymentMethod === method}
-                          onChange={e => setPaymentMethod(e.target.value)}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
                         />
                         <span>{method}</span>
                       </label>
@@ -379,10 +414,14 @@ export default function ListItemPage() {
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label fw-bold">Upload Payment Screenshot</label>
+                  <label className="form-label fw-bold">
+                    Upload Payment Screenshot
+                  </label>
                   <label className="btn btn-outline-danger d-block">
                     <i className="bi bi-upload me-2" />
-                    {paymentScreenshot ? paymentScreenshot.name : "Choose Screenshot (JPG, PNG)"}
+                    {paymentScreenshot
+                      ? paymentScreenshot.name
+                      : "Choose Screenshot (JPG, PNG)"}
                     <input
                       type="file"
                       accept=".jpg,.jpeg,.png,image/jpeg,image/png"
@@ -394,14 +433,20 @@ export default function ListItemPage() {
                     <img
                       src={paymentScreenshot.preview}
                       alt="Payment screenshot"
-                      style={{ maxHeight: "150px", marginTop: "0.5rem", borderRadius: "8px", border: "1px solid #dee2e6" }}
+                      style={{
+                        maxHeight: "150px",
+                        marginTop: "0.5rem",
+                        borderRadius: "8px",
+                        border: "1px solid #dee2e6",
+                      }}
                     />
                   )}
                 </div>
 
                 <div className="alert alert-info mb-0">
                   <i className="bi bi-info-circle me-2" />
-                  After submission your listing will be reviewed by our team. You will be notified once approved.
+                  After submission your listing will be reviewed by our team.
+                  You will be notified once approved.
                 </div>
               </div>
 
@@ -435,9 +480,6 @@ export default function ListItemPage() {
           <span className="section-label">Create Listing</span>
           <h1>List an Item for Rent</h1>
           <p>Complete the details renters need before contacting you.</p>
-        </div>
-        <div className="free-listing-note">
-          You have used 2 of your 3 free listings.
         </div>
       </div>
 
@@ -797,4 +839,3 @@ export default function ListItemPage() {
     </main>
   );
 }
-

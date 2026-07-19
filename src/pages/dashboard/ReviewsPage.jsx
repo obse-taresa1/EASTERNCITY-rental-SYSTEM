@@ -1,11 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import {
-  getBookingsByUser,
-  getReviewsByUser,
-  hasReviewForBooking,
-} from "../../services/bookingService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
+import { getReviewsByListings } from "../../services/reviewApiService.js";
 import LeaveReviewModal from "../../components/reviews/LeaveReviewModal.jsx";
 
 function StarDisplay({ rating }) {
@@ -26,14 +23,93 @@ export default function ReviewsPage() {
   const activeUser = user || currentUser;
   const [reviewBooking, setReviewBooking] = useState(null);
   const [refreshToken, setRefreshToken] = useState(0);
+  const [bookings, setBookings] = useState([]);
+  const [reviewsByListing, setReviewsByListing] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const bookings = activeUser ? getBookingsByUser(activeUser.id) : [];
-  const completedBookings = bookings.filter((b) => b.status === "completed");
-  const myReviews = activeUser ? getReviewsByUser(activeUser.id) : [];
+  useEffect(() => {
+    let active = true;
 
-  const pendingReviews = completedBookings.filter(
-    (b) => !hasReviewForBooking(b.id),
+    async function loadData() {
+      if (!activeUser) {
+        setBookings([]);
+        setReviewsByListing({});
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const data = await getMyBookings();
+        const renterBookings = data.filter(
+          (booking) =>
+            String(booking.renterId || booking.userId || "") ===
+            String(activeUser.id),
+        );
+        const completedBookings = renterBookings.filter(
+          (booking) => String(booking.status || "").toUpperCase() === "COMPLETED",
+        );
+        const listingIds = completedBookings.map((booking) => booking.listingId || booking.itemId);
+        const listingReviews = await getReviewsByListings(listingIds);
+
+        if (!active) return;
+        setBookings(renterBookings);
+        setReviewsByListing(listingReviews);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadData();
+
+    return () => {
+      active = false;
+    };
+  }, [activeUser, refreshToken]);
+
+  const completedBookings = useMemo(
+    () => bookings.filter((b) => String(b.status || "").toUpperCase() === "COMPLETED"),
+    [bookings],
   );
+
+  const myReviews = useMemo(() => {
+    if (!activeUser) return [];
+
+    return completedBookings.flatMap((booking) => {
+      const listingId = booking.listingId || booking.itemId;
+      const bookingReviews = reviewsByListing[String(listingId)] || [];
+
+      return bookingReviews
+        .filter(
+          (review) =>
+            String(review.bookingId || "") === String(booking.id) &&
+            String(review.reviewerId || review.userId || "") ===
+              String(activeUser.id),
+        )
+        .map((review) => ({
+          ...review,
+          itemTitle:
+            booking.itemTitle || booking.listing?.title || review.itemTitle || "Rental Item",
+          itemId: listingId,
+        }));
+    });
+  }, [activeUser, completedBookings, reviewsByListing]);
+
+  const pendingReviews = completedBookings.filter((booking) => {
+    const listingId = booking.listingId || booking.itemId;
+    const bookingReviews = reviewsByListing[String(listingId)] || [];
+
+    return !bookingReviews.some(
+      (review) =>
+        String(review.bookingId || "") === String(booking.id) &&
+        String(review.reviewerId || review.userId || "") ===
+          String(activeUser?.id || ""),
+    );
+  });
+
+  if (loading) {
+    return <div className="ud-page">Loading reviews...</div>;
+  }
 
   return (
     <div className="ud-page" key={refreshToken}>

@@ -1,12 +1,11 @@
-function validateSendMessage(req, res, next) {
-  if (!req.body.conversationId || !req.body.body) {
-    return res.status(400).json({
-      success: false,
-      message: "conversationId and body are required.",
-    });
-  }
+const { z } = require('zod');
+const { parseWithSchema } = require('./validationHelpers');
 
-  next();
-}
+const sendMessageSchema = z.object({
+  conversationId: z.string().uuid('conversationId must be a valid ID.'),
+  body: z.string().trim().min(1, 'Message body is required.'),
+});
 
-module.exports = { validateSendMessage };
+module.exports = {
+  validateSendMessage: (req, res, next) => parseWithSchema(sendMessageSchema, req, res, next),
+};

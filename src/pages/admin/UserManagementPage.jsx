@@ -6,6 +6,30 @@ export default function UserManagementPage() {
   const [usersList, setUsersList] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadUsers() {
+      setLoading(true);
+      setNotice("");
+      try {
+        const users = await getUsers();
+        if (active) setUsersList(users);
+      } catch (error) {
+        if (active) setNotice(error.message || "Unable to load users.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadUsers();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function loadUsers() {
     setUsersList(await adminApi.users({ search, status: filter }));
@@ -36,6 +60,7 @@ export default function UserManagementPage() {
       </div>
 
       <div className="admin-table-container">
+        {notice && <div className="alert alert-warning">{notice}</div>}
         <div className="d-flex flex-wrap justify-content-between gap-3 mb-4">
           <div className="d-flex gap-2">
             {["all", "active", "suspended"].map(status => (
