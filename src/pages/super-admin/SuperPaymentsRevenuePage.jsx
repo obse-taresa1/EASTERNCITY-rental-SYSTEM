@@ -3,14 +3,17 @@ import { fetchPromotionRequests } from "../../services/promotionApiService.js";
 
 function packageMatches(promotion, filter) {
   if (filter === "all") return true;
-  const value = `${promotion.package || ""} ${promotion.promotionType || ""} ${promotion.promotionPlacement || ""}`.toLowerCase();
+  const value =
+    `${promotion.package || ""} ${promotion.promotionType || ""} ${promotion.promotionPlacement || ""}`.toLowerCase();
   return value.includes(filter.toLowerCase());
 }
 
 function formatDate(value) {
   if (!value) return "-";
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+  return Number.isNaN(date.getTime())
+    ? String(value)
+    : date.toLocaleDateString();
 }
 
 export default function SuperPaymentsRevenuePage() {
@@ -24,12 +27,18 @@ export default function SuperPaymentsRevenuePage() {
       if (!active) return;
       setTxs(
         promotions
-          .filter((promotion) => String(promotion.status || "").toLowerCase() === "approved")
+          .filter(
+            (promotion) =>
+              String(promotion.status || "").toLowerCase() === "approved",
+          )
           .map((promotion) => ({
             id: promotion.id,
             itemTitle: promotion.listingTitle,
             owner: promotion.ownerName || promotion.userName,
-            package: promotion.promotionType || promotion.promotionPlacement || "Promotion",
+            package:
+              promotion.promotionType ||
+              promotion.promotionPlacement ||
+              "Promotion",
             amount: Number(promotion.amount || 0),
             date: promotion.requestDate,
             status: promotion.status,
@@ -75,7 +84,10 @@ export default function SuperPaymentsRevenuePage() {
         transaction.status,
       ].join(","),
     );
-    const csv = ["Transaction ID,Listing Item,Owner,Package,Date,Amount,Status", ...rows].join("\n");
+    const csv = [
+      "Transaction ID,Listing Item,Owner,Package,Date,Amount,Status",
+      ...rows,
+    ].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -92,10 +104,15 @@ export default function SuperPaymentsRevenuePage() {
           <span className="section-label">SUPER ADMIN</span>
           <h1 className="h3 mb-0">Payments & Promotion Revenue</h1>
           <p className="text-muted mb-0">
-            Track advertiser promotion fees. Rental payments are not collected on-platform.
+            Track advertiser promotion fees. Rental payments are not collected
+            on-platform.
           </p>
         </div>
-        <button type="button" className="btn btn-accent-custom" onClick={handleExport}>
+        <button
+          type="button"
+          className="btn btn-accent-custom"
+          onClick={handleExport}
+        >
           <i className="bi bi-file-earmark-arrow-down me-1" /> Export Reports
         </button>
       </div>
@@ -108,9 +125,16 @@ export default function SuperPaymentsRevenuePage() {
           ["Featured Listing Revenue", featuredListingRevenue, ""],
         ].map(([label, value, tone]) => (
           <div className="col-md-3 mb-3" key={label}>
-            <div className={`p-4 border rounded shadow-sm ${tone}`} style={tone ? undefined : { background: "var(--card-bg)" }}>
-              <span className={tone ? "opacity-75" : "text-muted"}><small>{label}</small></span>
-              <h2 className={`mb-0 fw-bold ${tone ? "" : "text-danger"}`}>{Number(value || 0).toLocaleString()} ETB</h2>
+            <div
+              className={`p-4 border rounded shadow-sm ${tone}`}
+              style={tone ? undefined : { background: "var(--card-bg)" }}
+            >
+              <span className={tone ? "opacity-75" : "text-muted"}>
+                <small>{label}</small>
+              </span>
+              <h2 className={`mb-0 fw-bold ${tone ? "" : "text-danger"}`}>
+                {Number(value || 0).toLocaleString()} ETB
+              </h2>
             </div>
           </div>
         ))}
@@ -160,18 +184,26 @@ export default function SuperPaymentsRevenuePage() {
                   <td>{t.itemTitle}</td>
                   <td>{t.owner}</td>
                   <td>
-                    <span className="badge bg-danger-subtle text-danger">{t.package}</span>
+                    <span className="badge bg-danger-subtle text-danger">
+                      {t.package}
+                    </span>
                   </td>
                   <td>{formatDate(t.date)}</td>
-                  <td className="fw-bold text-success">+{t.amount.toLocaleString()} ETB</td>
+                  <td className="fw-bold text-success">
+                    +{t.amount.toLocaleString()} ETB
+                  </td>
                   <td>
-                    <span className="badge bg-success-subtle text-success">{t.status}</span>
+                    <span className="badge bg-success-subtle text-success">
+                      {t.status}
+                    </span>
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="text-center text-muted py-4">No approved promotion payments found.</td>
+                  <td colSpan="7" className="text-center text-muted py-4">
+                    No approved promotion payments found.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -179,5 +211,22 @@ export default function SuperPaymentsRevenuePage() {
         </div>
       </div>
     </main>
+  );
+}
+function Rev({ label, value, primary }) {
+  return (
+    <div className="col-md-3 mb-3">
+      <div
+        className={`p-4 border rounded shadow-sm ${primary ? "bg-danger text-white" : ""}`}
+        style={primary ? undefined : { background: "var(--card-bg)" }}
+      >
+        <span className={primary ? "opacity-75" : "text-muted"}>
+          <small>{label}</small>
+        </span>
+        <h2 className={`mb-0 fw-bold ${primary ? "" : "text-danger"}`}>
+          {Number(value || 0).toLocaleString()} ETB
+        </h2>
+      </div>
+    </div>
   );
 }

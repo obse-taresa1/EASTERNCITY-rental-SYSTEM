@@ -63,19 +63,29 @@ export default function AdminReviewsPage() {
               {filtered.map((review) => (
                 <tr key={review.id}>
                   <td>{review.userName}</td>
-                  <td className="fw-bold">{review.listing?.title || review.itemId || "-"}</td>
+                  <td className="fw-bold">
+                    {review.listing?.title || review.itemId || "-"}
+                  </td>
                   <td>
                     <div className="text-warning">
-                      {Array.from({ length: Math.min(5, review.rating) }).map((_, i) => (
-                        <i key={i} className="bi bi-star-fill me-1" />
-                      ))}
-                      {Array.from({ length: Math.max(0, 5 - review.rating) }).map((_, i) => (
+                      {Array.from({ length: Math.min(5, review.rating) }).map(
+                        (_, i) => (
+                          <i key={i} className="bi bi-star-fill me-1" />
+                        ),
+                      )}
+                      {Array.from({
+                        length: Math.max(0, 5 - review.rating),
+                      }).map((_, i) => (
                         <i key={i} className="bi bi-star me-1 text-muted" />
                       ))}
                     </div>
                   </td>
                   <td>{review.comment || "-"}</td>
-                  <td>{review.createdAt ? new Date(review.createdAt).toLocaleDateString() : "-"}</td>
+                  <td>
+                    {review.createdAt
+                      ? new Date(review.createdAt).toLocaleDateString()
+                      : "-"}
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (

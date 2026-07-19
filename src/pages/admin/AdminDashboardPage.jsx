@@ -46,9 +46,13 @@ export default function AdminDashboardPage() {
       "easterncity:contact-messages-updated",
       "easterncity:notifications-updated",
     ];
-    events.forEach((eventName) => window.addEventListener(eventName, loadDashboard));
+    events.forEach((eventName) =>
+      window.addEventListener(eventName, loadDashboard),
+    );
     return () => {
-      events.forEach((eventName) => window.removeEventListener(eventName, loadDashboard));
+      events.forEach((eventName) =>
+        window.removeEventListener(eventName, loadDashboard),
+      );
     };
   }, [loadDashboard]);
 
@@ -59,20 +63,68 @@ export default function AdminDashboardPage() {
 
   const statCards = [
     { icon: "bi-people", label: "Total Users", value: counts.totalUsers || 0 },
-    { icon: "bi-box-seam", label: "Total Listings", value: counts.totalListings || 0 },
-    { icon: "bi-check-circle", label: "Active Listings", value: counts.activeListings || 0 },
-    { icon: "bi-hourglass-split", label: "Pending Listings", value: counts.pendingListings || 0 },
-    { icon: "bi-x-circle", label: "Rejected Listings", value: counts.rejectedListings || 0 },
-    { icon: "bi-star", label: "Featured Listings", value: counts.featuredListings || 0 },
-    { icon: "bi-megaphone", label: "Promotion Requests", value: counts.promotionRequests || 0 },
-    { icon: "bi-clock-history", label: "Promotion History", value: counts.promotionHistory || 0 },
-    { icon: "bi-cash-stack", label: "Platform Fee Payments", value: counts.platformFeePayments || 0 },
-    { icon: "bi-person-vcard", label: "Verification Requests", value: counts.verificationRequests || 0 },
+    {
+      icon: "bi-box-seam",
+      label: "Total Listings",
+      value: counts.totalListings || 0,
+    },
+    {
+      icon: "bi-check-circle",
+      label: "Active Listings",
+      value: counts.activeListings || 0,
+    },
+    {
+      icon: "bi-hourglass-split",
+      label: "Pending Listings",
+      value: counts.pendingListings || 0,
+    },
+    {
+      icon: "bi-x-circle",
+      label: "Rejected Listings",
+      value: counts.rejectedListings || 0,
+    },
+    {
+      icon: "bi-star",
+      label: "Featured Listings",
+      value: counts.featuredListings || 0,
+    },
+    {
+      icon: "bi-megaphone",
+      label: "Promotion Requests",
+      value: counts.promotionRequests || 0,
+    },
+    {
+      icon: "bi-clock-history",
+      label: "Promotion History",
+      value: counts.promotionHistory || 0,
+    },
+    {
+      icon: "bi-cash-stack",
+      label: "Platform Fee Payments",
+      value: counts.platformFeePayments || 0,
+    },
+    {
+      icon: "bi-person-vcard",
+      label: "Verification Requests",
+      value: counts.verificationRequests || 0,
+    },
     { icon: "bi-star-half", label: "Reviews", value: counts.reviews || 0 },
     { icon: "bi-flag", label: "Reports", value: counts.reports || 0 },
-    { icon: "bi-envelope-paper", label: "Contact Messages", value: counts.contactMessages || 0 },
-    { icon: "bi-headset", label: "Support Tickets", value: counts.supportTickets || 0 },
-    { icon: "bi-bell", label: "Notifications", value: counts.notifications || 0 },
+    {
+      icon: "bi-envelope-paper",
+      label: "Contact Messages",
+      value: counts.contactMessages || 0,
+    },
+    {
+      icon: "bi-headset",
+      label: "Support Tickets",
+      value: counts.supportTickets || 0,
+    },
+    {
+      icon: "bi-bell",
+      label: "Notifications",
+      value: counts.notifications || 0,
+    },
   ];
 
   const miniCards = [
@@ -99,6 +151,10 @@ export default function AdminDashboardPage() {
   return (
     <AdminOverviewDashboard
       variant="admin"
+      loading={loading}
+      error={error}
+      filters={filters}
+      onFiltersChange={setFilters}
       overview={{
         title: "Marketplace Overview",
         primaryValue: counts.activeListings || 0,
@@ -106,7 +162,10 @@ export default function AdminDashboardPage() {
         icons: ["bi-box-seam", "bi-people", "bi-megaphone"],
         stats: [
           { label: "Pending Listings", value: counts.pendingListings || 0 },
-          { label: "Pending Verifications", value: counts.pendingVerifications || 0 },
+          {
+            label: "Pending Verifications",
+            value: counts.pendingVerifications || 0,
+          },
           { label: "Notifications", value: counts.notifications || 0 },
         ],
         searchPlaceholder: "Search users, listings, payments",
@@ -121,12 +180,18 @@ export default function AdminDashboardPage() {
         },
         {
           label: "Pending Listings",
-          value: percent(counts.pendingListings || 0, counts.totalListings || 0),
+          value: percent(
+            counts.pendingListings || 0,
+            counts.totalListings || 0,
+          ),
           color: "#f4812a",
         },
         {
           label: "Approved Promotions",
-          value: percent(counts.featuredListings || 0, counts.promotionRequests || 0),
+          value: percent(
+            counts.featuredListings || 0,
+            counts.promotionRequests || 0,
+          ),
           color: "#719f58",
         },
       ]}

@@ -40,7 +40,9 @@ export default function AdminAnalyticsPage() {
         <div>
           <span className="section-label">ADMIN</span>
           <h1 className="h3 mb-0">Platform Analytics</h1>
-          <p className="text-muted mb-0">Analyze platform growth metrics and rental activities.</p>
+          <p className="text-muted mb-0">
+            Analyze platform growth metrics and rental activities.
+          </p>
         </div>
       </div>
 
@@ -60,7 +62,9 @@ export default function AdminAnalyticsPage() {
           </div>
 
           <div className="d-flex align-items-center gap-2">
-            <span className="text-muted"><small>Custom:</small></span>
+            <span className="text-muted">
+              <small>Custom:</small>
+            </span>
             <input
               type="date"
               className="form-control form-control-sm"
@@ -70,7 +74,9 @@ export default function AdminAnalyticsPage() {
                 setFilter("custom");
               }}
             />
-            <span className="text-muted"><small>to</small></span>
+            <span className="text-muted">
+              <small>to</small>
+            </span>
             <input
               type="date"
               className="form-control form-control-sm"
@@ -87,18 +93,45 @@ export default function AdminAnalyticsPage() {
       <div className="row">
         {[
           ["bi-people", "User Growth", counts.totalUsers || 0, "primary"],
-          ["bi-box-seam", "Listing Growth", counts.totalListings || 0, "success"],
-          ["bi-receipt", "Listing Fee Revenue", `${Number(revenue.listingFeeRevenue || 0).toLocaleString()} ETB`, "warning"],
-          ["bi-cash-stack", "Promotion Revenue", `${Number(revenue.promotionRevenue || 0).toLocaleString()} ETB`, "danger"],
-          ["bi-shield-check", "Verifications", counts.verificationRequests || 0, "info"],
+          [
+            "bi-box-seam",
+            "Listing Growth",
+            counts.totalListings || 0,
+            "success",
+          ],
+          [
+            "bi-receipt",
+            "Listing Fee Revenue",
+            `${Number(revenue.listingFeeRevenue || 0).toLocaleString()} ETB`,
+            "warning",
+          ],
+          [
+            "bi-cash-stack",
+            "Promotion Revenue",
+            `${Number(revenue.promotionRevenue || 0).toLocaleString()} ETB`,
+            "danger",
+          ],
+          [
+            "bi-shield-check",
+            "Verifications",
+            counts.verificationRequests || 0,
+            "info",
+          ],
         ].map(([icon, label, value, tone]) => (
           <div className="col-md-3 mb-4" key={label}>
-            <div className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-              <div className={`stat-icon-wrapper bg-${tone}-subtle text-${tone} p-3 rounded`}>
+            <div
+              className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm"
+              style={{ background: "var(--card-bg)" }}
+            >
+              <div
+                className={`stat-icon-wrapper bg-${tone}-subtle text-${tone} p-3 rounded`}
+              >
                 <i className={`bi ${icon}`} style={{ fontSize: "1.5rem" }} />
               </div>
               <div>
-                <span className="text-muted"><small>{label}</small></span>
+                <span className="text-muted">
+                  <small>{label}</small>
+                </span>
                 <h2 className="mb-0 fw-bold">{value}</h2>
               </div>
             </div>
@@ -110,7 +143,8 @@ export default function AdminAnalyticsPage() {
         <div className="col-12">
           <div className="admin-table-container">
             <h2 className="h5 mb-3 d-flex align-items-center gap-2">
-              <i className="bi bi-geo text-primary-custom" /> City Statistics Performance
+              <i className="bi bi-geo text-primary-custom" /> City Statistics
+              Performance
             </h2>
             <div className="table-responsive">
               <table className="table align-middle">
@@ -124,7 +158,10 @@ export default function AdminAnalyticsPage() {
                 </thead>
                 <tbody>
                   {cityStats.map((city) => {
-                    const rate = engagementRate(counts.totalRenters || 0, city.value || 0);
+                    const rate = engagementRate(
+                      counts.totalRenters || 0,
+                      city.value || 0,
+                    );
                     return (
                       <tr key={city.label}>
                         <td className="fw-bold">{city.label}</td>
@@ -132,8 +169,14 @@ export default function AdminAnalyticsPage() {
                         <td>{counts.totalRenters || 0} rentals</td>
                         <td>
                           <div className="d-flex align-items-center gap-2">
-                            <div className="progress w-100" style={{ height: "6px" }}>
-                              <div className="progress-bar bg-danger" style={{ width: `${rate}%` }} />
+                            <div
+                              className="progress w-100"
+                              style={{ height: "6px" }}
+                            >
+                              <div
+                                className="progress-bar bg-danger"
+                                style={{ width: `${rate}%` }}
+                              />
                             </div>
                             <small className="fw-bold">{rate}%</small>
                           </div>
@@ -143,7 +186,9 @@ export default function AdminAnalyticsPage() {
                   })}
                   {cityStats.length === 0 && (
                     <tr>
-                      <td colSpan="4" className="text-center text-muted py-4">No city statistics for this range.</td>
+                      <td colSpan="4" className="text-center text-muted py-4">
+                        No city statistics for this range.
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -153,5 +198,27 @@ export default function AdminAnalyticsPage() {
         </div>
       </div>
     </main>
+  );
+}
+function Metric({ label, value, icon, tone }) {
+  return (
+    <div className="col-md-3 mb-4">
+      <div
+        className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm"
+        style={{ background: "var(--card-bg)" }}
+      >
+        <div
+          className={`stat-icon-wrapper bg-${tone}-subtle text-${tone} p-3 rounded`}
+        >
+          <i className={`bi ${icon}`} style={{ fontSize: "1.5rem" }} />
+        </div>
+        <div>
+          <span className="text-muted">
+            <small>{label}</small>
+          </span>
+          <h2 className="mb-0 fw-bold">{value}</h2>
+        </div>
+      </div>
+    </div>
   );
 }

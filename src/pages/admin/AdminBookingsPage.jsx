@@ -5,12 +5,19 @@ import { getMyBookings } from "../../services/bookingApiService.js";
 function formatDate(value) {
   if (!value) return "-";
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+  return Number.isNaN(date.getTime())
+    ? String(value)
+    : date.toLocaleDateString();
 }
 
 function durationDays(startDate, endDate) {
   if (!startDate || !endDate) return "-";
-  const days = Math.max(1, Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)));
+  const days = Math.max(
+    1,
+    Math.ceil(
+      (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24),
+    ),
+  );
   return `${days} day${days !== 1 ? "s" : ""}`;
 }
 
@@ -38,7 +45,9 @@ export default function AdminBookingsPage() {
       booking.id,
     ]
       .filter(Boolean)
-      .some((value) => String(value).toLowerCase().includes(search.toLowerCase()));
+      .some((value) =>
+        String(value).toLowerCase().includes(search.toLowerCase()),
+      );
     const matchesFilter = filter === "all" || status === filter;
     return matchesSearch && matchesFilter;
   });
@@ -49,14 +58,25 @@ export default function AdminBookingsPage() {
         <div>
           <span className="section-label">ADMIN</span>
           <h1 className="h3 mb-0">Bookings Management</h1>
-          <p className="text-muted mb-0">Monitor platform rental bookings. Payments are arranged directly between renters and owners.</p>
+          <p className="text-muted mb-0">
+            Monitor platform rental bookings. Payments are arranged directly
+            between renters and owners.
+          </p>
         </div>
       </div>
 
       <div className="admin-table-container">
         <div className="d-flex flex-wrap justify-content-between gap-3 mb-4">
           <div className="d-flex gap-2">
-            {["all", "pending", "accepted", "active", "completed", "cancelled", "rejected"].map((opt) => (
+            {[
+              "all",
+              "pending",
+              "accepted",
+              "active",
+              "completed",
+              "cancelled",
+              "rejected",
+            ].map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -67,7 +87,10 @@ export default function AdminBookingsPage() {
               </button>
             ))}
           </div>
-          <div className="search-box" style={{ maxWidth: "300px", width: "100%" }}>
+          <div
+            className="search-box"
+            style={{ maxWidth: "300px", width: "100%" }}
+          >
             <input
               type="text"
               placeholder="Search by ID, item, renter..."
@@ -95,12 +118,20 @@ export default function AdminBookingsPage() {
                 <tr key={booking.id}>
                   <td className="fw-bold">{booking.id}</td>
                   <td>{booking.itemTitle}</td>
-                  <td>{booking.renter?.name || booking.renter?.email || "-"}</td>
                   <td>
-                    <div><small>{formatDate(booking.startDate)} to</small></div>
-                    <div><small>{formatDate(booking.endDate)}</small></div>
+                    {booking.renter?.name || booking.renter?.email || "-"}
                   </td>
-                  <td className="text-muted">{durationDays(booking.startDate, booking.endDate)}</td>
+                  <td>
+                    <div>
+                      <small>{formatDate(booking.startDate)} to</small>
+                    </div>
+                    <div>
+                      <small>{formatDate(booking.endDate)}</small>
+                    </div>
+                  </td>
+                  <td className="text-muted">
+                    {durationDays(booking.startDate, booking.endDate)}
+                  </td>
                   <td>
                     <StatusBadge status={booking.status} />
                   </td>

@@ -14,10 +14,10 @@ model User {
   password                      String
   role                          String               @default("USER")
   status                        String               @default("ACTIVE")
-  verificationStatus            String               @default("NOT_VERIFIED")
   city                          String?
-  sefer                         String?
-  address                       String?
+  phone                         String?
+  verificationStatus            String               @default("PENDING")
+  nationalIdNumber              String?
   nationalIdFrontUrl            String?
   nationalIdBackUrl             String?
   createdAt                     DateTime             @default(now())
@@ -35,6 +35,9 @@ model User {
   passwordResetTokens           PasswordResetToken[]
   reviews                       Review[]
   supportTicketReplies          SupportTicketReply[]
+  contactMessages               ContactMessage[]
+  reports                       Report[]
+  activityLogs                  ActivityLog[]
   supportTickets                SupportTicket[]
   contactMessages               ContactMessage[]
   updatedSettings               SystemSetting[]      @relation("SystemSettingUpdater")
@@ -237,6 +240,44 @@ model Notification {
   user          User     @relation(fields: [userId], references: [id])
 }
 
+model ContactMessage {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  subject    String
+  message    String
+  status     String   @default("OPEN")
+  adminReply String?
+  repliedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id         String   @id @default(uuid())
+  reporterId String?
+  type       String
+  subject    String
+  details    String
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  reporter   User?    @relation(fields: [reporterId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String
+  actorId   String?
+  actorName String?
+  metadata  String?
+  type      String   @default("ACTIVITY")
+  createdAt DateTime @default(now())
+  actor     User?    @relation(fields: [actorId], references: [id])
+}
+
 model SupportTicket {
   id         String               @id @default(uuid())
   userId     String
@@ -261,18 +302,3 @@ model SupportTicketReply {
   user      User          @relation(fields: [userId], references: [id])
 }
 
-model ContactMessage {
-  id         String    @id @default(uuid())
-  userId     String?
-  name       String
-  email      String
-  subject    String
-  message    String
-  status     String    @default("OPEN")
-  adminReply String?
-  repliedAt  DateTime?
-  resolvedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  user       User?     @relation(fields: [userId], references: [id])
-}

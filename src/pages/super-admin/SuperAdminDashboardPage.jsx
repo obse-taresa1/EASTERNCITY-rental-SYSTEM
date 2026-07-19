@@ -46,9 +46,13 @@ export default function SuperAdminDashboardPage() {
       "easterncity:contact-messages-updated",
       "easterncity:notifications-updated",
     ];
-    events.forEach((eventName) => window.addEventListener(eventName, loadDashboard));
+    events.forEach((eventName) =>
+      window.addEventListener(eventName, loadDashboard),
+    );
     return () => {
-      events.forEach((eventName) => window.removeEventListener(eventName, loadDashboard));
+      events.forEach((eventName) =>
+        window.removeEventListener(eventName, loadDashboard),
+      );
     };
   }, [loadDashboard]);
 
@@ -58,26 +62,102 @@ export default function SuperAdminDashboardPage() {
   const chart = dashboard?.chart || {};
 
   const statCards = [
-    { icon: "bi-people", label: "Total Platform Users", value: counts.totalUsers || 0 },
-    { icon: "bi-shield-lock", label: "Total Admins", value: counts.totalAdmins || 0 },
-    { icon: "bi-person-badge", label: "Total Owners", value: counts.totalOwners || 0 },
-    { icon: "bi-person-check", label: "Total Renters", value: counts.totalRenters || 0 },
-    { icon: "bi-box-seam", label: "Total Listings", value: counts.totalListings || 0 },
-    { icon: "bi-grid", label: "Listings by Category", value: (breakdowns.listingsByCategory || []).length },
-    { icon: "bi-geo-alt", label: "Listings by City", value: (breakdowns.listingsByCity || []).length },
-    { icon: "bi-pin-map", label: "Listings by Sefar", value: (breakdowns.listingsBySefar || []).length },
-    { icon: "bi-star", label: "Featured Listings", value: counts.featuredListings || 0 },
-    { icon: "bi-megaphone", label: "Promotion Requests", value: counts.promotionRequests || 0 },
-    { icon: "bi-cash-stack", label: "Promotion Revenue", value: formatCurrency(revenue.promotionRevenue || 0) },
-    { icon: "bi-receipt", label: "Listing Fee Revenue", value: formatCurrency(revenue.listingFeeRevenue || 0) },
-    { icon: "bi-person-vcard", label: "Verification Statistics", value: counts.verificationRequests || 0 },
-    { icon: "bi-flag", label: "Reports & Complaints", value: counts.reports || 0 },
-    { icon: "bi-headset", label: "Support Tickets", value: counts.supportTickets || 0 },
-    { icon: "bi-envelope-paper", label: "Contact Messages", value: counts.contactMessages || 0 },
-    { icon: "bi-bell", label: "Notifications", value: counts.notifications || 0 },
-    { icon: "bi-activity", label: "Platform Activity Logs", value: dashboard?.recentRows?.length || 0 },
+    {
+      icon: "bi-people",
+      label: "Total Platform Users",
+      value: counts.totalUsers || 0,
+    },
+    {
+      icon: "bi-shield-lock",
+      label: "Total Admins",
+      value: counts.totalAdmins || 0,
+    },
+    {
+      icon: "bi-person-badge",
+      label: "Total Owners",
+      value: counts.totalOwners || 0,
+    },
+    {
+      icon: "bi-person-check",
+      label: "Total Renters",
+      value: counts.totalRenters || 0,
+    },
+    {
+      icon: "bi-box-seam",
+      label: "Total Listings",
+      value: counts.totalListings || 0,
+    },
+    {
+      icon: "bi-grid",
+      label: "Listings by Category",
+      value: (breakdowns.listingsByCategory || []).length,
+    },
+    {
+      icon: "bi-geo-alt",
+      label: "Listings by City",
+      value: (breakdowns.listingsByCity || []).length,
+    },
+    {
+      icon: "bi-pin-map",
+      label: "Listings by Sefar",
+      value: (breakdowns.listingsBySefar || []).length,
+    },
+    {
+      icon: "bi-star",
+      label: "Featured Listings",
+      value: counts.featuredListings || 0,
+    },
+    {
+      icon: "bi-megaphone",
+      label: "Promotion Requests",
+      value: counts.promotionRequests || 0,
+    },
+    {
+      icon: "bi-cash-stack",
+      label: "Promotion Revenue",
+      value: formatCurrency(revenue.promotionRevenue || 0),
+    },
+    {
+      icon: "bi-receipt",
+      label: "Listing Fee Revenue",
+      value: formatCurrency(revenue.listingFeeRevenue || 0),
+    },
+    {
+      icon: "bi-person-vcard",
+      label: "Verification Statistics",
+      value: counts.verificationRequests || 0,
+    },
+    {
+      icon: "bi-flag",
+      label: "Reports & Complaints",
+      value: counts.reports || 0,
+    },
+    {
+      icon: "bi-headset",
+      label: "Support Tickets",
+      value: counts.supportTickets || 0,
+    },
+    {
+      icon: "bi-envelope-paper",
+      label: "Contact Messages",
+      value: counts.contactMessages || 0,
+    },
+    {
+      icon: "bi-bell",
+      label: "Notifications",
+      value: counts.notifications || 0,
+    },
+    {
+      icon: "bi-activity",
+      label: "Platform Activity Logs",
+      value: dashboard?.recentRows?.length || 0,
+    },
     { icon: "bi-shield-exclamation", label: "Security Logs", value: 0 },
-    { icon: "bi-heart-pulse", label: "System Health", value: `${counts.systemHealth || 0}%` },
+    {
+      icon: "bi-heart-pulse",
+      label: "System Health",
+      value: `${counts.systemHealth || 0}%`,
+    },
   ];
 
   const miniCards = [
@@ -104,6 +184,10 @@ export default function SuperAdminDashboardPage() {
   return (
     <AdminOverviewDashboard
       variant="superadmin"
+      loading={loading}
+      error={error}
+      filters={filters}
+      onFiltersChange={setFilters}
       overview={{
         title: "Platform Overview",
         primaryValue: counts.totalUsers || 0,
@@ -111,7 +195,10 @@ export default function SuperAdminDashboardPage() {
         icons: ["bi-people", "bi-shield-lock", "bi-graph-up"],
         stats: [
           { label: "Admins", value: counts.totalAdmins || 0 },
-          { label: "Pending Verifications", value: counts.pendingVerifications || 0 },
+          {
+            label: "Pending Verifications",
+            value: counts.pendingVerifications || 0,
+          },
           { label: "System Health", value: `${counts.systemHealth || 0}%` },
         ],
         searchPlaceholder: "Search platform records",
@@ -121,12 +208,18 @@ export default function SuperAdminDashboardPage() {
       ringMetrics={[
         {
           label: "Verified Requests",
-          value: percent(counts.approvedVerifications || 0, counts.verificationRequests || 0),
+          value: percent(
+            counts.approvedVerifications || 0,
+            counts.verificationRequests || 0,
+          ),
           color: "#dc1218",
         },
         {
           label: "Approved Promotions",
-          value: percent(counts.featuredListings || 0, counts.promotionRequests || 0),
+          value: percent(
+            counts.featuredListings || 0,
+            counts.promotionRequests || 0,
+          ),
           color: "#f4812a",
         },
         {

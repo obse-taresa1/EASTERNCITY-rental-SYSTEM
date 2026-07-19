@@ -36,7 +36,9 @@ export default function AnalyticsPage() {
         <div>
           <span className="section-label">SUPER ADMIN</span>
           <h1 className="h3 mb-0">Platform Analytics</h1>
-          <p className="text-muted mb-0">Track platform KPIs, system transactions, and location metrics.</p>
+          <p className="text-muted mb-0">
+            Track platform KPIs, system transactions, and location metrics.
+          </p>
         </div>
       </div>
 
@@ -56,7 +58,9 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="d-flex align-items-center gap-2">
-            <span className="text-muted"><small>Custom Range:</small></span>
+            <span className="text-muted">
+              <small>Custom Range:</small>
+            </span>
             <input
               type="date"
               className="form-control form-control-sm"
@@ -66,7 +70,9 @@ export default function AnalyticsPage() {
                 setFilter("custom");
               }}
             />
-            <span className="text-muted"><small>to</small></span>
+            <span className="text-muted">
+              <small>to</small>
+            </span>
             <input
               type="date"
               className="form-control form-control-sm"
@@ -82,14 +88,28 @@ export default function AnalyticsPage() {
 
       <div className="row mb-4">
         {[
-          ["Revenue Growth", `${Number((revenue.promotionRevenue || 0) + (revenue.listingFeeRevenue || 0)).toLocaleString()} ETB`, "success"],
+          [
+            "Revenue Growth",
+            `${Number((revenue.promotionRevenue || 0) + (revenue.listingFeeRevenue || 0)).toLocaleString()} ETB`,
+            "success",
+          ],
           ["User Growth", `${counts.totalUsers || 0} Users`, "primary"],
-          ["Listing Growth", `${counts.totalListings || 0} Listings`, "warning"],
-          ["Promotion Growth", `${counts.promotionRequests || 0} Promos`, "danger"],
+          [
+            "Listing Growth",
+            `${counts.totalListings || 0} Listings`,
+            "warning",
+          ],
+          [
+            "Promotion Growth",
+            `${counts.promotionRequests || 0} Promos`,
+            "danger",
+          ],
         ].map(([label, value, tone]) => (
           <div className="col-md-3" key={label}>
             <div className="p-4 border rounded shadow-sm bg-white text-dark mb-3">
-              <span className="text-muted"><small>{label}</small></span>
+              <span className="text-muted">
+                <small>{label}</small>
+              </span>
               <h2 className={`mb-0 fw-bold text-${tone}`}>{value}</h2>
             </div>
           </div>
@@ -102,18 +122,26 @@ export default function AnalyticsPage() {
             <h2 className="h5 mb-3">City Performance Distribution</h2>
             <ul className="list-group list-group-flush">
               {cityPerformance.map((city) => (
-                <li key={city.label} className="list-group-item bg-transparent text-color border-0 py-3">
+                <li
+                  key={city.label}
+                  className="list-group-item bg-transparent text-color border-0 py-3"
+                >
                   <div className="d-flex justify-content-between mb-1">
                     <span>{city.label}</span>
                     <strong className="text-danger">{city.percent}%</strong>
                   </div>
                   <div className="progress" style={{ height: "6px" }}>
-                    <div className="progress-bar bg-danger" style={{ width: `${city.percent}%` }} />
+                    <div
+                      className="progress-bar bg-danger"
+                      style={{ width: `${city.percent}%` }}
+                    />
                   </div>
                 </li>
               ))}
               {cityPerformance.length === 0 && (
-                <li className="list-group-item bg-transparent text-muted border-0 py-3">No city performance data for this range.</li>
+                <li className="list-group-item bg-transparent text-muted border-0 py-3">
+                  No city performance data for this range.
+                </li>
               )}
             </ul>
           </div>
@@ -124,18 +152,37 @@ export default function AnalyticsPage() {
             <h2 className="h5 mb-3">Category Performance</h2>
             <ul className="list-group list-group-flush">
               {categoryPerformance.map((category) => (
-                <li key={category.label} className="list-group-item bg-transparent text-color d-flex justify-content-between">
+                <li
+                  key={category.label}
+                  className="list-group-item bg-transparent text-color d-flex justify-content-between"
+                >
                   <span>{category.label}</span>
-                  <strong className="text-danger">{category.value} New Listings</strong>
+                  <strong className="text-danger">
+                    {category.value} New Listings
+                  </strong>
                 </li>
               ))}
               {categoryPerformance.length === 0 && (
-                <li className="list-group-item bg-transparent text-muted">No category performance data for this range.</li>
+                <li className="list-group-item bg-transparent text-muted">
+                  No category performance data for this range.
+                </li>
               )}
             </ul>
           </div>
         </div>
       </div>
     </main>
+  );
+}
+function Card({ label, value, tone }) {
+  return (
+    <div className="col-md-3">
+      <div className="p-4 border rounded shadow-sm bg-white text-dark mb-3">
+        <span className="text-muted">
+          <small>{label}</small>
+        </span>
+        <h2 className={`mb-0 fw-bold text-${tone}`}>{value}</h2>
+      </div>
+    </div>
   );
 }

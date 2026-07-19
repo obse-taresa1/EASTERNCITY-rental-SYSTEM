@@ -12,7 +12,11 @@ export default function RoleRequestsPage() {
       if (!active) return;
       setRequests(
         (dashboard.recentRows || [])
-          .filter((row) => String(row.type || "").toLowerCase().includes("verification"))
+          .filter((row) =>
+            String(row.type || "")
+              .toLowerCase()
+              .includes("verification"),
+          )
           .map((row) => ({
             id: row.id,
             name: row.detail,

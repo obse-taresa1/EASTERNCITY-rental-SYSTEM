@@ -11,11 +11,31 @@ export default function SuperPlatformMonitoringPage() {
       if (!active) return;
       const counts = dashboard.counts || {};
       setRows([
-        { id: "users", name: "Users Created Today", status: counts.totalUsers || 0 },
-        { id: "listings", name: "Listings Created Today", status: counts.totalListings || 0 },
-        { id: "promotions", name: "Promotion Requests Today", status: counts.promotionRequests || 0 },
-        { id: "support", name: "Support Tickets Today", status: counts.supportTickets || 0 },
-        { id: "notifications", name: "Notifications Today", status: counts.notifications || 0 },
+        {
+          id: "users",
+          name: "Users Created Today",
+          status: counts.totalUsers || 0,
+        },
+        {
+          id: "listings",
+          name: "Listings Created Today",
+          status: counts.totalListings || 0,
+        },
+        {
+          id: "promotions",
+          name: "Promotion Requests Today",
+          status: counts.promotionRequests || 0,
+        },
+        {
+          id: "support",
+          name: "Support Tickets Today",
+          status: counts.supportTickets || 0,
+        },
+        {
+          id: "notifications",
+          name: "Notifications Today",
+          status: counts.notifications || 0,
+        },
       ]);
     });
     return () => {
@@ -33,7 +53,8 @@ export default function SuperPlatformMonitoringPage() {
       </div>
       <div className="admin-table-container">
         <h2 className="h5 mb-3 d-flex align-items-center gap-2">
-          <i className="bi bi-table text-primary-custom"></i> Platform Monitoring Data
+          <i className="bi bi-table text-primary-custom"></i> Platform
+          Monitoring Data
         </h2>
         <AdminDataTable
           columns={[

@@ -44,7 +44,8 @@ export default function SecurityCenterPage() {
       </div>
       <div className="admin-table-container">
         <h2 className="h5 mb-3 d-flex align-items-center gap-2">
-          <i className="bi bi-table text-primary-custom"></i> Security Center Data
+          <i className="bi bi-table text-primary-custom"></i> Security Center
+          Data
         </h2>
         <AdminDataTable
           columns={[

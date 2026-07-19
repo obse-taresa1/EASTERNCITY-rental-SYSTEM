@@ -15,6 +15,8 @@ const supportTicketRoutes = require("./supportTicket.routes");
 const messageRoutes = require("./message.routes");
 const contactMessageRoutes = require("./contactMessage.routes");
 
+const router = express.Router();
+
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/notifications", notificationRoutes);
@@ -42,4 +44,3 @@ router.get("/health", (req, res) => {
 });
 
 module.exports = router;
-
