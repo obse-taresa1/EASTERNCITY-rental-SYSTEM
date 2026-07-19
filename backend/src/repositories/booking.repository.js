@@ -14,6 +14,13 @@ function findManyByUser(userId) {
   });
 }
 
+function findAll() {
+  return prisma.booking.findMany({
+    include: { listing: true, renter: true, owner: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 function findById(id) {
   return prisma.booking.findUnique({
     where: { id },
@@ -25,4 +32,4 @@ function update(id, data) {
   return prisma.booking.update({ where: { id }, data });
 }
 
-module.exports = { create, findManyByUser, findById, update };
+module.exports = { create, findManyByUser, findAll, findById, update };

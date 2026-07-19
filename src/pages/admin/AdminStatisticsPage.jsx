@@ -1,47 +1,23 @@
 import { useEffect, useState } from "react";
 import AdminStatGrid from "../../components/admin/AdminStatGrid.jsx";
-import { getBookings, fetchBookings } from "../../services/bookingService.js";
-import { getUsers } from "../../services/userApiService.js";
-import { items } from "../../data/items.js";
+import { fetchAdminDashboard } from "../../services/dashboardApiService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
 export default function AdminStatisticsPage() {
-  const [users, setUsers] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
 
   useEffect(() => {
     let active = true;
-
-    getUsers().then((data) => {
-      if (active) setUsers(data);
+    fetchAdminDashboard({ range: "year" }).then((data) => {
+      if (active) setDashboard(data);
     });
-
     return () => {
       active = false;
     };
   }, []);
 
-  const [bookings, setBookings] = useState([]);
-
-  useEffect(() => {
-    let active = true;
-    async function load() {
-      try {
-        const data = await fetchBookings();
-        if (active) setBookings(data || []);
-      } catch (err) {
-        if (active) setBookings([]);
-      }
-    }
-    load();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const totalRevenue = bookings.reduce(
-    (sum, booking) => sum + Number(booking.totalAmount || 0),
-    0,
-  );
+  const counts = dashboard?.counts || {};
+  const revenue = dashboard?.revenue || {};
 
   return (
     <main className="dashboard-content">
@@ -53,24 +29,27 @@ export default function AdminStatisticsPage() {
           {
             icon: "bi-people",
             label: "Total Users",
-            value: users.length,
+            value: counts.totalUsers || 0,
           },
           {
             icon: "bi-box-seam",
             label: "Total Listings",
-            value: items.length,
+            value: counts.totalListings || 0,
             tone: "success",
           },
           {
             icon: "bi-calendar-check",
             label: "Total Bookings",
-            value: bookings.length,
+            value: counts.totalRenters || 0,
             tone: "warning",
           },
           {
             icon: "bi-cash-stack",
-            label: "Total Revenue",
-            value: formatCurrency(totalRevenue),
+            label: "Platform Revenue",
+            value: formatCurrency(
+              Number(revenue.promotionRevenue || 0) +
+                Number(revenue.listingFeeRevenue || 0),
+            ),
             tone: "info",
           },
         ]}

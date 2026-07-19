@@ -33,6 +33,22 @@ function findByUser(userId) {
   });
 }
 
+function findAll() {
+  return prisma.review.findMany({
+    include: {
+      listing: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 function findByBooking(bookingId) {
   return prisma.review.findFirst({
     where: { bookingId },
@@ -66,6 +82,7 @@ function create(data) {
 module.exports = {
   findByListing,
   findByUser,
+  findAll,
   findByBooking,
   create,
 };

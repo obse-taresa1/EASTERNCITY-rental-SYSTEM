@@ -28,16 +28,6 @@ const ADMIN_SEARCH_ROUTES = [
     keywords: ["user", "users"],
   },
   {
-    label: "Owners Management",
-    to: "/admin-dashboard/owners",
-    keywords: ["owner", "owners"],
-  },
-  {
-    label: "Renters Management",
-    to: "/admin-dashboard/renters",
-    keywords: ["renter", "renters"],
-  },
-  {
     label: "Listing Management",
     to: "/admin-dashboard/listings",
     keywords: ["listing", "listings", "items"],

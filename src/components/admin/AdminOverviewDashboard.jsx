@@ -1,4 +1,13 @@
+import { useMemo, useState } from "react";
+
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const RANGE_OPTIONS = [
+  { value: "today", label: "Today" },
+  { value: "week", label: "This Week" },
+  { value: "month", label: "This Month" },
+  { value: "year", label: "This Year" },
+  { value: "custom", label: "Custom Range" },
+];
 
 function StatPill({ icon, label, value }) {
   return (
@@ -82,7 +91,15 @@ export default function AdminOverviewDashboard({
   miniCards = [],
   chart = {},
   rows = [],
+  dateRange = "month",
+  startDate = "",
+  endDate = "",
+  onDateRangeChange,
 }) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [page, setPage] = useState(1);
   const isSuper = variant === "superadmin";
   const title = overview.title || (isSuper ? "Platform Overview" : "Marketplace Overview");
   const primaryValue = overview.primaryValue ?? 0;
@@ -90,6 +107,42 @@ export default function AdminOverviewDashboard({
   const primaryStats = overview.stats || [];
   const chartValues = chart.values?.length ? chart.values : MONTHS.map(() => 0);
   const maxChartValue = Math.max(...chartValues, 1);
+  const statuses = useMemo(
+    () => [
+      "all",
+      ...Array.from(new Set(rows.map((row) => row.status).filter(Boolean))),
+    ],
+    [rows],
+  );
+  const filteredRows = useMemo(() => {
+    const searchTerm = search.trim().toLowerCase();
+    return rows
+      .filter((row) => {
+        if (statusFilter !== "all" && row.status !== statusFilter) return false;
+        if (!searchTerm) return true;
+        return [row.type, row.detail, row.status, row.date]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(searchTerm));
+      })
+      .sort((a, b) => {
+        const aDate = new Date(a.date || 0).getTime() || 0;
+        const bDate = new Date(b.date || 0).getTime() || 0;
+        return sortDirection === "asc" ? aDate - bDate : bDate - aDate;
+      });
+  }, [rows, search, statusFilter, sortDirection]);
+  const pageSize = 8;
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const visibleRows = filteredRows.slice((safePage - 1) * pageSize, safePage * pageSize);
+
+  function updateRange(nextRange, nextStartDate = startDate, nextEndDate = endDate) {
+    setPage(1);
+    onDateRangeChange?.({
+      range: nextRange,
+      startDate: nextStartDate,
+      endDate: nextEndDate,
+    });
+  }
 
   return (
     <main className="dashboard-content red-dashboard-page">
@@ -115,7 +168,14 @@ export default function AdminOverviewDashboard({
           </div>
           <label className="red-campaign-search">
             <i className="bi bi-search" />
-            <input placeholder={overview.searchPlaceholder || "Search marketplace data"} readOnly />
+            <input
+              placeholder={overview.searchPlaceholder || "Search marketplace data"}
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setPage(1);
+              }}
+            />
           </label>
         </article>
 
@@ -161,9 +221,31 @@ export default function AdminOverviewDashboard({
             </div>
             <div className="red-filter-row">
               <button type="button">{chart.primaryFilter || "Marketplace"} <i className="bi bi-chevron-down" /></button>
-              <button type="button">Monthly <i className="bi bi-chevron-down" /></button>
+              <select
+                aria-label="Dashboard date range"
+                value={dateRange}
+                onChange={(event) => updateRange(event.target.value)}
+              >
+                {RANGE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
             </div>
           </div>
+          {dateRange === "custom" && (
+            <div className="red-filter-row mb-3">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(event) => updateRange("custom", event.target.value, endDate)}
+              />
+              <input
+                type="date"
+                value={endDate}
+                onChange={(event) => updateRange("custom", startDate, event.target.value)}
+              />
+            </div>
+          )}
           <div className="red-bar-chart">
             {MONTHS.map((month, index) => {
               const height = Math.max(18, Math.round((Number(chartValues[index]) || 0) / maxChartValue * 132));
@@ -182,8 +264,26 @@ export default function AdminOverviewDashboard({
           <div className="red-card-header-row">
             <h2>{isSuper ? "Recent Platform Records" : "Recent Marketplace Records"}</h2>
             <div className="red-filter-row">
-              <button type="button"><i className="bi bi-funnel" /> Filter</button>
-              <button type="button"><i className="bi bi-box-arrow-up-right" /> Export</button>
+              <select
+                aria-label="Filter records by status"
+                value={statusFilter}
+                onChange={(event) => {
+                  setStatusFilter(event.target.value);
+                  setPage(1);
+                }}
+              >
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status === "all" ? "All Statuses" : status}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setSortDirection((current) => (current === "asc" ? "desc" : "asc"))}
+              >
+                <i className="bi bi-sort-down" /> {sortDirection === "asc" ? "Oldest" : "Newest"}
+              </button>
             </div>
           </div>
           <div className="table-responsive">
@@ -199,10 +299,10 @@ export default function AdminOverviewDashboard({
                 </tr>
               </thead>
               <tbody>
-                {rows.length > 0 ? rows.slice(0, 8).map((row, index) => (
+                {visibleRows.length > 0 ? visibleRows.map((row, index) => (
                   <tr key={row.id || index}>
                     <td><input type="checkbox" aria-label={`Select row ${index + 1}`} /></td>
-                    <td>{String(index + 1).padStart(2, "0")}</td>
+                    <td>{String((safePage - 1) * pageSize + index + 1).padStart(2, "0")}</td>
                     <td>
                       <strong>{row.type || row.label || "Record"}</strong>
                       {row.detail && <span className="red-table-subtext">{row.detail}</span>}
@@ -218,6 +318,17 @@ export default function AdminOverviewDashboard({
                 )}
               </tbody>
             </table>
+          </div>
+          <div className="red-filter-row justify-content-end mt-3">
+            <button type="button" disabled={safePage <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
+              Previous
+            </button>
+            <button type="button" disabled>
+              Page {safePage} of {totalPages}
+            </button>
+            <button type="button" disabled={safePage >= totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))}>
+              Next
+            </button>
           </div>
         </article>
       </section>

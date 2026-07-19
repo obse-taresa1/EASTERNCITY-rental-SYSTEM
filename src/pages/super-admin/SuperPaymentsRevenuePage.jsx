@@ -1,29 +1,88 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { fetchPromotionRequests } from "../../services/promotionApiService.js";
 
-const initialTransactions = [
-  { id: "TX-9081", itemTitle: "Toyota RAV4", owner: "Abebe Rental", package: "Homepage Banner", amount: 2000, date: "2026-06-24", status: "completed" },
-  { id: "TX-9082", itemTitle: "Gaming PC", owner: "Tech Hub Rentals", package: "Top Listing", amount: 1000, date: "2026-06-25", status: "completed" },
-  { id: "TX-9083", itemTitle: "Dewalt Drill Kit", owner: "BuildRight Tools", package: "Featured Listing", amount: 500, date: "2026-06-23", status: "completed" },
-  { id: "TX-9084", itemTitle: "Canon Camera", owner: "Lens House", package: "Homepage Banner", amount: 2000, date: "2026-06-22", status: "completed" },
-  { id: "TX-9085", itemTitle: "Sport Bike", owner: "Abebe Rental", package: "Top Listing", amount: 1000, date: "2026-06-20", status: "completed" },
-];
+function packageMatches(promotion, filter) {
+  if (filter === "all") return true;
+  const value = `${promotion.package || ""} ${promotion.promotionType || ""} ${promotion.promotionPlacement || ""}`.toLowerCase();
+  return value.includes(filter.toLowerCase());
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+}
 
 export default function SuperPaymentsRevenuePage() {
-  const [txs] = useState(initialTransactions);
+  const [txs, setTxs] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    fetchPromotionRequests().then((promotions) => {
+      if (!active) return;
+      setTxs(
+        promotions
+          .filter((promotion) => String(promotion.status || "").toLowerCase() === "approved")
+          .map((promotion) => ({
+            id: promotion.id,
+            itemTitle: promotion.listingTitle,
+            owner: promotion.ownerName || promotion.userName,
+            package: promotion.promotionType || promotion.promotionPlacement || "Promotion",
+            amount: Number(promotion.amount || 0),
+            date: promotion.requestDate,
+            status: promotion.status,
+          })),
+      );
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const totalRevenue = txs.reduce((sum, t) => sum + t.amount, 0);
-  const homepageBannerRevenue = txs.filter(t => t.package === "Homepage Banner").reduce((sum, t) => sum + t.amount, 0);
-  const topListingRevenue = txs.filter(t => t.package === "Top Listing").reduce((sum, t) => sum + t.amount, 0);
-  const featuredListingRevenue = txs.filter(t => t.package === "Featured Listing").reduce((sum, t) => sum + t.amount, 0);
+  const homepageBannerRevenue = txs
+    .filter((t) => String(t.package).toLowerCase().includes("banner"))
+    .reduce((sum, t) => sum + t.amount, 0);
+  const topListingRevenue = txs
+    .filter((t) => String(t.package).toLowerCase().includes("top"))
+    .reduce((sum, t) => sum + t.amount, 0);
+  const featuredListingRevenue = txs
+    .filter((t) => String(t.package).toLowerCase().includes("featured"))
+    .reduce((sum, t) => sum + t.amount, 0);
 
-  const filtered = txs.filter(t => {
-    if (filter === "all") return true;
-    return t.package.toLowerCase().includes(filter.toLowerCase());
-  });
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return txs.filter((t) => {
+      if (!packageMatches(t, filter)) return false;
+      if (!term) return true;
+      return [t.id, t.itemTitle, t.owner, t.package, t.status]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(term));
+    });
+  }, [txs, filter, search]);
 
   const handleExport = () => {
-    alert("Revenue reports exported to PDF/CSV successfully!");
+    const rows = filtered.map((transaction) =>
+      [
+        transaction.id,
+        transaction.itemTitle,
+        transaction.owner,
+        transaction.package,
+        formatDate(transaction.date),
+        transaction.amount,
+        transaction.status,
+      ].join(","),
+    );
+    const csv = ["Transaction ID,Listing Item,Owner,Package,Date,Amount,Status", ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "promotion-revenue.csv";
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -42,37 +101,33 @@ export default function SuperPaymentsRevenuePage() {
       </div>
 
       <div className="row mb-4">
-        <div className="col-md-3 mb-3">
-          <div className="p-4 border rounded shadow-sm bg-danger text-white">
-            <span className="opacity-75"><small>Total Platform Revenue</small></span>
-            <h2 className="mb-0 fw-bold">{totalRevenue.toLocaleString()} ETB</h2>
+        {[
+          ["Total Platform Revenue", totalRevenue, "bg-danger text-white"],
+          ["Homepage Banner Revenue", homepageBannerRevenue, ""],
+          ["Top Listing Revenue", topListingRevenue, ""],
+          ["Featured Listing Revenue", featuredListingRevenue, ""],
+        ].map(([label, value, tone]) => (
+          <div className="col-md-3 mb-3" key={label}>
+            <div className={`p-4 border rounded shadow-sm ${tone}`} style={tone ? undefined : { background: "var(--card-bg)" }}>
+              <span className={tone ? "opacity-75" : "text-muted"}><small>{label}</small></span>
+              <h2 className={`mb-0 fw-bold ${tone ? "" : "text-danger"}`}>{Number(value || 0).toLocaleString()} ETB</h2>
+            </div>
           </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div className="p-4 border rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <span className="text-muted"><small>Homepage Banner Revenue</small></span>
-            <h2 className="mb-0 fw-bold text-danger">{homepageBannerRevenue.toLocaleString()} ETB</h2>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div className="p-4 border rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <span className="text-muted"><small>Top Listing Revenue</small></span>
-            <h2 className="mb-0 fw-bold text-danger">{topListingRevenue.toLocaleString()} ETB</h2>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div className="p-4 border rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <span className="text-muted"><small>Featured Listing Revenue</small></span>
-            <h2 className="mb-0 fw-bold text-danger">{featuredListingRevenue.toLocaleString()} ETB</h2>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="admin-table-container">
-        <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
           <h2 className="h5 mb-0">Monthly Revenue Transactions</h2>
+          <input
+            className="form-control form-control-sm"
+            style={{ maxWidth: "260px" }}
+            placeholder="Search transactions..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
           <div className="d-flex gap-2">
-            {["all", "Homepage", "Top", "Featured"].map(opt => (
+            {["all", "Homepage", "Top", "Featured"].map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -99,7 +154,7 @@ export default function SuperPaymentsRevenuePage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(t => (
+              {filtered.map((t) => (
                 <tr key={t.id}>
                   <td className="fw-bold">{t.id}</td>
                   <td>{t.itemTitle}</td>
@@ -107,13 +162,18 @@ export default function SuperPaymentsRevenuePage() {
                   <td>
                     <span className="badge bg-danger-subtle text-danger">{t.package}</span>
                   </td>
-                  <td>{t.date}</td>
+                  <td>{formatDate(t.date)}</td>
                   <td className="fw-bold text-success">+{t.amount.toLocaleString()} ETB</td>
                   <td>
-                    <span className="badge bg-success-subtle text-success">Success</span>
+                    <span className="badge bg-success-subtle text-success">{t.status}</span>
                   </td>
                 </tr>
               ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="text-center text-muted py-4">No approved promotion payments found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

@@ -47,8 +47,6 @@ export default function AdminSidebar({ variant = "admin" }) {
 const adminLinks = [
   { to: "/admin-dashboard", label: "Dashboard", icon: "bi-house-door" },
   { to: "/admin-dashboard/users", label: "Users Management", icon: "bi-people" },
-  { to: "/admin-dashboard/owners", label: "Owners Management", icon: "bi-person-badge" },
-  { to: "/admin-dashboard/renters", label: "Renters Management", icon: "bi-person-check" },
   { to: "/admin-dashboard/listings", label: "Listing Management", icon: "bi-card-checklist" },
   { to: "/admin-dashboard/categories", label: "Categories Management", icon: "bi-grid-3x3-gap" },
   { to: "/admin-dashboard/bookings", label: "Bookings Management", icon: "bi-calendar-check" },

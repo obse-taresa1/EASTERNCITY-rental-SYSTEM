@@ -11,6 +11,10 @@ function listByUser(userId) {
   return repository.findByUser(userId);
 }
 
+function listAll() {
+  return repository.findAll();
+}
+
 async function create(userId, payload) {
   const booking = await bookingRepository.findById(payload.bookingId);
 
@@ -68,5 +72,6 @@ async function create(userId, payload) {
 module.exports = {
   listByListing,
   listByUser,
+  listAll,
   create,
 };

@@ -1,50 +1,38 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { fetchAdminDashboard } from "../../services/dashboardApiService.js";
 
-const getMockData = (filter, startDate, endDate) => {
-  let multiplier = 1;
-  if (filter === "today") multiplier = 0.1;
-  else if (filter === "week") multiplier = 0.5;
-  else if (filter === "month") multiplier = 1.0;
-  else if (filter === "year") multiplier = 8.0;
-  else if (startDate && endDate) {
-    const diff = Math.ceil(Math.abs(new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
-    multiplier = Math.max(0.1, Number((diff / 30).toFixed(2)));
-  }
-
-  return {
-    userGrowth: Math.round(15 * multiplier),
-    listingGrowth: Math.round(8 * multiplier),
-    listingFeeRevenue: Math.round(4000 * multiplier),
-    promoRevenue: Math.round(3500 * multiplier),
-    verifications: Math.round(6 * multiplier),
-    cityStats: [
-      { city: "Jigjiga", listings: Math.round(12 * multiplier), rentals: Math.round(5 * multiplier) },
-      { city: "Dire Dawa", listings: Math.round(8 * multiplier), rentals: Math.round(3 * multiplier) },
-      { city: "Harar", listings: Math.round(5 * multiplier), rentals: Math.round(2 * multiplier) },
-    ]
-  };
-};
+function engagementRate(renters, listings) {
+  if (!listings) return 0;
+  return Math.min(100, Math.round((renters / listings) * 100));
+}
 
 export default function AdminAnalyticsPage() {
   const [filter, setFilter] = useState("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [data, setData] = useState(() => getMockData("month"));
+  const [data, setData] = useState(null);
 
   useEffect(() => {
+    let active = true;
+    const params = { range: filter };
     if (filter === "custom") {
-      if (startDate && endDate) {
-        setData(getMockData("custom", startDate, endDate));
-      }
-    } else {
-      setData(getMockData(filter));
+      if (!startDate || !endDate) return undefined;
+      params.startDate = startDate;
+      params.endDate = endDate;
     }
+
+    fetchAdminDashboard(params).then((nextData) => {
+      if (active) setData(nextData);
+    });
+
+    return () => {
+      active = false;
+    };
   }, [filter, startDate, endDate]);
 
-  const handleCustomSearch = (e) => {
-    e.preventDefault();
-    setFilter("custom");
-  };
+  const counts = data?.counts || {};
+  const revenue = data?.revenue || {};
+  const cityStats = data?.breakdowns?.listingsByCity || [];
 
   return (
     <main className="dashboard-content">
@@ -59,7 +47,7 @@ export default function AdminAnalyticsPage() {
       <div className="admin-table-container mb-4">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
           <div className="d-flex gap-2">
-            {["today", "week", "month", "year"].map(opt => (
+            {["today", "week", "month", "year"].map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -71,93 +59,51 @@ export default function AdminAnalyticsPage() {
             ))}
           </div>
 
-          <form onSubmit={handleCustomSearch} className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-2">
             <span className="text-muted"><small>Custom:</small></span>
             <input
               type="date"
               className="form-control form-control-sm"
               value={startDate}
-              onChange={e => {
-                setStartDate(e.target.value);
+              onChange={(event) => {
+                setStartDate(event.target.value);
                 setFilter("custom");
               }}
-              required
             />
             <span className="text-muted"><small>to</small></span>
             <input
               type="date"
               className="form-control form-control-sm"
               value={endDate}
-              onChange={e => {
-                setEndDate(e.target.value);
+              onChange={(event) => {
+                setEndDate(event.target.value);
                 setFilter("custom");
               }}
-              required
             />
-          </form>
+          </div>
         </div>
       </div>
 
       <div className="row">
-        <div className="col-md-3 mb-4">
-          <div className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <div className="stat-icon-wrapper bg-primary-subtle text-primary p-3 rounded">
-              <i className="bi bi-people" style={{ fontSize: "1.5rem" }} />
-            </div>
-            <div>
-              <span className="text-muted"><small>User Growth</small></span>
-              <h2 className="mb-0 fw-bold">+{data.userGrowth}</h2>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-md-3 mb-4">
-          <div className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <div className="stat-icon-wrapper bg-success-subtle text-success p-3 rounded">
-              <i className="bi bi-box-seam" style={{ fontSize: "1.5rem" }} />
-            </div>
-            <div>
-              <span className="text-muted"><small>Listing Growth</small></span>
-              <h2 className="mb-0 fw-bold">+{data.listingGrowth}</h2>
+        {[
+          ["bi-people", "User Growth", counts.totalUsers || 0, "primary"],
+          ["bi-box-seam", "Listing Growth", counts.totalListings || 0, "success"],
+          ["bi-receipt", "Listing Fee Revenue", `${Number(revenue.listingFeeRevenue || 0).toLocaleString()} ETB`, "warning"],
+          ["bi-cash-stack", "Promotion Revenue", `${Number(revenue.promotionRevenue || 0).toLocaleString()} ETB`, "danger"],
+          ["bi-shield-check", "Verifications", counts.verificationRequests || 0, "info"],
+        ].map(([icon, label, value, tone]) => (
+          <div className="col-md-3 mb-4" key={label}>
+            <div className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
+              <div className={`stat-icon-wrapper bg-${tone}-subtle text-${tone} p-3 rounded`}>
+                <i className={`bi ${icon}`} style={{ fontSize: "1.5rem" }} />
+              </div>
+              <div>
+                <span className="text-muted"><small>{label}</small></span>
+                <h2 className="mb-0 fw-bold">{value}</h2>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="col-md-3 mb-4">
-          <div className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <div className="stat-icon-wrapper bg-warning-subtle text-warning p-3 rounded">
-              <i className="bi bi-receipt" style={{ fontSize: "1.5rem" }} />
-            </div>
-            <div>
-              <span className="text-muted"><small>Listing Fee Revenue</small></span>
-              <h2 className="mb-0 fw-bold">{data.listingFeeRevenue.toLocaleString()} ETB</h2>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-md-3 mb-4">
-          <div className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <div className="stat-icon-wrapper bg-danger-subtle text-danger p-3 rounded">
-              <i className="bi bi-cash-stack" style={{ fontSize: "1.5rem" }} />
-            </div>
-            <div>
-              <span className="text-muted"><small>Promotion Revenue</small></span>
-              <h2 className="mb-0 fw-bold">{data.promoRevenue.toLocaleString()} ETB</h2>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-md-3 mb-4">
-          <div className="admin-stat-card d-flex align-items-center gap-3 p-4 rounded shadow-sm" style={{ background: "var(--card-bg)" }}>
-            <div className="stat-icon-wrapper bg-info-subtle text-info p-3 rounded">
-              <i className="bi bi-shield-check" style={{ fontSize: "1.5rem" }} />
-            </div>
-            <div>
-              <span className="text-muted"><small>Verifications</small></span>
-              <h2 className="mb-0 fw-bold">{data.verifications}</h2>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="row">
@@ -177,26 +123,29 @@ export default function AdminAnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.cityStats.map(c => (
-                    <tr key={c.city}>
-                      <td className="fw-bold">{c.city}</td>
-                      <td>+{c.listings} listings</td>
-                      <td>+{c.rentals} rentals</td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <div className="progress w-100" style={{ height: "6px" }}>
-                            <div
-                              className="progress-bar bg-danger"
-                              style={{ width: `${Math.min(100, Math.round((c.rentals / (c.listings || 1)) * 100))}%` }}
-                            />
+                  {cityStats.map((city) => {
+                    const rate = engagementRate(counts.totalRenters || 0, city.value || 0);
+                    return (
+                      <tr key={city.label}>
+                        <td className="fw-bold">{city.label}</td>
+                        <td>{city.value} listings</td>
+                        <td>{counts.totalRenters || 0} rentals</td>
+                        <td>
+                          <div className="d-flex align-items-center gap-2">
+                            <div className="progress w-100" style={{ height: "6px" }}>
+                              <div className="progress-bar bg-danger" style={{ width: `${rate}%` }} />
+                            </div>
+                            <small className="fw-bold">{rate}%</small>
                           </div>
-                          <small className="fw-bold">
-                            {Math.min(100, Math.round((c.rentals / (c.listings || 1)) * 100))}%
-                          </small>
-                        </div>
-                      </td>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {cityStats.length === 0 && (
+                    <tr>
+                      <td colSpan="4" className="text-center text-muted py-4">No city statistics for this range.</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

@@ -1,26 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { fetchContactMessages } from "../../services/contactMessageService.js";
+import { fetchSupportTickets } from "../../services/supportTicketService.js";
 
-const initialReports = [
-  { id: "rep-1", reporter: "Yared Abera", type: "Listing Report", subject: "Toyota RAV4", details: "Listing says price is 6000 ETB, but owner demands 8500 ETB in private messages.", status: "pending" },
-  { id: "rep-2", reporter: "Sintayehu Tesfaye", type: "Owner Report", subject: "Tech Hub Rentals", details: "Owner was abusive during pickup and didn't provide power cable.", status: "pending" },
-  { id: "rep-3", reporter: "Helena Assefa", type: "User Complaint", subject: "False claims", details: "Renter left review claiming drill was broken, but it works perfectly.", status: "resolved" },
-];
+function isReportLike(record) {
+  const text = `${record.subject || ""} ${record.message || ""}`.toLowerCase();
+  return text.includes("report") || text.includes("complaint") || text.includes("abuse") || text.includes("dispute");
+}
 
 export default function AdminReportsPage() {
-  const [reports, setReports] = useState(initialReports);
+  const [reports, setReports] = useState([]);
   const [filter, setFilter] = useState("all");
   const [viewingDetails, setViewingDetails] = useState(null);
 
-  const handleAction = (id, newStatus) => {
-    setReports(prev =>
-      prev.map(r => (r.id === id ? { ...r, status: newStatus } : r))
-    );
-  };
+  useEffect(() => {
+    let active = true;
+    Promise.all([fetchContactMessages(), fetchSupportTickets()]).then(([messages, tickets]) => {
+      if (!active) return;
+      const contactReports = (messages || []).filter(isReportLike).map((message) => ({
+        id: `contact-${message.id}`,
+        reporter: message.name || message.email,
+        type: "Contact Report",
+        subject: message.subject,
+        details: message.message,
+        status: String(message.status || "OPEN").toLowerCase(),
+      }));
+      const ticketReports = (tickets || []).filter(isReportLike).map((ticket) => ({
+        id: `ticket-${ticket.id}`,
+        reporter: ticket.name || ticket.email || ticket.userName || ticket.userId,
+        type: "Support Ticket",
+        subject: ticket.subject,
+        details: ticket.message,
+        status: String(ticket.status || "OPEN").toLowerCase(),
+      }));
+      setReports([...contactReports, ...ticketReports]);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  const filtered = reports.filter(r => {
+  const filtered = reports.filter((report) => {
     if (filter === "all") return true;
-    return r.status === filter;
+    if (filter === "pending") return ["open", "pending"].includes(report.status);
+    if (filter === "resolved") return ["resolved", "closed"].includes(report.status);
+    return report.status === filter;
   });
 
   return (
@@ -37,7 +61,7 @@ export default function AdminReportsPage() {
 
       <div className="admin-table-container">
         <div className="d-flex gap-2 mb-4">
-          {["all", "pending", "resolved"].map(opt => (
+          {["all", "pending", "resolved"].map((opt) => (
             <button
               key={opt}
               type="button"
@@ -62,47 +86,23 @@ export default function AdminReportsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(r => (
-                <tr key={r.id}>
+              {filtered.map((report) => (
+                <tr key={report.id}>
                   <td>
-                    <span className="badge bg-danger-subtle text-danger">{r.type}</span>
+                    <span className="badge bg-danger-subtle text-danger">{report.type}</span>
                   </td>
-                  <td>{r.reporter}</td>
-                  <td className="fw-bold">{r.subject}</td>
+                  <td>{report.reporter || "-"}</td>
+                  <td className="fw-bold">{report.subject}</td>
                   <td>
-                    <div className="text-truncate" style={{ maxWidth: "250px" }}>{r.details}</div>
-                  </td>
-                  <td>
-                    <StatusBadge status={r.status} />
+                    <div className="text-truncate" style={{ maxWidth: "250px" }}>{report.details}</div>
                   </td>
                   <td>
-                    <div className="d-flex gap-2">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-info"
-                        onClick={() => setViewingDetails(r)}
-                      >
-                        Review
-                      </button>
-                      {r.status === "pending" && (
-                        <>
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-success"
-                            onClick={() => handleAction(r.id, "resolved")}
-                          >
-                            Resolve
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => handleAction(r.id, "dismissed")}
-                          >
-                            Dismiss
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    <StatusBadge status={report.status} />
+                  </td>
+                  <td>
+                    <button type="button" className="btn btn-sm btn-outline-info" onClick={() => setViewingDetails(report)}>
+                      Review
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -124,18 +124,14 @@ export default function AdminReportsPage() {
             <div className="modal-content" style={{ background: "var(--card-bg)" }}>
               <div className="modal-header border-0">
                 <h5 className="modal-title">Dispute Report Details</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setViewingDetails(null)}
-                />
+                <button type="button" className="btn-close" onClick={() => setViewingDetails(null)} />
               </div>
               <div className="modal-body">
                 <div className="mb-3">
                   <strong>Report Type:</strong> <span className="text-danger">{viewingDetails.type}</span>
                 </div>
                 <div className="mb-3">
-                  <strong>Reporter:</strong> {viewingDetails.reporter}
+                  <strong>Reporter:</strong> {viewingDetails.reporter || "-"}
                 </div>
                 <div className="mb-3">
                   <strong>Subject/Target:</strong> <span className="fw-bold">{viewingDetails.subject}</span>
@@ -146,11 +142,7 @@ export default function AdminReportsPage() {
                 </div>
               </div>
               <div className="modal-footer border-0">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setViewingDetails(null)}
-                >
+                <button type="button" className="btn btn-secondary" onClick={() => setViewingDetails(null)}>
                   Close
                 </button>
               </div>

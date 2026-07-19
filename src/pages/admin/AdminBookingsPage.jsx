@@ -1,24 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { getMyBookings } from "../../services/bookingApiService.js";
 
-const initialBookings = [
-  { id: "BK-101", itemTitle: "Toyota RAV4", userName: "Yared Abera", startDate: "2026-06-01", endDate: "2026-06-04", totalAmount: 18000, status: "completed" },
-  { id: "BK-102", itemTitle: "Gaming PC", userName: "Sintayehu Tesfaye", startDate: "2026-06-10", endDate: "2026-06-15", totalAmount: 17500, status: "accepted" },
-  { id: "BK-103", itemTitle: "Dewalt Drill Kit", userName: "Helena Assefa", startDate: "2026-06-20", endDate: "2026-06-21", totalAmount: 1300, status: "pending" },
-  { id: "BK-104", itemTitle: "Canon Camera", userName: "Mohamed Ibrahim", startDate: "2026-06-25", endDate: "2026-06-27", totalAmount: 5200, status: "cancelled" },
-];
+function formatDate(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+}
+
+function durationDays(startDate, endDate) {
+  if (!startDate || !endDate) return "-";
+  const days = Math.max(1, Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)));
+  return `${days} day${days !== 1 ? "s" : ""}`;
+}
 
 export default function AdminBookingsPage() {
-  const [bookings, setBookings] = useState(initialBookings);
+  const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const filtered = bookings.filter(b => {
-    const matchesSearch =
-      b.itemTitle.toLowerCase().includes(search.toLowerCase()) ||
-      b.userName.toLowerCase().includes(search.toLowerCase()) ||
-      b.id.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === "all" || b.status === filter;
+  useEffect(() => {
+    let active = true;
+    getMyBookings().then((data) => {
+      if (active) setBookings(data || []);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filtered = bookings.filter((booking) => {
+    const status = String(booking.status || "").toLowerCase();
+    const matchesSearch = [
+      booking.itemTitle,
+      booking.renter?.name,
+      booking.renter?.email,
+      booking.id,
+    ]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(search.toLowerCase()));
+    const matchesFilter = filter === "all" || status === filter;
     return matchesSearch && matchesFilter;
   });
 
@@ -35,7 +56,7 @@ export default function AdminBookingsPage() {
       <div className="admin-table-container">
         <div className="d-flex flex-wrap justify-content-between gap-3 mb-4">
           <div className="d-flex gap-2">
-            {["all", "pending", "accepted", "active", "completed", "cancelled"].map(opt => (
+            {["all", "pending", "accepted", "active", "completed", "cancelled", "rejected"].map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -52,7 +73,7 @@ export default function AdminBookingsPage() {
               placeholder="Search by ID, item, renter..."
               className="form-control"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(event) => setSearch(event.target.value)}
             />
           </div>
         </div>
@@ -70,24 +91,18 @@ export default function AdminBookingsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(b => (
-                <tr key={b.id}>
-                  <td className="fw-bold">{b.id}</td>
-                  <td>{b.itemTitle}</td>
-                  <td>{b.userName}</td>
+              {filtered.map((booking) => (
+                <tr key={booking.id}>
+                  <td className="fw-bold">{booking.id}</td>
+                  <td>{booking.itemTitle}</td>
+                  <td>{booking.renter?.name || booking.renter?.email || "-"}</td>
                   <td>
-                    <div><small>{b.startDate} to</small></div>
-                    <div><small>{b.endDate}</small></div>
+                    <div><small>{formatDate(booking.startDate)} to</small></div>
+                    <div><small>{formatDate(booking.endDate)}</small></div>
                   </td>
-                  <td className="text-muted">
-                    {(() => {
-                      if (!b.startDate || !b.endDate) return '—';
-                      const days = Math.max(1, Math.ceil((new Date(b.endDate) - new Date(b.startDate)) / (1000*60*60*24)));
-                      return `${days} day${days !== 1 ? 's' : ''}`;
-                    })()}
-                  </td>
+                  <td className="text-muted">{durationDays(booking.startDate, booking.endDate)}</td>
                   <td>
-                    <StatusBadge status={b.status} />
+                    <StatusBadge status={booking.status} />
                   </td>
                 </tr>
               ))}

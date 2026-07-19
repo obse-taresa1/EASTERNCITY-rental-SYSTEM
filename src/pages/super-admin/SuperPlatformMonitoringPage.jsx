@@ -1,6 +1,28 @@
+import { useEffect, useState } from "react";
 import AdminDataTable from "../../components/admin/AdminDataTable.jsx";
+import { fetchSuperAdminDashboard } from "../../services/dashboardApiService.js";
 
 export default function SuperPlatformMonitoringPage() {
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetchSuperAdminDashboard({ range: "today" }).then((dashboard) => {
+      if (!active) return;
+      const counts = dashboard.counts || {};
+      setRows([
+        { id: "users", name: "Users Created Today", status: counts.totalUsers || 0 },
+        { id: "listings", name: "Listings Created Today", status: counts.totalListings || 0 },
+        { id: "promotions", name: "Promotion Requests Today", status: counts.promotionRequests || 0 },
+        { id: "support", name: "Support Tickets Today", status: counts.supportTickets || 0 },
+        { id: "notifications", name: "Notifications Today", status: counts.notifications || 0 },
+      ]);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <main className="dashboard-content">
       <div className="d-flex justify-content-between align-items-end mb-4">
@@ -14,8 +36,12 @@ export default function SuperPlatformMonitoringPage() {
           <i className="bi bi-table text-primary-custom"></i> Platform Monitoring Data
         </h2>
         <AdminDataTable
-          columns={[{ key: "id", label: "ID" }, { key: "name", label: "Name" }, { key: "status", label: "Status" } ]}
-          rows={[{ id: 1, name: "Sample Data", status: "Active" }]}
+          columns={[
+            { key: "id", label: "ID" },
+            { key: "name", label: "Name" },
+            { key: "status", label: "Status" },
+          ]}
+          rows={rows}
         />
       </div>
     </main>
