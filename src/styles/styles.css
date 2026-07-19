@@ -10135,3 +10135,159 @@ html[data-theme="dark"] main.auth-page .listing-form-notice {
     grid-template-columns: 1fr;
   }
 }
+
+/* Premium enterprise crimson palette for Admin/Super Admin dashboards */
+.admin-red-shell.dashboard-shell {
+  background:
+    radial-gradient(circle at 28% 16%, rgba(111, 16, 36, 0.1), transparent 34%),
+    linear-gradient(120deg, #fffafa 0%, #f7f1f3 42%, #ffffff 100%) !important;
+}
+
+[data-theme="dark"] .admin-red-shell.dashboard-shell {
+  background:
+    radial-gradient(circle at 24% 16%, rgba(143, 29, 51, 0.18), transparent 34%),
+    linear-gradient(120deg, #0d0508 0%, #18070d 46%, #080406 100%) !important;
+}
+
+.admin-red-shell .admin-sidebar {
+  background:
+    radial-gradient(circle at 32% 8%, rgba(168, 50, 70, 0.38), transparent 28%),
+    linear-gradient(170deg, #7f1730 0%, #4f0d1e 48%, #21050d 100%) !important;
+  box-shadow: 28px 0 68px rgba(33, 5, 13, 0.32) !important;
+}
+
+.admin-red-shell .admin-brand-mark i,
+.admin-red-shell .admin-flag,
+.red-market-stat-pill i {
+  color: #7f1730 !important;
+}
+
+.admin-red-shell .admin-nav-item:hover,
+.admin-red-shell .admin-nav-item.active {
+  background: linear-gradient(135deg, #a83246, #7f1730 54%, #4f0d1e) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 14px 30px rgba(79, 13, 30, 0.3) !important;
+}
+
+.admin-red-shell .admin-theme-switch span {
+  background: linear-gradient(135deg, #a83246, #6f1024) !important;
+  box-shadow: 0 8px 18px rgba(79, 13, 30, 0.22) !important;
+}
+
+.admin-red-shell .admin-notification-button span,
+.red-status-dot::before {
+  background: #8f1d33 !important;
+}
+
+.red-glass-card,
+.red-overview-card,
+.red-mini-campaign-card {
+  border-color: rgba(255, 255, 255, 0.84) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(255, 250, 251, 0.62)) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.34), 0 18px 44px rgba(79, 13, 30, 0.09) !important;
+}
+
+[data-theme="dark"] .red-glass-card,
+[data-theme="dark"] .red-mini-campaign-card {
+  background: linear-gradient(145deg, rgba(25, 8, 13, 0.82), rgba(13, 5, 8, 0.72)) !important;
+  border-color: rgba(168, 50, 70, 0.16) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 18px 44px rgba(0, 0, 0, 0.32) !important;
+}
+
+.red-card-primary {
+  background:
+    radial-gradient(circle at 80% 22%, rgba(255, 255, 255, 0.16), transparent 24%),
+    linear-gradient(145deg, #a83246 0%, #7f1730 44%, #3b0918 100%) !important;
+  box-shadow: 0 24px 48px rgba(79, 13, 30, 0.24) !important;
+}
+
+.red-platform-icons span,
+.red-social-icon {
+  color: #7f1730 !important;
+  box-shadow: 0 10px 24px rgba(79, 13, 30, 0.13) !important;
+}
+
+.red-pie-chart {
+  background: conic-gradient(#6f1024 0 56%, #a83246 56% 76%, #d7a0aa 76% 100%) !important;
+  box-shadow: 0 18px 34px rgba(79, 13, 30, 0.16) !important;
+}
+
+.dot.sent { background: #6f1024 !important; }
+.dot.pending { background: #a83246 !important; }
+.dot.cancel { background: #d7a0aa !important; }
+.legend-add { border-color: #8f1d33 !important; }
+.legend-facebook { background: #6f1024 !important; }
+.legend-instagram { background: #a83246 !important; }
+.legend-youtube { background: #d7a0aa !important; }
+
+.red-sparkline {
+  background:
+    radial-gradient(circle at 10% 70%, #8f1d33 0 2px, transparent 3px),
+    linear-gradient(135deg, transparent 0 22%, #8f1d33 23% 25%, transparent 26% 42%, #a83246 43% 45%, transparent 46% 66%, #6f1024 67% 69%, transparent 70%) !important;
+}
+
+.red-bar {
+  background: linear-gradient(180deg, #ead0d5 0 28%, #a83246 28% 58%, #5a0d22 58%) !important;
+  box-shadow: 0 10px 20px rgba(79, 13, 30, 0.14) !important;
+}
+
+.red-filter-row button,
+.red-date-filter-row select,
+.red-date-filter-row input {
+  min-height: 42px;
+  padding: 0 1rem;
+  border: 1px solid rgba(111, 16, 36, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.56);
+  color: #272731;
+  outline: 0;
+}
+
+.red-date-filter-row select:focus,
+.red-date-filter-row input:focus {
+  border-color: rgba(127, 23, 48, 0.42);
+  box-shadow: 0 0 0 0.18rem rgba(127, 23, 48, 0.12);
+}
+
+.red-dashboard-alert {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(127, 23, 48, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 245, 247, 0.82);
+  color: #6f1024;
+}
+
+[data-theme="dark"] .red-filter-row button,
+[data-theme="dark"] .red-date-filter-row select,
+[data-theme="dark"] .red-date-filter-row input {
+  background: rgba(30, 8, 12, 0.88) !important;
+  border-color: rgba(168, 50, 70, 0.2) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .red-dashboard-alert {
+  background: rgba(79, 13, 30, 0.28);
+  border-color: rgba(168, 50, 70, 0.28);
+  color: #f3d5db;
+}
+
+html[data-theme="dark"] main.auth-page .btn-primary-custom,
+html[data-theme="dark"] main.auth-page .btn-accent-custom,
+html[data-theme="dark"] main.legal-support-page .btn-primary-custom,
+html[data-theme="dark"] main.legal-support-page .btn-accent-custom,
+html[data-theme="dark"] main.legal-document-page .btn-primary-custom,
+html[data-theme="dark"] main.legal-document-page .btn-accent-custom {
+  background: linear-gradient(135deg, #8f1d33, #4f0d1e) !important;
+  border-color: #8f1d33 !important;
+  box-shadow: 0 12px 28px rgba(79, 13, 30, 0.28) !important;
+}
+
+html[data-theme="dark"] main.auth-page .btn-primary-custom:hover,
+html[data-theme="dark"] main.auth-page .btn-accent-custom:hover,
+html[data-theme="dark"] main.legal-support-page .btn-primary-custom:hover,
+html[data-theme="dark"] main.legal-support-page .btn-accent-custom:hover,
+html[data-theme="dark"] main.legal-document-page .btn-primary-custom:hover,
+html[data-theme="dark"] main.legal-document-page .btn-accent-custom:hover {
+  background: linear-gradient(135deg, #a83246, #6f1024) !important;
+  border-color: #a83246 !important;
+}

@@ -1,20 +1,7 @@
+import { useEffect, useMemo, useState } from "react";
 import AdminOverviewDashboard from "../../components/admin/AdminOverviewDashboard.jsx";
-import { getBookings } from "../../services/bookingService.js";
-import { getUsers, coerceRole } from "../../services/authService.js";
-import { getManagementItems } from "../../services/itemService.js";
-import { getContactMessages } from "../../services/contactMessageService.js";
-import { getNotifications } from "../../services/notificationService.js";
-import { fetchActivePromotions, fetchPromotionRequests } from "../../services/promotionService.js";
+import { fetchAdminDashboard } from "../../services/dashboardService.js";
 import { formatCurrency } from "../../utils/currency.js";
-
-function uniqueCount(values) {
-  return new Set(values.filter(Boolean).map((value) => String(value).toLowerCase())).size;
-}
-
-function statusIncludes(value, terms) {
-  const normalized = String(value || "").toLowerCase().replace(/[_-]/g, " ");
-  return terms.some((term) => normalized.includes(term));
-}
 
 function percent(part, total) {
   if (!total) return 0;
@@ -28,109 +15,103 @@ function formatDate(value) {
   return date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
 }
 
-function createMonthlySeries(records, keys) {
-  const values = Array.from({ length: 12 }, () => 0);
-  const fallbackMonth = new Date().getMonth();
+function useLiveDashboard(loader, filters) {
+  const [state, setState] = useState({ data: null, loading: true, error: "" });
 
-  records.forEach((record) => {
-    const rawDate = keys.map((key) => record?.[key]).find(Boolean);
-    const date = rawDate ? new Date(rawDate) : null;
-    const month = date && !Number.isNaN(date.getTime()) ? date.getMonth() : fallbackMonth;
-    values[month] += 1;
-  });
+  useEffect(() => {
+    let isMounted = true;
 
-  return values;
-}
+    async function load() {
+      try {
+        const data = await loader(filters);
+        if (isMounted) setState({ data, loading: false, error: "" });
+      } catch (error) {
+        if (isMounted) setState((current) => ({ ...current, loading: false, error: error.message || "Unable to load dashboard." }));
+      }
+    }
 
-function createBreakdown(items, key, fallback = "Unknown") {
-  const counts = items.reduce((result, item) => {
-    const label = item?.[key] || fallback;
-    result[label] = (result[label] || 0) + 1;
-    return result;
-  }, {});
-  const total = Math.max(items.length, 1);
+    load();
+    const interval = window.setInterval(load, 30000);
+    window.addEventListener("focus", load);
 
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([label, value]) => ({ label, value, percent: percent(value, total) }));
+    return () => {
+      isMounted = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", load);
+    };
+  }, [loader, filters]);
+
+  return state;
 }
 
 export default function AdminDashboardPage() {
-  const users = getUsers();
-  const bookings = getBookings();
-  const items = getManagementItems();
-  const promotions = fetchPromotionRequests();
-  const activePromotions = fetchActivePromotions();
-  const contactMessages = getContactMessages();
-  const notifications = getNotifications();
-
-  const platformUsers = users.filter((user) => coerceRole(user.role) === "USER");
-  const totalOwners = uniqueCount(items.map((item) => item.ownerId || item.userId || item.ownerName || item.owner));
-  const totalRenters = uniqueCount(bookings.map((booking) => booking.renterId || booking.userId));
-  const activeListings = items.filter((item) => item.available !== false && !statusIncludes(item.status, ["pending", "rejected"]));
-  const pendingListings = items.filter((item) => statusIncludes(item.status, ["pending", "under review", "pending approval"]));
-  const verifiedOwners = uniqueCount(items.filter((item) => item.verifiedOwner || statusIncludes(item.verificationStatus, ["verified"])).map((item) => item.ownerId || item.userId || item.ownerName || item.owner));
-  const pendingVerifications = users.filter((user) => statusIncludes(user.verificationStatus, ["pending"])).length + pendingListings.length;
-  const promotionRevenue = promotions.reduce((sum, promotion) => sum + Number(promotion.amount || 0), 0);
-  const reportsAndComplaints = contactMessages.filter((message) => statusIncludes(message.subject, ["report", "complaint"]) || statusIncludes(message.message, ["report", "complaint"])).length;
+  const [filters, setFilters] = useState({ range: "month" });
+  const stableFilters = useMemo(() => filters, [filters]);
+  const { data, loading, error } = useLiveDashboard(fetchAdminDashboard, stableFilters);
+  const counts = data?.counts || {};
+  const revenue = data?.revenue || {};
 
   const statCards = [
-    { icon: "bi-people", label: "Total Users", value: platformUsers.length },
-    { icon: "bi-person-badge", label: "Total Owners", value: totalOwners },
-    { icon: "bi-person-check", label: "Total Renters", value: totalRenters },
-    { icon: "bi-box-seam", label: "Total Listings", value: items.length },
-    { icon: "bi-check-circle", label: "Active Listings", value: activeListings.length },
-    { icon: "bi-hourglass-split", label: "Pending Listings", value: pendingListings.length },
-    { icon: "bi-shield-check", label: "Verified Owners", value: verifiedOwners },
-    { icon: "bi-person-vcard", label: "Pending Verifications", value: pendingVerifications },
-    { icon: "bi-megaphone", label: "Active Promotions", value: activePromotions.length },
-    { icon: "bi-envelope-paper", label: "Contact Messages", value: contactMessages.length },
-    { icon: "bi-flag", label: "Reports & Complaints", value: reportsAndComplaints },
-    { icon: "bi-bell", label: "Notifications Sent", value: notifications.length },
+    { icon: "bi-people", label: "Total Users", value: counts.totalUsers ?? 0 },
+    { icon: "bi-person-badge", label: "Total Owners", value: counts.totalOwners ?? 0 },
+    { icon: "bi-person-check", label: "Total Renters", value: counts.totalRenters ?? 0 },
+    { icon: "bi-box-seam", label: "Total Listings", value: counts.totalListings ?? 0 },
+    { icon: "bi-check-circle", label: "Active Listings", value: counts.activeListings ?? 0 },
+    { icon: "bi-hourglass-split", label: "Pending Listings", value: counts.pendingListings ?? 0 },
+    { icon: "bi-x-octagon", label: "Rejected Listings", value: counts.rejectedListings ?? 0 },
+    { icon: "bi-star", label: "Featured Listings", value: counts.featuredListings ?? 0 },
+    { icon: "bi-megaphone", label: "Promotion Requests", value: counts.promotionRequests ?? 0 },
+    { icon: "bi-cash-stack", label: "Platform Fee Payments", value: formatCurrency(counts.platformFeePayments ?? 0) },
+    { icon: "bi-person-vcard", label: "Verification Requests", value: counts.verificationRequests ?? 0 },
+    { icon: "bi-chat-square-heart", label: "Reviews", value: counts.reviews ?? 0 },
+    { icon: "bi-flag", label: "Reports", value: counts.reports ?? 0 },
+    { icon: "bi-envelope-paper", label: "Contact Messages", value: counts.contactMessages ?? 0 },
+    { icon: "bi-headset", label: "Support Tickets", value: counts.supportTickets ?? 0 },
+    { icon: "bi-bell", label: "Notifications", value: counts.notifications ?? 0 },
   ];
 
   const miniCards = [
-    { icon: "bi-shield-check", name: "Verified Owners", value: verifiedOwners, helper: "Owner trust" },
-    { icon: "bi-megaphone", name: "Active Promotions", value: activePromotions.length, helper: formatCurrency(promotionRevenue) },
-    { icon: "bi-envelope-paper", name: "Contact Messages", value: contactMessages.length, helper: "Inbox" },
+    { icon: "bi-megaphone", name: "Promotion Requests", value: counts.promotionRequests ?? 0, helper: formatCurrency(revenue.promotionRevenue ?? 0), color: "#8f1d33" },
+    { icon: "bi-cash-stack", name: "Platform Fees", value: formatCurrency(counts.platformFeePayments ?? 0), helper: "Live revenue", color: "#6f1024" },
+    { icon: "bi-headset", name: "Support Tickets", value: counts.supportTickets ?? 0, helper: "Open support", color: "#a83246" },
   ];
 
-  const rows = [
-    ...users.slice(-2).reverse().map((user) => ({ id: `user-${user.id}`, type: "Recent User", detail: user.email, status: coerceRole(user.role), date: formatDate(user.createdAt) })),
-    ...items.slice(0, 2).map((item) => ({ id: `listing-${item.id}`, type: "Recent Listing", detail: item.title, status: item.status || "Active", date: formatDate(item.createdAt || item.requestDate) })),
-    ...promotions.slice(0, 2).map((promotion) => ({ id: promotion.id, type: "Promotion Payment", detail: promotion.listingTitle, status: promotion.status, date: formatDate(promotion.requestDate) })),
-    ...contactMessages.slice(0, 2).map((message) => ({ id: message.id, type: "Contact Message", detail: message.subject, status: message.status, date: formatDate(message.createdAt) })),
-  ];
+  const rows = (data?.recent?.activities || []).map((row) => ({ ...row, date: formatDate(row.date) }));
+  const totalListings = counts.totalListings ?? 0;
+  const totalUsers = counts.totalUsers ?? 0;
 
   return (
     <AdminOverviewDashboard
       variant="admin"
+      loading={loading}
+      error={error}
+      filters={filters}
+      onFiltersChange={setFilters}
       overview={{
         title: "Marketplace Overview",
-        primaryValue: activeListings.length,
+        primaryValue: counts.activeListings ?? 0,
         primaryLabel: "Active Listings",
         icons: ["bi-box-seam", "bi-people", "bi-megaphone"],
         stats: [
-          { label: "Pending Listings", value: pendingListings.length },
-          { label: "Pending Verifications", value: pendingVerifications },
-          { label: "Notifications Sent", value: notifications.length },
+          { label: "Pending Listings", value: counts.pendingListings ?? 0 },
+          { label: "Verification Requests", value: counts.verificationRequests ?? 0 },
+          { label: "Notifications", value: counts.notifications ?? 0 },
         ],
         searchPlaceholder: "Search users, listings, payments",
       }}
       statCards={statCards}
-      breakdown={createBreakdown(items, "city", "EasternCity")}
+      breakdown={data?.breakdowns?.listingsByCity || []}
       ringMetrics={[
-        { label: "Verified Owners", value: percent(verifiedOwners, Math.max(totalOwners, 1)), color: "#dc1218" },
-        { label: "Active Listings", value: percent(activeListings.length, Math.max(items.length, 1)), color: "#f4812a" },
-        { label: "Active Promotions", value: percent(activePromotions.length, Math.max(promotions.length, 1)), color: "#719f58" },
+        { label: "Active Listings", value: percent(counts.activeListings ?? 0, totalListings), color: "#7f1730" },
+        { label: "Pending Listings", value: percent(counts.pendingListings ?? 0, totalListings), color: "#a83246" },
+        { label: "Owners", value: percent(counts.totalOwners ?? 0, totalUsers), color: "#4f0d1e" },
       ]}
       miniCards={miniCards}
       chart={{
         title: "Marketplace Growth",
         legends: ["User Growth", "Listing Growth", "Promotion Revenue", "Listings by City"],
         primaryFilter: "Rental marketplace",
-        values: createMonthlySeries([...users, ...items, ...promotions], ["createdAt", "requestDate", "updatedAt"]),
+        values: data?.charts?.listingGrowth || [],
       }}
       rows={rows}
     />

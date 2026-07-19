@@ -42,4 +42,15 @@ export const apiClient = {
       body: JSON.stringify(body || {}),
     });
   },
+  put(path, body, options) {
+    return apiRequest(path, {
+      ...options,
+      method: "PUT",
+      body: JSON.stringify(body || {}),
+    });
+  },
+  delete(path, options) {
+    return apiRequest(path, { ...options, method: "DELETE" });
+  },
 };
+

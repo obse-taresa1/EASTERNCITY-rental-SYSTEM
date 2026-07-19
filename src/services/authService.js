@@ -7,7 +7,7 @@ const CURRENT_USER_KEY = "currentUser";
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 
-export const USE_MOCK_AUTH = String(import.meta.env?.VITE_USE_MOCK_AUTH ?? "true") !== "false";
+export const USE_MOCK_AUTH = String(import.meta.env?.VITE_USE_MOCK_AUTH ?? "false") === "true";
 
 function createMockTokens(user) {
   return {
@@ -225,5 +225,3 @@ export function coerceRole(role) {
   if (["USER", "ADMIN", "SUPER_ADMIN"].includes(normalized)) return normalized;
   return "USER";
 }
-
-

@@ -13,6 +13,13 @@ model User {
   email                         String               @unique
   password                      String
   role                          String               @default("USER")
+  status                        String               @default("ACTIVE")
+  city                          String?
+  phone                         String?
+  verificationStatus            String               @default("PENDING")
+  nationalIdNumber              String?
+  nationalIdFrontUrl            String?
+  nationalIdBackUrl             String?
   createdAt                     DateTime             @default(now())
   ownedBookings                 Booking[]            @relation("BookingOwner")
   rentedBookings                Booking[]            @relation("BookingRenter")
@@ -27,6 +34,9 @@ model User {
   refreshTokens                 RefreshToken[]
   reviews                       Review[]
   supportTicketReplies          SupportTicketReply[]
+  contactMessages               ContactMessage[]
+  reports                       Report[]
+  activityLogs                  ActivityLog[]
   supportTickets                SupportTicket[]
   updatedSettings               SystemSetting[]      @relation("SystemSettingUpdater")
 }
@@ -189,6 +199,44 @@ model Notification {
   user          User     @relation(fields: [userId], references: [id])
 }
 
+model ContactMessage {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  subject    String
+  message    String
+  status     String   @default("OPEN")
+  adminReply String?
+  repliedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id         String   @id @default(uuid())
+  reporterId String?
+  type       String
+  subject    String
+  details    String
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  reporter   User?    @relation(fields: [reporterId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String
+  actorId   String?
+  actorName String?
+  metadata  String?
+  type      String   @default("ACTIVITY")
+  createdAt DateTime @default(now())
+  actor     User?    @relation(fields: [actorId], references: [id])
+}
+
 model SupportTicket {
   id         String               @id @default(uuid())
   userId     String
@@ -212,3 +260,4 @@ model SupportTicketReply {
   ticket    SupportTicket @relation(fields: [ticketId], references: [id])
   user      User          @relation(fields: [userId], references: [id])
 }
+
