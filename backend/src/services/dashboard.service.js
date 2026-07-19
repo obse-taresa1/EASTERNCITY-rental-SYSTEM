@@ -1,219 +1,249 @@
 const prisma = require("../config/db");
 
-function getDateRange(range = "month", from, to) {
-  const now = new Date();
-  const end = to ? new Date(to) : now;
-  let start;
+function normalizeDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 
-  if (from) {
-    start = new Date(from);
-  } else if (range === "today") {
-    start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  } else if (range === "week") {
-    start = new Date(now);
-    start.setDate(now.getDate() - 6);
-    start.setHours(0, 0, 0, 0);
-  } else if (range === "year") {
-    start = new Date(now.getFullYear(), 0, 1);
-  } else {
-    start = new Date(now.getFullYear(), now.getMonth(), 1);
+function getDateRange(query = {}) {
+  const now = new Date();
+  const range = String(query.range || "month").toLowerCase();
+  let startDate = normalizeDate(query.startDate);
+  let endDate = normalizeDate(query.endDate);
+
+  if (range !== "custom" || !startDate || !endDate) {
+    endDate = now;
+    startDate = new Date(now);
+
+    if (range === "today") {
+      startDate.setHours(0, 0, 0, 0);
+    } else if (range === "week") {
+      startDate.setDate(now.getDate() - 6);
+      startDate.setHours(0, 0, 0, 0);
+    } else if (range === "year") {
+      startDate = new Date(now.getFullYear(), 0, 1);
+    } else {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
   }
 
-  return { start, end };
+  endDate.setHours(23, 59, 59, 999);
+  return { startDate, endDate, range };
 }
 
-function createdBetween(start, end) {
-  return { createdAt: { gte: start, lte: end } };
+function dateWhere(startDate, endDate, field = "createdAt") {
+  return {
+    [field]: {
+      gte: startDate,
+      lte: endDate,
+    },
+  };
 }
 
-function monthSeries(records, amountKey) {
+function statusWhere(statuses) {
+  return {
+    OR: statuses.map((status) => ({
+      status: { equals: status, mode: "insensitive" },
+    })),
+  };
+}
+
+function toNumber(value) {
+  if (value === null || value === undefined) return 0;
+  return Number(value) || 0;
+}
+
+function formatDate(value) {
+  return value ? new Date(value).toISOString() : null;
+}
+
+function monthSeries(records, dateKeys = ["createdAt"]) {
   const values = Array.from({ length: 12 }, () => 0);
-
   records.forEach((record) => {
-    const date = new Date(record.createdAt);
-    if (Number.isNaN(date.getTime())) return;
-    values[date.getMonth()] += amountKey ? Number(record[amountKey] || 0) : 1;
+    const rawDate = dateKeys.map((key) => record?.[key]).find(Boolean);
+    const date = rawDate ? new Date(rawDate) : null;
+    if (!date || Number.isNaN(date.getTime())) return;
+    values[date.getMonth()] += 1;
   });
-
   return values;
 }
 
 function percent(part, total) {
-  return total ? Math.round((part / total) * 100) : 0;
+  if (!total) return 0;
+  return Math.round((part / total) * 100);
 }
 
-function money(value) {
-  return Number(value || 0);
-}
-
-function topBreakdown(rows, labelKey, valueKey = "_count") {
-  const total = rows.reduce((sum, row) => sum + Number(row[valueKey] || 0), 0) || 1;
-
-  return rows.slice(0, 3).map((row) => ({
+function mapBreakdown(rows, labelKey = "label") {
+  const total = rows.reduce((sum, row) => sum + row._count._all, 0);
+  return rows.map((row) => ({
     label: row[labelKey] || "Unknown",
-    value: Number(row[valueKey] || 0),
-    percent: percent(Number(row[valueKey] || 0), total),
+    value: row._count._all,
+    percent: percent(row._count._all, total),
   }));
 }
 
-function mapRecent(type, records, getDetail, getStatus) {
-  return records.map((record) => ({
-    id: `${type}-${record.id}`,
+function row(type, detail, status, date, id) {
+  return {
+    id,
     type,
-    detail: getDetail(record),
-    status: getStatus(record),
-    date: record.createdAt,
-  }));
+    detail: detail || "-",
+    status: status || "-",
+    date: formatDate(date),
+  };
 }
 
-async function getSharedDashboardData({ range, from, to }) {
-  const { start, end } = getDateRange(range, from, to);
-  const dateWhere = createdBetween(start, end);
-  const activeListingStatuses = ["APPROVED", "ACTIVE", "AVAILABLE", "Approved", "Active", "Available"];
-  const pendingListingStatuses = ["PENDING", "PENDING_APPROVAL", "UNDER_REVIEW", "Pending", "Pending Approval", "Under Review"];
-  const rejectedListingStatuses = ["REJECTED", "Rejected"];
-  const approvedPromotionStatuses = ["APPROVED", "ACTIVE", "Approved", "Active"];
+async function getCommonDashboardData(query = {}) {
+  const { startDate, endDate, range } = getDateRange(query);
+  const createdAtRange = dateWhere(startDate, endDate);
 
   const [
-    totalUsers,
-    totalAdmins,
-    totalOwners,
-    totalRenters,
+    users,
+    admins,
     totalListings,
     activeListings,
     pendingListings,
     rejectedListings,
     featuredListings,
-    promotionRequests,
-    promotionHistory,
-    platformFeePayments,
-    reviews,
-    notifications,
-    supportTickets,
-    contactMessages,
-    reports,
+    listings,
+    bookings,
+    promotions,
+    activePromotions,
+    pendingPromotions,
+    approvedPromotions,
     verificationRequests,
+    pendingVerifications,
+    approvedVerifications,
+    rejectedVerifications,
+    reviews,
+    contactMessages,
+    supportTickets,
+    notifications,
+    listingsByCity,
+    listingsByLocation,
+    listingsByCategoryRaw,
     recentUsers,
     recentListings,
     recentPromotions,
+    recentContacts,
+    recentSupportTickets,
     recentNotifications,
-    listingSeries,
-    userSeries,
-    promotionSeries,
-    listingsByCity,
-    listingsByCategory,
-    listingFeeRevenue,
-    promotionRevenue,
+    recentVerifications,
   ] = await Promise.all([
-    prisma.user.count({ where: dateWhere }),
-    prisma.user.count({ where: { role: "ADMIN", ...dateWhere } }),
-    prisma.listing.findMany({ where: dateWhere, distinct: ["ownerId"], select: { ownerId: true } }).then((rows) => rows.length),
-    prisma.booking.findMany({ where: dateWhere, distinct: ["renterId"], select: { renterId: true } }).then((rows) => rows.length),
-    prisma.listing.count({ where: dateWhere }),
-    prisma.listing.count({ where: { status: { in: activeListingStatuses }, ...dateWhere } }),
-    prisma.listing.count({ where: { status: { in: pendingListingStatuses }, ...dateWhere } }),
-    prisma.listing.count({ where: { status: { in: rejectedListingStatuses }, ...dateWhere } }),
-    prisma.promotion.count({ where: { status: { in: approvedPromotionStatuses }, ...dateWhere } }),
-    prisma.promotion.count({ where: dateWhere }),
-    prisma.promotion.findMany({ where: dateWhere, orderBy: { createdAt: "desc" }, take: 8, include: { listing: true } }),
-    prisma.booking.aggregate({ where: dateWhere, _sum: { serviceFee: true } }),
-    prisma.review.count({ where: dateWhere }),
-    prisma.notification.count({ where: dateWhere }),
-    prisma.supportTicket.count({ where: dateWhere }),
-    prisma.contactMessage.count({ where: dateWhere }),
-    prisma.report.count({ where: dateWhere }),
-    prisma.user.count({ where: { verificationStatus: { in: ["PENDING", "pending"] }, ...dateWhere } }),
-    prisma.user.findMany({ where: dateWhere, orderBy: { createdAt: "desc" }, take: 4, select: { id: true, name: true, email: true, role: true, createdAt: true } }),
-    prisma.listing.findMany({ where: dateWhere, orderBy: { createdAt: "desc" }, take: 4, select: { id: true, title: true, status: true, createdAt: true } }),
-    prisma.promotion.findMany({ where: dateWhere, orderBy: { createdAt: "desc" }, take: 4, include: { listing: true } }),
-    prisma.notification.findMany({ where: dateWhere, orderBy: { createdAt: "desc" }, take: 4 }),
-    prisma.listing.findMany({ where: dateWhere, select: { createdAt: true } }),
-    prisma.user.findMany({ where: dateWhere, select: { createdAt: true } }),
-    prisma.promotion.findMany({ where: dateWhere, select: { createdAt: true, amount: true } }),
-    prisma.listing.groupBy({ by: ["city"], where: dateWhere, _count: true, orderBy: { _count: { city: "desc" } }, take: 3 }),
-    prisma.listing.groupBy({ by: ["categoryId"], where: dateWhere, _count: true, orderBy: { _count: { categoryId: "desc" } }, take: 3 }),
-    prisma.booking.aggregate({ where: dateWhere, _sum: { serviceFee: true } }),
-    prisma.promotion.aggregate({ where: { status: { in: approvedPromotionStatuses }, ...dateWhere }, _sum: { amount: true } }),
+    prisma.user.findMany({ where: createdAtRange, select: { id: true, role: true, verificationStatus: true, createdAt: true } }),
+    prisma.user.count({ where: { role: { equals: "ADMIN", mode: "insensitive" }, ...createdAtRange } }),
+    prisma.listing.count({ where: createdAtRange }),
+    prisma.listing.count({ where: { ...createdAtRange, ...statusWhere(["APPROVED", "ACTIVE"]) } }),
+    prisma.listing.count({ where: { ...createdAtRange, ...statusWhere(["PENDING", "UNDER_REVIEW", "PENDING_APPROVAL"]) } }),
+    prisma.listing.count({ where: { ...createdAtRange, ...statusWhere(["REJECTED"]) } }),
+    prisma.promotion.count({ where: { ...createdAtRange, ...statusWhere(["APPROVED"]) } }),
+    prisma.listing.findMany({ where: createdAtRange, select: { id: true, ownerId: true, city: true, location: true, categoryId: true, createdAt: true } }),
+    prisma.booking.findMany({ where: createdAtRange, select: { id: true, renterId: true, ownerId: true, totalAmount: true, createdAt: true } }),
+    prisma.promotion.findMany({ where: createdAtRange, include: { listing: { select: { title: true } }, user: { select: { name: true, email: true } } } }),
+    prisma.promotion.count({ where: { ...createdAtRange, ...statusWhere(["APPROVED"]) } }),
+    prisma.promotion.count({ where: { ...createdAtRange, ...statusWhere(["PENDING"]) } }),
+    prisma.promotion.findMany({ where: { ...createdAtRange, ...statusWhere(["APPROVED"]) }, select: { amount: true, createdAt: true } }),
+    prisma.verificationRequest.findMany({ where: createdAtRange, select: { id: true, status: true, createdAt: true } }),
+    prisma.verificationRequest.count({ where: { ...createdAtRange, ...statusWhere(["PENDING"]) } }),
+    prisma.verificationRequest.count({ where: { ...createdAtRange, ...statusWhere(["APPROVED", "VERIFIED"]) } }),
+    prisma.verificationRequest.count({ where: { ...createdAtRange, ...statusWhere(["REJECTED"]) } }),
+    prisma.review.findMany({ where: createdAtRange, select: { id: true, rating: true, createdAt: true } }),
+    prisma.contactMessage.findMany({ where: createdAtRange, select: { id: true, subject: true, message: true, status: true, createdAt: true } }),
+    prisma.supportTicket.findMany({ where: createdAtRange, include: { user: { select: { name: true, email: true } } } }),
+    prisma.notification.findMany({ where: createdAtRange, select: { id: true, title: true, type: true, isRead: true, createdAt: true } }),
+    prisma.listing.groupBy({ by: ["city"], where: createdAtRange, _count: { _all: true }, orderBy: { _count: { city: "desc" } }, take: 5 }),
+    prisma.listing.groupBy({ by: ["location"], where: createdAtRange, _count: { _all: true }, orderBy: { _count: { location: "desc" } }, take: 5 }),
+    prisma.listing.groupBy({ by: ["categoryId"], where: createdAtRange, _count: { _all: true }, orderBy: { _count: { categoryId: "desc" } }, take: 5 }),
+    prisma.user.findMany({ where: createdAtRange, orderBy: { createdAt: "desc" }, take: 5, select: { id: true, name: true, email: true, role: true, createdAt: true } }),
+    prisma.listing.findMany({ where: createdAtRange, orderBy: { createdAt: "desc" }, take: 5, select: { id: true, title: true, status: true, createdAt: true } }),
+    prisma.promotion.findMany({ where: createdAtRange, orderBy: { createdAt: "desc" }, take: 5, include: { listing: { select: { title: true } } } }),
+    prisma.contactMessage.findMany({ where: createdAtRange, orderBy: { createdAt: "desc" }, take: 5 }),
+    prisma.supportTicket.findMany({ where: createdAtRange, orderBy: { createdAt: "desc" }, take: 5, include: { user: { select: { name: true, email: true } } } }),
+    prisma.notification.findMany({ where: createdAtRange, orderBy: { createdAt: "desc" }, take: 5 }),
+    prisma.verificationRequest.findMany({ where: createdAtRange, orderBy: { createdAt: "desc" }, take: 5, include: { user: { select: { name: true, email: true } } } }),
   ]);
 
-  const categoryNames = await prisma.category.findMany({
-    where: { id: { in: listingsByCategory.map((row) => row.categoryId).filter(Boolean) } },
-    select: { id: true, name: true },
+  const categoryIds = listingsByCategoryRaw.map((item) => item.categoryId).filter(Boolean);
+  const categories = categoryIds.length
+    ? await prisma.category.findMany({ where: { id: { in: categoryIds } }, select: { id: true, name: true } })
+    : [];
+  const categoryById = new Map(categories.map((category) => [category.id, category.name]));
+
+  const reportsAndComplaints = contactMessages.filter((message) => {
+    const text = `${message.subject || ""} ${message.message || ""}`.toLowerCase();
+    return text.includes("report") || text.includes("complaint");
   });
-  const categoryMap = new Map(categoryNames.map((category) => [category.id, category.name]));
-  const categoryBreakdown = listingsByCategory.map((row) => ({
-    label: categoryMap.get(row.categoryId) || "Uncategorized",
-    value: row._count,
-  }));
+  const promotionRevenue = approvedPromotions.reduce((sum, promotion) => sum + toNumber(promotion.amount), 0);
 
   const recentRows = [
-    ...mapRecent("Recent User", recentUsers, (user) => user.email || user.name, (user) => user.role),
-    ...mapRecent("Recent Listing", recentListings, (listing) => listing.title, (listing) => listing.status),
-    ...mapRecent("Recent Promotion Payment", recentPromotions, (promotion) => promotion.listing?.title || promotion.packageType, (promotion) => promotion.status),
-    ...mapRecent("Recent Activity", recentNotifications, (notification) => notification.title, (notification) => notification.isRead ? "Read" : "Unread"),
-  ].sort((a, b) => new Date(b.date) - new Date(a.date));
+    ...recentUsers.map((user) => row("Recent User", user.email, user.role, user.createdAt, `user-${user.id}`)),
+    ...recentListings.map((listing) => row("Recent Listing", listing.title, listing.status, listing.createdAt, `listing-${listing.id}`)),
+    ...recentPromotions.map((promotion) => row("Promotion Payment", promotion.listing?.title, promotion.status, promotion.createdAt, `promotion-${promotion.id}`)),
+    ...recentContacts.map((message) => row("Contact Message", message.subject, message.status, message.createdAt, `contact-${message.id}`)),
+    ...recentSupportTickets.map((ticket) => row("Support Ticket", ticket.subject, ticket.status, ticket.createdAt, `ticket-${ticket.id}`)),
+    ...recentNotifications.map((notification) => row("Notification", notification.title, notification.isRead ? "Read" : "Unread", notification.createdAt, `notification-${notification.id}`)),
+    ...recentVerifications.map((request) => row("Verification Request", request.user?.email || request.user?.name, request.status, request.createdAt, `verification-${request.id}`)),
+  ].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 12);
 
   return {
-    range: { start, end },
+    range,
+    startDate: formatDate(startDate),
+    endDate: formatDate(endDate),
     counts: {
-      totalUsers,
-      totalAdmins,
-      totalOwners,
-      totalRenters,
+      totalUsers: users.length,
+      totalAdmins: admins,
+      totalOwners: new Set(listings.map((listing) => listing.ownerId).filter(Boolean)).size,
+      totalRenters: new Set(bookings.map((booking) => booking.renterId).filter(Boolean)).size,
       totalListings,
       activeListings,
       pendingListings,
       rejectedListings,
       featuredListings,
-      promotionRequests,
-      promotionHistory: promotionHistory.length,
-      platformFeePayments: money(platformFeePayments._sum.serviceFee),
-      verificationRequests,
-      reviews,
-      reports,
-      contactMessages,
-      supportTickets,
-      notifications,
+      promotionRequests: promotions.length,
+      pendingPromotions,
+      promotionHistory: promotions.filter((promotion) => String(promotion.status || "").toUpperCase() !== "PENDING").length,
+      platformFeePayments: listings.filter((listing) => listing.id).length,
+      verificationRequests: verificationRequests.length,
+      pendingVerifications,
+      approvedVerifications,
+      rejectedVerifications,
+      reviews: reviews.length,
+      reports: reportsAndComplaints.length,
+      contactMessages: contactMessages.length,
+      supportTickets: supportTickets.length,
+      notifications: notifications.length,
       systemHealth: 100,
     },
     revenue: {
-      promotionRevenue: money(promotionRevenue._sum.amount),
-      listingFeeRevenue: money(listingFeeRevenue._sum.serviceFee),
+      promotionRevenue,
+      listingFeeRevenue: 0,
     },
     breakdowns: {
-      listingsByCity: topBreakdown(listingsByCity, "city"),
-      listingsByCategory: topBreakdown(categoryBreakdown, "label", "value"),
-      listingsBySefar: [],
+      listingsByCity: mapBreakdown(listingsByCity, "city"),
+      listingsBySefar: mapBreakdown(listingsByLocation, "location"),
+      listingsByCategory: listingsByCategoryRaw.map((item) => ({
+        label: item.categoryId ? categoryById.get(item.categoryId) || "Uncategorized" : "Uncategorized",
+        value: item._count._all,
+        percent: percent(item._count._all, listings.length),
+      })),
     },
-    charts: {
-      userGrowth: monthSeries(userSeries),
-      listingGrowth: monthSeries(listingSeries),
-      promotionRevenue: monthSeries(promotionSeries, "amount"),
+    chart: {
+      values: monthSeries([...users, ...listings, ...promotions, ...notifications, ...reviews]),
+      promotionRevenueValues: monthSeries(approvedPromotions),
     },
-    recent: {
-      users: recentUsers,
-      listings: recentListings,
-      promotionPayments: recentPromotions,
-      activities: recentRows,
-      promotionHistory,
-      platformActivityLogs: recentRows,
-      securityLogs: [],
-    },
+    recentRows,
   };
 }
 
 async function getAdminDashboard(query) {
-  return getSharedDashboardData(query);
+  return getCommonDashboardData(query);
 }
 
 async function getSuperAdminDashboard(query) {
-  return getSharedDashboardData(query);
+  return getCommonDashboardData(query);
 }
 
 module.exports = {
   getAdminDashboard,
   getSuperAdminDashboard,
 };
-
-
-

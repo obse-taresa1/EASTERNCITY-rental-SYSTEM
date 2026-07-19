@@ -8,7 +8,7 @@ const categoryRoutes = require("./categoryRoutes");
 const promotionRoutes = require("./promotionRoutes");
 const reviewRoutes = require("./reviewRoutes");
 const dashboardRoutes = require("./dashboard.routes");
-const adminManagementRoutes = require("./adminManagement.routes");
+const router = express.Router();
 const bookingRoutes = require("./booking.routes");
 const conversationRoutes = require("./conversation.routes");
 const supportTicketRoutes = require("./supportTicket.routes");
@@ -26,7 +26,6 @@ router.use("/categories", categoryRoutes);
 router.use("/promotions", promotionRoutes);
 router.use("/reviews", reviewRoutes);
 router.use("/dashboard", dashboardRoutes);
-router.use("/admin-management", adminManagementRoutes);
 router.use("/bookings", bookingRoutes);
 router.use("/conversations", conversationRoutes);
 router.use("/support-tickets", supportTicketRoutes);
@@ -45,4 +44,3 @@ router.get("/health", (req, res) => {
 });
 
 module.exports = router;
-

@@ -52,8 +52,6 @@ import AdminAnalyticsPage from "../pages/admin/AdminAnalyticsPage.jsx";
 import AdminSupportTicketsPage from "../pages/admin/AdminSupportTicketsPage.jsx";
 import AdminNotificationsPage from "../pages/admin/AdminNotificationsPage.jsx";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage.jsx";
-import AdminOwnersPage from "../pages/admin/AdminOwnersPage.jsx";
-import AdminRentersPage from "../pages/admin/AdminRentersPage.jsx";
 import AdminBookingsPage from "../pages/admin/AdminBookingsPage.jsx";
 import AdminReviewsPage from "../pages/admin/AdminReviewsPage.jsx";
 
@@ -246,14 +244,6 @@ export default function AppRouter() {
               <Route
                 path="/admin-dashboard/notifications"
                 element={<AdminNotificationsPage />}
-              />
-              <Route
-                path="/admin-dashboard/owners"
-                element={<AdminOwnersPage />}
-              />
-              <Route
-                path="/admin-dashboard/renters"
-                element={<AdminRentersPage />}
               />
               <Route
                 path="/admin-dashboard/bookings"

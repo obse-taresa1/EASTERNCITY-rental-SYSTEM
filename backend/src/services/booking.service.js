@@ -20,6 +20,9 @@ async function createBooking(user, payload) {
 }
 
 function getMyBookings(user) {
+  if (["ADMIN", "SUPER_ADMIN"].includes(String(user.role || "").toUpperCase())) {
+    return repository.findAll();
+  }
   return repository.findManyByUser(user.id);
 }
 

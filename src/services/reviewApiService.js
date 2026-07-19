@@ -18,6 +18,7 @@ function normalizeReview(review) {
     bookingId: review.bookingId,
     rating: Number(review.rating || 0),
     comment: review.comment || "",
+    listing: review.listing || null,
     createdAt: review.createdAt,
     updatedAt: review.updatedAt,
   };
@@ -58,5 +59,10 @@ export async function submitReview(payload) {
 
 export async function getMyReviews() {
   const data = await apiClient.get("/api/reviews/my");
+  return Array.isArray(data) ? data.map(normalizeReview) : [];
+}
+
+export async function getAllReviews() {
+  const data = await apiClient.get("/api/reviews");
   return Array.isArray(data) ? data.map(normalizeReview) : [];
 }

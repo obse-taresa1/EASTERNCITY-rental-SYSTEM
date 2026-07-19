@@ -1,30 +1,28 @@
 const dashboardService = require("../services/dashboard.service");
 
-const getAdminDashboard = async (req, res, next) => {
+async function getAdminDashboard(req, res, next) {
   try {
     const data = await dashboardService.getAdminDashboard(req.query);
-
-    res.status(200).json({
+    res.json({
       success: true,
       data,
     });
   } catch (error) {
     next(error);
   }
-};
+}
 
-const getSuperAdminDashboard = async (req, res, next) => {
+async function getSuperAdminDashboard(req, res, next) {
   try {
     const data = await dashboardService.getSuperAdminDashboard(req.query);
-
-    res.status(200).json({
+    res.json({
       success: true,
       data,
     });
   } catch (error) {
     next(error);
   }
-};
+}
 
 module.exports = {
   getAdminDashboard,

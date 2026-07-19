@@ -18,6 +18,15 @@ exports.listMine = async (req, res, next) => {
   }
 };
 
+exports.listAll = async (req, res, next) => {
+  try {
+    const data = await service.listAll();
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.create = async (req, res, next) => {
   try {
     const data = await service.create(req.user.id, req.body);
