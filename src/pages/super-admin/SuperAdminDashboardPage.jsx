@@ -1,34 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AdminOverviewDashboard from "../../components/admin/AdminOverviewDashboard.jsx";
-import { coerceRole } from "../../services/authService.js";
-import { getUsers } from "../../services/userApiService.js";
-import { getManageListings } from "../../services/listingApiService.js";
-import { getBookings, fetchBookings } from "../../services/bookingService.js";
-import { getContactMessages } from "../../services/contactMessageService.js";
-import {
-  getNotifications,
-  fetchNotifications,
-} from "../../services/notificationService.js";
-import {
-  fetchActivePromotions,
-  fetchPromotionRequests,
-} from "../../services/promotionApiService.js";
-import { useRef } from "react";
-import { roleRequests } from "../../data/roleRequests.js";
+import { fetchSuperAdminDashboard } from "../../services/dashboardService.js";
 import { formatCurrency } from "../../utils/currency.js";
-
-function uniqueCount(values) {
-  return new Set(
-    values.filter(Boolean).map((value) => String(value).toLowerCase()),
-  ).size;
-}
-
-function statusIncludes(value, terms) {
-  const normalized = String(value || "")
-    .toLowerCase()
-    .replace(/[_-]/g, " ");
-  return terms.some((term) => normalized.includes(term));
-}
 
 function percent(part, total) {
   if (!total) return 0;
@@ -46,290 +19,98 @@ function formatDate(value) {
   });
 }
 
-function createMonthlySeries(records, keys) {
-  const values = Array.from({ length: 12 }, () => 0);
-  const fallbackMonth = new Date().getMonth();
+function useLiveDashboard(loader, filters) {
+  const [state, setState] = useState({ data: null, loading: true, error: "" });
 
-  records.forEach((record) => {
-    const rawDate = keys.map((key) => record?.[key]).find(Boolean);
-    const date = rawDate ? new Date(rawDate) : null;
-    const month =
-      date && !Number.isNaN(date.getTime()) ? date.getMonth() : fallbackMonth;
-    values[month] += 1;
-  });
+  useEffect(() => {
+    let isMounted = true;
 
-  return values;
-}
+    async function load() {
+      try {
+        const data = await loader(filters);
+        if (isMounted) setState({ data, loading: false, error: "" });
+      } catch (error) {
+        if (isMounted) setState((current) => ({ ...current, loading: false, error: error.message || "Unable to load dashboard." }));
+      }
+    }
 
-function createBreakdown(items, key, fallback = "Unknown") {
-  const counts = items.reduce((result, item) => {
-    const label = item?.[key] || fallback;
-    result[label] = (result[label] || 0) + 1;
-    return result;
-  }, {});
-  const total = Math.max(items.length, 1);
+    load();
+    const interval = window.setInterval(load, 30000);
+    window.addEventListener("focus", load);
 
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([label, value]) => ({
-      label,
-      value,
-      percent: percent(value, total),
-    }));
+    return () => {
+      isMounted = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", load);
+    };
+  }, [loader, filters]);
+
+  return state;
 }
 
 export default function SuperAdminDashboardPage() {
-  const [users, setUsers] = useState([]);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  const [promotions, setPromotions] = useState([]);
-  const [activePromotions, setActivePromotions] = useState([]);
-  const promotionsLoaded = useRef(false);
-  const [bookings, setBookings] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadUsers() {
-      try {
-        const data = await getUsers();
-        if (active) setUsers(data);
-      } finally {
-        if (active) setIsLoadingUsers(false);
-      }
-    }
-
-    loadUsers();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadPromotions() {
-      try {
-        const p = await fetchPromotionRequests();
-        const a = await fetchActivePromotions();
-        if (active) {
-          setPromotions(p || []);
-          setActivePromotions(a || []);
-          promotionsLoaded.current = true;
-        }
-      } catch (err) {
-        if (active) {
-          setPromotions([]);
-          setActivePromotions([]);
-        }
-      }
-    }
-
-    loadPromotions();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadBookings() {
-      try {
-        const b = await fetchBookings();
-        if (active) setBookings(b || []);
-      } catch (err) {
-        if (active) setBookings([]);
-      }
-    }
-
-    async function loadListings() {
-      try {
-        const data = await getManageListings();
-        if (active) setItems(data || []);
-      } catch (err) {
-        if (active) setItems([]);
-      }
-    }
-
-    async function loadNotifications() {
-      try {
-        const n = await fetchNotifications();
-        if (active) setNotifications(n || []);
-      } catch (err) {
-        if (active) setNotifications([]);
-      }
-    }
-
-    loadBookings();
-    loadListings();
-    loadNotifications();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  // promotions and activePromotions loaded asynchronously via effect
-  const contactMessages = getContactMessages();
-
-  const admins = users.filter((user) => coerceRole(user.role) === "ADMIN");
-  const totalOwners = uniqueCount(
-    items.map(
-      (item) => item.ownerId || item.userId || item.ownerName || item.owner,
-    ),
-  );
-  const totalRenters = uniqueCount(
-    bookings.map((booking) => booking.renterId || booking.userId),
-  );
-  const verifiedUsers = users.filter((user) =>
-    statusIncludes(user.verificationStatus, ["verified"]),
-  ).length;
-  const pendingVerifications =
-    users.filter((user) => statusIncludes(user.verificationStatus, ["pending"]))
-      .length +
-    roleRequests.filter((request) =>
-      statusIncludes(request.status, ["pending"]),
-    ).length;
-  const totalRevenue = promotions.reduce(
-    (sum, promotion) => sum + Number(promotion.amount || 0),
-    0,
-  );
-  const reportsAndComplaints = contactMessages.filter(
-    (message) =>
-      statusIncludes(message.subject, ["report", "complaint"]) ||
-      statusIncludes(message.message, ["report", "complaint"]),
-  ).length;
-  const supportTickets = contactMessages.length;
-  const systemHealth = 100;
+  const [filters, setFilters] = useState({ range: "month" });
+  const stableFilters = useMemo(() => filters, [filters]);
+  const { data, loading, error } = useLiveDashboard(fetchSuperAdminDashboard, stableFilters);
+  const counts = data?.counts || {};
+  const revenue = data?.revenue || {};
 
   const statCards = [
-    { icon: "bi-people", label: "Total Platform Users", value: users.length },
-    { icon: "bi-shield-lock", label: "Total Admins", value: admins.length },
-    { icon: "bi-person-badge", label: "Total Owners", value: totalOwners },
-    { icon: "bi-person-check", label: "Total Renters", value: totalRenters },
-    { icon: "bi-box-seam", label: "Total Listings", value: items.length },
-    {
-      icon: "bi-cash-stack",
-      label: "Promotion Revenue",
-      value: formatCurrency(totalRevenue),
-    },
-    {
-      icon: "bi-megaphone",
-      label: "Active Promotions",
-      value: activePromotions.length,
-    },
-    { icon: "bi-shield-check", label: "Verified Users", value: verifiedUsers },
-    {
-      icon: "bi-person-vcard",
-      label: "Pending Verifications",
-      value: pendingVerifications,
-    },
-    {
-      icon: "bi-flag",
-      label: "Reports & Complaints",
-      value: reportsAndComplaints,
-    },
-    { icon: "bi-headset", label: "Support Tickets", value: supportTickets },
-    {
-      icon: "bi-heart-pulse",
-      label: "System Health",
-      value: `${systemHealth}%`,
-    },
+    { icon: "bi-people", label: "Total Platform Users", value: counts.totalUsers ?? 0 },
+    { icon: "bi-shield-lock", label: "Total Admins", value: counts.totalAdmins ?? 0 },
+    { icon: "bi-person-badge", label: "Total Owners", value: counts.totalOwners ?? 0 },
+    { icon: "bi-person-check", label: "Total Renters", value: counts.totalRenters ?? 0 },
+    { icon: "bi-box-seam", label: "Total Listings", value: counts.totalListings ?? 0 },
+    { icon: "bi-grid", label: "Listings by Category", value: data?.breakdowns?.listingsByCategory?.length ?? 0 },
+    { icon: "bi-geo-alt", label: "Listings by City", value: data?.breakdowns?.listingsByCity?.length ?? 0 },
+    { icon: "bi-map", label: "Listings by Sefar", value: data?.breakdowns?.listingsBySefar?.length ?? 0 },
+    { icon: "bi-star", label: "Featured Listings", value: counts.featuredListings ?? 0 },
+    { icon: "bi-megaphone", label: "Promotion Requests", value: counts.promotionRequests ?? 0 },
+    { icon: "bi-cash-stack", label: "Promotion Revenue", value: formatCurrency(revenue.promotionRevenue ?? 0) },
+    { icon: "bi-receipt", label: "Listing Fee Revenue", value: formatCurrency(revenue.listingFeeRevenue ?? 0) },
+    { icon: "bi-person-vcard", label: "Verification Statistics", value: counts.verificationRequests ?? 0 },
+    { icon: "bi-flag", label: "Reports & Complaints", value: counts.reports ?? 0 },
+    { icon: "bi-headset", label: "Support Tickets", value: counts.supportTickets ?? 0 },
+    { icon: "bi-envelope-paper", label: "Contact Messages", value: counts.contactMessages ?? 0 },
+    { icon: "bi-bell", label: "Notifications", value: counts.notifications ?? 0 },
+    { icon: "bi-heart-pulse", label: "System Health", value: `${counts.systemHealth ?? 100}%` },
   ];
 
   const miniCards = [
-    {
-      icon: "bi-megaphone",
-      name: "Active Promotions",
-      value: activePromotions.length,
-      helper: "Live packages",
-    },
-    {
-      icon: "bi-shield-check",
-      name: "Verified Users",
-      value: verifiedUsers,
-      helper: "Trusted accounts",
-    },
-    {
-      icon: "bi-bell",
-      name: "Notifications",
-      value: notifications.length,
-      helper: "Sent alerts",
-    },
+    { icon: "bi-cash-stack", name: "Promotion Revenue", value: formatCurrency(revenue.promotionRevenue ?? 0), helper: "Approved promos", color: "#8f1d33" },
+    { icon: "bi-receipt", name: "Listing Fee Revenue", value: formatCurrency(revenue.listingFeeRevenue ?? 0), helper: "Platform fees", color: "#6f1024" },
+    { icon: "bi-heart-pulse", name: "System Health", value: `${counts.systemHealth ?? 100}%`, helper: "Live status", color: "#a83246" },
   ];
 
-  const rows = [
-    ...notifications.slice(0, 2).map((notification) => ({
-      id: notification.id,
-      type: "Recent Activity",
-      detail: notification.title,
-      status: notification.isRead ? "Read" : "Unread",
-      date: formatDate(notification.createdAt),
-    })),
-    ...roleRequests.slice(0, 2).map((request) => ({
-      id: request.id,
-      type: "Recent Verification",
-      detail: request.name,
-      status: request.status,
-      date: "-",
-    })),
-    ...admins.slice(0, 2).map((admin) => ({
-      id: `admin-${admin.id}`,
-      type: "Recent Admin Action",
-      detail: admin.email,
-      status: coerceRole(admin.role),
-      date: formatDate(admin.createdAt),
-    })),
-    ...promotions.slice(0, 2).map((promotion) => ({
-      id: promotion.id,
-      type: "Recent Payment",
-      detail: promotion.listingTitle,
-      status: promotion.status,
-      date: formatDate(promotion.requestDate),
-    })),
-    ...contactMessages.slice(0, 2).map((message) => ({
-      id: message.id,
-      type: "Recent Report",
-      detail: message.subject,
-      status: message.status,
-      date: formatDate(message.createdAt),
-    })),
-  ];
+  const rows = (data?.recent?.platformActivityLogs || []).map((row) => ({ ...row, date: formatDate(row.date) }));
+  const totalListings = counts.totalListings ?? 0;
+  const totalUsers = counts.totalUsers ?? 0;
 
   return (
     <AdminOverviewDashboard
       variant="superadmin"
+      loading={loading}
+      error={error}
+      filters={filters}
+      onFiltersChange={setFilters}
       overview={{
         title: "Platform Overview",
-        primaryValue: users.length,
+        primaryValue: counts.totalUsers ?? 0,
         primaryLabel: "Platform Users",
         icons: ["bi-people", "bi-shield-lock", "bi-graph-up"],
         stats: [
-          { label: "Admins", value: admins.length },
-          { label: "Pending Verifications", value: pendingVerifications },
-          { label: "System Health", value: `${systemHealth}%` },
+          { label: "Admins", value: counts.totalAdmins ?? 0 },
+          { label: "Promotion Requests", value: counts.promotionRequests ?? 0 },
+          { label: "System Health", value: `${counts.systemHealth ?? 100}%` },
         ],
         searchPlaceholder: "Search platform records",
       }}
       statCards={statCards}
-      breakdown={createBreakdown(items, "category", "Uncategorized")}
+      breakdown={data?.breakdowns?.listingsByCategory || []}
       ringMetrics={[
-        {
-          label: "Verified Users",
-          value: percent(verifiedUsers, Math.max(users.length, 1)),
-          color: "#dc1218",
-        },
-        {
-          label: "Active Promotions",
-          value: percent(
-            activePromotions.length,
-            Math.max(promotions.length, 1),
-          ),
-          color: "#f4812a",
-        },
-        { label: "System Health", value: systemHealth, color: "#719f58" },
+        { label: "Owners", value: percent(counts.totalOwners ?? 0, totalUsers), color: "#7f1730" },
+        { label: "Active Listings", value: percent(counts.activeListings ?? 0, totalListings), color: "#a83246" },
+        { label: "System Health", value: counts.systemHealth ?? 100, color: "#4f0d1e" },
       ]}
       miniCards={miniCards}
       chart={{
@@ -343,10 +124,7 @@ export default function SuperAdminDashboardPage() {
           "Promotion Revenue Trends",
         ],
         primaryFilter: "Platform metrics",
-        values: createMonthlySeries(
-          [...users, ...items, ...promotions, ...notifications],
-          ["createdAt", "requestDate", "updatedAt"],
-        ),
+        values: data?.charts?.userGrowth || [],
       }}
       rows={rows}
       loading={isLoadingUsers}

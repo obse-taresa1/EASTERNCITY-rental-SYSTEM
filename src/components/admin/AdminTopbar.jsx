@@ -3,10 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { useTheme } from "../../context/ThemeContext.jsx";
-import {
-  fetchNotifications,
-  markNotificationRead,
-} from "../../services/notificationService.js";
+import { adminApi } from "../../services/adminManagementService.js";
 import { getInitials } from "../../utils/user.js";
 
 const LANGUAGES = [
@@ -244,37 +241,22 @@ export default function AdminTopbar({ title }) {
   );
 
   useEffect(() => {
-    let active = true;
-
-    async function updateNotifications() {
-      const notifications = await fetchNotifications(activeUser?.id).catch(
-        () => [],
-      );
-      if (!active) return;
-      setNotifications((notifications || []).slice(0, 5));
-      setUnreadCount(
-        (notifications || []).filter((notification) => !notification.isRead)
-          .length,
-      );
-    }
+    let mounted = true;
+    const updateNotifications = async () => {
+      const notifications = await adminApi.notifications().catch(() => []);
+      if (mounted) {
+        setUnreadCount(notifications.filter((notification) => !notification.isRead).length);
+      }
+    };
 
     updateNotifications();
-    window.addEventListener(
-      "easterncity:notifications-updated",
-      updateNotifications,
-    );
-    window.addEventListener("storage", updateNotifications);
+    window.addEventListener("easterncity:notifications-updated", updateNotifications);
 
     return () => {
-      active = false;
-      window.removeEventListener(
-        "easterncity:notifications-updated",
-        updateNotifications,
-      );
-      window.removeEventListener("storage", updateNotifications);
+      mounted = false;
+      window.removeEventListener("easterncity:notifications-updated", updateNotifications);
     };
   }, [activeUser?.id]);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -510,3 +492,6 @@ export default function AdminTopbar({ title }) {
     </header>
   );
 }
+
+
+

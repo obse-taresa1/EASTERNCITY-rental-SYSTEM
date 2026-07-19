@@ -1,4 +1,11 @@
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const RANGE_OPTIONS = [
+  { value: "today", label: "Today" },
+  { value: "week", label: "This Week" },
+  { value: "month", label: "This Month" },
+  { value: "year", label: "This Year" },
+  { value: "custom", label: "Custom Range" },
+];
 
 function StatPill({ icon, label, value }) {
   return (
@@ -10,7 +17,7 @@ function StatPill({ icon, label, value }) {
   );
 }
 
-function MiniCard({ icon, name, value, helper, color = "#ef4444" }) {
+function MiniCard({ icon, name, value, helper, color = "#8f1d33" }) {
   return (
     <article className="red-mini-campaign-card red-market-mini-card">
       <div className="red-mini-card-top">
@@ -73,6 +80,30 @@ function PieBreakdown({ breakdown = [] }) {
   );
 }
 
+function DateRangeControls({ filters = {}, onFiltersChange }) {
+  const range = filters.range || "month";
+
+  function update(next) {
+    onFiltersChange?.({ ...filters, ...next });
+  }
+
+  return (
+    <div className="red-filter-row red-date-filter-row">
+      <select value={range} onChange={(event) => update({ range: event.target.value })} aria-label="Dashboard date range">
+        {RANGE_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+      {range === "custom" && (
+        <>
+          <input type="date" value={filters.from || ""} onChange={(event) => update({ from: event.target.value })} aria-label="Start date" />
+          <input type="date" value={filters.to || ""} onChange={(event) => update({ to: event.target.value })} aria-label="End date" />
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function AdminOverviewDashboard({
   variant = "admin",
   overview = {},
@@ -82,10 +113,14 @@ export default function AdminOverviewDashboard({
   miniCards = [],
   chart = {},
   rows = [],
+  filters = { range: "month" },
+  onFiltersChange,
+  loading = false,
+  error = "",
 }) {
   const isSuper = variant === "superadmin";
   const title = overview.title || (isSuper ? "Platform Overview" : "Marketplace Overview");
-  const primaryValue = overview.primaryValue ?? 0;
+  const primaryValue = loading ? "..." : overview.primaryValue ?? 0;
   const primaryLabel = overview.primaryLabel || (isSuper ? "Platform Users" : "Active Listings");
   const primaryStats = overview.stats || [];
   const chartValues = chart.values?.length ? chart.values : MONTHS.map(() => 0);
@@ -93,6 +128,7 @@ export default function AdminOverviewDashboard({
 
   return (
     <main className="dashboard-content red-dashboard-page">
+      {error && <div className="red-dashboard-alert">{error}</div>}
       <section className="red-dashboard-grid">
         <article className="red-overview-card red-card-primary">
           <button className="red-card-menu" type="button" aria-label="More options">
@@ -110,7 +146,7 @@ export default function AdminOverviewDashboard({
           </div>
           <div className="red-overview-stats">
             {primaryStats.map((item) => (
-              <span key={item.label}>{item.value} {item.label}</span>
+              <span key={item.label}>{loading ? "..." : item.value} {item.label}</span>
             ))}
           </div>
           <label className="red-campaign-search">
@@ -126,7 +162,7 @@ export default function AdminOverviewDashboard({
           <h2>{isSuper ? "Platform Statistics" : "Marketplace Statistics"}</h2>
           <div className="red-market-stat-grid">
             {statCards.map((stat) => (
-              <StatPill key={stat.label} {...stat} />
+              <StatPill key={stat.label} {...stat} value={loading ? "..." : stat.value} />
             ))}
           </div>
         </article>
@@ -138,14 +174,14 @@ export default function AdminOverviewDashboard({
           <h2>{isSuper ? "System Health" : "Operational Health"}</h2>
           <div className="red-ring-row">
             {ringMetrics.slice(0, 3).map((metric) => (
-              <RingMetric key={metric.label} {...metric} />
+              <RingMetric key={metric.label} {...metric} value={loading ? 0 : metric.value} />
             ))}
           </div>
         </article>
 
         <div className="red-mini-card-stack">
           {miniCards.slice(0, 3).map((card) => (
-            <MiniCard key={card.name} {...card} />
+            <MiniCard key={card.name} {...card} value={loading ? "..." : card.value} />
           ))}
         </div>
 
@@ -161,7 +197,7 @@ export default function AdminOverviewDashboard({
             </div>
             <div className="red-filter-row">
               <button type="button">{chart.primaryFilter || "Marketplace"} <i className="bi bi-chevron-down" /></button>
-              <button type="button">Monthly <i className="bi bi-chevron-down" /></button>
+              <DateRangeControls filters={filters} onFiltersChange={onFiltersChange} />
             </div>
           </div>
           <div className="red-bar-chart">
@@ -213,7 +249,7 @@ export default function AdminOverviewDashboard({
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="6" className="text-center py-4">No recent records yet.</td>
+                    <td colSpan="6" className="text-center py-4">{loading ? "Loading live dashboard records..." : "No recent records yet."}</td>
                   </tr>
                 )}
               </tbody>

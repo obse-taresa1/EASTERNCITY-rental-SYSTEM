@@ -95,6 +95,13 @@ const loginUser = async (email, password) => {
     throw error;
   }
 
+  const blockedStatuses = new Set(['SUSPENDED', 'DEACTIVATED', 'INACTIVE', 'DELETED', 'BANNED']);
+  if (blockedStatuses.has(String(user.status || 'ACTIVE').toUpperCase())) {
+    const error = new Error('Your account is not active. Please contact support.');
+    error.statusCode = 403;
+    throw error;
+  }
+
   const isMatch = await comparePassword(password, user.password);
   if (!isMatch) {
     const error = new Error('Invalid email or password.');
