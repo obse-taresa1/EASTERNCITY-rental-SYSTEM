@@ -9,6 +9,12 @@ const CURRENT_USER_KEY = "currentUser";
 
 export const USE_MOCK_AUTH = String(import.meta.env?.VITE_USE_MOCK_AUTH ?? "false") === "true";
 
+export function persistAuthSession({ user, accessToken, refreshToken } = {}) {
+  if (accessToken) {
+    writeStorage(TOKEN_KEY, accessToken);
+    writeStorage(ACCESS_TOKEN_KEY, accessToken);
+  }
+
   if (refreshToken) {
     writeStorage(REFRESH_TOKEN_KEY, refreshToken);
   }
