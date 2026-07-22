@@ -151,10 +151,8 @@ export default function AdminDashboardPage() {
   return (
     <AdminOverviewDashboard
       variant="admin"
-      loading={loading}
-      error={error}
-      filters={filters}
-      onFiltersChange={setFilters}
+      loading={isLoading}
+      error={null}
       overview={{
         title: "Marketplace Overview",
         primaryValue: counts.activeListings || 0,

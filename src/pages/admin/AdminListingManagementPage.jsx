@@ -11,15 +11,70 @@ export default function AdminListingManagementPage() {
   const [notice, setNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshListings = async () => setListings(await adminApi.listings({ search, status: filter === "all" ? "" : filter }));
-  useEffect(() => { refreshListings().catch(console.error); }, [search, filter]);
+  const refreshListings = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.listings({ search, status: filter === "all" ? "" : filter });
+      setListings(data);
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load listings.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const handleStatusChange = async (id, newStatus, reason = "") => { await adminApi.updateListing(id, { status: newStatus, rejectionReason: reason }); await refreshListings(); };
-  const handleRemove = async (id) => { if (confirm("Are you sure you want to remove this listing?")) { await adminApi.deleteListing(id); await refreshListings(); } };
-  const handleSaveEdit = async (e) => { e.preventDefault(); await adminApi.updateListing(editingItem.id, { title: editingItem.title, city: editingItem.city, location: editingItem.location, pricePerDay: editingItem.pricePerDay }); setEditingItem(null); await refreshListings(); };
+  useEffect(() => {
+    refreshListings();
+  }, [search, filter]);
 
+  const handleStatusChange = async (id, newStatus, reason = "") => {
+    setIsLoading(true);
+    try {
+      await adminApi.updateListing(id, { status: newStatus, rejectionReason: reason });
+      setNotice(`Listing status updated to ${newStatus}.`);
+      await refreshListings();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to update listing status.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemove = async (id) => {
+    if (confirm("Are you sure you want to remove this listing?")) {
+      setIsLoading(true);
+      try {
+        await adminApi.deleteListing(id);
+        setNotice("Listing removed successfully.");
+        await refreshListings();
+      } catch (error) {
+        setNotice(error.response?.data?.message || "Failed to remove listing.");
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await adminApi.updateListing(editingItem.id, {
+        title: editingItem.title,
+        city: editingItem.city,
+        location: editingItem.location,
+        pricePerDay: editingItem.pricePerDay,
+      });
+      setEditingItem(null);
+      setNotice("Listing details updated successfully.");
+      await refreshListings();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to update listing details.");
+      setIsLoading(false);
+    }
+  };
   return (
     <main className="dashboard-content"><div className="d-flex justify-content-between align-items-center mb-4"><div><span className="section-label">ADMIN</span><h1 className="h3 mb-0">Listings Management</h1><p className="text-muted mb-0">Approve new listings, reject invalid entries, or edit listing info.</p></div></div>
+      {notice && <div className="alert alert-warning">{notice}</div>}
       <div className="admin-table-container"><div className="d-flex flex-wrap justify-content-between gap-3 mb-4"><div className="d-flex gap-2">{["all", "under_review", "published", "rejected"].map(opt => <button key={opt} type="button" className={`btn btn-sm ${filter === opt ? "btn-accent-custom" : "btn-outline-secondary"}`} onClick={() => setFilter(opt)}>{opt.replace("_", " ").toUpperCase()}</button>)}</div><div className="search-box" style={{ maxWidth: "300px", width: "100%" }}><input type="text" placeholder="Search listings..." className="form-control" value={search} onChange={e => setSearch(e.target.value)} /></div></div>
         <div className="table-responsive"><table className="table table-hover align-middle"><thead><tr><th>Item Name</th><th>Category</th><th>City</th><th>Owner</th><th>Submitted</th><th>Screenshot</th><th>Status</th><th>Actions</th></tr></thead><tbody>{listings.map(item => { const status = String(item.status || "PENDING").toLowerCase(); return <tr key={item.id}><td className="fw-bold">{item.title}</td><td>{item.category?.name || "-"}</td><td>{item.city}</td><td>{item.owner?.name || item.owner?.email || "-"}</td><td>{formatDate(item.createdAt)}</td><td>{item.paymentProofUrl ? <button className="btn btn-sm btn-outline-secondary" onClick={() => setViewScreenshot(item.paymentProofUrl)}>View</button> : <span className="text-muted small">None</span>}</td><td><StatusBadge status={item.status} /></td><td><div className="d-flex gap-2">{["pending", "under_review", "pending approval", "rejected"].includes(status) && <><button type="button" className="btn btn-sm btn-success" onClick={() => handleStatusChange(item.id, "APPROVED")}>Approve</button><button type="button" className="btn btn-sm btn-outline-warning" onClick={() => { const reason = prompt("Enter rejection reason:"); if (reason) handleStatusChange(item.id, "REJECTED", reason); }}>Reject</button></>}<button type="button" className="btn btn-sm btn-outline-info" onClick={() => setEditingItem(item)}>Edit</button><button type="button" className="btn btn-sm btn-outline-danger" onClick={() => handleRemove(item.id)}>Remove</button></div></td></tr>; })}{listings.length === 0 && <tr><td colSpan="8" className="text-center text-muted py-4">No listings found matching criteria.</td></tr>}</tbody></table></div>
       </div>

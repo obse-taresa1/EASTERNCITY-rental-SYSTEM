@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { fetchSuperAdminDashboard } from "../../services/dashboardApiService.js";
+import { adminApi } from "../../services/adminManagementService.js";
 
 export default function AnalyticsPage() {
   const [filter, setFilter] = useState("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [data, setData] = useState(null);
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -16,9 +18,18 @@ export default function AnalyticsPage() {
       params.endDate = endDate;
     }
 
-    fetchSuperAdminDashboard(params).then((nextData) => {
-      if (active) setData(nextData);
-    });
+    setIsLoading(true);
+    setNotice("");
+    adminApi.analytics(params)
+      .then((nextData) => {
+        if (active) setData(nextData || {});
+      })
+      .catch((error) => {
+        if (active) setNotice(error.response?.data?.message || "Failed to load analytics data.");
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
 
     return () => {
       active = false;
@@ -41,6 +52,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
       </div>
+      {notice && <div className="alert alert-warning">{notice}</div>}
 
       <div className="admin-table-container mb-4">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">

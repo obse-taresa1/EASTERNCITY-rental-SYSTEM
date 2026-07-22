@@ -39,7 +39,6 @@ model User {
   reports                       Report[]
   activityLogs                  ActivityLog[]
   supportTickets                SupportTicket[]
-  contactMessages               ContactMessage[]
   updatedSettings               SystemSetting[]      @relation("SystemSettingUpdater")
   verificationRequests          VerificationRequest[] @relation("VerificationRequester")
   reviewedVerificationRequests  VerificationRequest[] @relation("VerificationReviewer")

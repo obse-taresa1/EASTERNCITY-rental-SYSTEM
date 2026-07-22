@@ -1,19 +1,42 @@
 import { useEffect, useState } from "react";
-import { getAllReviews } from "../../services/reviewApiService.js";
+import { adminApi } from "../../services/adminManagementService.js";
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchReviews = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.reviews();
+      setReviews(data || []);
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load reviews.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let active = true;
-    getAllReviews().then((data) => {
-      if (active) setReviews(data || []);
-    });
-    return () => {
-      active = false;
-    };
+    fetchReviews();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this review?")) {
+      setIsLoading(true);
+      try {
+        await adminApi.deleteReview(id);
+        setNotice("Review deleted successfully.");
+        await fetchReviews();
+      } catch (error) {
+        setNotice(error.response?.data?.message || "Failed to delete review.");
+        setIsLoading(false);
+      }
+    }
+  };
 
   const filtered = reviews.filter((review) => {
     if (filter === "all") return true;
@@ -33,6 +56,8 @@ export default function AdminReviewsPage() {
           </p>
         </div>
       </div>
+
+      {notice && <div className="alert alert-warning">{notice}</div>}
 
       <div className="admin-table-container">
         <div className="d-flex gap-2 mb-4">
@@ -57,6 +82,7 @@ export default function AdminReviewsPage() {
                 <th>Rating</th>
                 <th>Comment</th>
                 <th>Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -85,6 +111,15 @@ export default function AdminReviewsPage() {
                     {review.createdAt
                       ? new Date(review.createdAt).toLocaleDateString()
                       : "-"}
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleDelete(review.id)}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

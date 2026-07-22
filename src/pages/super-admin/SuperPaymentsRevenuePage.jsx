@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchPromotionRequests } from "../../services/promotionApiService.js";
+import { adminApi } from "../../services/adminManagementService.js";
 
 function packageMatches(promotion, filter) {
   if (filter === "all") return true;
@@ -20,11 +20,14 @@ export default function SuperPaymentsRevenuePage() {
   const [txs, setTxs] = useState([]);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    let active = true;
-    fetchPromotionRequests().then((promotions) => {
-      if (!active) return;
+  const fetchPromotions = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const promotions = await adminApi.promotions();
       setTxs(
         promotions
           .filter(
@@ -33,21 +36,27 @@ export default function SuperPaymentsRevenuePage() {
           )
           .map((promotion) => ({
             id: promotion.id,
-            itemTitle: promotion.listingTitle,
-            owner: promotion.ownerName || promotion.userName,
+            itemTitle: promotion.listingTitle || promotion.listing?.title,
+            owner: promotion.ownerName || promotion.userName || promotion.user?.name,
             package:
               promotion.promotionType ||
               promotion.promotionPlacement ||
+              promotion.packageType ||
               "Promotion",
             amount: Number(promotion.amount || 0),
-            date: promotion.requestDate,
+            date: promotion.requestDate || promotion.createdAt,
             status: promotion.status,
           })),
       );
-    });
-    return () => {
-      active = false;
-    };
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load revenue data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPromotions();
   }, []);
 
   const totalRevenue = txs.reduce((sum, t) => sum + t.amount, 0);
@@ -116,6 +125,7 @@ export default function SuperPaymentsRevenuePage() {
           <i className="bi bi-file-earmark-arrow-down me-1" /> Export Reports
         </button>
       </div>
+      {notice && <div className="alert alert-warning">{notice}</div>}
 
       <div className="row mb-4">
         {[

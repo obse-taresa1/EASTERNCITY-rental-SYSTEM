@@ -154,8 +154,6 @@ async function submitVerification(userId, payload, files = {}) {
       where: { id: userId },
       data: {
         city,
-        sefer,
-        address,
         nationalIdFrontUrl,
         nationalIdBackUrl,
         verificationStatus: USER_VERIFICATION_STATUSES.PENDING,
@@ -211,8 +209,6 @@ async function reviewVerification(identifier, payload, reviewedById) {
       where: { id: request.userId },
       data: {
         city: request.city,
-        sefer: request.sefer,
-        address: request.address,
         nationalIdFrontUrl: request.nationalIdFrontUrl,
         nationalIdBackUrl: request.nationalIdBackUrl,
         verificationStatus: userStatus,

@@ -76,15 +76,5 @@ export const apiClient = {
   delete(path, options) {
     return apiRequest("DELETE", path, undefined, options);
   },
-  put(path, body, options) {
-    return apiRequest(path, {
-      ...options,
-      method: "PUT",
-      body: JSON.stringify(body || {}),
-    });
-  },
-  delete(path, options) {
-    return apiRequest(path, { ...options, method: "DELETE" });
-  },
 };
 

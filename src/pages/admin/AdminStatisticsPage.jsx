@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
 import AdminStatGrid from "../../components/admin/AdminStatGrid.jsx";
-import { fetchAdminDashboard } from "../../services/dashboardApiService.js";
+import { adminApi } from "../../services/adminManagementService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
 export default function AdminStatisticsPage() {
   const [dashboard, setDashboard] = useState(null);
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
-    fetchAdminDashboard({ range: "year" }).then((data) => {
-      if (active) setDashboard(data);
-    });
+    setIsLoading(true);
+    adminApi.analytics({ range: "year" })
+      .then((data) => {
+        if (active) setDashboard(data || {});
+      })
+      .catch((error) => {
+        if (active) setNotice(error.response?.data?.message || "Failed to load statistics.");
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
     return () => {
       active = false;
     };
@@ -23,6 +33,7 @@ export default function AdminStatisticsPage() {
     <main className="dashboard-content">
       <span className="section-label">ADMIN</span>
       <h1>Statistics</h1>
+      {notice && <div className="alert alert-warning">{notice}</div>}
 
       <AdminStatGrid
         stats={[

@@ -8781,6 +8781,13 @@ html[data-theme="dark"] .dashboard-sidebar {
   font-size: 1.75rem;
   filter: drop-shadow(0 2px 8px rgba(227, 30, 36, 0.4));
 }
+.admin-brand-logo-img {
+  max-height: 72px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
 
 .admin-nav {
   padding: 0 1rem;

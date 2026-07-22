@@ -7,11 +7,59 @@ export default function ContactMessagesPage() {
   const [selectedId, setSelectedId] = useState("");
   const [reply, setReply] = useState("");
   const [notice, setNotice] = useState("");
-  async function load() { const rows = await adminApi.contactMessages(); setMessages(rows); if (!selectedId && rows[0]) setSelectedId(rows[0].id); }
-  useEffect(() => { load().catch(console.error); }, []);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const rows = await adminApi.contactMessages();
+      setMessages(rows);
+      if (!selectedId && rows[0]) setSelectedId(rows[0].id);
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load contact messages.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
   const selectedMessage = useMemo(() => messages.find((message) => message.id === selectedId) || messages[0] || null, [messages, selectedId]);
-  function handleSelect(message) { setSelectedId(message.id); setReply(message.adminReply || ""); setNotice(""); }
-  async function handleReply(event) { event.preventDefault(); if (!selectedMessage || !reply.trim()) return; await adminApi.updateContactMessage(selectedMessage.id, { adminReply: reply.trim(), status: "REPLIED" }); setNotice("Reply saved to the database."); await load(); }
-  async function handleResolve() { if (!selectedMessage) return; await adminApi.updateContactMessage(selectedMessage.id, { status: "RESOLVED" }); setNotice("Contact message marked as resolved."); await load(); }
+  
+  function handleSelect(message) {
+    setSelectedId(message.id);
+    setReply(message.adminReply || "");
+    setNotice("");
+  }
+
+  async function handleReply(event) {
+    event.preventDefault();
+    if (!selectedMessage || !reply.trim()) return;
+    setIsLoading(true);
+    try {
+      await adminApi.updateContactMessage(selectedMessage.id, { adminReply: reply.trim(), status: "REPLIED" });
+      setNotice("Reply saved to the database.");
+      await load();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to save reply.");
+      setIsLoading(false);
+    }
+  }
+
+  async function handleResolve() {
+    if (!selectedMessage) return;
+    setIsLoading(true);
+    try {
+      await adminApi.updateContactMessage(selectedMessage.id, { status: "RESOLVED" });
+      setNotice("Contact message marked as resolved.");
+      await load();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to mark as resolved.");
+      setIsLoading(false);
+    }
+  }
   return <main className="dashboard-content contact-messages-page"><div className="d-flex justify-content-between align-items-end mb-4"><div><span className="section-label">ADMIN</span><h1 className="h3 mb-0">Contact Messages</h1></div></div>{notice && <div className="alert alert-info">{notice}</div>}<div className="row g-4"><div className="col-lg-7"><section className="admin-table-container"><div className="table-responsive"><table className="table align-middle dashboard-table"><thead><tr><th>Name</th><th>Subject</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody>{messages.map((message) => <tr key={message.id}><td><strong>{message.name}</strong><div className="small text-muted">{message.email}</div></td><td>{message.subject}</td><td><span className="badge bg-danger-subtle text-danger">{message.status}</span></td><td>{formatDate(message.createdAt)}</td><td><button className="btn btn-sm btn-outline-danger" onClick={() => handleSelect(message)} type="button">Read</button></td></tr>)}{!messages.length && <tr><td colSpan="5" className="text-center text-muted py-4">No contact messages submitted yet.</td></tr>}</tbody></table></div></section></div><div className="col-lg-5"><section className="admin-table-container contact-message-detail">{selectedMessage ? <><div className="d-flex justify-content-between gap-3 mb-3"><div><h2 className="h5 mb-1">{selectedMessage.subject}</h2><p className="small text-muted mb-0">{selectedMessage.name} | {selectedMessage.email}</p></div><span className="badge bg-danger-subtle text-danger align-self-start">{selectedMessage.status}</span></div><p className="contact-message-body">{selectedMessage.message}</p><p className="small text-muted">Submitted: {formatDate(selectedMessage.createdAt)}</p>{selectedMessage.adminReply && <div className="alert alert-secondary"><strong>Previous reply:</strong><p className="mb-0 mt-2">{selectedMessage.adminReply}</p><small>{formatDate(selectedMessage.repliedAt)}</small></div>}<form onSubmit={handleReply}><label className="form-label" htmlFor="admin-contact-reply">Admin Reply</label><textarea id="admin-contact-reply" className="form-control mb-3" rows="5" value={reply} onChange={(event) => setReply(event.target.value)} required /><div className="d-flex flex-wrap gap-2"><button className="btn btn-primary-custom" type="submit">Send Reply</button><button className="btn btn-outline-secondary" type="button" onClick={handleResolve}>Mark Resolved</button></div></form></> : <p className="text-muted mb-0">Select a contact message to read details.</p>}</section></div></div></main>;
 }
