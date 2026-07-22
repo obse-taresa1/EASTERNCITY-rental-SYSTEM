@@ -184,10 +184,7 @@ export default function SuperAdminDashboardPage() {
   return (
     <AdminOverviewDashboard
       variant="superadmin"
-      loading={loading}
-      error={error}
-      filters={filters}
-      onFiltersChange={setFilters}
+      error={null}
       overview={{
         title: "Platform Overview",
         primaryValue: counts.totalUsers || 0,

@@ -7,12 +7,73 @@ export default function AdminCategoriesPage() {
   const [newCatName, setNewCatName] = useState("");
   const [newCatSlug, setNewCatSlug] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  async function loadCategories() { setCategories(await adminApi.categories()); }
-  useEffect(() => { loadCategories().catch(console.error); }, []);
-  const handleAdd = async (e) => { e.preventDefault(); if (!newCatName || !newCatSlug) return; await adminApi.createCategory({ name: newCatName, slug: newCatSlug }); setNewCatName(""); setNewCatSlug(""); setIsAdding(false); await loadCategories(); };
-  const handleSaveEdit = async (e) => { e.preventDefault(); await adminApi.updateCategory(editingCategory.id, editingCategory); setEditingCategory(null); await loadCategories(); };
-  const handleDelete = async (id) => { if (confirm("Are you sure you want to delete this category? All listings in this category might be affected.")) { await adminApi.deleteCategory(id); await loadCategories(); } };
-  return <main className="dashboard-content"><div className="d-flex justify-content-between align-items-center mb-4"><div><span className="section-label">ADMIN</span><h1 className="h3 mb-0">Categories Management</h1><p className="text-muted mb-0">Create new item categories or modify existing listings groups.</p></div><button type="button" className="btn btn-accent-custom" onClick={() => setIsAdding(true)}><i className="bi bi-plus-circle me-1" /> Add Category</button></div><div className="row mb-4"><div className="col-12"><div className="admin-table-container"><h2 className="h5 mb-3">Category Statistics</h2><div className="table-responsive"><table className="table table-hover align-middle"><thead><tr><th>Category Name</th><th>URL Slug</th><th>Total Listings</th><th>Active Rentals</th><th>Actions</th></tr></thead><tbody>{categories.map(c => <tr key={c.id}><td className="fw-bold">{c.name}</td><td><code>{c.slug}</code></td><td>{c._count?.listings || 0} Listings</td><td>{(c.listings || []).reduce((sum, listing) => sum + (listing.bookings || []).filter((booking) => ["ACCEPTED", "ACTIVE"].includes(String(booking.status).toUpperCase())).length, 0)} Rentals</td><td><div className="d-flex gap-2"><button type="button" className="btn btn-sm btn-outline-info" onClick={() => setEditingCategory(c)}>Edit</button><button type="button" className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(c.id)}>Delete</button></div></td></tr>)}</tbody></table></div></div></div></div>{isAdding && <CategoryModal title="Add New Category" name={newCatName} slug={newCatSlug} setName={setNewCatName} setSlug={setNewCatSlug} onClose={() => setIsAdding(false)} onSubmit={handleAdd} submit="Add Category" />}{editingCategory && <CategoryModal title="Edit Category" name={editingCategory.name} slug={editingCategory.slug} setName={(name) => setEditingCategory({ ...editingCategory, name })} setSlug={(slug) => setEditingCategory({ ...editingCategory, slug })} onClose={() => setEditingCategory(null)} onSubmit={handleSaveEdit} submit="Save Changes" />}</main>;
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchCategories = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.categories();
+      setCategories(data);
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load categories.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!newCatName || !newCatSlug) return;
+    setIsLoading(true);
+    try {
+      await adminApi.createCategory({ name: newCatName, slug: newCatSlug });
+      setNewCatName("");
+      setNewCatSlug("");
+      setIsAdding(false);
+      setNotice("Category created successfully.");
+      await fetchCategories();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to create category.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await adminApi.updateCategory(editingCategory.id, editingCategory);
+      setEditingCategory(null);
+      setNotice("Category updated successfully.");
+      await fetchCategories();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to update category.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this category? All listings in this category might be affected.")) {
+      setIsLoading(true);
+      try {
+        await adminApi.deleteCategory(id);
+        setNotice("Category deleted successfully.");
+        await fetchCategories();
+      } catch (error) {
+        setNotice(error.response?.data?.message || "Failed to delete category.");
+        setIsLoading(false);
+      }
+    }
+  };
+  return <main className="dashboard-content"><div className="d-flex justify-content-between align-items-center mb-4"><div><span className="section-label">ADMIN</span><h1 className="h3 mb-0">Categories Management</h1><p className="text-muted mb-0">Create new item categories or modify existing listings groups.</p></div><button type="button" className="btn btn-accent-custom" onClick={() => setIsAdding(true)}><i className="bi bi-plus-circle me-1" /> Add Category</button></div>
+    {notice && <div className="alert alert-warning">{notice}</div>}
+  <div className="row mb-4"><div className="col-12"><div className="admin-table-container"><h2 className="h5 mb-3">Category Statistics</h2><div className="table-responsive"><table className="table table-hover align-middle"><thead><tr><th>Category Name</th><th>URL Slug</th><th>Total Listings</th><th>Active Rentals</th><th>Actions</th></tr></thead><tbody>{categories.map(c => <tr key={c.id}><td className="fw-bold">{c.name}</td><td><code>{c.slug}</code></td><td>{c._count?.listings || 0} Listings</td><td>{(c.listings || []).reduce((sum, listing) => sum + (listing.bookings || []).filter((booking) => ["ACCEPTED", "ACTIVE"].includes(String(booking.status).toUpperCase())).length, 0)} Rentals</td><td><div className="d-flex gap-2"><button type="button" className="btn btn-sm btn-outline-info" onClick={() => setEditingCategory(c)}>Edit</button><button type="button" className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(c.id)}>Delete</button></div></td></tr>)}</tbody></table></div></div></div></div>{isAdding && <CategoryModal title="Add New Category" name={newCatName} slug={newCatSlug} setName={setNewCatName} setSlug={setNewCatSlug} onClose={() => setIsAdding(false)} onSubmit={handleAdd} submit="Add Category" />}{editingCategory && <CategoryModal title="Edit Category" name={editingCategory.name} slug={editingCategory.slug} setName={(name) => setEditingCategory({ ...editingCategory, name })} setSlug={(slug) => setEditingCategory({ ...editingCategory, slug })} onClose={() => setEditingCategory(null)} onSubmit={handleSaveEdit} submit="Save Changes" />}</main>;
 }
 function CategoryModal({ title, name, slug, setName, setSlug, onClose, onSubmit, submit }) { return <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}><div className="modal-dialog modal-dialog-centered"><div className="modal-content" style={{ background: "var(--card-bg)" }}><form onSubmit={onSubmit}><div className="modal-header border-0"><h5 className="modal-title">{title}</h5><button type="button" className="btn-close" onClick={onClose} /></div><div className="modal-body"><div className="mb-3"><label className="form-label">Category Name</label><input type="text" className="form-control" value={name} onChange={e => { setName(e.target.value); setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-")); }} required /></div><div className="mb-3"><label className="form-label">URL Slug</label><input type="text" className="form-control" value={slug} onChange={e => setSlug(e.target.value)} required /></div></div><div className="modal-footer border-0"><button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button><button type="submit" className="btn btn-accent-custom">{submit}</button></div></form></div></div></div>; }
 

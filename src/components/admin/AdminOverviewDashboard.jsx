@@ -108,6 +108,8 @@ function DateRangeControls({ filters = {}, onFiltersChange }) {
 
 export default function AdminOverviewDashboard({
   variant = "admin",
+  loading = false,
+  error = null,
   overview = {},
   statCards = [],
   breakdown = [],

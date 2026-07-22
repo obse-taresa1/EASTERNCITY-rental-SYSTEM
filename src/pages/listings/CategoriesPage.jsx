@@ -1,54 +1,13 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+
 import { useLanguage } from '../../context/LanguageContext.jsx';
 import { categories } from '../../data/items.js';
 import SectionHeader from '../../components/common/SectionHeader.jsx';
-import { fetchCategories } from '../../services/categoryApiService.js';
 
-function mergeCategories(apiCategories = []) {
-  const merged = new Map();
-
-  categories.forEach((category) => {
-    merged.set(category.id, category);
-  });
-
-  apiCategories.forEach((category) => {
-    const key = category.slug || category.id;
-    if (!key) return;
-    const existing = merged.get(key) || {};
-    merged.set(key, {
-      ...existing,
-      ...category,
-      id: key,
-      icon: existing.icon || 'bi-grid',
-      description: category.description || existing.description || '',
-    });
-  });
-
-  return [...merged.values()];
-}
 
 export default function CategoriesPage() {
   const { t } = useLanguage();
-  const [categoryOptions, setCategoryOptions] = useState(categories);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadCategories() {
-      try {
-        const data = await fetchCategories();
-        if (active) setCategoryOptions(mergeCategories(data));
-      } catch {
-        if (active) setCategoryOptions(categories);
-      }
-    }
-
-    loadCategories();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const categoryOptions = categories;
 
   return (
     <main className="container py-5">

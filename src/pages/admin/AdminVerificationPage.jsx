@@ -4,9 +4,39 @@ import { adminApi } from "../../services/adminManagementService.js";
 export default function AdminVerificationPage() {
   const [requests, setRequests] = useState([]);
   const [selectedID, setSelectedID] = useState(null);
-  async function load() { setRequests(await adminApi.users()); }
-  useEffect(() => { load().catch(console.error); }, []);
-  const handleAction = async (id, newStatus) => { await adminApi.updateUser(id, { verificationStatus: newStatus.toUpperCase() }); await load(); };
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchRequests = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.users();
+      setRequests(data);
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load verification requests.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const handleAction = async (id, newStatus) => {
+    setIsLoading(true);
+    try {
+      await adminApi.updateUser(id, { verificationStatus: newStatus.toUpperCase() });
+      setNotice(`Verification request ${newStatus}.`);
+      await fetchRequests();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to update verification status.");
+      setIsLoading(false);
+    }
+  };
   const rows = requests.filter((r) => r.nationalIdNumber || r.nationalIdFrontUrl || r.nationalIdBackUrl || ["PENDING", "APPROVED", "REJECTED"].includes(String(r.verificationStatus).toUpperCase()));
-  return <main className="dashboard-content"><div className="d-flex justify-content-between align-items-center mb-4"><div><span className="section-label">ADMIN</span><h1 className="h3 mb-0">Verification Requests</h1><p className="text-muted mb-0">Verify user identity using submitted government-issued National IDs.</p></div></div><div className="admin-table-container"><div className="table-responsive"><table className="table table-hover align-middle"><thead><tr><th>User Details</th><th>National ID Number</th><th>ID Documents</th><th>Status</th><th>Actions</th></tr></thead><tbody>{rows.map(r => { const status = String(r.verificationStatus || "PENDING").toLowerCase(); return <tr key={r.id}><td><div className="fw-bold">{r.name}</div><small className="text-muted">{r.email} | {r.phone || "-"}</small></td><td><code>{r.nationalIdNumber || "-"}</code></td><td><div className="d-flex gap-2"><button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setSelectedID({ ...r, side: "Front", url: r.nationalIdFrontUrl })}>ID Front</button><button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setSelectedID({ ...r, side: "Back", url: r.nationalIdBackUrl })}>ID Back</button></div></td><td>{status === "pending" && <span className="badge bg-warning-subtle text-warning">Pending</span>}{["approved", "verified"].includes(status) && <span className="badge bg-success-subtle text-success">Approved</span>}{status === "rejected" && <span className="badge bg-danger-subtle text-danger">Rejected</span>}</td><td>{status === "pending" ? <div className="d-flex gap-2"><button type="button" className="btn btn-sm btn-success" onClick={() => handleAction(r.id, "approved")}>Approve</button><button type="button" className="btn btn-sm btn-danger" onClick={() => handleAction(r.id, "rejected")}>Reject</button></div> : <span className="text-muted"><small>Resolved</small></span>}</td></tr>; })}</tbody></table></div></div>{selectedID && <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}><div className="modal-dialog modal-dialog-centered"><div className="modal-content" style={{ background: "var(--card-bg)" }}><div className="modal-header border-0"><h5 className="modal-title">National ID ({selectedID.side}) - {selectedID.name}</h5><button type="button" className="btn-close" onClick={() => setSelectedID(null)} /></div><div className="modal-body text-center"><div className="p-5 border rounded mb-3" style={{ backgroundColor: "rgba(227, 30, 36, 0.03)", borderStyle: "dashed", borderColor: "var(--primary-color)", minHeight: "200px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>{selectedID.url ? <img src={selectedID.url} alt={`${selectedID.side} ID`} className="img-fluid rounded" /> : <><i className="bi bi-card-image text-danger" style={{ fontSize: "4rem" }} /><p className="fw-bold mt-2">No {selectedID.side} document uploaded</p></>}<small className="text-muted">ID Number: {selectedID.nationalIdNumber || "-"}</small></div></div><div className="modal-footer border-0"><button type="button" className="btn btn-secondary" onClick={() => setSelectedID(null)}>Close</button></div></div></div></div>}</main>;
+  return <main className="dashboard-content"><div className="d-flex justify-content-between align-items-center mb-4"><div><span className="section-label">ADMIN</span><h1 className="h3 mb-0">Verification Requests</h1><p className="text-muted mb-0">Verify user identity using submitted government-issued National IDs.</p></div></div>
+  {notice && <div className="alert alert-warning">{notice}</div>}
+  <div className="admin-table-container"><div className="table-responsive"><table className="table table-hover align-middle"><thead><tr><th>User Details</th><th>National ID Number</th><th>ID Documents</th><th>Status</th><th>Actions</th></tr></thead><tbody>{rows.map(r => { const status = String(r.verificationStatus || "PENDING").toLowerCase(); return <tr key={r.id}><td><div className="fw-bold">{r.name}</div><small className="text-muted">{r.email} | {r.phone || "-"}</small></td><td><code>{r.nationalIdNumber || "-"}</code></td><td><div className="d-flex gap-2"><button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setSelectedID({ ...r, side: "Front", url: r.nationalIdFrontUrl })}>ID Front</button><button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setSelectedID({ ...r, side: "Back", url: r.nationalIdBackUrl })}>ID Back</button></div></td><td>{status === "pending" && <span className="badge bg-warning-subtle text-warning">Pending</span>}{["approved", "verified"].includes(status) && <span className="badge bg-success-subtle text-success">Approved</span>}{status === "rejected" && <span className="badge bg-danger-subtle text-danger">Rejected</span>}</td><td>{status === "pending" ? <div className="d-flex gap-2"><button type="button" className="btn btn-sm btn-success" onClick={() => handleAction(r.id, "approved")}>Approve</button><button type="button" className="btn btn-sm btn-danger" onClick={() => handleAction(r.id, "rejected")}>Reject</button></div> : <span className="text-muted"><small>Resolved</small></span>}</td></tr>; })}</tbody></table></div></div>{selectedID && <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}><div className="modal-dialog modal-dialog-centered"><div className="modal-content" style={{ background: "var(--card-bg)" }}><div className="modal-header border-0"><h5 className="modal-title">National ID ({selectedID.side}) - {selectedID.name}</h5><button type="button" className="btn-close" onClick={() => setSelectedID(null)} /></div><div className="modal-body text-center"><div className="p-5 border rounded mb-3" style={{ backgroundColor: "rgba(227, 30, 36, 0.03)", borderStyle: "dashed", borderColor: "var(--primary-color)", minHeight: "200px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>{selectedID.url ? <img src={selectedID.url} alt={`${selectedID.side} ID`} className="img-fluid rounded" /> : <><i className="bi bi-card-image text-danger" style={{ fontSize: "4rem" }} /><p className="fw-bold mt-2">No {selectedID.side} document uploaded</p></>}<small className="text-muted">ID Number: {selectedID.nationalIdNumber || "-"}</small></div></div><div className="modal-footer border-0"><button type="button" className="btn btn-secondary" onClick={() => setSelectedID(null)}>Close</button></div></div></div></div>}</main>;
 }

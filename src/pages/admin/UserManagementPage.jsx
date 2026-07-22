@@ -9,43 +9,46 @@ export default function UserManagementPage() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
 
-  useEffect(() => {
-    let active = true;
-
-    async function loadUsers() {
-      setLoading(true);
-      setNotice("");
-      try {
-        const users = await getUsers();
-        if (active) setUsersList(users);
-      } catch (error) {
-        if (active) setNotice(error.message || "Unable to load users.");
-      } finally {
-        if (active) setLoading(false);
-      }
+  const fetchUsers = async () => {
+    setLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.users({ search, status: filter });
+      setUsersList(data);
+    } catch (error) {
+      setNotice(error.response?.data?.message || error.message || "Unable to load users.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    loadUsers();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  async function loadUsers() {
-    setUsersList(await adminApi.users({ search, status: filter }));
-  }
-
-  useEffect(() => { loadUsers().catch(console.error); }, [search, filter]);
+  useEffect(() => {
+    fetchUsers();
+  }, [search, filter]);
 
   const handleStatusChange = async (id, newStatus) => {
-    await adminApi.updateUser(id, { status: newStatus.toUpperCase() });
-    await loadUsers();
+    setLoading(true);
+    try {
+      await adminApi.updateUser(id, { status: newStatus.toUpperCase() });
+      setNotice("User status updated successfully.");
+      await fetchUsers();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to update user.");
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this user?")) {
-      await adminApi.deleteUser(id);
-      await loadUsers();
+      setLoading(true);
+      try {
+        await adminApi.deleteUser(id);
+        setNotice("User deleted successfully.");
+        await fetchUsers();
+      } catch (error) {
+        setNotice(error.response?.data?.message || "Failed to delete user.");
+        setLoading(false);
+      }
     }
   };
 

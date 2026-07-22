@@ -8,8 +8,6 @@ const userSelect = {
   status: true,
   verificationStatus: true,
   city: true,
-  sefer: true,
-  address: true,
   nationalIdFrontUrl: true,
   nationalIdBackUrl: true,
   createdAt: true,

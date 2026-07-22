@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
-import { fetchSuperAdminDashboard } from "../../services/dashboardApiService.js";
+import { adminApi } from "../../services/adminManagementService.js";
 
 export default function PlatformOverviewPage() {
   const [dashboard, setDashboard] = useState(null);
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
-    fetchSuperAdminDashboard({ range: "month" }).then((data) => {
-      if (active) setDashboard(data);
-    });
+    setIsLoading(true);
+    adminApi.analytics({ range: "month" })
+      .then((data) => {
+        if (active) setDashboard(data || {});
+      })
+      .catch((error) => {
+        if (active) setNotice(error.response?.data?.message || "Failed to load platform overview.");
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
     return () => {
       active = false;
     };
@@ -31,6 +41,7 @@ export default function PlatformOverviewPage() {
           </p>
         </div>
       </div>
+      {notice && <div className="alert alert-warning">{notice}</div>}
 
       <div className="row">
         <div className="col-lg-6 mb-4">

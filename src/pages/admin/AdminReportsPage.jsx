@@ -1,65 +1,56 @@
 import { useEffect, useState } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
-import { fetchContactMessages } from "../../services/contactMessageService.js";
-import { fetchSupportTickets } from "../../services/supportTicketService.js";
-
-function isReportLike(record) {
-  const text = `${record.subject || ""} ${record.message || ""}`.toLowerCase();
-  return (
-    text.includes("report") ||
-    text.includes("complaint") ||
-    text.includes("abuse") ||
-    text.includes("dispute")
-  );
-}
+import { adminApi } from "../../services/adminManagementService.js";
 
 export default function AdminReportsPage() {
   const [reports, setReports] = useState([]);
   const [filter, setFilter] = useState("all");
   const [viewingDetails, setViewingDetails] = useState(null);
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchReports = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.reports({ status: filter === "all" ? "" : filter });
+      // Map the backend reports to the required format if needed
+      const formattedData = (data || []).map(r => ({
+        id: r.id,
+        reporter: r.reporter?.name || r.reporter?.email || r.userName || "-",
+        type: r.reportType || "Platform Report",
+        subject: r.subject || r.reason || "No Subject",
+        details: r.description || r.details || "No details provided",
+        status: String(r.status || "OPEN").toLowerCase(),
+        ...r
+      }));
+      setReports(formattedData);
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load reports.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let active = true;
-    Promise.all([fetchContactMessages(), fetchSupportTickets()]).then(
-      ([messages, tickets]) => {
-        if (!active) return;
-        const contactReports = (messages || [])
-          .filter(isReportLike)
-          .map((message) => ({
-            id: `contact-${message.id}`,
-            reporter: message.name || message.email,
-            type: "Contact Report",
-            subject: message.subject,
-            details: message.message,
-            status: String(message.status || "OPEN").toLowerCase(),
-          }));
-        const ticketReports = (tickets || [])
-          .filter(isReportLike)
-          .map((ticket) => ({
-            id: `ticket-${ticket.id}`,
-            reporter:
-              ticket.name || ticket.email || ticket.userName || ticket.userId,
-            type: "Support Ticket",
-            subject: ticket.subject,
-            details: ticket.message,
-            status: String(ticket.status || "OPEN").toLowerCase(),
-          }));
-        setReports([...contactReports, ...ticketReports]);
-      },
-    );
-    return () => {
-      active = false;
-    };
-  }, []);
+    fetchReports();
+  }, [filter]);
 
-  const filtered = reports.filter((report) => {
-    if (filter === "all") return true;
-    if (filter === "pending")
-      return ["open", "pending"].includes(report.status);
-    if (filter === "resolved")
-      return ["resolved", "closed"].includes(report.status);
-    return report.status === filter;
-  });
+  const handleUpdateStatus = async (id, newStatus) => {
+    setIsLoading(true);
+    try {
+      await adminApi.updateReport(id, { status: newStatus.toUpperCase() });
+      setNotice("Report status updated.");
+      setViewingDetails(null);
+      await fetchReports();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to update report.");
+      setIsLoading(false);
+    }
+  };
+
+  const filtered = reports; // Already filtered via API
+
 
   return (
     <main className="dashboard-content">
@@ -74,9 +65,11 @@ export default function AdminReportsPage() {
         </div>
       </div>
 
+      {notice && <div className="alert alert-warning">{notice}</div>}
+
       <div className="admin-table-container">
         <div className="d-flex gap-2 mb-4">
-          {["all", "pending", "resolved"].map((opt) => (
+          {["all", "open", "resolved"].map((opt) => (
             <button
               key={opt}
               type="button"
@@ -182,6 +175,15 @@ export default function AdminReportsPage() {
                 </div>
               </div>
               <div className="modal-footer border-0">
+                {String(viewingDetails.status).toLowerCase() === "open" && (
+                  <button
+                    type="button"
+                    className="btn btn-success me-auto"
+                    onClick={() => handleUpdateStatus(viewingDetails.id, "resolved")}
+                  >
+                    Mark as Resolved
+                  </button>
+                )}
                 <button
                   type="button"
                   className="btn btn-secondary"

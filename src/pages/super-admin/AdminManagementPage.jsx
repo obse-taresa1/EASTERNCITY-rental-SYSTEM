@@ -15,17 +15,83 @@ export default function AdminManagementPage() {
   const [notice, setNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  async function loadAdmins() { setAdmins(await adminApi.users({ role: "ADMIN" })); }
-  useEffect(() => { loadAdmins().catch(console.error); }, []);
+  const fetchAdmins = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.users({ role: "ADMIN" });
+      setAdmins(data);
+    } catch (error) {
+      setNotice(error.response?.data?.message || error.message || "Unable to load admins.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const handleAdd = async (e) => { e.preventDefault(); if (!newAdmin.name || !newAdmin.email || !newAdmin.password) return; await adminApi.createAdmin(newAdmin); setNewAdmin({ name: "", email: "", role: "ADMIN", password: "" }); setIsAdding(false); await loadAdmins(); };
-  const handleSaveEdit = async (e) => { e.preventDefault(); await adminApi.updateUser(editingAdmin.id, editingAdmin); setEditingAdmin(null); await loadAdmins(); };
-  const handleToggleStatus = async (a) => { await adminApi.updateUser(a.id, { status: String(a.status).toUpperCase() === "ACTIVE" ? "DEACTIVATED" : "ACTIVE" }); await loadAdmins(); };
-  const handleRemove = async (id) => { if (confirm("Are you sure you want to remove this administrator account?")) { await adminApi.deleteUser(id); await loadAdmins(); } };
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!newAdmin.name || !newAdmin.email || !newAdmin.password) return;
+    setIsLoading(true);
+    try {
+      await adminApi.createAdmin(newAdmin);
+      setNewAdmin({ name: "", email: "", role: "ADMIN", password: "" });
+      setIsAdding(false);
+      setNotice("Admin account created successfully.");
+      await fetchAdmins();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to create admin.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await adminApi.updateUser(editingAdmin.id, editingAdmin);
+      setEditingAdmin(null);
+      setNotice("Admin account updated successfully.");
+      await fetchAdmins();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to update admin.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggleStatus = async (a) => {
+    setIsLoading(true);
+    try {
+      await adminApi.updateUser(a.id, { status: String(a.status).toUpperCase() === "ACTIVE" ? "DEACTIVATED" : "ACTIVE" });
+      setNotice("Admin status updated.");
+      await fetchAdmins();
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to toggle status.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemove = async (id) => {
+    if (confirm("Are you sure you want to remove this administrator account?")) {
+      setIsLoading(true);
+      try {
+        await adminApi.deleteUser(id);
+        setNotice("Admin account removed successfully.");
+        await fetchAdmins();
+      } catch (error) {
+        setNotice(error.response?.data?.message || "Failed to delete admin.");
+        setIsLoading(false);
+      }
+    }
+  };
 
   return (
     <main className="dashboard-content">
       <div className="d-flex justify-content-between align-items-center mb-4"><div><span className="section-label">SUPER ADMIN</span><h1 className="h3 mb-0">Admin Management</h1><p className="text-muted mb-0">Create, monitor, or manage permission levels of administrative staff.</p></div><button type="button" className="btn btn-accent-custom" onClick={() => setIsAdding(true)}><i className="bi bi-plus-circle me-1" /> Add Admin</button></div>
+      {notice && <div className="alert alert-warning">{notice}</div>}
       <div className="admin-table-container"><div className="table-responsive"><table className="table table-hover align-middle"><thead><tr><th>Admin Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody>{admins.map(a => { const status = String(a.status || "ACTIVE").toLowerCase(); return <tr key={a.id}><td className="fw-bold">{a.name}</td><td>{a.email}</td><td><span className="badge bg-secondary-subtle text-dark">{a.role.toUpperCase()}</span></td><td><StatusBadge status={status} /></td><td><div className="d-flex gap-2"><button type="button" className={`btn btn-sm ${status === "active" ? "btn-warning text-white" : "btn-success"}`} onClick={() => handleToggleStatus(a)}>{status === "active" ? "Deactivate" : "Activate"}</button><button type="button" className="btn btn-sm btn-outline-info" onClick={() => setEditingAdmin(a)}>Edit</button><button type="button" className="btn btn-sm btn-outline-danger" onClick={() => handleRemove(a.id)}>Remove</button></div></td></tr>; })}</tbody></table></div></div>
       {isAdding && <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}><div className="modal-dialog modal-dialog-centered"><div className="modal-content" style={{ background: "var(--card-bg)" }}><form onSubmit={handleAdd}><div className="modal-header border-0"><h5 className="modal-title">Add Administrative Account</h5><button type="button" className="btn-close" onClick={() => setIsAdding(false)} /></div><div className="modal-body"><div className="mb-3"><label className="form-label">Full Name</label><input type="text" className="form-control" value={newAdmin.name} onChange={e => setNewAdmin({ ...newAdmin, name: e.target.value })} required /></div><div className="mb-3"><label className="form-label">Email Address</label><input type="email" className="form-control" value={newAdmin.email} onChange={e => setNewAdmin({ ...newAdmin, email: e.target.value })} required /></div><div className="mb-3"><label className="form-label">Password</label><input type="password" className="form-control" value={newAdmin.password} onChange={e => setNewAdmin({ ...newAdmin, password: e.target.value })} required /></div><div className="mb-3"><label className="form-label">Role Designation</label><select className="form-select" value={newAdmin.role} onChange={e => setNewAdmin({ ...newAdmin, role: e.target.value })}><option value="ADMIN">Admin</option></select></div></div><div className="modal-footer border-0"><button type="button" className="btn btn-secondary" onClick={() => setIsAdding(false)}>Cancel</button><button type="submit" className="btn btn-accent-custom">Add Account</button></div></form></div></div></div>}
       {editingAdmin && <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}><div className="modal-dialog modal-dialog-centered"><div className="modal-content" style={{ background: "var(--card-bg)" }}><form onSubmit={handleSaveEdit}><div className="modal-header border-0"><h5 className="modal-title">Edit Administrative Account</h5><button type="button" className="btn-close" onClick={() => setEditingAdmin(null)} /></div><div className="modal-body"><div className="mb-3"><label className="form-label">Full Name</label><input type="text" className="form-control" value={editingAdmin.name} onChange={e => setEditingAdmin({ ...editingAdmin, name: e.target.value })} required /></div><div className="mb-3"><label className="form-label">Email Address</label><input type="email" className="form-control" value={editingAdmin.email} onChange={e => setEditingAdmin({ ...editingAdmin, email: e.target.value })} required /></div><div className="mb-3"><label className="form-label">Role Designation</label><select className="form-select" value={editingAdmin.role} onChange={e => setEditingAdmin({ ...editingAdmin, role: e.target.value })}><option value="ADMIN">Admin</option></select></div></div><div className="modal-footer border-0"><button type="button" className="btn btn-secondary" onClick={() => setEditingAdmin(null)}>Cancel</button><button type="submit" className="btn btn-accent-custom">Save Changes</button></div></form></div></div></div>}

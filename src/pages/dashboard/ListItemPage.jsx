@@ -151,12 +151,15 @@ export default function ListItemPage() {
     });
   }
 
+  function showError(msg) {
+    setNotice(msg);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function validateBeforePreview(event) {
     event.preventDefault();
     if (images.length < 3) {
-      setNotice(
-        "Please upload at least 3 high-quality images before previewing.",
-      );
+      showError("Please upload at least 3 high-quality images before previewing.");
       return;
     }
     setNotice("");
@@ -230,9 +233,10 @@ export default function ListItemPage() {
           ? "Listing saved as draft in the database."
           : "Listing submitted. Waiting for admin review after payment verification.",
       );
-      setTimeout(() => navigate("/my-listings"), 500);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => navigate("/my-listings"), 2000);
     } catch (error) {
-      setNotice(error.message || "Unable to submit listing.");
+      showError(error.message || "Unable to submit listing.");
     }
   }
 
@@ -246,7 +250,7 @@ export default function ListItemPage() {
   function handlePaymentSubmit(e) {
     e.preventDefault();
     if (!paymentScreenshot) {
-      setNotice("Please upload a payment screenshot before submitting.");
+      showError("Please upload a payment screenshot before submitting.");
       return;
     }
     finishListing("publish", paymentScreenshot);
@@ -678,10 +682,10 @@ export default function ListItemPage() {
                   </button>
                   <button
                     type="button"
+                    className="remove-image"
                     onClick={() => removeImage(image.id)}
-                    aria-label="Remove image"
                   >
-                    <i className="bi bi-x-lg" />
+                    <i className="bi bi-x" />
                   </button>
                 </div>
               </div>

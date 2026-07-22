@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
-import { fetchCategories } from "../../services/categoryApiService.js";
 import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
@@ -18,7 +17,6 @@ export default function CategoryPage() {
   const [maxPrice, setMaxPrice] = useState(25000);
   const [isPriceFilterActive, setIsPriceFilterActive] = useState(false);
   const [listings, setListings] = useState([]);
-  const [categoryOptions, setCategoryOptions] = useState(categories);
   const [loading, setLoading] = useState(true);
 
   const normalizeFilterValue = (value) => {
@@ -28,7 +26,7 @@ export default function CategoryPage() {
   };
 
   const category =
-    categoryOptions.find(
+    categories.find(
       (item) =>
         normalizeFilterValue(item.id) === normalizeFilterValue(categoryId) ||
         normalizeFilterValue(item.slug) === normalizeFilterValue(categoryId),
@@ -40,22 +38,9 @@ export default function CategoryPage() {
     async function loadData() {
       setLoading(true);
       try {
-        const [listingData, categoryData] = await Promise.all([
-          getPublicListings(),
-          fetchCategories().catch(() => []),
-        ]);
+        const listingData = await getPublicListings();
         if (!active) return;
         setListings(listingData);
-        setCategoryOptions([
-          ...categories,
-          ...categoryData.map((item) => ({
-            ...item,
-            id: getCategoryKey(item),
-            icon:
-              categories.find((category) => category.id === item.slug)?.icon ||
-              "bi-grid",
-          })),
-        ]);
       } finally {
         if (active) setLoading(false);
       }

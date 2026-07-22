@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
-import { getMyBookings } from "../../services/bookingApiService.js";
+import { adminApi } from "../../services/adminManagementService.js";
 
 function formatDate(value) {
   if (!value) return "-";
@@ -25,15 +25,24 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [notice, setNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchBookings = async () => {
+    setIsLoading(true);
+    setNotice("");
+    try {
+      const data = await adminApi.bookings();
+      setBookings(data || []);
+    } catch (error) {
+      setNotice(error.response?.data?.message || "Failed to load bookings.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let active = true;
-    getMyBookings().then((data) => {
-      if (active) setBookings(data || []);
-    });
-    return () => {
-      active = false;
-    };
+    fetchBookings();
   }, []);
 
   const filtered = bookings.filter((booking) => {
@@ -64,7 +73,7 @@ export default function AdminBookingsPage() {
           </p>
         </div>
       </div>
-
+      {notice && <div className="alert alert-warning">{notice}</div>}
       <div className="admin-table-container">
         <div className="d-flex flex-wrap justify-content-between gap-3 mb-4">
           <div className="d-flex gap-2">

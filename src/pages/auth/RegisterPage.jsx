@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/forms/PasswordInput.jsx";
-import { getDashboardPath, useAuth } from "../../context/AuthContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { dashboardForRole as getDashboardPath } from "../../services/authService.js";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
