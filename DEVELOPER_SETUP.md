@@ -10,8 +10,9 @@
 From the project root:
 
 ```bash
-npm run install:frontend
-npm run install:backend
+npm install
+cd backend
+npm install
 ```
 
 ## Environment Setup
@@ -19,7 +20,6 @@ npm run install:backend
 Frontend:
 
 ```bash
-cd frontend
 copy .env.example .env
 ```
 
@@ -60,7 +60,7 @@ npx prisma generate
 From the project root:
 
 ```bash
-npm run dev:frontend
+npm run dev
 ```
 
 Default frontend URL: `http://localhost:5173`
@@ -73,12 +73,6 @@ From `backend/`:
 npm run dev
 ```
 
-Or from the project root:
-
-```bash
-npm run dev:backend
-```
-
 Default backend URL: `http://localhost:5000`
 
 ## Build And Verification
@@ -86,7 +80,7 @@ Default backend URL: `http://localhost:5000`
 Frontend build:
 
 ```bash
-npm run build:frontend
+npm run build
 ```
 
 Backend Prisma validation:

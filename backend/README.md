@@ -1,66 +1,176 @@
-# EasternCity Backend API
+# React Admin Dashboard System Backend API
 
-Express API for the EasternCity Rental System. It uses Prisma with PostgreSQL
-and can connect to a Neon database.
+A professional, production-ready, and beginner-friendly Node.js + Express backend designed with clean architecture and separation of concerns.
 
-## Setup
+## Tech Stack
+- **Node.js & Express.js** - Server and Routing framework
+- **Prisma ORM** - Database client management
+- **Neon PostgreSQL** - Hosted PostgreSQL database for shared backend development
+- **JWT (JSON Web Tokens)** - Authentication and Session representation
+- **Bcryptjs** - Secure one-way hashing for user passwords
+- **Dotenv** - Multi-environment configuration loader
+- **CORS** - Cross-Origin Resource Sharing enabled for frontend integration
 
+---
+
+## Folder Structure
+```text
+backend/
+├── prisma/
+│   ├── migrations/            # PostgreSQL migration history
+│   └── schema.prisma          # Prisma Schema configured for Neon PostgreSQL
+│
+├── src/
+│   ├── config/
+│   │   └── db.js              # Shared single Prisma client instance config
+│   │
+│   ├── controllers/
+│   │   ├── authController.js  # Handle request-response flow for auth (Register, Login)
+│   │   └── userController.js  # Handle profile, retrieval, updates, deletion
+│   │
+│   ├── middleware/
+│   │   ├── auth.js            # JWT Validation middleware
+│   │   ├── authorize.js       # Role check authorization middleware
+│   │   └── errorHandler.js    # Global error response handler
+│   │
+│   ├── routes/
+│   │   ├── authRoutes.js      # Auth endpoints mapping
+│   │   └── userRoutes.js      # User management endpoints mapping
+│   │
+│   ├── services/
+│   │   ├── authService.js     # Hashing, token generation, logic for auth
+│   │   └── userService.js     # User database operations (CRUD)
+│   │
+│   ├── utils/
+│   │   ├── hash.js            # Password hashing & comparison helpers
+│   │   └── jwt.js             # Token creation & verification helpers
+│   │
+│   ├── validators/
+│   │   └── authValidator.js   # Input validation middleware for email/passwords
+│   │
+│   ├── app.js                 # App definition, middleware, and route mounting
+│   └── server.js              # Server initialization and listener
+│
+├── .env                       # Environment variables config file
+├── package.json               # NPM dependency management
+└── README.md                  # System Documentation
+```
+
+---
+
+## Getting Started
+
+### 1. Prerequisites
+Ensure you have **Node.js** installed on your system.
+
+### 2. Installation
+Navigate into the `backend/` directory and install the dependencies:
 ```bash
 cd backend
 npm install
-cp .env.example .env
 ```
 
-Update `backend/.env`. `DATABASE_URL` must be an actual connection string from
-your database provider; the example value is intentionally not usable.
-
+### 3. Environment Configuration
+Create a `.env` file in the root of the `backend/` folder (a default `.env` is already configured for you):
 ```env
-DATABASE_URL="postgresql://<user>:<password>@<host>/<database>?sslmode=require"
-JWT_SECRET="replace-with-a-long-random-secret"
-JWT_REFRESH_SECRET="replace-with-a-different-long-random-secret"
 PORT=5000
-CLIENT_URL="http://localhost:5173"
-CORS_ORIGIN="http://localhost:5173"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/neondb?sslmode=require&channel_binding=require"
+JWT_SECRET="your_super_secret_jwt_key_here_for_development"
+NODE_ENV="development"
 ```
 
-For Neon, copy the connection string from **Project → Connect**. Keep it in
-`backend/.env` only—never commit it.
-
-## Run locally
-
+### 4. Database Setup & Migrations
+Apply database migrations to Neon PostgreSQL and generate the Prisma Client using:
 ```bash
+npx prisma migrate deploy
 npx prisma generate
+```
+
+### 5. Running the Server
+
+#### For Development (with auto-reload using nodemon):
+```bash
 npm run dev
 ```
 
-The server listens on `http://localhost:5000`. Confirm it with:
-
+#### For Production:
 ```bash
-curl http://localhost:5000/
+npm run start
 ```
 
-## Database commands
+---
 
-```bash
-# Generate the Prisma client after schema changes
-npx prisma generate
+## API Documentation & Endpoints
 
-# Apply committed migrations to the configured database
-npx prisma migrate deploy
+### 1. Authentication Endpoints
 
-# Create a development migration (only when intentionally changing the schema)
-npx prisma migrate dev --name <migration-name>
+#### Register User
+- **URL:** `/api/auth/register`
+- **Method:** `POST`
+- **Body (`application/json`):**
+```json
+{
+  "name": "Admin User",
+  "email": "admin@example.com",
+  "password": "password123",
+  "role": "USER" 
+}
+```
+*Note: Public registration always creates `USER`. `ADMIN` and `SUPER_ADMIN` accounts must be created only by `SUPER_ADMIN` workflows.*
 
-# Seed data, if required
-npm run prisma:seed
+#### Login User
+- **URL:** `/api/auth/login`
+- **Method:** `POST`
+- **Body (`application/json`):**
+```json
+{
+  "email": "admin@example.com",
+  "password": "password123"
+}
 ```
 
-## Troubleshooting
+---
 
-- **`Can't reach database server at HOST:5432`**: `DATABASE_URL` still has its
-  placeholder host. Replace it with the copied Neon URL.
-- **`@prisma/client did not initialize yet`**: run `npx prisma generate`.
-- **Prisma schema validation error**: correct the named field in
-  `prisma/schema.prisma`, then generate the client again.
-- **CORS error from the frontend**: confirm `CLIENT_URL` and `CORS_ORIGIN`
-  match the Vite address, usually `http://localhost:5173`.
+### 2. User & Admin Management Endpoints
+*All requests below require the `Authorization` header containing the JWT token:*
+`Authorization: Bearer <your_jwt_token>`
+
+#### Get Logged-in Profile
+- **URL:** `/api/users/profile`
+- **Method:** `GET`
+- **Access:** Authenticated user
+
+#### Get All Users (Admin Dashboard)
+- **URL:** `/api/users`
+- **Method:** `GET`
+- **Access:** `ADMIN` or `SUPER_ADMIN` only
+
+#### Get Specific User Profile (Admin View)
+- **URL:** `/api/users/:id`
+- **Method:** `GET`
+- **Access:** `ADMIN` or `SUPER_ADMIN` only
+
+#### Update User Profile
+- **URL:** `/api/users/:id`
+- **Method:** `PUT`
+- **Access:** Owner of the profile, `ADMIN`, or `SUPER_ADMIN`
+- **Body Example:**
+```json
+{
+  "name": "Updated Admin Name",
+  "email": "newadmin@example.com"
+}
+```
+
+#### Delete User Profile
+- **URL:** `/api/users/:id`
+- **Method:** `DELETE`
+- **Access:** `ADMIN` or `SUPER_ADMIN` only (Cannot delete self)
+
+---
+
+## Architecture Plan
+
+See `backend/IMPLEMENTATION_PLAN.md` for the current backend implementation plan, cleanup phase, role rules, booking architecture, developer allocation, and security checklist.
+
+
