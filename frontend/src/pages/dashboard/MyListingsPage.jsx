@@ -256,7 +256,7 @@ export default function MyListingsPage() {
   }
 
   return (
-    <main className="dashboard-content my-bookings-page pb-5">
+    <main className="dashboard-content my-bookings-page my-listings-page pb-5">
       <div className="d-flex justify-content-between align-items-end mb-4">
         <div>
           <span
