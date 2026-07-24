@@ -263,7 +263,15 @@ export default function BothDashboardPage() {
     <div className="ud-overview-page">
       <div className="ud-welcome-banner">
         <div className="ud-welcome-avatar">
-          <span>{getInitials(activeUser?.name)}</span>
+          {activeUser?.avatar ? (
+            <img 
+              src={activeUser.avatar} 
+              alt={activeUser.name || "User Avatar"} 
+              style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(255,255,255,0.5)" }} 
+            />
+          ) : (
+            <span>{getInitials(activeUser?.name)}</span>
+          )}
           {isVerified && (
             <span className="ud-welcome-verified-badge" title="Verified">
               <i className="bi bi-patch-check-fill" />

@@ -86,7 +86,7 @@ export default function SupportChatWidget() {
           </div>
 
           <div className="cw-chat-title">
-            <h2>CityWide Support</h2>
+            <h2>Eastern Cities Support</h2>
             <p>
               <span></span>Online assistant
             </p>
@@ -143,16 +143,15 @@ export default function SupportChatWidget() {
             </button>
           ))}
         </div>
-        [6/16/2026 11:37 PM] Obsi:{" "}
         <form className="cw-chat-form" onSubmit={handleSubmit}>
           <label className="visually-hidden" htmlFor="cw-chat-input">
-            Ask CityWide support
+            Ask Eastern Cities support
           </label>
 
           <textarea
             id="cw-chat-input"
             rows="1"
-            placeholder="Ask about CityWide services..."
+            placeholder="Ask about Eastern Cities services..."
             value={message}
             onChange={(event) => setMessage(event.target.value)}
           ></textarea>

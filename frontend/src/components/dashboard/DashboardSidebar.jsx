@@ -140,8 +140,8 @@ export default function DashboardSidebar() {
       {/* Profile Card */}
       <div className="ud-sidebar-profile">
         <div className="ud-sidebar-avatar">
-          {activeUser?.profileImage ? (
-            <img src={activeUser.profileImage} alt="Profile" />
+          {activeUser?.avatar || activeUser?.profileImage ? (
+            <img src={activeUser.avatar || activeUser.profileImage} alt="Profile" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
           ) : (
             <span>{getInitials(activeUser?.name)}</span>
           )}

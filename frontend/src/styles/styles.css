@@ -2427,11 +2427,11 @@ html[data-theme="dark"] .theme-toggle .icon-dark {
 /* Hero */
 .motorx-hero {
   position: relative;
-  min-height: 88vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 4rem 0 8rem;
+  padding: 4rem 0 10rem;
   overflow: hidden;
 }
 
@@ -2462,23 +2462,20 @@ html[data-theme="dark"] .theme-toggle .icon-dark {
   inset: 0;
   z-index: 1;
   background-position: center right;
-  background-size: contain;
+  background-size: auto 100%;
   background-repeat: no-repeat;
   opacity: 0;
-  transform: scale(1.04);
-  transition:
-    opacity 900ms ease,
-    transform 5200ms ease;
+  transform: scale(1);
+  transition: opacity 1000ms ease;
 }
 
 .hero-slide.is-active {
   opacity: 1;
-  transform: scale(1);
 }
 
 .motorx-hero-inner {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 .hero-layout {
@@ -7442,7 +7439,7 @@ html[data-theme="dark"] .dashboard-sidebar {
   background: #08090c;
 }
 .hero-slide {
-  background-size: contain;
+  background-size: auto 100%;
   background-repeat: no-repeat;
   background-position: center right;
   filter: saturate(1.1) contrast(1.04) brightness(1.1);
@@ -8343,7 +8340,13 @@ html[data-theme="dark"] .dashboard-sidebar {
    ============================================================ */
 .unified-dashboard-shell { min-height: 100vh; background: var(--soft-background, #f5f6fa); }
 .unified-dashboard-body { display: flex; min-height: calc(100vh - 72px); }
-.unified-dashboard-main { flex: 1; margin-left: 280px; padding: 2rem 2rem 4rem; min-height: calc(100vh - 72px); transition: margin 0.3s; }
+.unified-dashboard-main { 
+  flex: 1; 
+  padding: 2rem; 
+  min-height: calc(100vh - 72px); 
+  transition: margin 0.3s; 
+  max-width: 100%; 
+}
 
 /* ── Sidebar ── */
 .ud-sidebar { width: 280px; min-width: 280px; background: var(--card-bg, #fff); border-right: 1px solid var(--border-color, #e8e8e8); display: flex; flex-direction: column; padding: 1.5rem 0 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 100; scrollbar-width: thin; }
@@ -8684,7 +8687,7 @@ html[data-theme="dark"] .dashboard-sidebar {
   .ud-nav-link { justify-content: center; padding: 0.7rem; }
   .ud-nav-link i { font-size: 1.3rem; min-width: unset; }
   .ud-logout-btn { justify-content: center; }
-  .unified-dashboard-main { margin-left: 72px; padding: 1.25rem; }
+  .unified-dashboard-main { padding: 1.25rem; }
 }
 @media (max-width: 768px) {
   .ud-settings-layout { grid-template-columns: 1fr; }
@@ -8860,10 +8863,11 @@ html[data-theme="dark"] .dashboard-sidebar {
 
 .admin-main {
   flex-grow: 1;
-  margin-left: 320px;
-  padding: 20px 40px 40px 20px;
+  margin-left: 300px;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
+  width: calc(100% - 300px);
 }
 
 .admin-topbar {
@@ -9024,6 +9028,7 @@ html[data-theme="dark"] .dashboard-sidebar {
   .admin-main {
     margin-left: 0;
     padding: 15px;
+    width: 100%;
   }
 }
 
@@ -9182,8 +9187,9 @@ html[data-theme="dark"] .dashboard-sidebar {
 .admin-red-shell .admin-main {
   flex: 1 1 auto !important;
   margin-left: 300px !important;
-  padding: 0.75rem 0.9rem 1.4rem 0 !important;
+  padding: 2rem !important;
   min-width: 0;
+  width: calc(100% - 300px);
 }
 
 .admin-red-shell .admin-topbar {
@@ -9854,6 +9860,7 @@ html[data-theme="dark"] .dashboard-sidebar {
   .admin-red-shell .admin-main {
     margin-left: 0 !important;
     padding: 0.75rem !important;
+    width: 100% !important;
   }
   .admin-red-shell .admin-topbar {
     flex-wrap: wrap;
@@ -9884,7 +9891,8 @@ html[data-theme="dark"] .dashboard-sidebar {
 
 .admin-red-shell .admin-main {
   margin-left: 270px !important;
-  padding-top: 0.55rem !important;
+  padding: 2rem !important;
+  width: calc(100% - 270px) !important;
 }
 
 .admin-red-shell .admin-topbar {
@@ -10027,6 +10035,7 @@ html[data-theme="dark"] .dashboard-sidebar {
 @media (max-width: 991px) {
   .admin-red-shell .admin-main {
     margin-left: 0 !important;
+    width: 100% !important;
   }
 }
 

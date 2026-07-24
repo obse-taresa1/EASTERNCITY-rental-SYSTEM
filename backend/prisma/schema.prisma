@@ -8,29 +8,29 @@ datasource db {
 }
 
 model User {
-  id                            String               @id @default(uuid())
+  id                            String                @id @default(uuid())
   name                          String
-  email                         String               @unique
+  email                         String                @unique
   password                      String
-  role                          String               @default("USER")
-  status                        String               @default("ACTIVE")
+  role                          String                @default("USER")
+  status                        String                @default("ACTIVE")
   city                          String?
   phone                         String?
-  verificationStatus            String               @default("PENDING")
+  verificationStatus            String                @default("PENDING")
   nationalIdNumber              String?
   nationalIdFrontUrl            String?
   nationalIdBackUrl             String?
-  createdAt                     DateTime             @default(now())
-  ownedBookings                 Booking[]            @relation("BookingOwner")
-  rentedBookings                Booking[]            @relation("BookingRenter")
-  conversationsAsParticipantOne Conversation[]       @relation("ConversationParticipantOne")
-  conversationsAsParticipantTwo Conversation[]       @relation("ConversationParticipantTwo")
-  approvedListings              Listing[]            @relation("ListingApprover")
-  listings                      Listing[]            @relation("ListingOwner")
-  messages                      Message[]            @relation("MessageSender")
+  createdAt                     DateTime              @default(now())
+  ownedBookings                 Booking[]             @relation("BookingOwner")
+  rentedBookings                Booking[]             @relation("BookingRenter")
+  conversationsAsParticipantOne Conversation[]        @relation("ConversationParticipantOne")
+  conversationsAsParticipantTwo Conversation[]        @relation("ConversationParticipantTwo")
+  approvedListings              Listing[]             @relation("ListingApprover")
+  listings                      Listing[]             @relation("ListingOwner")
+  messages                      Message[]             @relation("MessageSender")
   notifications                 Notification[]
-  approvedPromotions            Promotion[]          @relation("PromotionApprover")
-  promotions                    Promotion[]          @relation("PromotionRequester")
+  approvedPromotions            Promotion[]           @relation("PromotionApprover")
+  promotions                    Promotion[]           @relation("PromotionRequester")
   refreshTokens                 RefreshToken[]
   passwordResetTokens           PasswordResetToken[]
   reviews                       Review[]
@@ -39,27 +39,27 @@ model User {
   reports                       Report[]
   activityLogs                  ActivityLog[]
   supportTickets                SupportTicket[]
-  updatedSettings               SystemSetting[]      @relation("SystemSettingUpdater")
+  updatedSettings               SystemSetting[]       @relation("SystemSettingUpdater")
   verificationRequests          VerificationRequest[] @relation("VerificationRequester")
   reviewedVerificationRequests  VerificationRequest[] @relation("VerificationReviewer")
 }
 
 model VerificationRequest {
-  id                 String   @id @default(uuid())
+  id                 String    @id @default(uuid())
   userId             String
   city               String
   sefer              String
   address            String?
   nationalIdFrontUrl String
   nationalIdBackUrl  String
-  status             String   @default("PENDING")
+  status             String    @default("PENDING")
   rejectionReason    String?
   reviewedById       String?
   reviewedAt         DateTime?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  user               User     @relation("VerificationRequester", fields: [userId], references: [id], onDelete: Cascade)
-  reviewedBy         User?    @relation("VerificationReviewer", fields: [reviewedById], references: [id])
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation("VerificationRequester", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy         User?     @relation("VerificationReviewer", fields: [reviewedById], references: [id])
 
   @@index([userId])
   @@index([status])
@@ -240,18 +240,18 @@ model Notification {
 }
 
 model ContactMessage {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
   email      String
   subject    String
   message    String
-  status     String   @default("OPEN")
+  status     String    @default("OPEN")
   adminReply String?
   repliedAt  DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
   userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
+  user       User?     @relation(fields: [userId], references: [id])
 }
 
 model Report {
@@ -300,4 +300,3 @@ model SupportTicketReply {
   ticket    SupportTicket @relation(fields: [ticketId], references: [id])
   user      User          @relation(fields: [userId], references: [id])
 }
-

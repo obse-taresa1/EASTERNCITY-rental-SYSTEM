@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 
@@ -7,6 +8,8 @@ async function upsertSuperAdmin() {
   const email = process.env.SEED_SUPER_ADMIN_EMAIL;
   const password = process.env.SEED_SUPER_ADMIN_PASSWORD;
   const name = process.env.SEED_SUPER_ADMIN_NAME || "Super Admin";
+
+  console.log(`Debug: Using email=${email}, password_length=${password ? password.length : 0}`);
 
   if (!email || !password) {
     console.log("Skipping super admin seed. Set SEED_SUPER_ADMIN_EMAIL and SEED_SUPER_ADMIN_PASSWORD to create one.");
