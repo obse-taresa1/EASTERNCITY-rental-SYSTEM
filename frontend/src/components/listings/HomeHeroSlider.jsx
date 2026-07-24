@@ -238,7 +238,7 @@ export default function HomeHeroSlider() {
 
         {/* Platform Stats Banner */}
         <div
-          className="hero-stats-banner animate-fade-in-up"
+          className="hero-stats-banner animate-fade-in-up d-none"
           style={{ animationDelay: "450ms" }}
         >
           <div className="hero-stat-block">

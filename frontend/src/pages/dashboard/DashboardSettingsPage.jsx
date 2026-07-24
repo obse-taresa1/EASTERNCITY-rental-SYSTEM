@@ -22,6 +22,7 @@ function ProfileSettings({ user, setCurrentUser }) {
     email: user?.email || "",
     phone: user?.phone || "",
     city: user?.city || "",
+    avatar: user?.avatar || "",
   });
   const [saved, setSaved] = useState(false);
 
@@ -37,6 +38,17 @@ function ProfileSettings({ user, setCurrentUser }) {
     }
   }
 
+  function handleAvatarChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm({ ...form, avatar: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   return (
     <form className="ud-settings-form" onSubmit={handleSave}>
       <h3 className="ud-settings-section-title">Profile Information</h3>
@@ -46,6 +58,41 @@ function ProfileSettings({ user, setCurrentUser }) {
           successfully.
         </div>
       )}
+      
+      <div className="ud-avatar-upload mb-4 d-flex align-items-center gap-3">
+        {/* Hidden file input used by both preview and Add Image button */}
+        <input id="avatar-input" type="file" accept="image/*" hidden onChange={handleAvatarChange} />
+        {/* Avatar preview - clicking opens file selector */}
+        <label htmlFor="avatar-input" className="ud-avatar-preview" style={{
+          width: "80px",
+          height: "80px",
+          borderRadius: "50%",
+          background: form.avatar ? `url(${form.avatar}) center/cover` : "var(--accent)",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "2rem",
+          fontWeight: "bold",
+          border: "3px solid rgba(227, 30, 36, 0.2)"
+        }}>
+          {!form.avatar && (form.name ? form.name.charAt(0).toUpperCase() : "U")}
+        </label>
+        <div className="d-flex gap-2">
+          {/* Add Image button */}
+          <label htmlFor="avatar-input" className="btn btn-sm btn-outline-danger m-0">
+            Add Image
+          </label>
+          {/* Remove button appears only when an avatar is set */}
+          {form.avatar && (
+            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setForm({ ...form, avatar: "" })}>
+              Remove
+            </button>
+          )}
+        </div>
+        <div className="text-muted small mt-1">JPG, GIF or PNG. Max size of 800K</div>
+      </div>
+
       <div className="ud-form-grid">
         <div className="ud-form-group">
           <label htmlFor="sett-name">Full Name</label>

@@ -1,0 +1,454 @@
+/* ==========================================================================
+   MOBILE BOTTOM NAVIGATION & DRAWER MENU
+   Telegram-inspired mobile UI — affects ONLY screens ≤ 768px.
+   Desktop remains 100% unchanged.
+   ========================================================================== */
+
+/* ------------------------------------
+   Mobile Bottom Navigation (base — hidden by default)
+   ------------------------------------ */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-bottom-nav-list {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 60px;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 500;
+  flex: 1;
+  height: 100%;
+  position: relative;
+  transition: color 0.2s ease, transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-item i {
+  font-size: 22px;
+  margin-bottom: 3px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.mobile-nav-item.active {
+  color: var(--accent);
+}
+
+.mobile-nav-item.active i {
+  transform: translateY(-2px);
+  color: var(--accent);
+}
+
+.mobile-nav-item:active {
+  opacity: 0.7;
+}
+
+/* ------------------------------------
+   Mobile Drawer Menu (Right Side — base styles)
+   ------------------------------------ */
+.mobile-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  backdrop-filter: blur(3px);
+  animation: mobileDrawerFadeIn 0.3s ease forwards;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100%;
+  background: var(--bg);
+  z-index: 1050;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.mobile-drawer.open {
+  right: 0;
+}
+
+.mobile-drawer-header {
+  padding: 24px 20px 20px;
+  background: var(--accent-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+.mobile-drawer-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.drawer-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(170, 59, 255, 0.3);
+}
+
+.drawer-avatar i {
+  font-size: 32px;
+}
+
+.drawer-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.drawer-user-email {
+  font-size: 13px;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+.drawer-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.drawer-close-btn:active {
+  color: var(--accent);
+}
+
+.mobile-drawer-content {
+  flex-grow: 1;
+  padding: 12px 0;
+}
+
+.drawer-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.drawer-menu-link,
+.drawer-menu-link-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  color: var(--text-h);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.drawer-menu-link i,
+.drawer-menu-link-wrapper i {
+  font-size: 20px;
+  color: var(--text);
+  margin-right: 16px;
+  width: 24px;
+  text-align: center;
+}
+
+.drawer-menu-link:active,
+.drawer-menu-item-interactive:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.drawer-control-inline {
+  margin-left: auto;
+}
+
+.drawer-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 0;
+}
+
+/* Three-dot trigger (base — hidden by default) */
+.mobile-menu-trigger {
+  display: none;
+}
+
+@keyframes mobileDrawerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ------------------------------------
+   Responsive — MOBILE ONLY (≤ 768px)
+   ------------------------------------ */
+@media (max-width: 768px) {
+  /* Show bottom nav */
+  .mobile-bottom-nav {
+    display: block;
+  }
+
+  /* Add padding so content isn't hidden behind bottom nav */
+  body {
+    padding-bottom: 80px !important;
+  }
+
+  /* Adjust Dashboard Layout for mobile */
+  .unified-dashboard-shell {
+    padding-bottom: 60px;
+  }
+
+  /* Make logo smaller on mobile */
+  .motorx-logo img {
+    height: 35px !important;
+    object-fit: contain;
+  }
+
+  /* Fix hero section messiness and text overlap */
+  .motorx-hero {
+    min-height: 100vh !important;
+    height: auto !important;
+    padding: 6rem 0 6rem !important;
+    overflow: visible !important; /* Prevent search form from getting cut off */
+    justify-content: flex-start !important;
+  }
+
+  /* Make background images visible on mobile */
+  .hero-slide {
+    background-size: cover !important;
+    background-position: center !important;
+  }
+
+  /* Hide the hero side floating card on mobile */
+  .hero-side {
+    display: none !important;
+  }
+
+  /* Chatbot smaller than desktop, but visible and above bottom nav */
+  .cw-support-widget {
+    bottom: 90px !important;
+    right: 15px !important;
+    z-index: 1020 !important;
+  }
+
+  .cw-support-launcher {
+    padding: 12px 18px !important;
+    font-size: 14px !important;
+    border-radius: 25px !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+  }
+  .cw-support-launcher i {
+    font-size: 20px !important;
+  }
+  
+  /* Hide the scroll-to-top arrow button on mobile so it doesn't overlap Contact Us */
+  #back-to-top {
+    display: none !important;
+  }
+  /* Chatbot panel centered on mobile */
+  .cw-chat-panel {
+    bottom: 50% !important;
+    right: 50% !important;
+    transform: translate(50%, 50%) !important;
+    width: 90vw !important;
+    max-width: 400px;
+    max-height: 80vh !important;
+    z-index: 1020 !important;
+    position: fixed !important;
+  }
+
+  /* Decrease size of the floating card in hero */
+  .hero-float-card {
+    transform: scale(0.85);
+    transform-origin: top center;
+    margin-bottom: -1rem;
+  }
+
+  .motorx-search-wrap {
+    margin-top: 1rem !important;
+    position: relative;
+    z-index: 10 !important;
+  }
+  
+  /* Decrease size of search box on mobile */
+  .motorx-search-wrap .bg-white.p-3 {
+    padding: 0.75rem !important;
+  }
+  
+  .motorx-search-wrap .form-control,
+  .motorx-search-wrap .form-select,
+  .motorx-search-wrap .btn {
+    padding: 0.35rem 0.5rem !important;
+    font-size: 0.85rem !important;
+  }
+  
+  .motorx-search-wrap .form-label {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+  
+  .motorx-search-wrap .row.g-2 {
+    --bs-gutter-y: 0.5rem;
+  }
+
+  /* Hide Desktop hamburger toggle on mobile (replaced by ⋮) */
+  .nav-check,
+  .nav-toggler-label {
+    display: none !important;
+  }
+
+  /* Hide desktop nav menu on mobile */
+  .motorx-nav-menu {
+    display: none !important;
+  }
+
+  /* Show three-dot trigger */
+  .mobile-menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: var(--text-h);
+    padding: 8px;
+    margin-left: auto;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-menu-trigger:active {
+    opacity: 0.6;
+  }
+
+  /* ------------------------------------
+     Mobile Dashboard Fixes
+     ------------------------------------ */
+  .ud-overview-page {
+    gap: 1rem !important;
+  }
+  
+  .ud-overview-bottom {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  
+  .ud-quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .ud-welcome-banner {
+    padding: 1.2rem !important;
+    gap: 1rem !important;
+  }
+  
+  .ud-welcome-avatar {
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+  }
+  
+  .ud-welcome-avatar > span {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.5rem !important;
+  }
+  
+  .ud-welcome-name {
+    font-size: 1.4rem !important;
+  }
+
+  /* Aggressive width constraints to prevent mobile horizontal scroll */
+  .unified-dashboard-main {
+    padding: 1rem 0.75rem !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-section {
+    max-width: 100% !important;
+  }
+
+  /* Fix stats grid overflowing or stacking awkwardly */
+  .ud-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+  
+  .ud-stat-card {
+    padding: 1rem 0.5rem !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .ud-stat-arrow {
+    display: none !important;
+  }
+
+  /* Keep footer visible but add padding above bottom nav */
+  .footer-premium {
+    padding-bottom: 80px;
+  }
+}
+
+/* ------------------------------------
+   Responsive — DESKTOP ONLY (≥ 769px)
+   ------------------------------------ */
+@media (min-width: 769px) {
+  .mobile-menu-trigger {
+    display: none !important;
+  }
+
+  .mobile-drawer,
+  .mobile-drawer-overlay,
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+}

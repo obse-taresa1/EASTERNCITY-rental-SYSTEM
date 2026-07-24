@@ -91,7 +91,7 @@ export default function HomeSearchForm() {
         <form onSubmit={submitSearch}>
           <div className="row g-2 align-items-end">
             {/* 1. Keyword Search */}
-            <div className="col-md-2 text-start">
+            <div className="col-12 col-md-2 text-start">
               <label
                 className="form-label text-dark fw-bold mb-1"
                 style={{ fontSize: "0.8rem" }}
@@ -109,7 +109,7 @@ export default function HomeSearchForm() {
             </div>
 
             {/* 2. City */}
-            <div className="col-md-2 text-start">
+            <div className="col-6 col-md-2 text-start">
               <label
                 className="form-label text-dark fw-bold mb-1"
                 style={{ fontSize: "0.8rem" }}
@@ -130,7 +130,7 @@ export default function HomeSearchForm() {
             </div>
 
             {/* 3. Sefar (Neighbourhood) */}
-            <div className="col-md-2 text-start">
+            <div className="col-6 col-md-2 text-start">
               <label
                 className="form-label text-dark fw-bold mb-1"
                 style={{ fontSize: "0.8rem" }}
@@ -158,7 +158,7 @@ export default function HomeSearchForm() {
             </div>
 
             {/* 4. Category */}
-            <div className="col-md-2 text-start">
+            <div className="col-6 col-md-2 text-start">
               <label
                 className="form-label text-dark fw-bold mb-1"
                 style={{ fontSize: "0.8rem" }}
@@ -183,7 +183,7 @@ export default function HomeSearchForm() {
             </div>
 
             {/* 5. Price */}
-            <div className="col-md-2 text-start">
+            <div className="col-6 col-md-2 text-start">
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <span
                   className="text-dark fw-bold"
@@ -215,7 +215,7 @@ export default function HomeSearchForm() {
             </div>
 
             {/* 6. Submit Button */}
-            <div className="col-md-2">
+            <div className="col-12 col-md-2 mt-3 mt-md-0">
               <button
                 type="submit"
                 className="btn btn-danger w-100 btn-sm fw-bold d-flex align-items-center justify-content-center gap-1"
