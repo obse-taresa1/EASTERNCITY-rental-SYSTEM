@@ -145,12 +145,6 @@ export default function DashboardSidebar() {
           ) : (
             <span>{getInitials(activeUser?.name)}</span>
           )}
-          <span
-            className={`ud-avatar-badge ${isVerified ? "ud-badge-verified" : "ud-badge-pending"}`}
-            title={verificationStatus}
-          >
-            <i className={`bi ${isVerified ? "bi-check-lg" : "bi-clock"}`} />
-          </span>
         </div>
 
         <div className="ud-sidebar-user-info">
@@ -159,31 +153,6 @@ export default function DashboardSidebar() {
             <i className={`bi ${isVerified ? "bi-shield-check" : "bi-shield-exclamation"}`} />
             {verificationStatus}
           </span>
-          <div className="ud-sidebar-meta">
-            <span>
-              <i className="bi bi-geo-alt" />
-              {activeUser?.city || "Location not set"}
-            </span>
-            <span>
-              <i className="bi bi-calendar3" />
-              Since {memberSince}
-            </span>
-          </div>
-        </div>
-
-        <div className="ud-sidebar-mini-stats">
-          <div className="ud-mini-stat">
-            <strong>{activeBookings}</strong>
-            <span>Bookings</span>
-          </div>
-          <div className="ud-mini-stat">
-            <strong>{savedItems}</strong>
-            <span>Saved</span>
-          </div>
-          <div className="ud-mini-stat">
-            <strong>{reviews}</strong>
-            <span>Reviews</span>
-          </div>
         </div>
       </div>
 

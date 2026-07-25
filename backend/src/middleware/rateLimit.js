@@ -2,7 +2,7 @@ const rateLimit = require("express-rate-limit");
 
 function createRateLimiter(options = {}) {
   const windowMs = options.windowMs || 15 * 60 * 1000;
-  const max = options.max || 100;
+  const max = options.max || 5000;
 
   return rateLimit({
     windowMs,

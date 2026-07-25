@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getMyListings } from "../../services/listingApiService.js";
-import { getMyBookings } from "../../services/bookingApiService.js";
+import { getMyListings, deleteListing } from "../../services/listingApiService.js";
+import { useNavigate } from "react-router-dom";
 import ListingManagementTable from "../../components/dashboard/ListingManagementTable.jsx";
 import BookingTable from "../../components/dashboard/BookingTable.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
@@ -33,6 +33,7 @@ async function fileToDataUrl(file) {
 }
 
 export default function MyListingsPage() {
+  const navigate = useNavigate();
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const [activeTab, setActiveTab] = useState("all");
@@ -255,9 +256,24 @@ export default function MyListingsPage() {
     setRefresh((value) => value + 1);
   }
 
+  function handleEdit(item) {
+    navigate(`/list-item?edit=${item.id}`);
+  }
+
+  async function handleDelete(item) {
+    if (!window.confirm(`Are you sure you want to delete "${item.title}"?`)) return;
+    try {
+      await deleteListing(item.id);
+      setNotice(`Listing "${item.title}" deleted successfully.`);
+      setRefresh(r => r + 1);
+    } catch (error) {
+      setNotice(error.message || "Failed to delete listing.");
+    }
+  }
+
   return (
     <main className="dashboard-content my-bookings-page pb-5">
-      <div className="d-flex justify-content-between align-items-end mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <span
             className="text-danger fw-bold"
@@ -267,7 +283,7 @@ export default function MyListingsPage() {
               textTransform: "uppercase",
             }}
           >
-            Management
+            Listings
           </span>
           <h1 className="fw-bold m-0" style={{ fontSize: "2.5rem" }}>
             My Listings
@@ -277,49 +293,30 @@ export default function MyListingsPage() {
           to="/list-item"
           className="btn btn-danger rounded-pill fw-bold px-4 py-2 shadow-sm"
         >
-          <i className="bi bi-plus-circle-fill me-2" /> Add Listing
+          <i className="bi bi-plus-circle me-2" /> Add Listing
         </Link>
       </div>
 
       {notice && <div className="alert alert-info">{notice}</div>}
 
       <div className="d-flex gap-2 mb-4 overflow-auto pb-2 border-bottom details-tab-system">
-        <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "all" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("all")}
-        >
-          All Listings
-        </button>
-        <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "pending" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          Pending Listings
-        </button>
-        <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "approved" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("approved")}
-        >
-          Approved Listings
-        </button>
-        <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "rejected" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("rejected")}
-        >
-          Rejected Listings
-        </button>
-        <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "requests" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("requests")}
-        >
-          Booking Requests
-        </button>
-        <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "promotions" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
-          onClick={() => setActiveTab("promotions")}
-        >
-          Promotion Requests
-        </button>
+        {[
+          { key: "all", label: "All Listings" },
+          { key: "pending", label: "Pending" },
+          { key: "approved", label: "Approved" },
+          { key: "rejected", label: "Rejected" },
+          { key: "requests", label: "Booking Requests" },
+          { key: "promotions", label: "Promotion Requests" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            className={`btn rounded-pill fw-bold px-4 filter-tab ${activeTab === tab.key ? "active" : ""}`}
+            onClick={() => setActiveTab(tab.key)}
+            style={{ transition: "all 0.2s ease", whiteSpace: "nowrap" }}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {activeTab === "requests" ? (
@@ -331,10 +328,8 @@ export default function MyListingsPage() {
                 style={{ fontSize: "4rem" }}
               ></i>
             </div>
-            <h3 className="fw-bold">No booking requests available</h3>
-            <p className="text-muted">
-              You haven't received any booking requests yet.
-            </p>
+            <h3 className="fw-bold">No Booking Requests</h3>
+            <p className="text-muted">You haven't received any booking requests yet.</p>
           </div>
         ) : (
           <div className="premium-glass-card bg-white p-4">
@@ -350,10 +345,8 @@ export default function MyListingsPage() {
                 style={{ fontSize: "4rem" }}
               ></i>
             </div>
-            <h3 className="fw-bold">No promotion requests available</h3>
-            <p className="text-muted">
-              Submitted listing promotion requests will appear here.
-            </p>
+            <h3 className="fw-bold">No Promotion Requests</h3>
+            <p className="text-muted">Submitted listing promotion requests will appear here.</p>
           </div>
         ) : (
           <div className="premium-glass-card bg-white p-4">
@@ -386,7 +379,7 @@ export default function MyListingsPage() {
       ) : isLoadingListings ? (
         <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
           <div className="spinner-border text-danger" role="status" />
-          <p className="mt-3 text-muted mb-0">Loading your listings...</p>
+          <p className="mt-3 text-muted">Loading your listings...</p>
         </div>
       ) : filteredItems.length === 0 ? (
         <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
@@ -396,26 +389,23 @@ export default function MyListingsPage() {
               style={{ fontSize: "4rem" }}
             ></i>
           </div>
-          <h3 className="fw-bold">No listings found</h3>
-          <p className="text-muted">
-            You don't have any listings in this category.
-          </p>
+          <h3 className="fw-bold">You haven't created any listings yet.</h3>
           {activeTab === "all" && (
             <Link
               to="/list-item"
-              className="btn btn-outline-danger rounded-pill fw-bold mt-3 px-4"
+              className="btn btn-danger rounded-pill fw-bold mt-3 px-4 py-2"
             >
-              Create your first listing
+              <i className="bi bi-plus-circle me-2" /> Add Listing
             </Link>
           )}
         </div>
       ) : (
-        <div className="premium-glass-card bg-white p-4">
-          <ListingManagementTable
-            items={filteredItems}
-            onPromote={handlePromote}
-          />
-        </div>
+        <ListingManagementTable
+          items={filteredItems}
+          onPromote={handlePromote}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       )}
 
       {promotionListing && (

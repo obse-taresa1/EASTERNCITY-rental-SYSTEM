@@ -108,7 +108,7 @@ export default function ListingCard({ item }) {
 
   return (
     <article className="premium-glass-card listing-card-premium">
-      <div className="card-img-wrapper">
+      <div className="card-img-wrapper" style={{ height: "120px" }}>
         <img
           src={item.image || item.coverImage || fallbackListingImage}
           alt={item.imageAlt || item.title}

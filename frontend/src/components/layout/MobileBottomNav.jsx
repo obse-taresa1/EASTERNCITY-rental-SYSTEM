@@ -54,43 +54,6 @@ export default function MobileBottomNav() {
             <span>{t("contactUs") || "Contact"}</span>
           </NavLink>
         </li>
-        {isAuthenticated ? (
-          <>
-            <li>
-              <NavLink
-                to={dashboardForRole(currentUser?.role)}
-                className={({ isActive }) =>
-                  `mobile-nav-item ${isActive ? "active" : ""}`
-                }
-              >
-                <i className="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/messages"
-                className={({ isActive }) =>
-                  `mobile-nav-item ${isActive ? "active" : ""}`
-                }
-              >
-                <i className="bi bi-chat-dots"></i>
-                <span>Messages</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/profile"
-                className={({ isActive }) =>
-                  `mobile-nav-item ${isActive ? "active" : ""}`
-                }
-              >
-                <i className="bi bi-person"></i>
-                <span>Profile</span>
-              </NavLink>
-            </li>
-          </>
-        ) : null}
       </ul>
     </nav>
   );

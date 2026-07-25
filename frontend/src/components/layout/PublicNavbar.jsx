@@ -82,6 +82,12 @@ export default function PublicNavbar() {
                     aria-expanded={panelOpen}
                     aria-haspopup="true"
                     type="button"
+                    style={{
+                      padding: currentUser?.avatar ? 0 : undefined,
+                      overflow: "hidden",
+                      backgroundColor: currentUser?.avatar ? "transparent" : undefined,
+                      border: currentUser?.avatar ? "none" : undefined
+                    }}
                   >
                     {currentUser?.avatar ? (
                       <img 

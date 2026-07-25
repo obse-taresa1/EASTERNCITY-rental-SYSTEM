@@ -8,6 +8,7 @@ import {
   logoutUser,
   refreshCurrentUser,
   registerUser,
+  setCurrentUser as persistCurrentUser,
 } from "../services/authService.js";
 
 const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
@@ -62,6 +63,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   function setCurrentUser(user) {
+    persistCurrentUser(user);
     setCurrentUserState(user || null);
   }
 

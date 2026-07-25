@@ -123,7 +123,7 @@ export default function AboutPage() {
               <a href="/register" className="btn-hero-primary">
                 {t("aboutCtaGetStarted")}
               </a>
-              <a href="/items" className="btn-hero-outline">
+              <a href="/items" className="btn-hero-primary">
                 {t("aboutCtaBrowse")}
               </a>
             </div>

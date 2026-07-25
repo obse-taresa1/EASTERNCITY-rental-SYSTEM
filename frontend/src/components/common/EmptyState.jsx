@@ -5,11 +5,13 @@ export default function EmptyState({
   action,
 }) {
   return (
-    <div className="text-center py-5">
-      <i className={`bi ${icon} display-5 text-muted d-block mb-3`} />
-      <h3 className="h5 mb-2">{title}</h3>
-      <p className="text-muted mb-4">{description}</p>
-      {action}
+    <div className="empty-state-premium">
+      <div className="empty-state-icon-wrapper">
+        <i className={`bi ${icon}`} />
+      </div>
+      <h3>{title}</h3>
+      <p>{description}</p>
+      {action && <div className="empty-state-action">{action}</div>}
     </div>
   );
 }

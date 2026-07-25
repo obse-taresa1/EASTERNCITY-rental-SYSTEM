@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { getInitials } from "../../utils/user.js";
 import {
@@ -6,6 +7,7 @@ import {
 } from "../../utils/verificationStatus.js";
 
 export default function ProfilePanel({ user, open, onClose, onLogout, dashboardPath = "/dashboard" }) {
+  const [showImage, setShowImage] = useState(false);
   if (!open) return null;
 
   const isAdminOrSuperAdmin = ["ADMIN", "SUPER_ADMIN"].includes(String(user?.role || "").toUpperCase());
@@ -50,7 +52,21 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
         </button>
 
         <div className="profile-panel-header">
-          <div className="profile-panel-avatar">{initials}</div>
+          <div 
+            className="profile-panel-avatar" 
+            style={{ padding: user?.avatar ? 0 : undefined, overflow: "hidden", cursor: user?.avatar ? "pointer" : "default" }}
+            onClick={() => user?.avatar && setShowImage(true)}
+          >
+            {user?.avatar ? (
+              <img 
+                src={user.avatar} 
+                alt="Profile" 
+                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
+              />
+            ) : (
+              initials
+            )}
+          </div>
           <div>
             <strong>{user?.name || "User"}</strong>
             <span>{user?.email || "Email not available"}</span>
@@ -84,6 +100,49 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
           </button>
         </nav>
       </aside>
+
+      {/* Image Popup Modal */}
+      {showImage && user?.avatar && (
+        <div 
+          style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.8)",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowImage(false);
+          }}
+        >
+          <div style={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh" }}>
+            <button 
+              onClick={() => setShowImage(false)}
+              style={{
+                position: "absolute",
+                top: "-40px",
+                right: "0",
+                background: "transparent",
+                border: "none",
+                color: "white",
+                fontSize: "2rem",
+                cursor: "pointer"
+              }}
+            >
+              &times;
+            </button>
+            <img 
+              src={user.avatar} 
+              alt="Profile Full" 
+              style={{ maxWidth: "100%", maxHeight: "90vh", borderRadius: "12px", objectFit: "contain", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }} 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

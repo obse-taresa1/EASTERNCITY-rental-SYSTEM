@@ -13,35 +13,37 @@ model User {
   email                         String                @unique
   password                      String
   role                          String                @default("USER")
+  createdAt                     DateTime              @default(now())
   status                        String                @default("ACTIVE")
+  verificationStatus            String                @default("NOT_VERIFIED")
   city                          String?
-  phone                         String?
-  verificationStatus            String                @default("PENDING")
-  nationalIdNumber              String?
+  sefer                         String?
+  address                       String?
   nationalIdFrontUrl            String?
   nationalIdBackUrl             String?
-  createdAt                     DateTime              @default(now())
+  phone                         String?
+  nationalIdNumber              String?
+  activityLogs                  ActivityLog[]
   ownedBookings                 Booking[]             @relation("BookingOwner")
   rentedBookings                Booking[]             @relation("BookingRenter")
+  contactMessages               ContactMessage[]
   conversationsAsParticipantOne Conversation[]        @relation("ConversationParticipantOne")
   conversationsAsParticipantTwo Conversation[]        @relation("ConversationParticipantTwo")
   approvedListings              Listing[]             @relation("ListingApprover")
   listings                      Listing[]             @relation("ListingOwner")
   messages                      Message[]             @relation("MessageSender")
   notifications                 Notification[]
+  passwordResetTokens           PasswordResetToken[]
   approvedPromotions            Promotion[]           @relation("PromotionApprover")
   promotions                    Promotion[]           @relation("PromotionRequester")
   refreshTokens                 RefreshToken[]
-  passwordResetTokens           PasswordResetToken[]
-  reviews                       Review[]
-  supportTicketReplies          SupportTicketReply[]
-  contactMessages               ContactMessage[]
   reports                       Report[]
-  activityLogs                  ActivityLog[]
+  reviews                       Review[]
   supportTickets                SupportTicket[]
+  supportTicketReplies          SupportTicketReply[]
   updatedSettings               SystemSetting[]       @relation("SystemSettingUpdater")
-  verificationRequests          VerificationRequest[] @relation("VerificationRequester")
   reviewedVerificationRequests  VerificationRequest[] @relation("VerificationReviewer")
+  verificationRequests          VerificationRequest[] @relation("VerificationRequester")
 }
 
 model VerificationRequest {
@@ -58,8 +60,8 @@ model VerificationRequest {
   reviewedAt         DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
-  user               User      @relation("VerificationRequester", fields: [userId], references: [id], onDelete: Cascade)
   reviewedBy         User?     @relation("VerificationReviewer", fields: [reviewedById], references: [id])
+  user               User      @relation("VerificationRequester", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
@@ -76,13 +78,13 @@ model Listing {
   location        String?
   pricePerDay     Decimal
   status          String         @default("PENDING")
-  paymentMethod   String?
-  paymentProofUrl String?
-  paymentStatus   String         @default("PENDING")
   approvedById    String?
   approvedAt      DateTime?
   rejectionReason String?
   updatedAt       DateTime       @updatedAt
+  paymentMethod   String?
+  paymentProofUrl String?
+  paymentStatus   String?        @default("PENDING")
   bookings        Booking[]
   conversations   Conversation[]
   approvedBy      User?          @relation("ListingApprover", fields: [approvedById], references: [id])
@@ -124,9 +126,9 @@ model Conversation {
   lastMessageAt    DateTime?
   createdAt        DateTime  @default(now())
   listing          Listing   @relation(fields: [listingId], references: [id])
-  messages         Message[]
   participantOne   User      @relation("ConversationParticipantOne", fields: [participantOneId], references: [id])
   participantTwo   User      @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id])
+  messages         Message[]
 }
 
 model Message {
@@ -139,6 +141,9 @@ model Message {
   updatedAt      DateTime     @updatedAt
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
 }
 
 model ListingImage {
@@ -153,10 +158,10 @@ model ListingImage {
 model Category {
   id          String    @id @default(uuid())
   name        String    @unique
-  slug        String    @unique
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  slug        String    @unique
   listings    Listing[]
 }
 
@@ -184,11 +189,11 @@ model Review {
   id        String   @id @default(uuid())
   userId    String
   listingId String
-  bookingId String   @unique
   rating    Int
   comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  bookingId String   @unique
   booking   Booking  @relation(fields: [bookingId], references: [id])
   listing   Listing  @relation(fields: [listingId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
@@ -241,6 +246,7 @@ model Notification {
 
 model ContactMessage {
   id         String    @id @default(uuid())
+  userId     String?
   name       String
   email      String
   subject    String
@@ -248,10 +254,13 @@ model ContactMessage {
   status     String    @default("OPEN")
   adminReply String?
   repliedAt  DateTime?
+  resolvedAt DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-  userId     String?
   user       User?     @relation(fields: [userId], references: [id])
+
+  @@index([status])
+  @@index([userId])
 }
 
 model Report {
@@ -287,8 +296,8 @@ model SupportTicket {
   resolvedAt DateTime?
   createdAt  DateTime             @default(now())
   updatedAt  DateTime             @updatedAt
-  replies    SupportTicketReply[]
   user       User                 @relation(fields: [userId], references: [id])
+  replies    SupportTicketReply[]
 }
 
 model SupportTicketReply {
@@ -299,4 +308,10 @@ model SupportTicketReply {
   createdAt DateTime      @default(now())
   ticket    SupportTicket @relation(fields: [ticketId], references: [id])
   user      User          @relation(fields: [userId], references: [id])
+}
+
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
 }

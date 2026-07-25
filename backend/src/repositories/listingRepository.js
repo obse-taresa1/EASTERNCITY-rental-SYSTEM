@@ -82,7 +82,8 @@ function update(id, data) {
   });
 }
 
-function remove(id) {
+async function remove(id) {
+  await prisma.listingImage.deleteMany({ where: { listingId: id } });
   return prisma.listing.delete({
     where: { id },
   });

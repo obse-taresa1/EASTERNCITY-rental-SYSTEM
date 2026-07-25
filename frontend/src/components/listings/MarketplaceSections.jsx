@@ -183,11 +183,12 @@ export default function MarketplaceSections() {
 
           return (
             <div className="marketplace-row" key={section.title}>
-              <div className="listings-header">
+              <div className="premium-section-header">
                 <div>
                   <span className="section-label">{section.label}</span>
                   <h2>{section.title}</h2>
                 </div>
+                <Link to="/items" className="view-all-link">View All <i className="bi bi-arrow-right"></i></Link>
               </div>
               <div className="row g-4">
                 {listings.map((item) => (

@@ -171,25 +171,25 @@ export default function MyBookingsPage() {
 
       <div className="d-flex gap-2 mb-4 overflow-auto pb-2 border-bottom details-tab-system">
         <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "pending" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
+          className={`btn rounded-pill fw-bold px-4 filter-tab ${activeTab === "pending" ? "active" : ""}`}
           onClick={() => setActiveTab("pending")}
         >
           Pending
         </button>
         <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "accepted" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
+          className={`btn rounded-pill fw-bold px-4 filter-tab ${activeTab === "accepted" ? "active" : ""}`}
           onClick={() => setActiveTab("accepted")}
         >
           Accepted Bookings
         </button>
         <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "active" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
+          className={`btn rounded-pill fw-bold px-4 filter-tab ${activeTab === "active" ? "active" : ""}`}
           onClick={() => setActiveTab("active")}
         >
           Active Rentals
         </button>
         <button
-          className={`btn rounded-pill fw-bold px-4 ${activeTab === "finished" ? "btn-danger" : "btn-outline-secondary bg-white"}`}
+          className={`btn rounded-pill fw-bold px-4 filter-tab ${activeTab === "finished" ? "active" : ""}`}
           onClick={() => setActiveTab("finished")}
         >
           Finished Rentals

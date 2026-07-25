@@ -6,6 +6,19 @@ import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
 import { listingMatchesRentalCategory } from "../../utils/categoryMapping.js";
+import categoryListings from "../../data/categoryListings.js";
+import { homeListings } from "../../data/homeListings.js";
+
+// Merge and deduplicate local fallback data for all categories
+const localFallbackData = (() => {
+  const combined = [...categoryListings, ...homeListings];
+  const seen = new Set();
+  return combined.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+})();
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -40,7 +53,19 @@ export default function CategoryPage() {
       try {
         const listingData = await getPublicListings();
         if (!active) return;
-        setListings(listingData);
+        // Merge API data with local fallback, deduplicate by id
+        const apiData = Array.isArray(listingData) && listingData.length > 0 ? listingData : [];
+        const combined = [...apiData, ...localFallbackData];
+        const seen = new Set();
+        const deduped = combined.filter((item) => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+        setListings(deduped);
+      } catch {
+        // On error, use local fallback data
+        if (active) setListings(localFallbackData);
       } finally {
         if (active) setLoading(false);
       }
