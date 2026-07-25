@@ -3107,8 +3107,8 @@ html[data-theme="dark"] .theme-toggle .icon-dark {
 .icon-btn {
   width: 36px;
   height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: none;
+  outline: none;
   background: #fff;
   color: var(--text-muted);
   display: flex;
@@ -4002,7 +4002,8 @@ body[data-public-shell="true"] .auth-page {
   position: relative;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: none;
+  outline: none;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;

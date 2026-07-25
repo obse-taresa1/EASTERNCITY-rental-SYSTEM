@@ -211,7 +211,7 @@ export default function HomeHeroSlider() {
                 />
                 <div className="flex-grow-1">
                   <div className="hero-float-card-rating">
-                    <i className={`${activeSlide.icon}`}></i>
+                    <i className={`bi ${activeSlide.icon}`}></i>
                     <span>{activeSlide.rating}</span>
                     <span
                       className="text-muted"

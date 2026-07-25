@@ -72,6 +72,43 @@ body {
   margin: 0;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   ROOT CAUSE FIX — Bootstrap button border-radius override
+   ─────────────────────────────────────────────────────────────────────────────
+   Bootstrap's reboot CSS (imported in main.jsx before all app CSS) sets:
+
+       button { border-radius: 0 }
+
+   This forces EVERY button element to be a hard-edged rectangle, overriding
+   the `border-radius: 50%` on circular avatars, the `border-radius: 999px` on
+   pill buttons, and the `border-radius: 10px` on soft icon buttons — creating
+   the unwanted square/rectangle outline seen across the entire app.
+
+   FIX: Unset Bootstrap's forced 0 so each button's own class (`.nav-icon-btn`,
+   `.btn-icon-soft`, `.premium-avatar`, `.btn-primary-custom`, etc.) controls
+   its own radius exactly as designed. Nothing else is changed.
+
+   ALSO: Remove Bootstrap's :focus outline suppression which only targets
+   :focus (not :focus-visible), and replace with a proper :focus-visible rule.
+   ───────────────────────────────────────────────────────────────────────────── */
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  border-radius: revert;   /* undo Bootstrap's forced border-radius: 0        */
+  border: none;            /* prevent user-agent 2px outset rectangle          */
+  outline: none;           /* prevent browser default focus outline on click   */
+}
+
+/* Accessibility: branded focus ring ONLY on keyboard Tab navigation */
+button:focus-visible,
+[type="button"]:focus-visible,
+[type="reset"]:focus-visible,
+[type="submit"]:focus-visible {
+  outline: 2px solid #e53935;
+  outline-offset: 2px;
+}
+
 #root {
   width: 1126px;
   max-width: 100%;
