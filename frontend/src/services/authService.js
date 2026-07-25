@@ -76,6 +76,8 @@ function toSafeUser(user) {
     nationalIdFrontUrl: resolveAssetUrl(user.nationalIdFrontUrl || user.nationalIdFront),
     nationalIdBackUrl: resolveAssetUrl(user.nationalIdBackUrl || user.nationalIdBack),
     verificationStatus: normalizeVerificationStatus(user.verificationStatus),
+    avatar: user.avatar || user.profileImage || "",
+    profileImage: user.profileImage || user.avatar || "",
   };
 }
 
@@ -115,6 +117,14 @@ export async function refreshCurrentUser() {
   }
 
   const payload = normalizeAuthPayload(await apiClient.get("/api/users/me"));
+  
+  // Preserve local avatar in case the backend drops it
+  const localUser = getCurrentUser();
+  if (payload.user && localUser) {
+    payload.user.avatar = payload.user.avatar || localUser.avatar || "";
+    payload.user.profileImage = payload.user.profileImage || localUser.profileImage || "";
+  }
+
   persistAuthSession({
     user: payload.user,
     ...getAuthTokens(),

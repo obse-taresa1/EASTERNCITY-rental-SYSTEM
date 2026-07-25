@@ -1,0 +1,150 @@
+/* ==============================================================
+   Categories Page Premium Styles
+   --------------------------------------------------------------
+   Implements modern card design, header, statistics, CTA, and animations
+   ============================================================== */
+
+/* Header */
+.category-page-header {
+  padding-top: 0.2rem;
+  padding-bottom: 0.1rem;
+  text-align: center;
+}
+.category-page-header .title {
+  font-size: 2.5rem; /* approx 40px, within 32-36px range */
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+  color: var(--text);
+}
+.category-page-header .description {
+  font-size: 1rem; /* 16px */
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+/* Statistics Row */
+.category-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+.category-stat {
+  text-align: center;
+}
+.category-stat .number {
+  font-size: 1.75rem; /* 28px */
+  font-weight: 700;
+  color: var(--motorx-red);
+}
+.category-stat .label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Card Grid */
+.category-grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  margin-top: 0.5rem;
+}
+.category-premium-card {
+  background: var(--white);
+  border-radius: 1rem; /* 16px, close to 18-20px */
+  padding: 2rem; /* 32px */
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  box-shadow: var(--card-shadow);
+}
+.category-premium-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+  border-color: var(--motorx-red);
+}
+.category-icon-wrapper {
+  background: rgba(227,30,36,0.12);
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--motorx-red);
+  margin-bottom: 1rem;
+  transition: background 0.25s ease;
+}
+.category-premium-card:hover .category-icon-wrapper {
+  background: rgba(227,30,36,0.25);
+}
+.category-premium-card h4 {
+  font-size: 1.375rem; /* 22px */
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+.category-premium-card p {
+  font-size: 0.9375rem; /* 15px */
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* CTA Section (matched to About CTA) */
+.category-cta-section {
+  background: linear-gradient(
+    135deg,
+    rgba(227, 30, 36, 0.7) 0%,
+    rgba(18, 18, 22, 0.9) 100%
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  color: #fff;
+  margin-top: 2rem;
+}
+.category-cta-section h3 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  color: #fff;
+}
+.category-cta-section p {
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+.category-cta-section .btn-primary {
+  background: var(--white);
+  color: var(--motorx-red);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  margin: 0 0.5rem;
+  transition: background 0.25s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+.category-cta-section .btn-primary:hover {
+  background: rgba(255,255,255,0.85);
+}
+
+
+/* Fade-in animation */
+@keyframes fade-in-up {
+  from {opacity:0; transform: translateY(20px);}
+  to {opacity:1; transform: translateY(0);}
+}
+.category-page {
+  animation: fade-in-up 0.6s ease forwards;
+}

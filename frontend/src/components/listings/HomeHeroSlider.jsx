@@ -40,21 +40,6 @@ const slides = [
     specs: ["RTX 4070", "16GB RAM", "1TB SSD"],
   },
   {
-    titleKey: "heroToolsTitle",
-    subtitleKey: "heroToolsSubtitle",
-    image: heroDrill,
-    cardTitle: "DeWalt Power Drill Set",
-    cardPrice: "ETB 2,300",
-    cardLocation: "Harar",
-    categoryId: "construction-diy",
-    categoryKey: "tools",
-    icon: "bi-hammer",
-    itemId: "dewalt-drill",
-    rating: "4.7",
-    reviewsCount: 15,
-    specs: ["20V Max", "Cordless", "2 Batteries"],
-  },
-  {
     titleKey: "heroCameraTitle",
     subtitleKey: "heroCameraSubtitle",
     image: heroCanon,
@@ -99,12 +84,57 @@ const slides = [
     reviewsCount: 11,
     specs: ["21-Speed", "Disc Brakes", "Suspension"],
   },
+  {
+    titleKey: "heroEventTitle",
+    subtitleKey: "heroEventSubtitle",
+    image: "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=1200&h=800&fit=crop",
+    cardTitle: "Wedding Tent 20x30m",
+    cardPrice: "ETB 8,000",
+    cardLocation: "Dire Dawa",
+    categoryId: "party-wedding",
+    categoryKey: "party",
+    icon: "bi-tent",
+    itemId: "",
+    rating: "4.9",
+    reviewsCount: 24,
+    specs: ["200 Capacity", "Lighting", "Setup"],
+  },
+  {
+    titleKey: "heroToolsTitle",
+    subtitleKey: "heroToolsSubtitle",
+    image: heroDrill,
+    cardTitle: "DeWalt Drill Set",
+    cardPrice: "ETB 500",
+    cardLocation: "Harar",
+    categoryId: "tools",
+    categoryKey: "tools",
+    icon: "bi-tools",
+    itemId: "",
+    rating: "4.8",
+    reviewsCount: 10,
+    specs: ["Cordless", "20V", "Brushless"],
+  },
+  {
+    titleKey: "heroEventTitle",
+    subtitleKey: "heroEventSubtitle",
+    image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&h=800&fit=crop",
+    cardTitle: "Wedding Chairs (Set of 50)",
+    cardPrice: "ETB 1,500",
+    cardLocation: "Jigjiga",
+    categoryId: "party-wedding",
+    categoryKey: "party",
+    icon: "bi-shop",
+    itemId: "",
+    rating: "4.9",
+    reviewsCount: 15,
+    specs: ["Plastic", "White", "Stackable"],
+  }
 ];
 
 export default function HomeHeroSlider() {
   const { t } = useLanguage();
-  const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
   const activeSlide = slides[activeIndex];
 
   useEffect(() => {
@@ -181,7 +211,7 @@ export default function HomeHeroSlider() {
                 />
                 <div className="flex-grow-1">
                   <div className="hero-float-card-rating">
-                    <i className="bi bi-star-fill"></i>
+                    <i className={`${activeSlide.icon}`}></i>
                     <span>{activeSlide.rating}</span>
                     <span
                       className="text-muted"

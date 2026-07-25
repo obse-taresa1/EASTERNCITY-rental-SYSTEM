@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getInitials } from "../../utils/user.js";
+import { dashboardForRole } from "../../services/authService.js";
 import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
 import ThemeToggle from "../common/ThemeToggle.jsx";
 
@@ -23,17 +24,25 @@ export default function MobileDrawerMenu({ open, onClose }) {
       <div className={`mobile-drawer ${open ? "open" : ""}`}>
         <div className="mobile-drawer-header">
           {isAuthenticated ? (
-            <div className="mobile-drawer-profile">
-              <div className="drawer-avatar">
-                <span className="avatar-initials">
-                  {getInitials(currentUser?.name)}
-                </span>
+            <Link to="/dashboard-settings" onClick={onClose} className="mobile-drawer-profile" style={{ textDecoration: 'none', display: 'flex', color: 'inherit' }}>
+              <div className="drawer-avatar" style={{ padding: currentUser?.avatar ? 0 : undefined, overflow: 'hidden' }}>
+                {currentUser?.avatar ? (
+                  <img 
+                    src={currentUser.avatar} 
+                    alt="Profile" 
+                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
+                  />
+                ) : (
+                  <span className="avatar-initials">
+                    {getInitials(currentUser?.name)}
+                  </span>
+                )}
               </div>
               <div className="drawer-user-info">
                 <span className="drawer-user-name">{currentUser?.name}</span>
                 <span className="drawer-user-email">{currentUser?.email}</span>
               </div>
-            </div>
+            </Link>
           ) : (
             <div className="mobile-drawer-profile guest-profile">
               <div className="drawer-avatar">
@@ -85,7 +94,13 @@ export default function MobileDrawerMenu({ open, onClose }) {
               <>
                 <li className="drawer-divider"></li>
                 <li>
-                  <Link to="/profile" onClick={onClose} className="drawer-menu-link">
+                  <Link to={dashboardForRole(currentUser?.role)} onClick={onClose} className="drawer-menu-link">
+                    <i className="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard-settings" onClick={onClose} className="drawer-menu-link">
                     <i className="bi bi-person"></i>
                     <span>Profile Info</span>
                   </Link>

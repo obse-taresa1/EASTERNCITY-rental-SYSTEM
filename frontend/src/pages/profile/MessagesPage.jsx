@@ -212,7 +212,7 @@ export default function MessagesPage() {
         />
       ) : (
         <section className="messages-layout">
-          <aside className="messages-list premium-glass-card">
+          <aside className="messages-list premium-card">
             {conversations.map((conversation) => (
               <Link
                 to={`/messages?conversation=${conversation.id}`}
@@ -256,7 +256,7 @@ export default function MessagesPage() {
             ))}
           </aside>
 
-          <article className="message-chat premium-glass-card">
+          <article className="message-chat">
             <div className="message-chat-header">
               <div>
                 <span className="section-label">CHAT WITH OWNER</span>

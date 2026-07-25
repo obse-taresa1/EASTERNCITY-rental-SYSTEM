@@ -211,7 +211,7 @@ export default function ItemDetailsPage() {
             </button>
             <button
               type="button"
-              className="btn btn-outline-danger details-contact-button"
+              className="btn btn-accent-custom btn-shine details-contact-button mt-3"
               onClick={handleContactOwner}
               disabled={contactLoading}
             >
@@ -223,7 +223,7 @@ export default function ItemDetailsPage() {
                 {contactError}
               </div>
             )}
-            <p className="details-contact-helper">
+            <p className="details-contact-helper mt-3">
               Discuss availability, rental duration, pickup, delivery, pricing,
               and payment arrangements directly with the owner.
             </p>

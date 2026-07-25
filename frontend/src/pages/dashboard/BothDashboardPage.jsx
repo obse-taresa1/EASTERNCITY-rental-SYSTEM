@@ -254,8 +254,35 @@ export default function BothDashboardPage() {
       icon: "bi-shield-check",
       label: "Verification",
       value: verificationStatus,
-      color: isVerified ? "stat-verified" : "stat-pending",
+    color: isVerified ? "stat-verified" : "stat-pending",
       to: "/verification",
+    },
+  ];
+
+  const QUICK_ACTIONS = [
+    {
+      to: "/my-listings/new",
+      label: "List an Item",
+      icon: "bi-plus-circle",
+      color: "ud-action-blue",
+    },
+    {
+      to: "/messages",
+      label: "Messages",
+      icon: "bi-chat-text",
+      color: "ud-action-purple",
+    },
+    {
+      to: "/profile/settings",
+      label: "Edit Profile",
+      icon: "bi-person-gear",
+      color: "ud-action-orange",
+    },
+    {
+      to: "/items",
+      label: "Browse Items",
+      icon: "bi-search",
+      color: "ud-action-teal",
     },
   ];
 

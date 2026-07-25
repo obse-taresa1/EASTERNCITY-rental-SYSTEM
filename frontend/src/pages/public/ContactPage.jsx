@@ -37,24 +37,80 @@ export default function ContactPage() {
     <main className="container page-header pb-5 legal-support-page">
       <div className="row g-4">
         <div className="col-lg-5">
-          <section className="card card-custom p-4 h-100">
-            <span className="section-label">{t("contactEyebrow")}</span>
+          <style>{`
+            .contact-shiny-box {
+              background: linear-gradient(135deg, #e31e24 0%, #b3161c 100%) !important;
+              position: relative;
+              overflow: hidden;
+              box-shadow: 0 10px 25px rgba(227, 30, 36, 0.3) !important;
+              border-radius: 12px !important;
+              color: white !important;
+              border: none !important;
+              transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+            }
+            .contact-shiny-box:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 15px 35px rgba(227, 30, 36, 0.4) !important;
+            }
+            .contact-shiny-box::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: -150%;
+              width: 50%;
+              height: 100%;
+              background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+              transform: skewX(-25deg);
+              transition: left 0.6s ease;
+              pointer-events: none;
+            }
+            .contact-shiny-box:hover::before {
+              left: 150%;
+            }
+            .contact-form-shiny {
+              position: relative;
+              overflow: hidden;
+              transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
+            }
+            .contact-form-shiny:hover {
+              transform: translateY(-5px);
+              border-color: #e31e24 !important;
+              box-shadow: 0 10px 30px rgba(227, 30, 36, 0.25), 0 0 15px rgba(227, 30, 36, 0.4) !important;
+            }
+            .contact-form-shiny::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: -150%;
+              width: 50%;
+              height: 100%;
+              background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(227, 30, 36, 0.1) 50%, rgba(255,255,255,0) 100%);
+              transform: skewX(-25deg);
+              transition: left 0.6s ease;
+              pointer-events: none;
+            }
+            .contact-form-shiny:hover::before {
+              left: 150%;
+            }
+          `}</style>
+          <section className="card card-custom p-4 h-100 contact-shiny-box text-white border-0">
+            <span className="section-label text-white-50" style={{background: 'rgba(255,255,255,0.1)'}}>{t("contactEyebrow")}</span>
             <h1 className="h3 mb-3">{t("contactUs")}</h1>
-            <p className="text-muted">
+            <p className="text-white-50 mb-5">
               {t("contactLead")}
             </p>
 
-            <p className="mb-2">
-              <i className="bi bi-envelope"></i> support@cityrent.com
+            <p className="mb-3 d-flex align-items-center gap-2">
+              <i className="bi bi-envelope fs-4"></i> support@cityrent.com
             </p>
-            <p className="mb-0">
-              <i className="bi bi-geo-alt"></i> {t("contactLocation")}
+            <p className="mb-0 d-flex align-items-center gap-2">
+              <i className="bi bi-geo-alt fs-4"></i> {t("contactLocation")}
             </p>
           </section>
         </div>
 
         <div className="col-lg-7">
-          <section className="card card-custom p-4">
+          <section className="card card-custom p-4 contact-form-shiny">
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label className="form-label" htmlFor="contact-name">

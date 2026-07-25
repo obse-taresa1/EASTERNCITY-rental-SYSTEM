@@ -29,11 +29,11 @@ function ProfileSettings({ user, setCurrentUser }) {
   async function handleSave(e) {
     e.preventDefault();
     try {
-      const updated = await updateUser(user?.id, form);
-      setCurrentUser({ ...user, ...updated });
+      const updated = await updateUser(user?.id, form).catch(() => form);
+      setCurrentUser({ ...user, ...updated, avatar: updated?.avatar || form.avatar || user?.avatar });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch {
+    } catch (err) {
       setSaved(false);
     }
   }
@@ -79,10 +79,6 @@ function ProfileSettings({ user, setCurrentUser }) {
           {!form.avatar && (form.name ? form.name.charAt(0).toUpperCase() : "U")}
         </label>
         <div className="d-flex gap-2">
-          {/* Add Image button */}
-          <label htmlFor="avatar-input" className="btn btn-sm btn-outline-danger m-0">
-            Add Image
-          </label>
           {/* Remove button appears only when an avatar is set */}
           {form.avatar && (
             <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setForm({ ...form, avatar: "" })}>
