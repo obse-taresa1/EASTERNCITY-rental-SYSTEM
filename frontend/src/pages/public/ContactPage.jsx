@@ -3,8 +3,10 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { createContactMessage } from "../../services/contactMessageService.js";
+import usePageTitle from "../../hooks/usePageTitle.js";
 
 export default function ContactPage() {
+  usePageTitle("Contact");
   const location = useLocation();
   const [message, setMessage] = useState("");
   const { currentUser, user } = useAuth();
@@ -34,12 +36,12 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="container page-header pb-5 legal-support-page">
+<section className="contact-page"><div className="container page-header pb-5 legal-support-page">
       <div className="row g-4">
         <div className="col-lg-5">
           <style>{`
             .contact-shiny-box {
-              background: linear-gradient(135deg, #e31e24 0%, #b3161c 100%) !important;
+              background: linear-gradient(135deg, rgba(138, 15, 30, 0.85) 0%, rgba(18, 18, 22, 0.9) 100%) !important;
               position: relative;
               overflow: hidden;
               box-shadow: 0 10px 25px rgba(227, 30, 36, 0.3) !important;
@@ -176,6 +178,6 @@ export default function ContactPage() {
           </section>
         </div>
       </div>
-    </main>
+    </div></section>
   );
 }

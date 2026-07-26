@@ -7,8 +7,10 @@ import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
 import ProfilePanel from "../common/ProfilePanel.jsx";
 import ThemeToggle from "../common/ThemeToggle.jsx";
 import { getInitials } from "../../utils/user.js";
+import { useTheme } from "../../context/ThemeContext.jsx";
 import MobileDrawerMenu from "./MobileDrawerMenu.jsx";
-import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
+import lightLogo from "../../assets/images/eastern-cities-header-logo-transparent.png";
+import darkLogo from "../../assets/images/eastern-cities-header-logo-white.png";
 
 export default function PublicNavbar() {
   const { currentUser, isAuthenticated, logout } = useAuth();
@@ -16,6 +18,8 @@ export default function PublicNavbar() {
   const navigate = useNavigate();
   const [panelOpen, setPanelOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+const { theme } = useTheme();
+const logoSrc = theme === "dark" ? darkLogo : lightLogo;
 
   const handleLogout = () => {
     setPanelOpen(false);
@@ -28,7 +32,7 @@ export default function PublicNavbar() {
       <div className="container">
         <div className="motorx-nav-flex">
           <Link className="motorx-logo" to="/">
-            <img src={logo} alt="Eastern Cities" />
+            <img src={logoSrc} alt="Eastern Cities" className="theme-aware-logo" />
           </Link>
 
           {/* Desktop hamburger toggle (hidden on mobile via mobile-ui.css) */}

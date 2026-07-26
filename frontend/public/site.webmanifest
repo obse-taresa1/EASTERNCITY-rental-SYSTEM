@@ -1,0 +1,22 @@
+{
+  "name": "Eastern Cities Rental System",
+  "short_name": "Eastern Cities",
+  "description": "Rent anything across Jigjiga, Harar and Dire Dawa — Eastern Cities Rental Marketplace",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#E31E24",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

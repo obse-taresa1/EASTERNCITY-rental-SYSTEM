@@ -1,34 +1,10 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: 'Montserrat', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: 'Montserrat', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
+@import "./styles/designTokens.css";
+@import "./components/ui/Button.css";
+@import "./components/ui/Card.css";
+@import "./components/ui/Input.css";
+@import "./components/ui/Hero.css";
+@import "./components/ui/IconContainer.css";
+/* Existing index.css now relies on design tokens for colors, fonts, etc. */
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -70,6 +46,43 @@
 
 body {
   margin: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ROOT CAUSE FIX — Bootstrap button border-radius override
+   ─────────────────────────────────────────────────────────────────────────────
+   Bootstrap's reboot CSS (imported in main.jsx before all app CSS) sets:
+
+       button { border-radius: 0 }
+
+   This forces EVERY button element to be a hard-edged rectangle, overriding
+   the `border-radius: 50%` on circular avatars, the `border-radius: 999px` on
+   pill buttons, and the `border-radius: 10px` on soft icon buttons — creating
+   the unwanted square/rectangle outline seen across the entire app.
+
+   FIX: Unset Bootstrap's forced 0 so each button's own class (`.nav-icon-btn`,
+   `.btn-icon-soft`, `.premium-avatar`, `.btn-primary-custom`, etc.) controls
+   its own radius exactly as designed. Nothing else is changed.
+
+   ALSO: Remove Bootstrap's :focus outline suppression which only targets
+   :focus (not :focus-visible), and replace with a proper :focus-visible rule.
+   ───────────────────────────────────────────────────────────────────────────── */
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  border-radius: revert;   /* undo Bootstrap's forced border-radius: 0        */
+  border: none;            /* prevent user-agent 2px outset rectangle          */
+  outline: none;           /* prevent browser default focus outline on click   */
+}
+
+/* Accessibility: branded focus ring ONLY on keyboard Tab navigation */
+button:focus-visible,
+[type="button"]:focus-visible,
+[type="reset"]:focus-visible,
+[type="submit"]:focus-visible {
+  outline: 2px solid #e53935;
+  outline-offset: 2px;
 }
 
 #root {

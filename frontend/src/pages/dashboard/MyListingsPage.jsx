@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { getMyListings, deleteListing } from "../../services/listingApiService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
 import { useNavigate } from "react-router-dom";
 import ListingManagementTable from "../../components/dashboard/ListingManagementTable.jsx";
 import BookingTable from "../../components/dashboard/BookingTable.jsx";

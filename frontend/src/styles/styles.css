@@ -1,6 +1,6 @@
 @import url("./premium.css");
 /* ==========================================================================
-   Citywide Item Rental System - Main Stylesheet
+   Eastern Cities Item Rental System - Main Stylesheet
    Technologies: CSS3, Flexbox, Bootstrap 5 overrides
    ========================================================================== */
 
@@ -29,19 +29,22 @@
   --logo-height: 110px;
 }
 
-/* ---------- Dark Theme (CSS-only toggle) ---------- */
+/* ---------- Premium Dark Theme ---------- */
 html[data-theme="dark"] {
+  --bg-gradient: radial-gradient(circle at top right, rgba(227, 30, 36, 0.08), transparent 40%), linear-gradient(135deg, #0b1121 0%, #0f172a 100%);
   --bg: #0f172a;
-  --text: #f1f5f9;
-  --text-muted: #e2e5ea;
-  --white: #ffffff;
-  --border: #334155;
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  --surface-color: #1E293B;
+  --text: #ffffff;
+  --text-muted: #94a3b8;
+  --white: #1E293B; /* Treat cards as surface */
+  --border: rgba(255, 255, 255, 0.1);
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 10px 30px rgba(227, 30, 36, 0.15);
 }
 
 html[data-theme="dark"] body {
-  background-color: var(--bg);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text);
 }
 
@@ -51,15 +54,26 @@ html[data-theme="dark"] .search-box,
 html[data-theme="dark"] .auth-card,
 html[data-theme="dark"] .sidebar,
 html[data-theme="dark"] .chat-sidebar,
-html[data-theme="dark"] .chat-main {
-  background-color: var(--white) !important;
+html[data-theme="dark"] .chat-main,
+html[data-theme="dark"] .category-card {
+  background-color: var(--surface-color) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
 }
 
 html[data-theme="dark"] .form-control,
-html[data-theme="dark"] .form-select {
-  background-color: #0f172a;
-  border-color: var(--border);
-  color: var(--text);
+html[data-theme="dark"] .form-select,
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea {
+  background-color: #0f172a !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .navbar-custom {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ---------- Base & Typography ---------- */
@@ -796,6 +810,13 @@ html[data-theme="dark"] .review-modal-card .form-label {
   box-shadow: var(--card-shadow-hover);
   padding: 1.5rem;
   border: 1px solid var(--border);
+}
+
+/* Dark mode */
+html[data-theme="dark"] .search-box {
+  background: var(--surface-color);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .search-box .row {
@@ -3107,8 +3128,8 @@ html[data-theme="dark"] .theme-toggle .icon-dark {
 .icon-btn {
   width: 36px;
   height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: none;
+  outline: none;
   background: #fff;
   color: var(--text-muted);
   display: flex;
@@ -4002,7 +4023,8 @@ body[data-public-shell="true"] .auth-page {
   position: relative;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: none;
+  outline: none;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -4533,7 +4555,7 @@ main.page-header.dashboard-main,
   }
 }
 
-/* ---------- CityWide AI Support Chatbot ---------- */
+/* ---------- Eastern Cities AI Support Chatbot ---------- */
 .home-search-form .form-select,
 .home-search-form .form-range {
   cursor: pointer;
@@ -4999,7 +5021,7 @@ main.page-header.dashboard-main,
   }
 }
 
-/* ---------- Telegram-inspired CityWide Support Chat ---------- */
+/* ---------- Telegram-inspired Eastern Cities Support Chat ---------- */
 .cw-support-widget {
   --cw-telegram-bg: #e7edf4;
   --cw-telegram-panel: #ffffff;
@@ -7637,7 +7659,8 @@ html[data-theme="dark"] .dashboard-sidebar {
   z-index: 1200;
   width: 230px;
   padding: 0.55rem;
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--surface, rgba(255, 255, 255, 0.96));
+  border: 1px solid var(--border);
 }
 
 .language-option {
@@ -7667,7 +7690,7 @@ html[data-theme="dark"] .dashboard-sidebar {
   place-items: center;
   height: 32px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--bg-color, #fff);
   border: 1px solid rgba(227, 30, 36, 0.18);
 }
 

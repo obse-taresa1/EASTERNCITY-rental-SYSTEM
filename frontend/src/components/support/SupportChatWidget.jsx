@@ -17,7 +17,7 @@ export default function SupportChatWidget() {
   const [messages, setMessages] = useState([
     {
       sender: "bot",
-      text: "Hello, I am the CityWide support assistant. I can help with registration, login, service requests, complaints, tracking, profile updates, notifications, and platform navigation.",
+      text: "Hello, I am the Eastern Cities support assistant. I can help with registration, login, service requests, complaints, tracking, profile updates, notifications, and platform navigation.",
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -41,7 +41,7 @@ export default function SupportChatWidget() {
       },
       {
         sender: "bot",
-        text: "Thanks for your message. CityWide support will guide you through the next step.",
+        text: "Thanks for your message. Eastern Cities support will guide you through the next step.",
         time: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -63,12 +63,12 @@ export default function SupportChatWidget() {
         isMinimized ? "is-minimized" : ""
       }`.trim()}
       data-cw-support
-      aria-label="CityWide customer support chat"
+      aria-label="Eastern Cities customer support chat"
     >
       <button
         className="cw-support-launcher"
         type="button"
-        aria-label="Open CityWide support chat"
+        aria-label="Open Eastern Cities support chat"
         aria-expanded={isOpen}
         onClick={() => {
           setIsOpen(true);

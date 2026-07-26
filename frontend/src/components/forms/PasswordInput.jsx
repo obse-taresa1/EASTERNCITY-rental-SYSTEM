@@ -12,21 +12,23 @@ export default function PasswordInput({
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <div className="input-group">
+    <div className="premium-input-wrapper">
+      <i className="bi bi-lock leading-icon"></i>
       <input
         id={id}
         name={name}
         type={isVisible ? "text" : "password"}
-        className="form-control"
+        className="premium-input has-icon"
         value={value}
         onChange={onChange}
         minLength={minLength}
         required={required}
         autoComplete={autoComplete}
+        placeholder="Enter your password"
       />
       <button
         type="button"
-        className="btn btn-outline-secondary"
+        className="premium-password-toggle"
         onClick={() => setIsVisible((current) => !current)}
         aria-label={isVisible ? "Hide password" : "Show password"}
       >
