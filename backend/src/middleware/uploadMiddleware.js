@@ -66,12 +66,21 @@ const verificationUpload = multer({
   },
 });
 
+const profileUpload = multer({
+  storage: createStorage("profiles"),
+  fileFilter: imageFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
 module.exports = {
   listingImages: listingUpload.fields([
     { name: "images", maxCount: 8 },
     { name: "paymentProof", maxCount: 1 },
   ]),
   paymentProof: paymentUpload.single("paymentProof"),
+  profileImage: profileUpload.single("profileImage"),
   verificationDocuments: verificationUpload.fields([
     { name: "nationalIdFront", maxCount: 1 },
     { name: "nationalIdBack", maxCount: 1 },

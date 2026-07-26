@@ -31,6 +31,20 @@ const login = async (req, res, next) => {
   }
 };
 
+const googleLogin = async (req, res, next) => {
+  try {
+    const result = await authService.loginWithGoogle(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: 'Google login successful.',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const refresh = async (req, res, next) => {
   try {
     const result = await authService.refreshSession(req.body.refreshToken);
@@ -102,6 +116,7 @@ const resetPassword = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  googleLogin,
   refresh,
   logout,
   changePassword,

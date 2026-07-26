@@ -34,6 +34,41 @@ function publicUser(user) {
   return userWithoutPassword;
 }
 
+async function getGoogleProfile({ accessToken, credential }) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+  const url = accessToken
+    ? 'https://www.googleapis.com/oauth2/v3/userinfo'
+    : `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`;
+
+  const response = await fetch(url, { headers });
+  const profile = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error('Google sign-in failed. Please try again.');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const email = String(profile.email || '').trim().toLowerCase();
+
+  if (!email) {
+    const error = new Error('Google did not return an accessible email address for this account.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (profile.email_verified === false || profile.email_verified === 'false') {
+    const error = new Error('Google account email is not verified.');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  return {
+    email,
+    name: String(profile.name || profile.given_name || email.split('@')[0]).trim(),
+  };
+}
+
 async function createSession(user) {
   if (String(user.status || 'ACTIVE').toUpperCase() === 'SUSPENDED') {
     const error = new Error('Account is suspended.');
@@ -107,6 +142,26 @@ const loginUser = async (email, password) => {
     const error = new Error('Invalid email or password.');
     error.statusCode = 401;
     throw error;
+  }
+
+  return createSession(user);
+};
+
+const loginWithGoogle = async ({ accessToken, credential }) => {
+  const profile = await getGoogleProfile({ accessToken, credential });
+
+  let user = await prisma.user.findUnique({ where: { email: profile.email } });
+
+  if (!user) {
+    const randomPassword = crypto.randomBytes(32).toString('hex');
+    user = await prisma.user.create({
+      data: {
+        name: profile.name || profile.email,
+        email: profile.email,
+        password: await hashPassword(randomPassword),
+        role: 'USER',
+      },
+    });
   }
 
   return createSession(user);
@@ -269,6 +324,7 @@ const resetPassword = async (token, newPassword) => {
 module.exports = {
   registerUser,
   loginUser,
+  loginWithGoogle,
   refreshSession,
   revokeRefreshToken,
   changePassword,

@@ -192,8 +192,7 @@ async function getCommonDashboardData(query = {}) {
     counts: {
       totalUsers: users.length,
       totalAdmins: admins,
-      totalOwners: new Set(listings.map((listing) => listing.ownerId).filter(Boolean)).size,
-      totalRenters: new Set(bookings.map((booking) => booking.renterId).filter(Boolean)).size,
+      totalBookings: bookings.length,
       totalListings,
       activeListings,
       pendingListings,

@@ -66,6 +66,7 @@ function toSafeUser(user) {
     email: user.email,
     role: coerceRole(user.role),
     status: user.status || "",
+    phone: user.phone || "",
     createdAt: user.createdAt || "",
     businessName: user.businessName || "",
     city: user.city || "",
@@ -76,8 +77,9 @@ function toSafeUser(user) {
     nationalIdFrontUrl: resolveAssetUrl(user.nationalIdFrontUrl || user.nationalIdFront),
     nationalIdBackUrl: resolveAssetUrl(user.nationalIdBackUrl || user.nationalIdBack),
     verificationStatus: normalizeVerificationStatus(user.verificationStatus),
-    avatar: user.avatar || user.profileImage || "",
-    profileImage: user.profileImage || user.avatar || "",
+    profileImageUrl: resolveAssetUrl(user.profileImageUrl || user.profileImage || user.avatar),
+    avatar: resolveAssetUrl(user.avatar || user.profileImage || user.profileImageUrl),
+    profileImage: resolveAssetUrl(user.profileImage || user.avatar || user.profileImageUrl),
   };
 }
 
@@ -94,6 +96,17 @@ function normalizeAuthPayload(payload) {
 export async function loginUser(email, password) {
   const payload = normalizeAuthPayload(
     await apiClient.post("/api/auth/login", { email, password }),
+  );
+  persistAuthSession(payload);
+  return payload.user;
+}
+
+export async function loginWithGoogleCredential(googlePayload) {
+  const payload = normalizeAuthPayload(
+    await apiClient.post(
+      "/api/auth/google",
+      typeof googlePayload === "string" ? { credential: googlePayload } : googlePayload,
+    ),
   );
   persistAuthSession(payload);
   return payload.user;
@@ -156,6 +169,13 @@ export async function resetPassword({ token, newPassword, confirmPassword }) {
   });
 }
 
+export async function changePassword({ currentPassword, newPassword }) {
+  return apiClient.patch("/api/auth/change-password", {
+    currentPassword,
+    newPassword,
+  });
+}
+
 export function dashboardForRole(role) {
   const normalized = coerceRole(role);
   const routes = {
@@ -165,6 +185,17 @@ export function dashboardForRole(role) {
   };
 
   return routes[normalized] || "/dashboard";
+}
+
+export function profileForRole(role) {
+  const normalized = coerceRole(role);
+  const routes = {
+    SUPER_ADMIN: "/super-admin-dashboard/profile",
+    ADMIN: "/admin-dashboard/profile",
+    USER: "/profile",
+  };
+
+  return routes[normalized] || "/profile";
 }
 
 export function coerceRole(role) {

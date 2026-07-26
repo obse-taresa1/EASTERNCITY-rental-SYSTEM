@@ -10,7 +10,7 @@ import { getInitials } from "../../utils/user.js";
 import { useTheme } from "../../context/ThemeContext.jsx";
 import MobileDrawerMenu from "./MobileDrawerMenu.jsx";
 import lightLogo from "../../assets/images/eastern-cities-header-logo-transparent.png";
-import darkLogo from "../../assets/images/eastern-cities-header-logo-white.png";
+import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
 
 export default function PublicNavbar() {
   const { currentUser, isAuthenticated, logout } = useAuth();

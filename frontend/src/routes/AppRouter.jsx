@@ -54,6 +54,7 @@ import AdminNotificationsPage from "../pages/admin/AdminNotificationsPage.jsx";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage.jsx";
 import AdminBookingsPage from "../pages/admin/AdminBookingsPage.jsx";
 import AdminReviewsPage from "../pages/admin/AdminReviewsPage.jsx";
+import AdminProfilePage from "../pages/admin/AdminProfilePage.jsx";
 
 // Inside Admin Layout routes block (after existing admin routes)
 
@@ -246,6 +247,10 @@ export default function AppRouter() {
                 element={<AdminNotificationsPage />}
               />
               <Route
+                path="/admin-dashboard/profile"
+                element={<AdminProfilePage />}
+              />
+              <Route
                 path="/admin-dashboard/bookings"
                 element={<AdminBookingsPage />}
               />
@@ -307,6 +312,10 @@ export default function AppRouter() {
               <Route
                 path="/super-admin-dashboard/notifications"
                 element={<AdminNotificationsPage />}
+              />
+              <Route
+                path="/super-admin-dashboard/profile"
+                element={<AdminProfilePage />}
               />
               <Route
                 path="/super-admin-dashboard/analytics"

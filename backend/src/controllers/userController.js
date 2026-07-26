@@ -87,6 +87,39 @@ const update = async (req, res, next) => {
   }
 };
 
+const updateProfileImage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (req.user.role === 'USER' && req.user.id !== id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You can only update your own profile.',
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Profile image is required.',
+      });
+    }
+
+    const updatedUser = await userService.updateProfileImage(
+      id,
+      `/uploads/profiles/${req.file.filename}`,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile image updated successfully.',
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * Delete a user (Admin/Super Admin only)
  */
@@ -134,5 +167,6 @@ module.exports = {
   getUsers,
   getUser,
   update,
+  updateProfileImage,
   remove,
 };

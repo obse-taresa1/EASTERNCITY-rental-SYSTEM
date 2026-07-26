@@ -73,19 +73,14 @@ export default function SuperAdminDashboardPage() {
       value: counts.totalAdmins || 0,
     },
     {
-      icon: "bi-person-badge",
-      label: "Total Owners",
-      value: counts.totalOwners || 0,
-    },
-    {
-      icon: "bi-person-check",
-      label: "Total Renters",
-      value: counts.totalRenters || 0,
-    },
-    {
       icon: "bi-box-seam",
       label: "Total Listings",
       value: counts.totalListings || 0,
+    },
+    {
+      icon: "bi-calendar-check",
+      label: "Total Bookings",
+      value: counts.totalBookings || 0,
     },
     {
       icon: "bi-grid",

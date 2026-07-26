@@ -3,26 +3,21 @@ import { Link } from 'react-router-dom';
 import { fetchCategories } from '../../services/categoryApiService';
 import usePageTitle from '../../hooks/usePageTitle.js';
 import '../../styles/categories-premium.css';
-import { 
-  Camera, PartyPopper, Car, Bike, Calendar, Sofa, 
-  Dumbbell, Hammer, Gamepad2, Refrigerator, Shirt, 
-  Tent, Wrench, Package, Search 
-} from 'lucide-react';
 
 const iconMap = {
-  'electronics-cameras': Camera,
-  'party-wedding': PartyPopper,
-  'vehicles': Car,
-  'cars-bikes': Bike,
-  'events': Calendar,
-  'furniture': Sofa,
-  'sports-outdoor': Dumbbell,
-  'construction-diy': Hammer,
-  'gadgets': Gamepad2,
-  'home-appliances': Refrigerator,
-  'fashion-accessories': Shirt,
-  'travel-camping': Tent,
-  'tools': Wrench,
+  'electronics-cameras': 'bi-camera',
+  'party-wedding': 'bi-stars',
+  'vehicles': 'bi-car-front',
+  'cars-bikes': 'bi-bicycle',
+  'events': 'bi-calendar-event',
+  'furniture': 'bi-lamp',
+  'sports-outdoor': 'bi-dribbble',
+  'construction-diy': 'bi-hammer',
+  'gadgets': 'bi-controller',
+  'home-appliances': 'bi-house-gear',
+  'fashion-accessories': 'bi-bag',
+  'travel-camping': 'bi-backpack',
+  'tools': 'bi-wrench',
 };
 
 export default function CategoriesPage() {
@@ -50,7 +45,6 @@ export default function CategoriesPage() {
   );
 
   const totalListings = categories.reduce((sum, cat) => sum + (cat.listingsCount || 0), 0);
-  const totalVerified = 230; // Static mockup for verified owners, as requested in stats
 
   return (
     <div className="premium-categories-page">
@@ -72,7 +66,7 @@ export default function CategoriesPage() {
         {/* Search & Stats Bar */}
         <div className="search-stats-container mb-5">
           <div className="search-wrapper">
-            <Search className="search-icon" size={20} />
+            <i className="bi bi-search search-icon" />
             <input 
               type="text" 
               className="premium-search-input" 
@@ -87,9 +81,6 @@ export default function CategoriesPage() {
             </div>
             <div className="stat-item">
               <strong>{totalListings}</strong> Listings
-            </div>
-            <div className="stat-item">
-              <strong>{totalVerified}</strong> Verified Owners
             </div>
             <div className="stat-item">
               <strong>3</strong> Cities
@@ -111,16 +102,16 @@ export default function CategoriesPage() {
           ) : filteredCategories.length === 0 ? (
             <div className="empty-categories-state">
               <h3>No categories found</h3>
-              <p>Be the first owner to add an item!</p>
+              <p>Be the first user to add an item!</p>
               <Link to="/dashboard/list-item" className="btn btn-accent-custom mt-3">List Item</Link>
             </div>
           ) : (
             filteredCategories.map((cat) => {
-              const IconComponent = iconMap[cat.slug] || Package;
+              const iconClass = iconMap[cat.slug] || 'bi-box-seam';
               return (
                 <Link to={`/categories/${cat.id}`} key={cat.id} className="premium-category-card">
                   <div className="premium-card-icon">
-                    <IconComponent size={28} />
+                    <i className={`bi ${iconClass}`} />
                   </div>
                   <h3 className="premium-card-title">{cat.name}</h3>
                   <p className="premium-card-desc">
@@ -139,7 +130,7 @@ export default function CategoriesPage() {
         {/* Bottom CTA Section */}
         <div className="bottom-cta-section mt-5 text-center">
           <h2>Can't find what you're looking for?</h2>
-          <p>Become an owner and list your item today.</p>
+          <p>List your item today.</p>
           <Link to="/dashboard/list-item" className="btn btn-primary-custom mt-3">List an Item</Link>
         </div>
 

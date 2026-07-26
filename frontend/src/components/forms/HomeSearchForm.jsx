@@ -33,8 +33,8 @@ function PortalDropdown({ value, onChange, options, placeholder, style, disabled
       ...(openUp
         ? { bottom: viewportH - rect.top }
         : { top: rect.bottom }),
-      background: isDark ? "#1e293b" : "#fff",
-      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #dee2e6",
+      background: isDark ? "var(--bg-card)" : "#fff",
+      border: isDark ? "1px solid var(--border)" : "1px solid #dee2e6",
       borderRadius: "8px",
       boxShadow: isDark ? "0 12px 36px rgba(0,0,0,0.45)" : "0 12px 36px rgba(0,0,0,0.15)",
       maxHeight: "240px",
@@ -102,14 +102,14 @@ function PortalDropdown({ value, onChange, options, placeholder, style, disabled
         .hsf-search-btn { transition: all 0.2s ease; }
         .hsf-search-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(227,30,36,0.3); }
         .hsf-search-btn:active { transform: translateY(0); }
-        html[data-theme="dark"] .hsf-cat-trigger { background-color:#0f172a!important; color:#e2e8f0!important; border-color: rgba(255,255,255,0.12)!important; }
+        html[data-theme="dark"] .hsf-cat-trigger { background-color:var(--bg-card)!important; color:var(--text)!important; border-color: var(--border)!important; }
         html[data-theme="dark"] .hsf-cat-trigger:hover { border-color: rgba(255,255,255,0.25) !important; }
-        html[data-theme="dark"] .hsf-cat-trigger .bi-chevron-down { color: #94a3b8 !important; }
-        html[data-theme="dark"] .hsf-search-wrap { background: #1e293b!important; border-color: rgba(255,255,255,0.1)!important; }
-        html[data-theme="dark"] .hsf-search-wrap .form-label { color: #e2e8f0!important; }
-        html[data-theme="dark"] .hsf-search-wrap .border-top { border-color: rgba(255,255,255,0.1)!important; }
-        html[data-theme="dark"] .hsf-search-wrap .hsf-input-field { background-color:#0f172a!important; color:#e2e8f0!important; border-color: rgba(255,255,255,0.12)!important; }
-        html[data-theme="dark"] .hsf-search-wrap label span { color: #e2e8f0!important; }
+        html[data-theme="dark"] .hsf-cat-trigger .bi-chevron-down { color: var(--text-muted) !important; }
+        html[data-theme="dark"] .hsf-search-wrap { background: var(--bg-card)!important; border-color: var(--border)!important; }
+        html[data-theme="dark"] .hsf-search-wrap .form-label { color: var(--text)!important; }
+        html[data-theme="dark"] .hsf-search-wrap .border-top { border-color: var(--border)!important; }
+        html[data-theme="dark"] .hsf-search-wrap .hsf-input-field { background-color:var(--bg-elevated)!important; color:var(--text)!important; border-color: var(--border)!important; }
+        html[data-theme="dark"] .hsf-search-wrap label span { color: var(--text)!important; }
       `}</style>
 
       {/* Trigger — styled to match form-select-sm */}
@@ -201,6 +201,7 @@ function mergeCategoryOptions(apiCategories = []) {
 export default function HomeSearchForm() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const isDark = typeof document !== "undefined" && document.documentElement.getAttribute("data-theme") === "dark";
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [city, setCity] = useState("all");
@@ -260,7 +261,10 @@ export default function HomeSearchForm() {
     >
       <div
         className="p-3 rounded-4 shadow-lg border hsf-search-wrap"
-        style={{ boxShadow: "0 8px 30px rgba(0,0,0,0.06)", background: "#fff" }}
+        style={{
+          boxShadow: "0 8px 30px rgba(0,0,0,0.06)",
+          background: isDark ? "var(--bg-card)" : "#fff",
+        }}
       >
         <form onSubmit={submitSearch}>
           <div style={{

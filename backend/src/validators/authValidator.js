@@ -21,6 +21,14 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required.'),
 });
 
+const googleLoginSchema = z.object({
+  accessToken: z.string().trim().min(1, 'Google access token is required.').optional(),
+  credential: z.string().trim().min(1, 'Google credential is required.').optional(),
+}).refine((data) => data.accessToken || data.credential, {
+  message: 'Google authentication response is required.',
+  path: ['accessToken'],
+});
+
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required.'),
   newPassword: z.string().min(6, 'New password must be at least 6 characters long.'),
@@ -45,6 +53,7 @@ const resetPasswordSchema = z.object({
 module.exports = {
   validateRegister: (req, res, next) => parseWithSchema(registerSchema, req, res, next),
   validateLogin: (req, res, next) => parseWithSchema(loginSchema, req, res, next),
+  validateGoogleLogin: (req, res, next) => parseWithSchema(googleLoginSchema, req, res, next),
   validateChangePassword: (req, res, next) => parseWithSchema(changePasswordSchema, req, res, next),
   validateForgotPassword: (req, res, next) => parseWithSchema(forgotPasswordSchema, req, res, next),
   validateResetPassword: (req, res, next) => parseWithSchema(resetPasswordSchema, req, res, next),
