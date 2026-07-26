@@ -1,0 +1,71 @@
+/* Design Tokens for Light/Dark themes */
+:root {
+  /* Primary palette */
+  --color-primary-light: #e31e24;
+  --color-primary-dark: #c084fc;
+  --color-accent: var(--color-primary-light);
+
+  /* Backgrounds */
+  --color-bg-light: #ffffff;
+  --color-bg-dark: #16171d;
+  --color-surface-light: #f9fafb;
+  --color-surface-dark: #1f2028;
+
+  /* Text */
+  --color-text-light: #1f2937; /* dark gray */
+  --color-text-dark: #d1d5db; /* light gray */
+  --color-text-muted-light: #6b6375;
+  --color-text-muted-dark: #9ca3af;
+
+  /* Borders & shadows */
+  --color-border-light: #e5e4e7;
+  --color-border-dark: #2e303a;
+  --shadow-soft-light: rgba(0,0,0,0.1) 0 2px 4px;
+  --shadow-soft-dark: rgba(0,0,0,0.4) 0 2px 4px;
+
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  /* Spacing */
+  --spacing-xxs: 0.25rem;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Typography */
+  --font-sans: 'Montserrat', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Montserrat', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+  --font-size-base: 1rem; /* 16px */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+
+  /* Animations */
+  --anim-duration: 250ms;
+  --anim-ease: ease-out;
+}
+
+[data-theme="light"] {
+  --color-primary: var(--color-primary-light);
+  --color-bg: var(--color-bg-light);
+  --color-surface: var(--color-surface-light);
+  --color-text: var(--color-text-light);
+  --color-text-muted: var(--color-text-muted-light);
+  --color-border: var(--color-border-light);
+  --shadow-soft: var(--shadow-soft-light);
+}
+
+[data-theme="dark"] {
+  --color-primary: var(--color-primary-dark);
+  --color-bg: var(--color-bg-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-text: var(--color-text-dark);
+  --color-text-muted: var(--color-text-muted-dark);
+  --color-border: var(--color-border-dark);
+  --shadow-soft: var(--shadow-soft-dark);
+}

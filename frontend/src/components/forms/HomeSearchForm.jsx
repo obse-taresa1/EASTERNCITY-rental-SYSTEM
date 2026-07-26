@@ -23,6 +23,7 @@ function PortalDropdown({ value, onChange, options, placeholder, style, disabled
     const menuH = Math.min(240, options.length * 34 + 8);
     const openUp = spaceBelow < menuH + 8 && rect.top > menuH + 8;
 
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     setMenuStyle({
       position: "fixed",
       left: rect.left,
@@ -32,10 +33,10 @@ function PortalDropdown({ value, onChange, options, placeholder, style, disabled
       ...(openUp
         ? { bottom: viewportH - rect.top }
         : { top: rect.bottom }),
-      background: "#fff",
-      border: "1px solid #dee2e6",
+      background: isDark ? "#1e293b" : "#fff",
+      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #dee2e6",
       borderRadius: "8px",
-      boxShadow: "0 12px 36px rgba(0,0,0,0.15)",
+      boxShadow: isDark ? "0 12px 36px rgba(0,0,0,0.45)" : "0 12px 36px rgba(0,0,0,0.15)",
       maxHeight: "240px",
       overflowY: "auto",
       animation: "slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -101,6 +102,14 @@ function PortalDropdown({ value, onChange, options, placeholder, style, disabled
         .hsf-search-btn { transition: all 0.2s ease; }
         .hsf-search-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(227,30,36,0.3); }
         .hsf-search-btn:active { transform: translateY(0); }
+        html[data-theme="dark"] .hsf-cat-trigger { background-color:#0f172a!important; color:#e2e8f0!important; border-color: rgba(255,255,255,0.12)!important; }
+        html[data-theme="dark"] .hsf-cat-trigger:hover { border-color: rgba(255,255,255,0.25) !important; }
+        html[data-theme="dark"] .hsf-cat-trigger .bi-chevron-down { color: #94a3b8 !important; }
+        html[data-theme="dark"] .hsf-search-wrap { background: #1e293b!important; border-color: rgba(255,255,255,0.1)!important; }
+        html[data-theme="dark"] .hsf-search-wrap .form-label { color: #e2e8f0!important; }
+        html[data-theme="dark"] .hsf-search-wrap .border-top { border-color: rgba(255,255,255,0.1)!important; }
+        html[data-theme="dark"] .hsf-search-wrap .hsf-input-field { background-color:#0f172a!important; color:#e2e8f0!important; border-color: rgba(255,255,255,0.12)!important; }
+        html[data-theme="dark"] .hsf-search-wrap label span { color: #e2e8f0!important; }
       `}</style>
 
       {/* Trigger — styled to match form-select-sm */}
@@ -152,7 +161,7 @@ function PortalDropdown({ value, onChange, options, placeholder, style, disabled
                 fontSize: "0.875rem",
                 cursor: "pointer",
                 backgroundColor: String(opt.value) === String(value) ? "rgba(227,30,36,0.08)" : "transparent",
-                color: String(opt.value) === String(value) ? "#e31e24" : "#212529",
+                color: String(opt.value) === String(value) ? "#e31e24" : (document.documentElement.getAttribute('data-theme') === 'dark' ? "#e2e8f0" : "#212529"),
                 fontWeight: String(opt.value) === String(value) ? 600 : 400,
                 userSelect: "none",
               }}
@@ -250,8 +259,8 @@ export default function HomeSearchForm() {
       }}
     >
       <div
-        className="bg-white p-3 rounded-4 shadow-lg border"
-        style={{ boxShadow: "0 8px 30px rgba(0,0,0,0.06)" }}
+        className="p-3 rounded-4 shadow-lg border hsf-search-wrap"
+        style={{ boxShadow: "0 8px 30px rgba(0,0,0,0.06)", background: "#fff" }}
       >
         <form onSubmit={submitSearch}>
           <div style={{
@@ -262,7 +271,7 @@ export default function HomeSearchForm() {
           }}>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <label className="form-label text-dark fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
+              <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
                 <i className="bi bi-search text-danger me-1"></i>
                 {t("keyword") || "Keyword"}
               </label>
@@ -272,12 +281,12 @@ export default function HomeSearchForm() {
                 placeholder={t("searchPlaceholder") || "Search keyword..."}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ height: "38px", borderRadius: "6px", padding: "0 0.75rem" }}
+                style={{ height: "38px", borderRadius: "0.375rem", padding: "0 0.5rem", fontSize: "0.875rem" }}
               />
             </div>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <label className="form-label text-dark fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
+              <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
                 <i className="bi bi-geo-alt text-danger me-1"></i>
                 {t("location") || "Location"}
               </label>
@@ -298,7 +307,7 @@ export default function HomeSearchForm() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <label className="form-label text-dark fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
+              <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
                 <i className="bi bi-signpost text-danger me-1"></i>
                 {t("sefar") || "Neighbourhood"}
               </label>
@@ -315,7 +324,7 @@ export default function HomeSearchForm() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <label className="form-label text-dark fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <i className="bi bi-tag text-danger me-1"></i>
                   {t("maxPrice") || "Max Price"}
@@ -337,7 +346,7 @@ export default function HomeSearchForm() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <label className="form-label text-dark fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
+              <label className="form-label fw-bold mb-1" style={{ fontSize: "0.8rem", height: "20px", display: "flex", alignItems: "center" }}>
                 <i className="bi bi-grid text-danger me-1"></i>
                 {t("category") || "Category"}
               </label>
@@ -367,7 +376,7 @@ export default function HomeSearchForm() {
           </div>
 
           <div
-            className="d-flex justify-content-center gap-3 mt-2 pt-2 border-top text-dark"
+            className="d-flex justify-content-center gap-3 mt-2 pt-2 border-top"
             style={{ fontSize: "0.75rem" }}
           >
             <label className="d-flex align-items-center gap-1 cursor-pointer m-0">

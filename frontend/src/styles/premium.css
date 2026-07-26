@@ -1672,12 +1672,7 @@ section.motorx-hero .hero-slider-controls {
   filter: drop-shadow(0 3px 8px rgba(15, 23, 42, 0.16));
 }
 
-[data-theme="dark"] .app-public-header .motorx-logo img {
-  filter:
-    drop-shadow(0 0 1px rgba(255, 255, 255, 0.95))
-    drop-shadow(0 0 8px rgba(255, 255, 255, 0.28))
-    drop-shadow(0 0 12px rgba(227, 30, 36, 0.2));
-}
+/* Dark mode logo now handled via image swap – no extra CSS needed */
 
 .footer-premium {
   background:
