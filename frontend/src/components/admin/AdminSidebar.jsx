@@ -1,6 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
+import darkLogo from "../../assets/images/eastern-cities-header-logo-white.png";
+import { useTheme } from "../../context/ThemeContext.jsx";
 
 function NavItem({ link }) {
   const hasChevron = /Management|Center|Monitoring|Reports|Users|Listings|Categories|Promotion|Verification|Support|Settings/.test(link.label);
@@ -16,14 +18,16 @@ function NavItem({ link }) {
 
 export default function AdminSidebar({ variant = "admin" }) {
   const { logout } = useAuth();
+  const { theme } = useTheme();
   const isSuperAdmin = variant === "superadmin";
+  const logoSrc = theme === "dark" ? darkLogo : logo;
   const links = isSuperAdmin ? superAdminLinks : adminLinks;
 
   return (
     <aside className="admin-sidebar admin-red-sidebar">
       <div className="admin-sidebar-header">
         <NavLink to={isSuperAdmin ? "/super-admin-dashboard" : "/admin-dashboard"} className="admin-brand admin-brand-logo" aria-label="Eastern Cities dashboard home">
-          <img src={logo} alt="Eastern Cities" className="admin-brand-logo-img" />
+          <img src={logoSrc} alt="Eastern Cities" className="admin-brand-logo-img theme-aware-logo" />
         </NavLink>
         <button className="admin-sidebar-menu" type="button" aria-label="Collapse menu">
           <i className="bi bi-list" />

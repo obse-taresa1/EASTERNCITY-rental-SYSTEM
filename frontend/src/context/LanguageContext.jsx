@@ -129,7 +129,7 @@ const translations = {
     ourStoryBody:
       "Our platform helps owners list useful items and helps renters access what they need without buying everything outright.",
     careersTitle: "Careers",
-    careersSubtitle: "Join the team building trusted citywide rentals.",
+    careersSubtitle: "Join the team building trusted Eastern Cities rentals.",
     careersBody:
       "We are looking for people who care about community, access, and better rental experiences.",
     howItWorksBrowseTitle: "Browse",

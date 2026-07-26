@@ -8,6 +8,7 @@ import { getConversations } from "../../services/messageApiService.js";
 import { getMyReviews } from "../../services/reviewApiService.js";
 import { getStorageItem } from "../../services/storageService.js";
 import { formatCurrency } from "../../utils/currency.js";
+import usePageTitle from "../../hooks/usePageTitle.js";
 import {
   isVerificationApproved,
   normalizeVerificationStatus,
@@ -67,6 +68,7 @@ const QUICK_ACTIONS = [
 ];
 
 export default function BothDashboardPage() {
+  usePageTitle("Dashboard");
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const [conversations, setConversations] = useState([]);

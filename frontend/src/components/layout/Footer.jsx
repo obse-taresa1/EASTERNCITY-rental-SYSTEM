@@ -33,7 +33,7 @@ export default function Footer() {
                 <img
                   src={logo}
                   alt="Eastern Cities"
-                  className="footer-logo-img"
+                  className="footer-logo-img theme-aware-logo"
                 />
               </Link>
               <p className="footer-tagline">{t("footerTagline")}</p>

@@ -1,6 +1,9 @@
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import aboutImg from "../../assets/hero.png";
+import usePageTitle from "../../hooks/usePageTitle.js";
 
 export default function AboutPage() {
+  usePageTitle("About Us");
   const { t } = useLanguage();
 
   const values = [
@@ -35,9 +38,10 @@ export default function AboutPage() {
   return (
     <main className="about-page">
       {/* Hero */}
-      <section className="about-hero">
+      <section className="about-hero premium-hero">
         <div className="container">
           <div className="about-hero-content">
+            <img src={aboutImg} alt="About" className="hero-image" />
             <span className="section-label">{t("aboutEyebrow")}</span>
             <h2>{t("aboutHeroTitle")}</h2>
             <p>{t("aboutHeroDesc")}</p>
