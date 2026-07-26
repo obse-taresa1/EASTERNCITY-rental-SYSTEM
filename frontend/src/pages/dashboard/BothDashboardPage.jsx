@@ -355,7 +355,7 @@ export default function BothDashboardPage() {
           </Link>
         ))}
       </div>
-      <section className="dashboard-section mt-4">
+      <section className="dashboard-section incoming-booking-requests-card mt-4">
         <h2 className="h4 mb-3">Incoming Booking Requests</h2>
         {ownerBookings.length ? (
           <BookingTable bookings={ownerBookings} />

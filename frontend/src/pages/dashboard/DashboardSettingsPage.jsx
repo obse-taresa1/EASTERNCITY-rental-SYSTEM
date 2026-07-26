@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import {
-  getStorageItem,
-  setStorageItem,
-} from "../../services/storageService.js";
-import { updateUser } from "../../services/userApiService.js";
+import { changePassword } from "../../services/authService.js";
+import { updateUser, updateUserProfileImage } from "../../services/userApiService.js";
 
 const NOTIF_KEY = "ud_notification_prefs";
 
@@ -22,19 +19,52 @@ function ProfileSettings({ user, setCurrentUser }) {
     email: user?.email || "",
     phone: user?.phone || "",
     city: user?.city || "",
-    avatar: user?.avatar || "",
+    avatar: user?.avatar || user?.profileImage || user?.profileImageUrl || "",
+    avatarFile: null,
   });
-  const [saved, setSaved] = useState(false);
+  const [notice, setNotice] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   async function handleSave(e) {
     e.preventDefault();
+    setNotice(null);
+
+    if (!form.name.trim()) {
+      setNotice({ type: "error", text: "Full name is required." });
+      return;
+    }
+
+    setSaving(true);
     try {
-      const updated = await updateUser(user?.id, form).catch(() => form);
-      setCurrentUser({ ...user, ...updated, avatar: updated?.avatar || form.avatar || user?.avatar });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      const payload = {
+        name: form.name,
+        phone: form.phone,
+      };
+
+      if (!form.avatar && (user?.profileImageUrl || user?.profileImage || user?.avatar)) {
+        payload.profileImageUrl = "";
+      }
+
+      let updated = await updateUser(user?.id, payload);
+
+      if (form.avatarFile) {
+        updated = await updateUserProfileImage(user?.id, form.avatarFile);
+      }
+
+      setCurrentUser({
+        ...user,
+        ...updated,
+        avatar: updated?.avatar || form.avatar || "",
+        profileImage: updated?.profileImage || form.avatar || "",
+        profileImageUrl: updated?.profileImageUrl ?? "",
+        phone: updated?.phone || form.phone,
+      });
+      setForm((current) => ({ ...current, avatarFile: null }));
+      setNotice({ type: "success", text: "Profile updated successfully." });
     } catch (err) {
-      setSaved(false);
+      setNotice({ type: "error", text: err.message || "Unable to update profile." });
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -43,7 +73,7 @@ function ProfileSettings({ user, setCurrentUser }) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setForm({ ...form, avatar: reader.result });
+        setForm({ ...form, avatar: reader.result, avatarFile: file });
       };
       reader.readAsDataURL(file);
     }
@@ -52,10 +82,10 @@ function ProfileSettings({ user, setCurrentUser }) {
   return (
     <form className="ud-settings-form" onSubmit={handleSave}>
       <h3 className="ud-settings-section-title">Profile Information</h3>
-      {saved && (
-        <div className="ud-alert ud-alert-success">
-          <i className="bi bi-check-circle-fill" /> Profile updated
-          successfully.
+      {notice && (
+        <div className={`ud-alert ${notice.type === "success" ? "ud-alert-success" : "ud-alert-error"}`}>
+          <i className={`bi ${notice.type === "success" ? "bi-check-circle-fill" : "bi-exclamation-circle-fill"}`} />
+          {notice.text}
         </div>
       )}
       
@@ -81,7 +111,7 @@ function ProfileSettings({ user, setCurrentUser }) {
         <div className="d-flex gap-2">
           {/* Remove button appears only when an avatar is set */}
           {form.avatar && (
-            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setForm({ ...form, avatar: "" })}>
+            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setForm({ ...form, avatar: "", avatarFile: null })}>
               Remove
             </button>
           )}
@@ -108,8 +138,7 @@ function ProfileSettings({ user, setCurrentUser }) {
             type="email"
             className="ud-input"
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            required
+            readOnly
           />
         </div>
         <div className="ud-form-group">
@@ -140,8 +169,16 @@ function ProfileSettings({ user, setCurrentUser }) {
           </select>
         </div>
       </div>
-      <button type="submit" className="ud-btn-red">
-        <i className="bi bi-save" /> Save Changes
+      <button type="submit" className="ud-btn-red" disabled={saving}>
+        {saving ? (
+          <>
+            <span className="spinner-border spinner-border-sm" aria-hidden="true" /> Saving...
+          </>
+        ) : (
+          <>
+            <i className="bi bi-save" /> Save Changes
+          </>
+        )}
       </button>
     </form>
   );
@@ -157,6 +194,10 @@ function PasswordSettings({ user }) {
       setMsg({ type: "error", text: "New passwords do not match." });
       return;
     }
+    if (!form.current) {
+      setMsg({ type: "error", text: "Current password is required." });
+      return;
+    }
     if (form.next.length < 6) {
       setMsg({
         type: "error",
@@ -166,8 +207,9 @@ function PasswordSettings({ user }) {
     }
 
     try {
-      await updateUser(user?.id, {
-        password: form.next,
+      await changePassword({
+        currentPassword: form.current,
+        newPassword: form.next,
       });
       setMsg({ type: "success", text: "Password changed successfully." });
       setForm({ current: "", next: "", confirm: "" });

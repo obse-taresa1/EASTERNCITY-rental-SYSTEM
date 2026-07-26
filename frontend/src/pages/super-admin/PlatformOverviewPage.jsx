@@ -84,15 +84,15 @@ export default function PlatformOverviewPage() {
                 </strong>
               </li>
               <li className="list-group-item bg-transparent text-color d-flex justify-content-between">
-                <span>Active Renters</span>
+                <span>Total Bookings</span>
                 <strong className="text-color">
-                  {counts.totalRenters || 0}
+                  {counts.totalBookings || 0}
                 </strong>
               </li>
               <li className="list-group-item bg-transparent text-color d-flex justify-content-between">
-                <span>Active Owners</span>
+                <span>Active Listings</span>
                 <strong className="text-color">
-                  {counts.totalOwners || 0}
+                  {counts.activeListings || 0}
                 </strong>
               </li>
               <li className="list-group-item bg-transparent text-color d-flex justify-content-between">

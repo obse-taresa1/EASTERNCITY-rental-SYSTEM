@@ -2,14 +2,19 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useTheme } from "../../context/ThemeContext.jsx";
 import { dashboardForRole as getDashboardPath } from "../../services/authService.js";
 import usePageTitle from "../../hooks/usePageTitle.js";
+import lightLogo from "../../assets/images/eastern-cities-header-logo-transparent.png";
+import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
 import "../../styles/auth-premium.css";
 
 export default function RegisterPage() {
   usePageTitle("Register");
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { theme } = useTheme();
+  const authLogo = theme === "dark" ? darkLogo : lightLogo;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -98,29 +103,46 @@ export default function RegisterPage() {
       <div className="premium-auth-brand">
         <div className="premium-auth-brand-content">
           <Link to="/" className="premium-auth-brand-logo">
-            <i className="bi bi-geo-alt-fill"></i>
-            Eastern Cities
+            <img src={authLogo} alt="Eastern Cities" />
           </Link>
-          <h1>Join the Community</h1>
-          <p>
-            Create your account to start renting items or managing your own listings. Trusted, verified, and secure across Eastern Ethiopia.
-          </p>
+          <div className="premium-auth-copy">
+            <span className="premium-auth-eyebrow">Eastern Ethiopia Rentals</span>
+            <h1>Join the Community</h1>
+            <p>
+              Create your account to start renting items or managing your own listings. Trusted, verified, and secure across Eastern Ethiopia.
+            </p>
+          </div>
+          <div className="premium-auth-features" aria-label="Platform trust features">
+            {[
+              "National ID Verified",
+              "Secure Platform Payments",
+              "Trusted Community",
+              "Available in Harar, Dire Dawa & Jigjiga",
+            ].map((feature) => (
+              <div className="premium-auth-feature" key={feature}>
+                <span className="premium-auth-check">
+                  <i className="bi bi-check-lg"></i>
+                </span>
+                <span>{feature}</span>
+              </div>
+            ))}
+          </div>
           
           <div className="premium-auth-stats">
             <div className="premium-auth-stat-card">
               <div className="premium-auth-stat-value">230+</div>
-              <div className="premium-auth-stat-label">Verified Owners</div>
+              <div className="premium-auth-stat-label">Verified Users</div>
             </div>
             <div className="premium-auth-stat-card">
               <div className="premium-auth-stat-value">87</div>
-              <div className="premium-auth-stat-label">Listings</div>
+              <div className="premium-auth-stat-label">Active Listings</div>
             </div>
             <div className="premium-auth-stat-card">
               <div className="premium-auth-stat-value">3</div>
               <div className="premium-auth-stat-label">Cities</div>
             </div>
             <div className="premium-auth-stat-card">
-              <div className="premium-auth-stat-value">★★★★★</div>
+              <div className="premium-auth-stat-value premium-auth-stars" aria-label="Five star rating">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
               <div className="premium-auth-stat-label">Community Rated</div>
             </div>
           </div>

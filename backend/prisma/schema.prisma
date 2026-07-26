@@ -21,6 +21,7 @@ model User {
   address                       String?
   nationalIdFrontUrl            String?
   nationalIdBackUrl             String?
+  profileImageUrl               String?
   phone                         String?
   nationalIdNumber              String?
   activityLogs                  ActivityLog[]

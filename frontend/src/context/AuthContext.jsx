@@ -4,6 +4,7 @@ import {
   dashboardForRole,
   getAuthTokens,
   getCurrentUser,
+  loginWithGoogleCredential,
   loginUser,
   logoutUser,
   refreshCurrentUser,
@@ -75,6 +76,14 @@ export function AuthProvider({ children }) {
     return user;
   }
 
+  async function loginWithGoogle(credential) {
+    const user = await loginWithGoogleCredential(credential);
+    setCurrentUserState(user || null);
+    setTokens(getAuthTokens());
+    setIsAuthReady(true);
+    return user;
+  }
+
   async function register(formData) {
     const user = await registerUser(formData);
     setCurrentUserState(user || null);
@@ -100,6 +109,7 @@ export function AuthProvider({ children }) {
       isAuthReady,
       role: currentUser?.role?.toLowerCase() || "",
       login,
+      loginWithGoogle,
       register,
       logout,
       setCurrentUser,

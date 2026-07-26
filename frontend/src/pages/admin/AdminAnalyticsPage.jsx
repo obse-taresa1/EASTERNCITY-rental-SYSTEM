@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "../../services/adminManagementService.js";
 
-function engagementRate(renters, listings) {
+function engagementRate(bookings, listings) {
   if (!listings) return 0;
-  return Math.min(100, Math.round((renters / listings) * 100));
+  return Math.min(100, Math.round((bookings / listings) * 100));
 }
 
 export default function AdminAnalyticsPage() {
@@ -164,21 +164,21 @@ export default function AdminAnalyticsPage() {
                   <tr>
                     <th>City</th>
                     <th>New Listings</th>
-                    <th>New Rentals</th>
+                    <th>New Bookings</th>
                     <th>Engagement Rate</th>
                   </tr>
                 </thead>
                 <tbody>
                   {cityStats.map((city) => {
                     const rate = engagementRate(
-                      counts.totalRenters || 0,
+                      counts.totalBookings || 0,
                       city.value || 0,
                     );
                     return (
                       <tr key={city.label}>
                         <td className="fw-bold">{city.label}</td>
                         <td>{city.value} listings</td>
-                        <td>{counts.totalRenters || 0} rentals</td>
+                        <td>{counts.totalBookings || 0} bookings</td>
                         <td>
                           <div className="d-flex align-items-center gap-2">
                             <div

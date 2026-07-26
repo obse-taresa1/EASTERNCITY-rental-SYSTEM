@@ -8,9 +8,11 @@ const USER_UPDATE_FIELDS = new Set([
   'password',
   'role',
   'status',
+  'phone',
   'city',
   'sefer',
   'address',
+  'profileImageUrl',
 ]);
 
 function pickUserUpdateFields(updateData = {}) {
@@ -31,10 +33,12 @@ const getAllUsers = async () => {
       email: true,
       role: true,
       status: true,
+      phone: true,
       verificationStatus: true,
       city: true,
       nationalIdFrontUrl: true,
       nationalIdBackUrl: true,
+      profileImageUrl: true,
       createdAt: true,
     },
   });
@@ -54,10 +58,12 @@ const getUserById = async (id) => {
       email: true,
       role: true,
       status: true,
+      phone: true,
       verificationStatus: true,
       city: true,
       nationalIdFrontUrl: true,
       nationalIdBackUrl: true,
+      profileImageUrl: true,
       createdAt: true,
     },
   });
@@ -108,10 +114,12 @@ const updateUser = async (id, updateData) => {
       email: true,
       role: true,
       status: true,
+      phone: true,
       verificationStatus: true,
       city: true,
       nationalIdFrontUrl: true,
       nationalIdBackUrl: true,
+      profileImageUrl: true,
       createdAt: true,
     },
   });
@@ -173,10 +181,35 @@ const createAdminUser = async ({ name, email, password, role }) => {
       email: true,
       role: true,
       status: true,
+      phone: true,
       verificationStatus: true,
       city: true,
       nationalIdFrontUrl: true,
       nationalIdBackUrl: true,
+      profileImageUrl: true,
+      createdAt: true,
+    },
+  });
+};
+
+const updateProfileImage = async (id, profileImageUrl) => {
+  await getUserById(id);
+
+  return prisma.user.update({
+    where: { id },
+    data: { profileImageUrl },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      phone: true,
+      verificationStatus: true,
+      city: true,
+      nationalIdFrontUrl: true,
+      nationalIdBackUrl: true,
+      profileImageUrl: true,
       createdAt: true,
     },
   });
@@ -187,5 +220,6 @@ module.exports = {
   getAllUsers,
   getUserById,
   updateUser,
+  updateProfileImage,
   deleteUser,
 };

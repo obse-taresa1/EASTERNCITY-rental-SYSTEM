@@ -5,7 +5,7 @@ import { dashboardForRole } from "../../services/authService.js";
 import ThemeToggle from "../common/ThemeToggle.jsx";
 import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
 import ProfilePanel from "../common/ProfilePanel.jsx";
-import { getInitials } from "../../utils/user.js";
+import UserAvatar from "../common/UserAvatar.jsx";
 
 export default function DashboardTopbar() {
   const { currentUser, user, logout } = useAuth();
@@ -37,7 +37,7 @@ export default function DashboardTopbar() {
             aria-expanded={open}
           >
             <div className="topbar-avatar premium-avatar">
-              <span>{getInitials(activeUser?.name)}</span>
+              <UserAvatar user={activeUser} />
             </div>
             <div className="topbar-user-info">
               <strong>{activeUser?.name || "User"}</strong>

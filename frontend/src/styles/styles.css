@@ -75,7 +75,7 @@ html[data-theme="dark"] .form-control,
 html[data-theme="dark"] .form-select,
 html[data-theme="dark"] input,
 html[data-theme="dark"] textarea {
-  background-color: #0f172a !important;
+  background-color: var(--bg-card) !important;
   border-color: var(--border) !important;
   color: var(--text) !important;
 }
@@ -5869,7 +5869,7 @@ main.page-header.dashboard-main,
     rgba(138, 15, 30, 0.85) 0%,
     rgba(18, 18, 22, 0.9) 100%
   );
-  padding: 8.5rem 0 4rem;
+  padding: 4.5rem 0 2.75rem;
   position: relative;
   overflow: hidden;
 }
@@ -5895,16 +5895,25 @@ main.page-header.dashboard-main,
   z-index: 1;
 }
 
+.about-hero-content .hero-image {
+  max-width: 108px;
+  max-height: 108px;
+  width: clamp(72px, 8vw, 108px);
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
 .about-hero-content h2 {
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-size: clamp(2rem, 4.2vw, 3.05rem);
   font-weight: 800;
   color: #fff;
   line-height: 1.18;
-  margin: 0.75rem 0 1.25rem;
+  margin: 0.6rem 0 0.95rem;
 }
 
 .about-hero-content p {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.95);
   line-height: 1.65;
   max-width: 600px;
@@ -6057,7 +6066,7 @@ main.page-header.dashboard-main,
 }
 
 .about-cta-section {
-  padding: 3rem 0 4rem;
+  padding: 1.6rem 0 2.25rem;
 }
 
 .about-cta-card {
@@ -6070,7 +6079,7 @@ main.page-header.dashboard-main,
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
-  padding: 2.5rem 2rem;
+  padding: 1.45rem 1.5rem;
   text-align: center;
   color: #fff;
   position: relative;
@@ -6125,12 +6134,12 @@ main.page-header.dashboard-main,
   color: #fff;
   font-size: 2.25rem;
   font-weight: 800;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.45rem;
 }
 .about-cta-card p {
   color: rgba(255, 255, 255, 0.85);
   font-size: 1.05rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.15rem;
 }
 
 .btn-hero-outline {
@@ -10552,6 +10561,50 @@ html[data-theme="dark"] .dashboard-sidebar {
   background: var(--card-bg);
   border-color: var(--border-color);
 }
+[data-theme="dark"] .incoming-booking-requests-card {
+  background: var(--card-bg, #161b22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  color: var(--text-color, #f8fafc);
+}
+[data-theme="dark"] .incoming-booking-requests-card h2,
+[data-theme="dark"] .incoming-booking-requests-card .dashboard-table td {
+  color: var(--text-color, #f8fafc);
+}
+[data-theme="dark"] .incoming-booking-requests-card .dashboard-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-color, #f8fafc);
+  --bs-table-border-color: rgba(148, 163, 184, 0.16);
+  color: var(--text-color, #f8fafc);
+}
+[data-theme="dark"] .incoming-booking-requests-card .dashboard-table th {
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.16);
+}
+[data-theme="dark"] .incoming-booking-requests-card .dashboard-table td {
+  border-color: rgba(148, 163, 184, 0.14);
+}
+[data-theme="dark"] .incoming-booking-requests-card .text-muted,
+[data-theme="dark"] .incoming-booking-requests-card .owner-empty-state {
+  color: #9ca3af !important;
+}
+[data-theme="dark"] .incoming-booking-requests-card .owner-empty-state {
+  background: rgba(227, 30, 36, 0.08);
+  border-color: rgba(227, 30, 36, 0.26);
+}
+[data-theme="dark"] .incoming-booking-requests-card .owner-empty-state i {
+  color: var(--motorx-red, #e31e24);
+}
+[data-theme="dark"] .incoming-booking-requests-card .btn-outline-danger {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.45);
+}
+[data-theme="dark"] .incoming-booking-requests-card .btn-outline-danger:hover {
+  background: rgba(220, 38, 38, 0.18);
+  border-color: rgba(248, 113, 113, 0.65);
+  color: #fff;
+}
 [data-theme="dark"] .ud-quick-action-card {
   filter: brightness(0.8);
 }
@@ -10597,6 +10650,77 @@ html[data-theme="dark"] .dashboard-sidebar {
 }
 [data-theme="dark"] .ud-theme-option.active {
   background: rgba(227, 30, 36, 0.15);
+}
+.admin-profile-page .admin-profile-avatar-xl {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary-color, #e31e24), #8a0f1e);
+  color: #fff;
+  font-size: 2.8rem;
+  font-weight: 800;
+  border: 4px solid rgba(227, 30, 36, 0.16);
+  box-shadow: 0 18px 40px rgba(227, 30, 36, 0.18);
+}
+.admin-profile-page .admin-profile-avatar-xl img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.admin-profile-info-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+.admin-profile-info-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.72);
+}
+.admin-profile-info-card i {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(227, 30, 36, 0.1);
+  color: var(--primary-color, #e31e24);
+  flex: 0 0 auto;
+}
+.admin-profile-info-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.admin-profile-info-card strong {
+  display: block;
+  color: var(--text-color);
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+[data-theme="dark"] .admin-profile-page .admin-profile-info-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .admin-profile-page .admin-profile-info-card strong {
+  color: #f8fafc;
+}
+[data-theme="dark"] .admin-profile-page .admin-profile-info-card span {
+  color: #9ca3af;
+}
+[data-theme="dark"] .admin-profile-page .form-control[readonly] {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
 }
 [data-theme="dark"] .ud-logout-btn {
   border-color: var(--border-color);
@@ -12774,4 +12898,726 @@ html[data-theme="dark"] main.legal-document-page .btn-accent-custom:hover {
 [data-theme="dark"] .admin-red-shell .form-select {
   background: rgba(29, 7, 13, 0.9) !important;
   color: #f8eef1 !important;
+}
+
+/* Public navbar/auth button polish: preserves layout and branding */
+.app-public-header .motorx-nav-flex {
+  min-height: 72px;
+  padding: 0.45rem 0;
+  align-items: center;
+}
+
+.app-public-header .motorx-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.app-public-header .motorx-logo img.theme-aware-logo {
+  width: clamp(126px, 12vw, 158px) !important;
+  height: auto !important;
+  max-height: 48px !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.12));
+}
+
+[data-theme="dark"] .app-public-header .motorx-logo img.theme-aware-logo {
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.42));
+}
+
+.app-public-header .motorx-nav-links a,
+.app-public-header .nav-category-trigger {
+  position: relative;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 10px;
+  background: transparent !important;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.app-public-header .motorx-nav-links a::after,
+.app-public-header .nav-category-trigger::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.25rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary-color, #e31e24);
+  opacity: 0;
+  transform: scaleX(0.3);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.app-public-header .motorx-nav-links a:hover,
+.app-public-header .motorx-nav-links a.active,
+.app-public-header .nav-category-trigger:hover,
+.app-public-header .nav-category-trigger.active {
+  color: var(--primary-color, #e31e24) !important;
+  background: rgba(227, 30, 36, 0.07) !important;
+}
+
+.app-public-header .motorx-nav-links a:hover::after,
+.app-public-header .motorx-nav-links a.active::after,
+.app-public-header .nav-category-trigger:hover::after,
+.app-public-header .nav-category-trigger.active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.app-public-header .motorx-nav-actions {
+  gap: 0.8rem;
+}
+
+.app-public-header .nav-login,
+.dashboard-topbar .nav-login {
+  height: 44px;
+  min-height: 44px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.15rem;
+  border: 0 !important;
+  border-radius: 12px;
+  background: #e31e24 !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.28);
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.app-public-header .nav-login:hover,
+.dashboard-topbar .nav-login:hover {
+  background: #c91b20 !important;
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(227, 30, 36, 0.36);
+}
+
+.language-globe-button,
+.theme-toggle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--navbar-text, #0f172a);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.language-globe-button {
+  width: auto;
+  min-width: 62px;
+  gap: 0.38rem;
+}
+
+.language-globe-button:hover,
+.theme-toggle-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(227, 30, 36, 0.28);
+  background: rgba(227, 30, 36, 0.08);
+  color: var(--primary-color, #e31e24);
+}
+
+[data-theme="dark"] .language-globe-button,
+[data-theme="dark"] .theme-toggle-btn {
+  background: rgba(15, 23, 42, 0.76);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.26);
+}
+
+[data-theme="dark"] .language-globe-button:hover,
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: rgba(227, 30, 36, 0.16);
+  color: #fff;
+}
+
+@media (max-width: 991px) {
+  .app-public-header .motorx-logo img.theme-aware-logo {
+    width: 136px !important;
+    max-height: 42px !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .app-public-header .motorx-nav-flex {
+    min-height: 64px;
+  }
+
+  .app-public-header .motorx-logo img.theme-aware-logo {
+    width: 118px !important;
+    max-height: 36px !important;
+  }
+}
+
+/* Public dark-mode surface audit: keeps admin/super-admin shells untouched */
+html[data-theme="dark"] {
+  --bg-page: #0B1120;
+  --bg-section: #111827;
+  --bg-card: #182235;
+  --bg-elevated: #22304A;
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --accent: #e31e24;
+  --radius-card: 18px;
+  --shadow-sm: 0 12px 30px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] main:not(.dashboard-content):not(.unified-dashboard-main),
+html[data-theme="dark"] .page:not(.dashboard-content),
+html[data-theme="dark"] .page-wrapper,
+html[data-theme="dark"] .content-wrapper,
+html[data-theme="dark"] .contact-page,
+html[data-theme="dark"] .legal-support-page,
+html[data-theme="dark"] .legal-document-page {
+  background: var(--bg-page) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .container,
+html[data-theme="dark"] .contact-page .page-header,
+html[data-theme="dark"] .contact-page section:not(.contact-shiny-box):not(.contact-form-shiny),
+html[data-theme="dark"] .legal-support-page section:not(.card):not(.card-custom),
+html[data-theme="dark"] .legal-document-page section:not(.card):not(.card-custom) {
+  background: var(--bg-page) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--radius-card) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box:hover {
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box::before {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0),
+    rgba(227, 30, 36, 0.08),
+    rgba(255, 255, 255, 0)
+  ) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box .section-label,
+html[data-theme="dark"] .contact-page .contact-shiny-box i {
+  color: var(--accent) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box .section-label {
+  background: rgba(227, 30, 36, 0.12) !important;
+  border: 1px solid rgba(227, 30, 36, 0.2) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box h1 {
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box p,
+html[data-theme="dark"] .contact-page .contact-shiny-box .text-white-50 {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-form-shiny,
+html[data-theme="dark"] .contact-page .card-custom:not(.contact-shiny-box) {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--radius-card) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-form-shiny:hover {
+  border-color: rgba(227, 30, 36, 0.28) !important;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-label {
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control,
+html[data-theme="dark"] .contact-page input.form-control,
+html[data-theme="dark"] .contact-page textarea.form-control {
+  background: var(--bg-page) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control::placeholder {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control:focus,
+html[data-theme="dark"] .contact-page input.form-control:focus,
+html[data-theme="dark"] .contact-page textarea.form-control:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-form-shiny .form-control:focus,
+html[data-theme="dark"] .contact-page .contact-form-shiny input.form-control:focus,
+html[data-theme="dark"] .contact-page .contact-form-shiny textarea.form-control:focus,
+html[data-theme="dark"] .legal-support-page .contact-form-shiny .form-control:focus {
+  outline: 0 !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .contact-page .btn-primary-custom,
+html[data-theme="dark"] .contact-page .btn-accent-custom {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .legal-support-page .card,
+html[data-theme="dark"] .legal-support-page .card-custom,
+html[data-theme="dark"] .legal-document-page .card,
+html[data-theme="dark"] .legal-document-page .card-custom {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Public form dark-mode audit: login, register, contact, search, reset flows */
+html[data-theme="dark"] main.auth-page .form-control,
+html[data-theme="dark"] main.auth-page .form-select,
+html[data-theme="dark"] main.auth-page input.form-control,
+html[data-theme="dark"] main.auth-page textarea.form-control,
+html[data-theme="dark"] main.auth-page .premium-input,
+html[data-theme="dark"] .premium-auth-layout .premium-input,
+html[data-theme="dark"] .premium-auth-layout input,
+html[data-theme="dark"] .premium-auth-layout textarea,
+html[data-theme="dark"] .premium-auth-layout select,
+html[data-theme="dark"] .contact-page .form-control,
+html[data-theme="dark"] .contact-page .form-select,
+html[data-theme="dark"] .premium-categories-page .premium-search-input,
+html[data-theme="dark"] .home-search-form .form-control,
+html[data-theme="dark"] .home-search-form .form-select,
+html[data-theme="dark"] .motorx-search-wrap .form-control,
+html[data-theme="dark"] .motorx-search-wrap .form-select,
+html[data-theme="dark"] .newsletter-form .form-control,
+html[data-theme="dark"] .newsletter-form input,
+html[data-theme="dark"] .footer-premium input,
+html[data-theme="dark"] .footer-premium textarea,
+html[data-theme="dark"] .footer-premium select {
+  background: var(--bg-card) !important;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control,
+html[data-theme="dark"] .premium-categories-page .premium-search-input {
+  background: var(--bg-page) !important;
+  background-color: var(--bg-page) !important;
+}
+
+html[data-theme="dark"] main.auth-page .form-control::placeholder,
+html[data-theme="dark"] main.auth-page .premium-input::placeholder,
+html[data-theme="dark"] .premium-auth-layout .premium-input::placeholder,
+html[data-theme="dark"] .premium-auth-layout input::placeholder,
+html[data-theme="dark"] .premium-auth-layout textarea::placeholder,
+html[data-theme="dark"] .contact-page .form-control::placeholder,
+html[data-theme="dark"] .premium-categories-page .premium-search-input::placeholder,
+html[data-theme="dark"] .home-search-form .form-control::placeholder,
+html[data-theme="dark"] .motorx-search-wrap .form-control::placeholder,
+html[data-theme="dark"] .newsletter-form .form-control::placeholder,
+html[data-theme="dark"] .footer-premium input::placeholder,
+html[data-theme="dark"] .footer-premium textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] main.auth-page .form-control:focus,
+html[data-theme="dark"] main.auth-page .form-select:focus,
+html[data-theme="dark"] main.auth-page .premium-input:focus,
+html[data-theme="dark"] .premium-auth-layout .premium-input:focus,
+html[data-theme="dark"] .premium-auth-layout input:focus,
+html[data-theme="dark"] .premium-auth-layout textarea:focus,
+html[data-theme="dark"] .premium-auth-layout select:focus,
+html[data-theme="dark"] .contact-page .form-control:focus,
+html[data-theme="dark"] .contact-page .form-select:focus,
+html[data-theme="dark"] .premium-categories-page .premium-search-input:focus,
+html[data-theme="dark"] .home-search-form .form-control:focus,
+html[data-theme="dark"] .home-search-form .form-select:focus,
+html[data-theme="dark"] .motorx-search-wrap .form-control:focus,
+html[data-theme="dark"] .motorx-search-wrap .form-select:focus,
+html[data-theme="dark"] .newsletter-form .form-control:focus,
+html[data-theme="dark"] .footer-premium input:focus,
+html[data-theme="dark"] .footer-premium textarea:focus,
+html[data-theme="dark"] .footer-premium select:focus {
+  outline: 0 !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .home-search-form .hsf-cat-trigger,
+html[data-theme="dark"] .hsf-cat-trigger {
+  background: var(--bg-card) !important;
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .hsf-search-wrap {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Dashboard dark-mode consistency: My Listings, My Bookings, Messages */
+html[data-theme="dark"] .dashboard-content.my-bookings-page,
+html[data-theme="dark"] .dashboard-content.messages-workspace {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(227, 30, 36, 0.08), transparent 30%),
+    var(--bg-page, #0B1120) !important;
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page h1,
+html[data-theme="dark"] .my-bookings-page h2,
+html[data-theme="dark"] .my-bookings-page h3,
+html[data-theme="dark"] .my-bookings-page h4,
+html[data-theme="dark"] .messages-workspace h1,
+html[data-theme="dark"] .messages-workspace h2,
+html[data-theme="dark"] .message-thread strong,
+html[data-theme="dark"] .message-listing-context strong {
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .text-muted,
+html[data-theme="dark"] .my-bookings-page .owner-muted,
+html[data-theme="dark"] .messages-workspace .text-muted,
+html[data-theme="dark"] .messages-workspace .owner-muted,
+html[data-theme="dark"] .message-thread span,
+html[data-theme="dark"] .message-thread small,
+html[data-theme="dark"] .message-thread time,
+html[data-theme="dark"] .message-listing-context span {
+  color: #94A3B8 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .premium-glass-card,
+html[data-theme="dark"] .my-bookings-page .listing-card-hover,
+html[data-theme="dark"] .my-bookings-page .booking-card-enhanced,
+html[data-theme="dark"] .my-bookings-page .bg-white,
+html[data-theme="dark"] .my-bookings-page .card,
+html[data-theme="dark"] .my-bookings-page .alert-info,
+html[data-theme="dark"] .my-bookings-page .alert-success {
+  background: #161b22 !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24) !important;
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .listing-card-hover:hover,
+html[data-theme="dark"] .my-bookings-page .booking-card-enhanced:hover,
+html[data-theme="dark"] .my-bookings-page .premium-glass-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(227, 30, 36, 0.28) !important;
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.34) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .premium-glass-card img,
+html[data-theme="dark"] .my-bookings-page .listing-card-hover img {
+  border-radius: 14px !important;
+  object-fit: cover !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26);
+}
+
+html[data-theme="dark"] .my-bookings-page .bg-light,
+html[data-theme="dark"] .my-bookings-page .border-light {
+  background: var(--bg-elevated, #22304A) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .text-dark,
+html[data-theme="dark"] .my-bookings-page .fw-bold.text-dark {
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .details-tab-system {
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .filter-tab {
+  min-height: 42px;
+  background: var(--bg-card, #182235) !important;
+  color: #CBD5E1 !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .filter-tab:hover,
+html[data-theme="dark"] .my-bookings-page .filter-tab:focus {
+  background: rgba(227, 30, 36, 0.14) !important;
+  color: #fff !important;
+  border-color: rgba(227, 30, 36, 0.36) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .filter-tab.active {
+  background: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  border-color: var(--accent, #e31e24) !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.24) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-primary {
+  background: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(96, 165, 250, 0.6) !important;
+  color: #93C5FD !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-primary:hover {
+  background: #2563EB !important;
+  border-color: #2563EB !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-danger,
+html[data-theme="dark"] .my-bookings-page .listing-delete-btn {
+  background: rgba(248, 113, 113, 0.06) !important;
+  border-color: rgba(248, 113, 113, 0.48) !important;
+  color: #FCA5A5 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-danger:hover,
+html[data-theme="dark"] .my-bookings-page .listing-delete-btn:hover {
+  background: rgba(220, 38, 38, 0.18) !important;
+  border-color: #EF4444 !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-danger,
+html[data-theme="dark"] .my-bookings-page .btn-accent-custom {
+  background: var(--accent, #e31e24) !important;
+  border-color: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.22);
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-danger:hover,
+html[data-theme="dark"] .my-bookings-page .btn-accent-custom:hover {
+  background: #f43f46 !important;
+  border-color: #f43f46 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(227, 30, 36, 0.32);
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-secondary {
+  background: rgba(148, 163, 184, 0.06) !important;
+  border-color: rgba(148, 163, 184, 0.28) !important;
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-secondary:hover {
+  background: var(--bg-elevated, #22304A) !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-light,
+html[data-theme="dark"] .my-bookings-page .btn-warning {
+  background: var(--bg-elevated, #22304A) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .dashboard-table,
+html[data-theme="dark"] .my-bookings-page .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: #CBD5E1;
+  --bs-table-border-color: rgba(148, 163, 184, 0.16);
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .table th {
+  color: #F8FAFC !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .table td {
+  color: #CBD5E1 !important;
+  border-color: rgba(148, 163, 184, 0.12) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .booking-status-badge.badge-pending,
+html[data-theme="dark"] .my-bookings-page .badge-pending {
+  background: rgba(245, 158, 11, 0.16) !important;
+  color: #FCD34D !important;
+  border-color: rgba(245, 158, 11, 0.24) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .booking-status-badge.badge-confirmed,
+html[data-theme="dark"] .my-bookings-page .badge-confirmed,
+html[data-theme="dark"] .my-bookings-page .badge-completed {
+  background: rgba(34, 197, 94, 0.14) !important;
+  color: #86EFAC !important;
+  border-color: rgba(34, 197, 94, 0.24) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .badge-waiting {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: #93C5FD !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .badge-rejected,
+html[data-theme="dark"] .my-bookings-page .badge-cancelled {
+  background: rgba(239, 68, 68, 0.16) !important;
+  color: #FCA5A5 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .modal-content,
+html[data-theme="dark"] .my-bookings-page .modal-header,
+html[data-theme="dark"] .my-bookings-page .modal-body {
+  background: var(--bg-card, #182235) !important;
+  color: var(--text, #F8FAFC) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .messages-workspace {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(227, 30, 36, 0.08), transparent 30%),
+    var(--bg-page, #0B1120) !important;
+  min-height: 100vh;
+}
+
+html[data-theme="dark"] .messages-list,
+html[data-theme="dark"] .message-chat {
+  background: #161b22 !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme="dark"] .messages-list {
+  border-right-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .message-thread {
+  background: var(--bg-card, #182235) !important;
+  border-color: transparent !important;
+  border-left-color: transparent !important;
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .message-thread:hover {
+  background: var(--bg-elevated, #22304A) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-thread.is-active {
+  background: rgba(227, 30, 36, 0.16) !important;
+  border-color: rgba(227, 30, 36, 0.32) !important;
+  border-left-color: var(--accent, #e31e24) !important;
+  box-shadow: 0 14px 30px rgba(227, 30, 36, 0.16) !important;
+}
+
+html[data-theme="dark"] .message-thread:hover strong,
+html[data-theme="dark"] .message-thread.is-active strong {
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .message-thread:hover span,
+html[data-theme="dark"] .message-thread:hover small,
+html[data-theme="dark"] .message-thread:hover time,
+html[data-theme="dark"] .message-thread.is-active span,
+html[data-theme="dark"] .message-thread.is-active small,
+html[data-theme="dark"] .message-thread.is-active time {
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .message-thread-avatar {
+  background: var(--bg-elevated, #22304A) !important;
+  color: #F8FAFC !important;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+html[data-theme="dark"] .message-chat-header,
+html[data-theme="dark"] .message-compose {
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .message-chat-header h2 {
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .message-listing-context {
+  background: var(--bg-card, #182235) !important;
+  border: 1px solid rgba(227, 30, 36, 0.18) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-listing-context img {
+  object-fit: cover !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-bubble-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.28) !important;
+}
+
+html[data-theme="dark"] .message-bubble.sent {
+  background: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 30px rgba(227, 30, 36, 0.22) !important;
+}
+
+html[data-theme="dark"] .message-bubble.received {
+  background: var(--bg-elevated, #22304A) !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .message-bubble.received span {
+  color: #94A3B8 !important;
+}
+
+html[data-theme="dark"] .message-compose .form-control {
+  background: var(--bg-card, #182235) !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .message-compose .form-control::placeholder {
+  color: #94A3B8 !important;
+}
+
+html[data-theme="dark"] .message-compose .form-control:focus {
+  background: var(--bg-card, #182235) !important;
+  border-color: var(--accent, #e31e24) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-compose button {
+  background: var(--accent, #e31e24) !important;
+  border-color: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.22);
 }

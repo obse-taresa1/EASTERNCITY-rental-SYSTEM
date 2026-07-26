@@ -6,6 +6,7 @@ const authMiddleware = require('../middleware/auth');
 const {
   validateRegister,
   validateLogin,
+  validateGoogleLogin,
   validateChangePassword,
   validateForgotPassword,
   validateResetPassword,
@@ -13,6 +14,7 @@ const {
 
 router.post('/register', validateRegister, authController.register);
 router.post('/login', validateLogin, authController.login);
+router.post('/google', validateGoogleLogin, authController.googleLogin);
 router.post('/forgot-password', validateForgotPassword, authController.forgotPassword);
 router.post('/reset-password', validateResetPassword, authController.resetPassword);
 router.post('/refresh', authController.refresh);

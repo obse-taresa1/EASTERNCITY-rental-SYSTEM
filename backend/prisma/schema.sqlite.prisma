@@ -13,6 +13,7 @@ model User {
   password                      String
   role                          String               @default("USER")
   createdAt                     DateTime             @default(now())
+  profileImageUrl               String?
   ownedBookings                 Booking[]            @relation("BookingOwner")
   rentedBookings                Booking[]            @relation("BookingRenter")
   conversationsAsParticipantOne Conversation[]       @relation("ConversationParticipantOne")

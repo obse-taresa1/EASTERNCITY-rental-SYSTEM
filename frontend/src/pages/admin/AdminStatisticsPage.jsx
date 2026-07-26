@@ -51,7 +51,7 @@ export default function AdminStatisticsPage() {
           {
             icon: "bi-calendar-check",
             label: "Total Bookings",
-            value: counts.totalRenters || 0,
+            value: counts.totalBookings || 0,
             tone: "warning",
           },
           {

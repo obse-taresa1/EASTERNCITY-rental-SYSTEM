@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { useTheme } from "../../context/ThemeContext.jsx";
 import { adminApi } from "../../services/adminManagementService.js";
+import { profileForRole } from "../../services/authService.js";
 import { getInitials } from "../../utils/user.js";
 
 const LANGUAGES = [
@@ -289,7 +290,9 @@ export default function AdminTopbar({ title }) {
   };
 
   const handleProfileClick = () => {
-    navigate("/profile");
+    setMenuOpen(false);
+    setNotificationMenuOpen(false);
+    navigate(profileForRole(activeUser?.role));
   };
 
   const handleNotificationClick = async (notification) => {
