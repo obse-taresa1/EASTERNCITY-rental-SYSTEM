@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useTheme } from "../../context/ThemeContext.jsx";
@@ -82,7 +82,6 @@ async function requestGoogleUser(loginWithGoogle, googleClientId) {
 export default function LoginPage() {
   usePageTitle("Login");
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, loginWithGoogle } = useAuth();
   const { theme } = useTheme();
   const authLogo = theme === "dark" ? darkLogo : lightLogo;
@@ -104,9 +103,7 @@ export default function LoginPage() {
     try {
       // Call the auth service – adjust if a dedicated endpoint exists
       const loggedInUser = await requestGoogleUser(loginWithGoogle, googleClientId);
-      const from = location.state?.from?.pathname;
-      const nextRoute = from || getDashboardPath(loggedInUser.role);
-      navigate(nextRoute, { replace: true });
+      navigate(getDashboardPath(loggedInUser.role), { replace: true });
     } catch (err) {
       setError(err?.message ?? "Google sign‑in failed.");
     } finally {
@@ -128,25 +125,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const loggedInUser = await login(formData.email, formData.password);
-      const { getStorageItem, removeStorageItem } =
-        await import("../../services/storageService.js");
-
-      const pendingContactUrl = getStorageItem("pendingContactUrl", null);
-      if (pendingContactUrl) {
-        removeStorageItem("pendingContactUrl");
-        navigate(pendingContactUrl, {
-          replace: true,
-          state: {
-            contactReadyMessage:
-              "You are signed in. Click Contact Owner to start the conversation.",
-          },
-        });
-        return;
-      }
-      
-      const from = location.state?.from?.pathname;
-      const nextRoute = from || getDashboardPath(loggedInUser.role);
-      navigate(nextRoute, { replace: true });
+      navigate(getDashboardPath(loggedInUser.role), { replace: true });
     } catch (loginError) {
       setError(loginError.message || "Login failed.");
     } finally {

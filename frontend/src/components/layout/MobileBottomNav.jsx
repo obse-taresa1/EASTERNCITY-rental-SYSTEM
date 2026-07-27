@@ -40,7 +40,7 @@ export default function MobileBottomNav() {
             }
           >
             <i className="bi bi-info-circle"></i>
-            <span>About Us</span>
+            <span>{t("about") || "About Us"}</span>
           </NavLink>
         </li>
         <li>

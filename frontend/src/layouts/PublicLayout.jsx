@@ -16,18 +16,13 @@ export default function PublicLayout() {
       <main className="app-main-content" style={{ flex: 1 }}>
         <Outlet />
       </main>
+      <Footer />
       {!isAuthPage && (
         <>
-          <Footer />
           <MobileBottomNav />
           <BackToTopButton />
           <SupportChatWidget />
         </>
-      )}
-      {isAuthPage && (
-        <div style={{ textAlign: "center", padding: "1.5rem", fontSize: "0.85rem", color: "var(--text-muted)", background: "var(--auth-bg, #FAFBFC)" }}>
-          &copy; {new Date().getFullYear()} Eastern Cities. All rights reserved.
-        </div>
       )}
     </div>
   );

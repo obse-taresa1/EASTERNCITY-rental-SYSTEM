@@ -109,7 +109,8 @@ export default function AppRouter() {
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route element={<DashboardLayout />}>
+          <Route element={<RoleRoute allowedRoles={["USER"]} />}>
+            <Route element={<DashboardLayout />}>
             <Route
               path="/dashboard"
               element={
@@ -199,6 +200,7 @@ export default function AppRouter() {
             />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/verification" element={<VerificationPage />} />
+            </Route>
           </Route>
         </Route>
 

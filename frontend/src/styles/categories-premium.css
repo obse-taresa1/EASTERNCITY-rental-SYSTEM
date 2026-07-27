@@ -197,9 +197,32 @@ html[data-theme="dark"] .stat-item strong {
   padding: 1.8rem;
   text-decoration: none;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+/* Shine sweep overlay */
+.premium-category-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(227, 30, 36, 0.08) 50%,
+    transparent 60%
+  );
+  transition: left 0.55s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.premium-category-card:hover::before {
+  left: 150%;
 }
 
 html[data-theme="dark"] .premium-category-card {
@@ -279,14 +302,14 @@ html[data-theme="dark"] .listing-count {
 
 /* Hover States */
 .premium-category-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  border-color: #cbd5e1;
+  transform: translateY(-6px);
+  box-shadow: 0 8px 30px rgba(227, 30, 36, 0.18), 0 0 0 2px rgba(227, 30, 36, 0.6);
+  border-color: #e31e24;
 }
 
 html[data-theme="dark"] .premium-category-card:hover {
-  box-shadow: 0 10px 30px rgba(227, 30, 36, 0.15);
-  border-color: rgba(227, 30, 36, 0.3);
+  box-shadow: 0 10px 35px rgba(227, 30, 36, 0.25), 0 0 0 2px rgba(227, 30, 36, 0.7);
+  border-color: #e31e24;
 }
 
 .premium-category-card:hover .premium-card-icon {
