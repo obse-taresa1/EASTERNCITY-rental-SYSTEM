@@ -57,6 +57,16 @@ async function updateUser(actor, id, payload) {
 }
 
 async function createAdmin(actor, payload) {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: payload.email },
+  });
+
+  if (existingUser) {
+    const error = new Error("Email is already registered.");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const user = await prisma.user.create({
     data: {
       name: payload.name,

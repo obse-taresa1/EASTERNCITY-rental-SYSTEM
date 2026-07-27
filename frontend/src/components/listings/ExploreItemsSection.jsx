@@ -1,9 +1,7 @@
 import ListingCard from "../cards/ListingCard.jsx";
 import { useEffect, useState } from "react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import { getAllItems } from "../../services/itemService.js";
 import { getPublicListings } from "../../services/listingApiService.js";
-import { homeListings } from "../../data/homeListings.js";
 
 // Pick one representative item per category to ensure visual variety
 function pickOnePer(listings) {
@@ -30,9 +28,7 @@ export default function ExploreItemsSection() {
     async function loadListings() {
       try {
         const data = await getPublicListings();
-        const apiData = Array.isArray(data) && data.length > 0 ? data : [];
-        // Merge API data with homeListings and deduplicate
-        const combined = [...apiData, ...getAllItems()];
+        const combined = Array.isArray(data) ? data : [];
         const seen = new Set();
         const deduped = combined.filter((item) => {
           if (seen.has(item.id)) return false;
@@ -41,7 +37,7 @@ export default function ExploreItemsSection() {
         });
         if (active) setListings(deduped);
       } catch {
-        if (active) setListings(getAllItems());
+        if (active) setListings([]);
       }
     }
 
@@ -51,10 +47,7 @@ export default function ExploreItemsSection() {
     };
   }, []);
 
-  // Use homeListings as guaranteed fallback so variety is always shown
-  const source = listings.length > 0 ? listings : homeListings;
-
-  const filtered = source.filter((item) => {
+  const filtered = listings.filter((item) => {
     const s = String(item.status || "").toLowerCase();
     if (["draft", "rejected", "expired", "payment-pending"].includes(s)) return false;
     if (statusFilter === "new") return s === "new" || item.status === "new";

@@ -5,6 +5,12 @@ export const rentalCategoryAliases = {
     "electronics",
     "cameras",
     "camera",
+    "phones",
+    "phone",
+    "laptops",
+    "laptop",
+    "photography-equipment",
+    "photography equipment",
     "projectors",
     "drones",
   ],
@@ -29,6 +35,8 @@ export const rentalCategoryAliases = {
     "event essentials",
     "event",
     "events",
+    "event-equipment",
+    "event equipment",
   ],
   vehicles: [
     "vehicles",
@@ -50,6 +58,10 @@ export const rentalCategoryAliases = {
     "diy",
     "tools",
     "tool",
+    "power-tools",
+    "power tools",
+    "construction-tools",
+    "construction tools",
   ],
   furniture: ["furniture"],
   "home-appliances": [
@@ -63,6 +75,10 @@ export const rentalCategoryAliases = {
     "sports & outdoor",
     "sports",
     "outdoor",
+    "sports-equipment",
+    "sports equipment",
+    "outdoor-gear",
+    "outdoor gear",
   ],
   "travel-camping": [
     "travel-camping",
@@ -81,6 +97,8 @@ export const rentalCategoryAliases = {
     "music & audio equipment",
     "music",
     "audio",
+    "audio-equipment",
+    "audio equipment",
   ],
   "office-equipment": [
     "office-equipment",
@@ -121,10 +139,26 @@ export function getRentalCategoryAliases(categoryId) {
   return new Set(aliases.map(normalizeCategoryToken).filter(Boolean));
 }
 
+export function getCanonicalRentalCategoryId(value) {
+  const normalized = normalizeCategoryToken(value);
+  if (!normalized) return "";
+
+  const directMatch = Object.keys(rentalCategoryAliases).find(
+    (categoryId) => normalizeCategoryToken(categoryId) === normalized,
+  );
+  if (directMatch) return directMatch;
+
+  return (
+    Object.entries(rentalCategoryAliases).find(([, aliases]) =>
+      aliases.map(normalizeCategoryToken).includes(normalized),
+    )?.[0] || normalized
+  );
+}
+
 export function listingMatchesRentalCategory(listing, categoryId) {
   if (!categoryId || categoryId === "all") return true;
 
-  const aliases = getRentalCategoryAliases(categoryId);
+  const aliases = getRentalCategoryAliases(getCanonicalRentalCategoryId(categoryId));
   const categoryValues = [
     listing?.category,
     listing?.categoryName,

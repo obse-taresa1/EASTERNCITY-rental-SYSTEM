@@ -22,29 +22,6 @@ function pickUserUpdateFields(updateData = {}) {
 }
 
 /**
- * Fetch all users from the database (passwords excluded)
- * @returns {Promise<Array>} List of users
- */
-const getAllUsers = async () => {
-  return prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-      phone: true,
-      verificationStatus: true,
-      city: true,
-      nationalIdFrontUrl: true,
-      nationalIdBackUrl: true,
-      profileImageUrl: true,
-      createdAt: true,
-    },
-  });
-};
-
-/**
  * Fetch a single user by ID
  * @param {string} id - User ID
  * @returns {Promise<Object>} User object
@@ -137,61 +114,6 @@ const updateUser = async (id, updateData) => {
   return updatedUser;
 };
 
-/**
- * Delete a user by ID
- * @param {string} id - User ID
- * @returns {Promise<Object>} Deleted user record info
- */
-const deleteUser = async (id) => {
-  await getUserById(id);
-
-  return prisma.user.delete({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-    },
-  });
-};
-
-const createAdminUser = async ({ name, email, password, role }) => {
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-
-  if (existingUser) {
-    const error = new Error('Email is already registered.');
-    error.statusCode = 400;
-    throw error;
-  }
-
-  const hashedPassword = await hashPassword(password);
-
-  return prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      role,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-      phone: true,
-      verificationStatus: true,
-      city: true,
-      nationalIdFrontUrl: true,
-      nationalIdBackUrl: true,
-      profileImageUrl: true,
-      createdAt: true,
-    },
-  });
-};
-
 const updateProfileImage = async (id, profileImageUrl) => {
   await getUserById(id);
 
@@ -216,10 +138,7 @@ const updateProfileImage = async (id, profileImageUrl) => {
 };
 
 module.exports = {
-  createAdminUser,
-  getAllUsers,
   getUserById,
   updateUser,
   updateProfileImage,
-  deleteUser,
 };

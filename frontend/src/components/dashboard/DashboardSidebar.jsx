@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useRefreshToken } from "../../context/RefreshContext.jsx";
 import { getMyBookings } from "../../services/bookingApiService.js";
 import { getMyReviews } from "../../services/reviewApiService.js";
 import { getStorageItem } from "../../services/storageService.js";
@@ -58,6 +59,8 @@ export default function DashboardSidebar() {
   const { language } = useLanguage();
   const navigate = useNavigate();
   const activeUser = user || currentUser;
+  const savedItemsRefreshToken = useRefreshToken("savedItems");
+  const statsRefreshToken = useRefreshToken(["bookings", "reviews"]);
 
   const memberSince = activeUser?.createdAt
     ? new Date(activeUser.createdAt).getFullYear()
@@ -73,23 +76,12 @@ export default function DashboardSidebar() {
   );
 
   useEffect(() => {
-    function refreshSavedCount() {
-      setSavedItems(
-        getStorageItem("saved_items", []).filter(
-          (item) => String(item.userId || "") === String(activeUser?.id || ""),
-        ).length,
-      );
-    }
-
-    refreshSavedCount();
-    window.addEventListener("easterncity:saved-items-updated", refreshSavedCount);
-    return () => {
-      window.removeEventListener(
-        "easterncity:saved-items-updated",
-        refreshSavedCount,
-      );
-    };
-  }, [activeUser?.id]);
+    setSavedItems(
+      getStorageItem("saved_items", []).filter(
+        (item) => String(item.userId || "") === String(activeUser?.id || ""),
+      ).length,
+    );
+  }, [activeUser?.id, savedItemsRefreshToken]);
 
   useEffect(() => {
     let active = true;
@@ -123,7 +115,7 @@ export default function DashboardSidebar() {
     return () => {
       active = false;
     };
-  }, [activeUser?.id]);
+  }, [activeUser?.id, statsRefreshToken]);
 
   const verificationStatus = normalizeVerificationStatus(
     activeUser?.verificationStatus,

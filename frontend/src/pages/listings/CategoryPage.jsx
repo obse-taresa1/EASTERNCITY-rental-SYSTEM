@@ -5,20 +5,11 @@ import { categories } from "../../data/items.js";
 import { getPublicListings } from "../../services/listingApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
 import { getSefarByCity } from "../../data/sefar.js";
-import { listingMatchesRentalCategory } from "../../utils/categoryMapping.js";
-import categoryListings from "../../data/categoryListings.js";
-import { homeListings } from "../../data/homeListings.js";
-
-// Merge and deduplicate local fallback data for all categories
-const localFallbackData = (() => {
-  const combined = [...categoryListings, ...homeListings];
-  const seen = new Set();
-  return combined.filter((item) => {
-    if (seen.has(item.id)) return false;
-    seen.add(item.id);
-    return true;
-  });
-})();
+import {
+  getCanonicalRentalCategoryId,
+  listingMatchesRentalCategory,
+  normalizeCategoryToken,
+} from "../../utils/categoryMapping.js";
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -32,18 +23,13 @@ export default function CategoryPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const normalizeFilterValue = (value) => {
-    return String(value || "")
-      .toLowerCase()
-      .trim();
-  };
+  const canonicalCategoryId = getCanonicalRentalCategoryId(categoryId);
 
-  const category =
-    categories.find(
-      (item) =>
-        normalizeFilterValue(item.id) === normalizeFilterValue(categoryId) ||
-        normalizeFilterValue(item.slug) === normalizeFilterValue(categoryId),
-    ) || null;
+  const staticCategory =
+    categories.find((item) => {
+      const tokens = [item.id, item.slug, item.name].map(normalizeCategoryToken);
+      return tokens.includes(normalizeCategoryToken(canonicalCategoryId));
+    }) || null;
 
   useEffect(() => {
     let active = true;
@@ -53,19 +39,9 @@ export default function CategoryPage() {
       try {
         const listingData = await getPublicListings();
         if (!active) return;
-        // Merge API data with local fallback, deduplicate by id
-        const apiData = Array.isArray(listingData) && listingData.length > 0 ? listingData : [];
-        const combined = [...apiData, ...localFallbackData];
-        const seen = new Set();
-        const deduped = combined.filter((item) => {
-          if (seen.has(item.id)) return false;
-          seen.add(item.id);
-          return true;
-        });
-        setListings(deduped);
+        setListings(Array.isArray(listingData) ? listingData : []);
       } catch {
-        // On error, use local fallback data
-        if (active) setListings(localFallbackData);
+        if (active) setListings([]);
       } finally {
         if (active) setLoading(false);
       }
@@ -77,10 +53,35 @@ export default function CategoryPage() {
     };
   }, [categoryId]);
 
+  const dbCategory = useMemo(() => {
+    if (staticCategory) return null;
+    const routeToken = normalizeCategoryToken(categoryId);
+    const match = listings.find((item) => {
+      const categoryData = item.categoryData || {};
+      return [categoryData.id, categoryData.slug, categoryData.name, item.category, item.categoryName]
+        .map(normalizeCategoryToken)
+        .includes(routeToken);
+    });
+
+    const categoryData = match?.categoryData || {};
+    if (!categoryData.id && !categoryData.slug && !categoryData.name) return null;
+
+    return {
+      id: categoryData.slug || categoryData.id,
+      name: categoryData.name || categoryData.slug || "Category",
+      icon: "bi-box-seam",
+      description: categoryData.description || "Explore verified rentals in this category.",
+    };
+  }, [categoryId, listings, staticCategory]);
+
+  const category = staticCategory || dbCategory;
+
   const allItems = useMemo(
     () =>
-      listings.filter((item) => listingMatchesRentalCategory(item, categoryId)),
-    [listings, categoryId],
+      listings.filter((item) =>
+        listingMatchesRentalCategory(item, category?.id || canonicalCategoryId || categoryId),
+      ),
+    [listings, category?.id, canonicalCategoryId, categoryId],
   );
 
   const sefarOptions = city !== "all" ? getSefarByCity(city) : [];

@@ -2,13 +2,14 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const authorize = require("../middleware/authorize");
 const controller = require("../controllers/adminManagement.controller");
+const { validateCreateAdmin } = require("../validators/userValidator");
 
 const router = express.Router();
 router.use(auth, authorize("ADMIN", "SUPER_ADMIN"));
 
 router.get("/analytics", controller.analytics);
 router.get("/users", controller.listUsers);
-router.post("/admins", authorize("SUPER_ADMIN"), controller.createAdmin);
+router.post("/admins", authorize("SUPER_ADMIN"), validateCreateAdmin, controller.createAdmin);
 router.patch("/users/:id", controller.updateUser);
 router.delete("/users/:id", controller.deleteUser);
 router.get("/listings", controller.listListings);

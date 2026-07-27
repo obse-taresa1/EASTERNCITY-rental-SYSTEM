@@ -1,4 +1,5 @@
 import { apiClient, resolveAssetUrl } from "./apiClient.js";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 function normalizeUser(user) {
   if (!user) return null;
@@ -14,20 +15,7 @@ function normalizeUser(user) {
 }
 
 function emitUsersUpdate() {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("easterncity:users-updated"));
-  }
-}
-
-export async function getUsers() {
-  const data = await apiClient.get("/api/users");
-  return Array.isArray(data) ? data.map(normalizeUser) : [];
-}
-
-export async function createAdminUser(payload) {
-  const data = await apiClient.post("/api/users/admins", payload);
-  emitUsersUpdate();
-  return normalizeUser(data);
+  emitRefresh("users");
 }
 
 export async function updateUser(id, payload) {
@@ -48,10 +36,4 @@ export async function updateUserProfileImage(id, file) {
     profileImage: resolveAssetUrl(user?.profileImageUrl),
     avatar: resolveAssetUrl(user?.profileImageUrl),
   };
-}
-
-export async function deleteUser(id) {
-  const data = await apiClient.delete(`/api/users/${id}`);
-  emitUsersUpdate();
-  return data;
 }

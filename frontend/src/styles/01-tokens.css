@@ -1,0 +1,88 @@
+@import url("./premium.css");
+/* ==========================================================================
+   Eastern Cities Item Rental System - Main Stylesheet
+   Technologies: CSS3, Flexbox, Bootstrap 5 overrides
+   ========================================================================== */
+
+/* ---------- CSS Variables (Light Theme) ---------- */
+:root {
+  :root {
+    --primary: hsl(255, 100%, 98%);
+    --primary-dark: #c41920;
+    --secondary: #0c0c36;
+    --accent: #e31e24;
+    --accent-dark: #c41920;
+    --motorx-red: #e31e24;
+    --motorx-navy: #0b0b0f;
+    --bg: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --white: #ffffff;
+    --border: #bccad9;
+    --card-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    --card-shadow-hover:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    --radius-sm: 8px;
+    --radius-input: 10px;
+    --radius-btn: 12px;
+    --radius-card: 16px;
+    --transition: all 0.3s ease;
+    --navbar-height: 72px;
+    --logo-height: 110px;
+  }
+}
+
+/* ---------- Premium Dark Theme ---------- */
+html[data-theme="dark"] {
+  /* Dark theme hierarchy tokens */
+  --bg-page: #0f172a;
+  --bg-section: #111827;
+  --bg-card: #182235;
+  --bg-elevated: #22304a;
+  --border-token: rgba(255, 255, 255, 0.08);
+
+  /* Existing dark colors */
+  --bg: var(--bg-page);
+  --text: #f1f5f9;
+  --text-muted: #e2e5ea;
+  --white: #ffffff;
+  --border: #334155;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] body {
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text);
+}
+
+html[data-theme="dark"] .navbar,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .search-box,
+html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .chat-sidebar,
+html[data-theme="dark"] .chat-main,
+html[data-theme="dark"] .category-card {
+  background-color: var(--surface-color) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select,
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .navbar-custom {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+

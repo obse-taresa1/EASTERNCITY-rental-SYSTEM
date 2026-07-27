@@ -1,5 +1,6 @@
 import { apiClient } from "./apiClient.js";
 import fallbackListingImage from "../assets/images/pc.png";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 const API_BASE_URL =
   import.meta.env?.VITE_API_BASE_URL ||
@@ -73,9 +74,7 @@ function deriveSefar(listing) {
 }
 
 function emitListingUpdate() {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("easterncity:listings-updated"));
-  }
+  emitRefresh("listings");
 }
 
 export function normalizeListing(listing) {
@@ -116,8 +115,8 @@ export function normalizeListing(listing) {
   };
 }
 
-export async function getPublicListings() {
-  const data = await apiClient.get("/api/listings");
+export async function getPublicListings(filters = {}) {
+  const data = await apiClient.get(`/api/listings${buildQueryString(filters)}`);
   return Array.isArray(data) ? data.map(normalizeListing) : [];
 }
 

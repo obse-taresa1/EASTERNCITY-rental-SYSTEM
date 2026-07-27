@@ -51,6 +51,124 @@ function normalizeQueryValue(value) {
   return normalized && normalized.toLowerCase() !== "all" ? normalized : "";
 }
 
+const rentalCategoryAliases = {
+  "electronics-cameras": [
+    "electronics-cameras",
+    "electronics & cameras",
+    "electronics and cameras",
+    "electronics",
+    "cameras",
+    "camera",
+    "phones",
+    "phone",
+    "laptops",
+    "laptop",
+    "photography-equipment",
+    "photography equipment",
+  ],
+  "cars-bikes": [
+    "cars-bikes",
+    "cars & bikes",
+    "cars and bikes",
+    "cars",
+    "car",
+    "bikes",
+    "bike",
+    "motorcycles",
+    "motorcycle",
+  ],
+  "party-wedding": [
+    "party-wedding",
+    "party & wedding",
+    "party and wedding",
+    "party",
+    "wedding",
+  ],
+  "event-essentials": [
+    "event-essentials",
+    "event essentials",
+    "event",
+    "events",
+    "event-equipment",
+    "event equipment",
+  ],
+  vehicles: ["vehicles", "vehicle", "suv", "pickup", "truck", "van", "minibus"],
+  gadgets: ["gadgets", "gadget"],
+  "construction-diy": [
+    "construction-diy",
+    "construction & diy",
+    "construction and diy",
+    "construction",
+    "diy",
+    "tools",
+    "tool",
+    "power-tools",
+    "power tools",
+    "construction-tools",
+    "construction tools",
+  ],
+  furniture: ["furniture"],
+  "home-appliances": ["home-appliances", "home appliances", "appliances"],
+  "sports-outdoor": [
+    "sports-outdoor",
+    "sports & outdoor",
+    "sports and outdoor",
+    "sports",
+    "outdoor",
+    "sports-equipment",
+    "sports equipment",
+    "outdoor-gear",
+    "outdoor gear",
+  ],
+  "travel-camping": ["travel-camping", "travel & camping", "travel and camping", "travel", "camping"],
+  "fashion-accessories": [
+    "fashion-accessories",
+    "fashion & accessories",
+    "fashion and accessories",
+    "fashion",
+    "accessories",
+  ],
+  "music-audio": [
+    "music-audio",
+    "music & audio equipment",
+    "music and audio equipment",
+    "music",
+    "audio",
+    "audio-equipment",
+    "audio equipment",
+  ],
+  "office-equipment": ["office-equipment", "office equipment", "office"],
+  "beauty-salon": ["beauty-salon", "beauty & salon equipment", "beauty and salon equipment", "beauty", "salon"],
+  "baby-kids": ["baby-kids", "baby & kids essentials", "baby and kids essentials", "baby", "kids"],
+  "gaming-equipment": ["gaming-equipment", "gaming equipment", "gaming", "games"],
+};
+
+function normalizeCategoryToken(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getCategoryAliases(value) {
+  const normalized = normalizeCategoryToken(value);
+  if (!normalized) return [];
+
+  const canonical =
+    Object.entries(rentalCategoryAliases).find(([categoryId, aliases]) => {
+      const tokens = [categoryId, ...aliases].map(normalizeCategoryToken);
+      return tokens.includes(normalized);
+    })?.[0] || normalized;
+
+  return [
+    canonical,
+    ...(rentalCategoryAliases[canonical] || []),
+    value,
+  ].filter(Boolean);
+}
+
 function buildPublicListingWhere(query = {}) {
   const search = normalizeQueryValue(query.search || query.keyword || query.q);
   const category = normalizeQueryValue(
@@ -94,12 +212,15 @@ function buildPublicListingWhere(query = {}) {
   }
 
   if (category) {
+    const categoryAliases = [...new Set(getCategoryAliases(category))];
     where.category = {
       is: {
         OR: [
           { id: category },
-          { slug: { equals: category, mode: "insensitive" } },
-          { name: { equals: category, mode: "insensitive" } },
+          ...categoryAliases.flatMap((value) => [
+            { slug: { equals: value, mode: "insensitive" } },
+            { name: { equals: value, mode: "insensitive" } },
+          ]),
         ],
       },
     };

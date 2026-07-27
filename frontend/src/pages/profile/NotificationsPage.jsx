@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useRefreshToken } from "../../context/RefreshContext.jsx";
 import {
   fetchNotifications,
   markNotificationRead,
@@ -12,11 +13,12 @@ export default function NotificationsPage() {
   const activeUser = user || currentUser;
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
+  const notificationsRefreshToken = useRefreshToken("notifications");
 
   useEffect(() => {
     let isMounted = true;
 
-    const refreshNotifications = () => {
+    function refreshNotifications() {
       fetchNotifications(activeUser?.id)
         .then((items) => {
           if (isMounted) setNotifications(items || []);
@@ -24,18 +26,13 @@ export default function NotificationsPage() {
         .catch(() => {
           if (isMounted) setNotifications([]);
         });
-    };
+    }
 
     refreshNotifications();
-    window.addEventListener("easterncity:notifications-updated", refreshNotifications);
     return () => {
       isMounted = false;
-      window.removeEventListener(
-        "easterncity:notifications-updated",
-        refreshNotifications,
-      );
     };
-  }, [activeUser?.id]);
+  }, [activeUser?.id, notificationsRefreshToken]);
 
   async function handleMarkRead(notification) {
     await markNotificationRead(notification.id);

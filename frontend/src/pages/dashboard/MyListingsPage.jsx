@@ -1,12 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useRefreshToken } from "../../context/RefreshContext.jsx";
 import { getMyListings, deleteListing } from "../../services/listingApiService.js";
 import { getMyBookings } from "../../services/bookingApiService.js";
-import { useNavigate } from "react-router-dom";
 import ListingManagementTable from "../../components/dashboard/ListingManagementTable.jsx";
 import BookingTable from "../../components/dashboard/BookingTable.jsx";
-import StatusBadge from "../../components/common/StatusBadge.jsx";
+import MyListingsEmptyState from "../../components/dashboard/my-listings/MyListingsEmptyState.jsx";
+import MyListingsTabs from "../../components/dashboard/my-listings/MyListingsTabs.jsx";
+import PromotionRequestModal from "../../components/dashboard/my-listings/PromotionRequestModal.jsx";
+import PromotionRequestsTable from "../../components/dashboard/my-listings/PromotionRequestsTable.jsx";
 import {
   fetchOwnerPromotions,
   requestPromotion,
@@ -38,7 +41,7 @@ export default function MyListingsPage() {
   const { currentUser, user } = useAuth();
   const activeUser = user || currentUser;
   const [activeTab, setActiveTab] = useState("all");
-  const [refresh, setRefresh] = useState(0);
+  const refreshToken = useRefreshToken(["listings", "bookings", "promotions"]);
   const [listings, setListings] = useState([]);
   const [isLoadingListings, setIsLoadingListings] = useState(true);
   const [ownerBookings, setOwnerBookings] = useState([]);
@@ -48,21 +51,6 @@ export default function MyListingsPage() {
   const [selectedPromotionPackage, setSelectedPromotionPackage] = useState(1);
   const [selectedPromotionDuration, setSelectedPromotionDuration] = useState(7);
   const [promotionScreenshot, setPromotionScreenshot] = useState(null);
-
-  useEffect(() => {
-    const handleUpdate = () => setRefresh((r) => r + 1);
-    window.addEventListener("easterncity:listings-updated", handleUpdate);
-    window.addEventListener("easterncity:bookings-updated", handleUpdate);
-    window.addEventListener("easterncity:promotions-updated", handleUpdate);
-    return () => {
-      window.removeEventListener("easterncity:listings-updated", handleUpdate);
-      window.removeEventListener("easterncity:bookings-updated", handleUpdate);
-      window.removeEventListener(
-        "easterncity:promotions-updated",
-        handleUpdate,
-      );
-    };
-  }, []);
 
   useEffect(() => {
     let active = true;
@@ -93,7 +81,7 @@ export default function MyListingsPage() {
     return () => {
       active = false;
     };
-  }, [activeUser, refresh]);
+  }, [activeUser, refreshToken]);
 
   const ownedItems = useMemo(() => listings, [listings]);
 
@@ -131,7 +119,7 @@ export default function MyListingsPage() {
     return () => {
       active = false;
     };
-  }, [activeUser, refresh]);
+  }, [activeUser, refreshToken]);
 
   useEffect(() => {
     let active = true;
@@ -161,7 +149,7 @@ export default function MyListingsPage() {
     return () => {
       active = false;
     };
-  }, [activeUser, refresh]);
+  }, [activeUser, refreshToken]);
 
   const getFilteredItems = () => {
     switch (activeTab) {
@@ -254,7 +242,6 @@ export default function MyListingsPage() {
     );
     setPromotionListing(null);
     setPromotionScreenshot(null);
-    setRefresh((value) => value + 1);
   }
 
   function handleEdit(item) {
@@ -266,7 +253,6 @@ export default function MyListingsPage() {
     try {
       await deleteListing(item.id);
       setNotice(`Listing "${item.title}" deleted successfully.`);
-      setRefresh(r => r + 1);
     } catch (error) {
       setNotice(error.message || "Failed to delete listing.");
     }
@@ -300,38 +286,15 @@ export default function MyListingsPage() {
 
       {notice && <div className="alert alert-info">{notice}</div>}
 
-      <div className="d-flex gap-2 mb-4 overflow-auto pb-2 border-bottom details-tab-system">
-        {[
-          { key: "all", label: "All Listings" },
-          { key: "pending", label: "Pending" },
-          { key: "approved", label: "Approved" },
-          { key: "rejected", label: "Rejected" },
-          { key: "requests", label: "Booking Requests" },
-          { key: "promotions", label: "Promotion Requests" },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            className={`btn rounded-pill fw-bold px-4 filter-tab ${activeTab === tab.key ? "active" : ""}`}
-            onClick={() => setActiveTab(tab.key)}
-            style={{ transition: "all 0.2s ease", whiteSpace: "nowrap" }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <MyListingsTabs activeTab={activeTab} onChange={setActiveTab} />
 
       {activeTab === "requests" ? (
         ownerBookings.length === 0 ? (
-          <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
-            <div className="mb-3">
-              <i
-                className="bi bi-calendar-x text-danger opacity-50"
-                style={{ fontSize: "4rem" }}
-              ></i>
-            </div>
-            <h3 className="fw-bold">No Booking Requests</h3>
-            <p className="text-muted">You haven't received any booking requests yet.</p>
-          </div>
+          <MyListingsEmptyState
+            icon="bi-calendar-x"
+            title="No Booking Requests"
+            description="You haven't received any booking requests yet."
+          />
         ) : (
           <div className="premium-glass-card bg-white p-4">
             <BookingTable bookings={ownerBookings} />
@@ -339,43 +302,13 @@ export default function MyListingsPage() {
         )
       ) : activeTab === "promotions" ? (
         ownerPromotions.length === 0 ? (
-          <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
-            <div className="mb-3">
-              <i
-                className="bi bi-megaphone text-danger opacity-50"
-                style={{ fontSize: "4rem" }}
-              ></i>
-            </div>
-            <h3 className="fw-bold">No Promotion Requests</h3>
-            <p className="text-muted">Submitted listing promotion requests will appear here.</p>
-          </div>
+          <MyListingsEmptyState
+            icon="bi-megaphone"
+            title="No Promotion Requests"
+            description="Submitted listing promotion requests will appear here."
+          />
         ) : (
-          <div className="premium-glass-card bg-white p-4">
-            <div className="table-responsive">
-              <table className="table table-hover align-middle">
-                <thead>
-                  <tr>
-                    <th>Listing</th>
-                    <th>Promotion Type</th>
-                    <th>Request Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ownerPromotions.map((promotion) => (
-                    <tr key={promotion.id}>
-                      <td className="fw-bold">{promotion.listingTitle}</td>
-                      <td>{promotion.promotionType}</td>
-                      <td>{promotion.requestDate}</td>
-                      <td>
-                        <StatusBadge status={promotion.status} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <PromotionRequestsTable promotions={ownerPromotions} />
         )
       ) : isLoadingListings ? (
         <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
@@ -383,23 +316,11 @@ export default function MyListingsPage() {
           <p className="mt-3 text-muted">Loading your listings...</p>
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
-          <div className="mb-3">
-            <i
-              className="bi bi-card-list text-danger opacity-50"
-              style={{ fontSize: "4rem" }}
-            ></i>
-          </div>
-          <h3 className="fw-bold">You haven't created any listings yet.</h3>
-          {activeTab === "all" && (
-            <Link
-              to="/list-item"
-              className="btn btn-danger rounded-pill fw-bold mt-3 px-4 py-2"
-            >
-              <i className="bi bi-plus-circle me-2" /> Add Listing
-            </Link>
-          )}
-        </div>
+        <MyListingsEmptyState
+          icon="bi-card-list"
+          title="You haven't created any listings yet."
+          showAddButton={activeTab === "all"}
+        />
       ) : (
         <ListingManagementTable
           items={filteredItems}
@@ -410,136 +331,22 @@ export default function MyListingsPage() {
       )}
 
       {promotionListing && (
-        <div
-          className="modal show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-              <div className="modal-header bg-light border-0 py-3">
-                <h5 className="modal-title fw-bold">Promote Listing</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => {
-                    setPromotionListing(null);
-                    setPromotionScreenshot(null);
-                  }}
-                ></button>
-              </div>
-              <div className="modal-body p-4">
-                <p className="text-muted mb-4">
-                  Boost visibility for <strong>{promotionListing.title}</strong>{" "}
-                  by selecting a promotion package.
-                </p>
-                <form onSubmit={submitPromotionRequest}>
-                  <div className="mb-4">
-                    <label className="form-label fw-bold">Select Package</label>
-                    <div className="row g-3">
-                      {promotionPackages.map((pkg) => (
-                        <div className="col-12" key={pkg.id}>
-                          <label
-                            className={`d-flex align-items-center p-3 rounded-3 cursor-pointer border ${selectedPromotionPackage === pkg.id ? "border-danger bg-danger bg-opacity-10" : "border-light"}`}
-                          >
-                            <input
-                              type="radio"
-                              name="promotionPackage"
-                              value={pkg.id}
-                              checked={selectedPromotionPackage === pkg.id}
-                              onChange={() =>
-                                setSelectedPromotionPackage(pkg.id)
-                              }
-                              className="form-check-input me-3 mt-0"
-                            />
-                            <i
-                              className={`bi ${pkg.icon} fs-4 me-3 ${selectedPromotionPackage === pkg.id ? "text-danger" : "text-secondary"}`}
-                            ></i>
-                            <div className="flex-grow-1">
-                              <h6 className="mb-0 fw-bold">{pkg.label}</h6>
-                              <small className="text-muted">
-                                {pkg.baseRate} ETB / day
-                              </small>
-                            </div>
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="form-label fw-bold">
-                      Duration (Days)
-                    </label>
-                    <select
-                      className="form-select form-select-lg"
-                      value={selectedPromotionDuration}
-                      onChange={(e) =>
-                        setSelectedPromotionDuration(Number(e.target.value))
-                      }
-                    >
-                      {durationOptions.map((d) => (
-                        <option key={d} value={d}>
-                          {d} Days -{" "}
-                          {(promotionPackages.find(
-                            (p) => p.id === selectedPromotionPackage,
-                          )?.baseRate || 100) * d}{" "}
-                          ETB
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="form-label fw-bold">Payment Upload</label>
-                    <div className="p-3 bg-light rounded-3">
-                      <p className="small text-muted mb-2">
-                        Please pay{" "}
-                        <strong>
-                          {(promotionPackages.find(
-                            (p) => p.id === selectedPromotionPackage,
-                          )?.baseRate || 100) * selectedPromotionDuration}{" "}
-                          ETB
-                        </strong>{" "}
-                        via Telebirr or CBE Birr and upload the receipt.
-                      </p>
-                      <label className="btn btn-outline-danger w-100 d-flex justify-content-center align-items-center gap-2">
-                        <i className="bi bi-upload"></i>
-                        {promotionScreenshot
-                          ? promotionScreenshot.name
-                          : "Upload Payment Screenshot"}
-                        <input
-                          type="file"
-                          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                          hidden
-                          onChange={handlePromotionScreenshot}
-                        />
-                      </label>
-                      {promotionScreenshot && (
-                        <div className="mt-3 text-center">
-                          <img
-                            src={promotionScreenshot.preview}
-                            alt="Payment receipt preview"
-                            className="img-thumbnail"
-                            style={{ maxHeight: "150px" }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="d-grid mt-4">
-                    <button
-                      type="submit"
-                      className="btn btn-danger btn-lg rounded-pill fw-bold"
-                    >
-                      Submit Promotion Request
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PromotionRequestModal
+          durationOptions={durationOptions}
+          listing={promotionListing}
+          onClose={() => {
+            setPromotionListing(null);
+            setPromotionScreenshot(null);
+          }}
+          onScreenshotChange={handlePromotionScreenshot}
+          onSubmit={submitPromotionRequest}
+          packages={promotionPackages}
+          screenshot={promotionScreenshot}
+          selectedDuration={selectedPromotionDuration}
+          selectedPackage={selectedPromotionPackage}
+          setSelectedDuration={setSelectedPromotionDuration}
+          setSelectedPackage={setSelectedPromotionPackage}
+        />
       )}
     </main>
   );

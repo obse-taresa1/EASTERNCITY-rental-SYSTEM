@@ -193,13 +193,6 @@ export default function AppRouter() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/saved-items" element={<SavedItemsPage />} />
-            <Route
-              path="/dashboard-settings"
-              element={<DashboardSettingsPage />}
-            />
-            <Route path="/reviews" element={<ReviewsPage />} />
-            <Route path="/verification" element={<VerificationPage />} />
             </Route>
           </Route>
         </Route>

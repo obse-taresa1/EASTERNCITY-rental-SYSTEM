@@ -1,7 +1,5 @@
-import { items } from "../data/items.js";
-import categoryListings from "../data/categoryListings.js";
-import { homeListings } from "../data/homeListings.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 const OWNER_LISTINGS_KEY = "easterncity_owner_listings";
 const PUBLIC_LISTING_STATUSES = new Set(["published", "active", "featured", "renewed"]);
@@ -122,16 +120,11 @@ export function getPublicOwnerListings() {
 }
 
 export function getManagementItems() {
-  return [...getOwnerListings(), ...items, ...categoryListings, ...homeListings];
+  return getOwnerListings();
 }
 
 export function getAllItems() {
-  return sortPromotedListingsFirst([
-    ...getPublicOwnerListings(),
-    ...items,
-    ...categoryListings,
-    ...homeListings,
-  ]);
+  return sortPromotedListingsFirst(getPublicOwnerListings());
 }
 
 export function getItemById(id) {
@@ -211,7 +204,7 @@ export function saveOwnerListing(listing) {
     nextListing,
     ...listings.filter((item) => item.id !== nextListing.id),
   ]);
-  window.dispatchEvent(new Event("easterncity:listings-updated"));
+  emitRefresh("listings");
   return nextListing;
 }
 
@@ -219,7 +212,7 @@ export function deleteOwnerListing(id) {
   writeOwnerListings(
     getStorageItem(OWNER_LISTINGS_KEY, []).filter((item) => item.id !== id),
   );
-  window.dispatchEvent(new Event("easterncity:listings-updated"));
+  emitRefresh("listings");
 }
 
 export function updateOwnerListing(id, updates) {
@@ -230,7 +223,7 @@ export function updateOwnerListing(id, updates) {
     return updatedListing;
   });
   writeOwnerListings(listings);
-  window.dispatchEvent(new Event("easterncity:listings-updated"));
+  emitRefresh("listings");
   return updatedListing;
 }
 

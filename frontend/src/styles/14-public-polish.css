@@ -1,0 +1,383 @@
+/* Public navbar/auth button polish: preserves layout and branding */
+.app-public-header .motorx-nav-flex {
+  min-height: 72px;
+  padding: 0.45rem 0;
+  align-items: center;
+}
+
+.app-public-header .motorx-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.app-public-header .motorx-logo img.theme-aware-logo {
+  width: clamp(126px, 12vw, 158px) !important;
+  height: auto !important;
+  max-height: 48px !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.12));
+}
+
+[data-theme="dark"] .app-public-header .motorx-logo img.theme-aware-logo {
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.42));
+}
+
+.app-public-header .motorx-nav-links a,
+.app-public-header .nav-category-trigger {
+  position: relative;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 10px;
+  background: transparent !important;
+  color: var(--navbar-text, #f8fafc) !important;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.app-public-header .motorx-nav-links a::after,
+.app-public-header .nav-category-trigger::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.25rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary-color, #e31e24);
+  opacity: 0;
+  transform: scaleX(0.3);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.app-public-header .motorx-nav-links a:hover,
+.app-public-header .motorx-nav-links a.active,
+.app-public-header .nav-category-trigger:hover,
+.app-public-header .nav-category-trigger.active {
+  color: var(--primary-color, #e31e24) !important;
+  background: rgba(227, 30, 36, 0.07) !important;
+}
+
+.app-public-header .motorx-nav-links a:hover::after,
+.app-public-header .motorx-nav-links a.active::after,
+.app-public-header .nav-category-trigger:hover::after,
+.app-public-header .nav-category-trigger.active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.app-public-header .motorx-nav-actions {
+  gap: 0.8rem;
+}
+
+.app-public-header .nav-login,
+.dashboard-topbar .nav-login {
+  height: 44px;
+  min-height: 44px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.15rem;
+  border: 0 !important;
+  border-radius: 12px;
+  background: #e31e24 !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.28);
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.app-public-header .nav-login:hover,
+.dashboard-topbar .nav-login:hover {
+  background: #c91b20 !important;
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(227, 30, 36, 0.36);
+}
+
+.language-globe-button,
+.theme-toggle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--navbar-text, #0f172a);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.language-globe-button {
+  width: auto;
+  min-width: 62px;
+  gap: 0.38rem;
+}
+
+.language-globe-button:hover,
+.theme-toggle-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(227, 30, 36, 0.28);
+  background: rgba(227, 30, 36, 0.08);
+  color: var(--primary-color, #e31e24);
+}
+
+[data-theme="dark"] .language-globe-button,
+[data-theme="dark"] .theme-toggle-btn {
+  background: rgba(15, 23, 42, 0.76);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.26);
+}
+
+[data-theme="dark"] .language-globe-button:hover,
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: rgba(227, 30, 36, 0.16);
+  color: #fff;
+}
+
+@media (max-width: 991px) {
+  .app-public-header .motorx-logo img.theme-aware-logo {
+    width: 136px !important;
+    max-height: 42px !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .app-public-header .motorx-nav-flex {
+    min-height: 64px;
+  }
+
+  .app-public-header .motorx-logo img.theme-aware-logo {
+    width: 118px !important;
+    max-height: 36px !important;
+  }
+}
+
+/* Public dark-mode surface audit: keeps admin/super-admin shells untouched */
+html[data-theme="dark"] {
+  --bg-page: #0B1120;
+  --bg-section: #111827;
+  --bg-card: #182235;
+  --bg-elevated: #22304A;
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --accent: #e31e24;
+  --radius-card: 18px;
+  --shadow-sm: 0 12px 30px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] main:not(.dashboard-content):not(.unified-dashboard-main),
+html[data-theme="dark"] .page:not(.dashboard-content),
+html[data-theme="dark"] .page-wrapper,
+html[data-theme="dark"] .content-wrapper,
+html[data-theme="dark"] .contact-page,
+html[data-theme="dark"] .legal-support-page,
+html[data-theme="dark"] .legal-document-page {
+  background: var(--bg-page) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .container,
+html[data-theme="dark"] .contact-page .page-header,
+html[data-theme="dark"] .contact-page section:not(.contact-shiny-box):not(.contact-form-shiny),
+html[data-theme="dark"] .legal-support-page section:not(.card):not(.card-custom),
+html[data-theme="dark"] .legal-document-page section:not(.card):not(.card-custom) {
+  background: var(--bg-page) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--radius-card) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box:hover {
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box::before {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0),
+    rgba(227, 30, 36, 0.08),
+    rgba(255, 255, 255, 0)
+  ) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box .section-label,
+html[data-theme="dark"] .contact-page .contact-shiny-box i {
+  color: var(--accent) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box .section-label {
+  background: rgba(227, 30, 36, 0.12) !important;
+  border: 1px solid rgba(227, 30, 36, 0.2) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box h1 {
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-shiny-box p,
+html[data-theme="dark"] .contact-page .contact-shiny-box .text-white-50 {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-form-shiny,
+html[data-theme="dark"] .contact-page .card-custom:not(.contact-shiny-box) {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--radius-card) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-form-shiny:hover {
+  border-color: rgba(227, 30, 36, 0.28) !important;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-label {
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control,
+html[data-theme="dark"] .contact-page input.form-control,
+html[data-theme="dark"] .contact-page textarea.form-control {
+  background: var(--bg-page) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control::placeholder {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control:focus,
+html[data-theme="dark"] .contact-page input.form-control:focus,
+html[data-theme="dark"] .contact-page textarea.form-control:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .contact-page .contact-form-shiny .form-control:focus,
+html[data-theme="dark"] .contact-page .contact-form-shiny input.form-control:focus,
+html[data-theme="dark"] .contact-page .contact-form-shiny textarea.form-control:focus,
+html[data-theme="dark"] .legal-support-page .contact-form-shiny .form-control:focus {
+  outline: 0 !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .contact-page .btn-primary-custom,
+html[data-theme="dark"] .contact-page .btn-accent-custom {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .legal-support-page .card,
+html[data-theme="dark"] .legal-support-page .card-custom,
+html[data-theme="dark"] .legal-document-page .card,
+html[data-theme="dark"] .legal-document-page .card-custom {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Public form dark-mode audit: login, register, contact, search, reset flows */
+html[data-theme="dark"] main.auth-page .form-control,
+html[data-theme="dark"] main.auth-page .form-select,
+html[data-theme="dark"] main.auth-page input.form-control,
+html[data-theme="dark"] main.auth-page textarea.form-control,
+html[data-theme="dark"] main.auth-page .premium-input,
+html[data-theme="dark"] .premium-auth-layout .premium-input,
+html[data-theme="dark"] .premium-auth-layout input,
+html[data-theme="dark"] .premium-auth-layout textarea,
+html[data-theme="dark"] .premium-auth-layout select,
+html[data-theme="dark"] .contact-page .form-control,
+html[data-theme="dark"] .contact-page .form-select,
+html[data-theme="dark"] .premium-categories-page .premium-search-input,
+html[data-theme="dark"] .home-search-form .form-control,
+html[data-theme="dark"] .home-search-form .form-select,
+html[data-theme="dark"] .motorx-search-wrap .form-control,
+html[data-theme="dark"] .motorx-search-wrap .form-select,
+html[data-theme="dark"] .newsletter-form .form-control,
+html[data-theme="dark"] .newsletter-form input,
+html[data-theme="dark"] .footer-premium input,
+html[data-theme="dark"] .footer-premium textarea,
+html[data-theme="dark"] .footer-premium select {
+  background: var(--bg-card) !important;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .contact-page .form-control,
+html[data-theme="dark"] .premium-categories-page .premium-search-input {
+  background: var(--bg-page) !important;
+  background-color: var(--bg-page) !important;
+}
+
+html[data-theme="dark"] main.auth-page .form-control::placeholder,
+html[data-theme="dark"] main.auth-page .premium-input::placeholder,
+html[data-theme="dark"] .premium-auth-layout .premium-input::placeholder,
+html[data-theme="dark"] .premium-auth-layout input::placeholder,
+html[data-theme="dark"] .premium-auth-layout textarea::placeholder,
+html[data-theme="dark"] .contact-page .form-control::placeholder,
+html[data-theme="dark"] .premium-categories-page .premium-search-input::placeholder,
+html[data-theme="dark"] .home-search-form .form-control::placeholder,
+html[data-theme="dark"] .motorx-search-wrap .form-control::placeholder,
+html[data-theme="dark"] .newsletter-form .form-control::placeholder,
+html[data-theme="dark"] .footer-premium input::placeholder,
+html[data-theme="dark"] .footer-premium textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] main.auth-page .form-control:focus,
+html[data-theme="dark"] main.auth-page .form-select:focus,
+html[data-theme="dark"] main.auth-page .premium-input:focus,
+html[data-theme="dark"] .premium-auth-layout .premium-input:focus,
+html[data-theme="dark"] .premium-auth-layout input:focus,
+html[data-theme="dark"] .premium-auth-layout textarea:focus,
+html[data-theme="dark"] .premium-auth-layout select:focus,
+html[data-theme="dark"] .contact-page .form-control:focus,
+html[data-theme="dark"] .contact-page .form-select:focus,
+html[data-theme="dark"] .premium-categories-page .premium-search-input:focus,
+html[data-theme="dark"] .home-search-form .form-control:focus,
+html[data-theme="dark"] .home-search-form .form-select:focus,
+html[data-theme="dark"] .motorx-search-wrap .form-control:focus,
+html[data-theme="dark"] .motorx-search-wrap .form-select:focus,
+html[data-theme="dark"] .newsletter-form .form-control:focus,
+html[data-theme="dark"] .footer-premium input:focus,
+html[data-theme="dark"] .footer-premium textarea:focus,
+html[data-theme="dark"] .footer-premium select:focus {
+  outline: 0 !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .home-search-form .hsf-cat-trigger,
+html[data-theme="dark"] .hsf-cat-trigger {
+  background: var(--bg-card) !important;
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .hsf-search-wrap {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+

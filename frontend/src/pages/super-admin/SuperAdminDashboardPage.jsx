@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import AdminOverviewDashboard from "../../components/admin/AdminOverviewDashboard.jsx";
+import { useRefreshToken } from "../../context/RefreshContext.jsx";
 import { fetchSuperAdminDashboard } from "../../services/dashboardApiService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
@@ -23,6 +24,14 @@ export default function SuperAdminDashboardPage() {
     startDate: "",
     endDate: "",
   });
+  const dashboardRefreshToken = useRefreshToken([
+    "adminData",
+    "listings",
+    "promotions",
+    "users",
+    "contactMessages",
+    "notifications",
+  ]);
 
   const loadDashboard = useCallback(async () => {
     setIsLoading(true);
@@ -36,25 +45,7 @@ export default function SuperAdminDashboardPage() {
 
   useEffect(() => {
     loadDashboard();
-  }, [loadDashboard]);
-
-  useEffect(() => {
-    const events = [
-      "easterncity:listings-updated",
-      "easterncity:promotions-updated",
-      "easterncity:users-updated",
-      "easterncity:contact-messages-updated",
-      "easterncity:notifications-updated",
-    ];
-    events.forEach((eventName) =>
-      window.addEventListener(eventName, loadDashboard),
-    );
-    return () => {
-      events.forEach((eventName) =>
-        window.removeEventListener(eventName, loadDashboard),
-      );
-    };
-  }, [loadDashboard]);
+  }, [loadDashboard, dashboardRefreshToken]);
 
   const counts = dashboard?.counts || {};
   const revenue = dashboard?.revenue || {};

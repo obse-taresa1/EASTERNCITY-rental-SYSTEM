@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════════════
+   PRIVACY & TERMS PAGE — Shiny Red Border Hover Effect
+   ═══════════════════════════════════════════════════════ */
+
+main.legal-document-page .card.card-custom {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
+}
+
+/* Shine sweep */
+main.legal-document-page .card.card-custom::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(227, 30, 36, 0.07) 50%,
+    transparent 60%
+  );
+  transition: left 0.55s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+main.legal-document-page .card.card-custom:hover::before {
+  left: 150%;
+}
+
+/* Red border glow on hover — light mode */
+main.legal-document-page .card.card-custom:hover {
+  border-color: #e31e24 !important;
+  box-shadow: 0 8px 30px rgba(227, 30, 36, 0.15), 0 0 0 2px rgba(227, 30, 36, 0.5) !important;
+  transform: translateY(-4px);
+}
+
+/* Red border glow on hover — dark mode */
+html[data-theme="dark"] main.legal-document-page .card.card-custom:hover {
+  border-color: #e31e24 !important;
+  box-shadow: 0 10px 35px rgba(227, 30, 36, 0.25), 0 0 0 2px rgba(227, 30, 36, 0.65) !important;
+  transform: translateY(-4px);
+}
+
+/* Listing card action: use literal high-contrast colors so the link never
+   inherits a light/transparent value from a theme or card rule. */
+.listing-card-premium .btn-view-details {
+  background: #b4122c !important;
+  border: 1px solid #b4122c !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+.listing-card-premium .btn-view-details i {
+  color: #ffffff !important;
+}
+
+.listing-card-premium .btn-view-details:hover {
+  background: #8a0f1e !important;
+  border-color: #8a0f1e !important;
+  color: #ffffff !important;
+}
+
+/* Use the Contact Us left-panel treatment for Features & Specifications. */
+.details-info-card:nth-child(2) {
+  background: linear-gradient(135deg, rgba(138, 15, 30, 0.85) 0%, rgba(18, 18, 22, 0.9) 100%) !important;
+  border: 1px solid rgba(138, 15, 30, 0.4) !important;
+  color: #ffffff !important;
+}
+
+.details-info-card:nth-child(2) .section-label,
+.details-info-card:nth-child(2) h2 {
+  color: #ffffff !important;
+}
+
+.details-info-card:nth-child(2) .details-feature-pill {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.details-info-card:nth-child(2) .details-feature-pill i {
+  color: #fecdd3 !important;
+}
+
+/* Keep the Contact Us left card burgundy in dark mode as well. */
+html[data-theme="dark"] .contact-page .contact-shiny-box,
+[data-theme="dark"] .contact-page .contact-shiny-box,
+html[data-theme="dark"] .details-info-card:nth-child(2),
+[data-theme="dark"] .details-info-card:nth-child(2) {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .details-info-card:nth-child(2) .details-feature-pill,
+[data-theme="dark"] .details-info-card:nth-child(2) .details-feature-pill {
+  background: rgba(227, 30, 36, 0.12) !important;
+  border-color: rgba(227, 30, 36, 0.22) !important;
+  color: #fecdd3 !important;
+}
+

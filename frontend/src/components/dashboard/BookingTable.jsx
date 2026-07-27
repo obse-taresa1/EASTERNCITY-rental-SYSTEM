@@ -19,7 +19,6 @@ export default function BookingTable({ bookings }) {
     setRows((current) =>
       current.map((booking) => (booking.id === id ? updated : booking)),
     );
-    window.dispatchEvent(new Event("easterncity:bookings-updated"));
   }
 
   return (

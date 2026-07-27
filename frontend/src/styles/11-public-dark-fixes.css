@@ -1,0 +1,230 @@
+/* ========== DARK MODE OVERRIDES (BUG FIXES) ========== */
+
+/* 1. View Details Page Dark Mode Fixes */
+[data-theme="dark"] .details-contact-page {
+  background: var(--bg-color) !important;
+}
+
+[data-theme="dark"] .details-gallery,
+[data-theme="dark"] .details-contact-card,
+[data-theme="dark"] .details-info-card,
+[data-theme="dark"] .details-review-card,
+[data-theme="dark"] .message-chat,
+[data-theme="dark"] .messages-list {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .message-bubble.received {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .message-thread-avatar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .details-gallery img {
+  background: var(--input-bg) !important;
+}
+
+[data-theme="dark"] .details-contact-card h1,
+[data-theme="dark"] .details-info-card h2,
+[data-theme="dark"] .details-reviews-section h2,
+[data-theme="dark"] .details-price-row strong {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .details-info-card:nth-child(2) h2 {
+  color: var(--motorx-red) !important;
+}
+
+[data-theme="dark"] .details-rating-row {
+  background: rgba(227, 30, 36, 0.12) !important;
+}
+
+[data-theme="dark"] .details-rating-row span {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .details-location,
+[data-theme="dark"] .details-contact-helper,
+[data-theme="dark"] .details-info-card p {
+  color: var(--muted-color) !important;
+}
+
+/* Feature pills in dark mode — keep brand red palette */
+[data-theme="dark"] .details-feature-pill {
+  background: rgba(227, 30, 36, 0.15) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(227, 30, 36, 0.3) !important;
+}
+
+[data-theme="dark"] .details-feature-pill i {
+  color: #f87171 !important;
+}
+
+/* Contact card dark mode — match Description/Requirements cards */
+[data-theme="dark"] .details-contact-card {
+  background: var(--card-bg) !important;
+  border-color: rgba(227, 30, 36, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme="dark"] .details-requirement-grid strong {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .details-requirement-grid span {
+  color: var(--muted-color) !important;
+}
+
+[data-theme="dark"] .details-review-card p {
+  color: var(--muted-color) !important;
+}
+
+[data-theme="dark"] .details-review-top strong {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .details-review-top span {
+  color: var(--muted-color) !important;
+}
+
+/* 2. Login/Register Page Dark Mode Fixes */
+[data-theme="dark"] .auth-page {
+  background: var(--bg-color) !important;
+}
+
+[data-theme="dark"] .auth-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+[data-theme="dark"] .auth-card::before {
+  background: rgba(227, 30, 36, 0.06) !important;
+}
+
+[data-theme="dark"] .auth-card h1,
+[data-theme="dark"] .auth-card h2 {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .auth-card p,
+[data-theme="dark"] .auth-card .text-muted {
+  color: var(--muted-color) !important;
+}
+
+[data-theme="dark"] .auth-card .form-label {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .auth-card .form-control {
+  background: var(--input-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .auth-card .form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .auth-card .form-control:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.15) !important;
+}
+
+[data-theme="dark"] .auth-card .form-text {
+  color: var(--muted-color) !important;
+}
+
+[data-theme="dark"] .auth-card .btn-outline-custom {
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .auth-card .btn-outline-custom:hover {
+  background: rgba(227, 30, 36, 0.1) !important;
+}
+
+[data-theme="dark"] .national-id-verification h2 {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .national-id-verification p {
+  color: var(--muted-color) !important;
+}
+
+[data-theme="dark"] .id-upload-card {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--muted-color) !important;
+}
+
+[data-theme="dark"] .id-upload-card:hover {
+  border-color: var(--primary-color) !important;
+  background: rgba(227, 30, 36, 0.06) !important;
+}
+
+[data-theme="dark"] .role-option {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .role-option strong {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .role-option small {
+  color: var(--muted-color) !important;
+}
+
+[data-theme="dark"] .role-option:hover,
+[data-theme="dark"] .role-option:has(input:checked) {
+  border-color: var(--primary-color) !important;
+  background: rgba(227, 30, 36, 0.1) !important;
+}
+
+/* 3. Contact Us Dark Mode Fixes */
+[data-theme="dark"] .card-custom {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .card-custom .form-control,
+[data-theme="dark"] .card-custom textarea.form-control {
+  background: var(--input-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .card-custom .form-control::placeholder,
+[data-theme="dark"] .card-custom textarea.form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .card-custom .form-control:focus,
+[data-theme="dark"] .card-custom textarea.form-control:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.15) !important;
+}
+
+[data-theme="dark"] .card-custom .form-label {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-custom .text-success {
+  color: #4ade80 !important;
+}
+
+[data-theme="dark"] .card-custom .btn-primary-custom {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+

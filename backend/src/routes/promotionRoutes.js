@@ -36,4 +36,5 @@ router.patch(
   controller.reject,
 );
 
+router.get("/featured/active", controller.getActiveFeatured);
 module.exports = router;

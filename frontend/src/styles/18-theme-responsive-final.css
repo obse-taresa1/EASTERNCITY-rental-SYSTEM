@@ -1,0 +1,120 @@
+/* Theme-aware logo and public-layout consistency. */
+.theme-aware-logo {
+  display: block;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.app-main-content {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.app-main-content > .contact-page {
+  flex: 1 0 auto;
+}
+
+.footer-premium {
+  flex: 0 0 auto;
+}
+
+html[data-theme="dark"] .app-public-header,
+html[data-theme="dark"] .footer-premium {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive Admin and Super Admin navigation drawer. */
+.admin-sidebar-backdrop { display: none; }
+
+@media (max-width: 1024px) {
+  .admin-red-shell .admin-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 1rem !important;
+  }
+
+  .admin-red-shell .admin-sidebar {
+    display: flex !important;
+    flex-direction: column;
+    width: min(300px, calc(100vw - 40px)) !important;
+    height: 100dvh !important;
+    transform: translateX(-115%) !important;
+    transition: transform 260ms ease !important;
+    z-index: 30001 !important;
+    overscroll-behavior: contain;
+  }
+
+  .admin-red-shell .admin-sidebar.is-open { transform: translateX(0) !important; }
+
+  .admin-red-shell .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(5, 5, 8, 0.52);
+    backdrop-filter: blur(2px);
+    z-index: 30000;
+    cursor: default;
+  }
+
+  .admin-red-shell .admin-sidebar-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: inherit;
+  }
+
+  .admin-red-shell .admin-nav {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-bottom: 1rem !important;
+  }
+
+  .admin-red-shell .admin-logout {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto !important;
+    background: inherit !important;
+  }
+
+  .admin-red-shell .admin-nav-item { min-height: 48px !important; }
+  .admin-red-shell .admin-topbar { border-radius: 16px !important; }
+  .admin-red-shell .dashboard-content { min-width: 0; }
+}
+
+@media (max-width: 767px) {
+  .admin-red-shell .admin-main { padding: 0.75rem !important; }
+  .admin-red-shell .admin-topbar { padding: 0.65rem 0.75rem !important; }
+  .admin-red-shell .admin-welcome-block { gap: 0.55rem; }
+  .admin-red-shell .admin-topbar-actions { gap: 0.4rem !important; }
+  .admin-red-shell .admin-search-pill { order: 10; width: 100% !important; }
+  .admin-red-shell .admin-language-pill select { min-width: 54px !important; }
+
+  .admin-red-shell .dashboard-content > .d-flex:first-child,
+  .admin-red-shell .dashboard-content .d-flex.justify-content-between {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+
+  .admin-red-shell .dashboard-content .d-flex.gap-2,
+  .admin-red-shell .admin-table-container .d-flex.gap-2 { flex-wrap: wrap !important; }
+  .admin-red-shell .admin-table-container { padding: 1rem !important; }
+  .admin-red-shell .admin-table-container .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-red-shell .admin-table-container table { min-width: 680px; }
+  .admin-red-shell .red-schedule-table { min-width: 680px; }
+  .admin-red-shell .red-dashboard-grid { min-width: 0; }
+  .admin-red-shell .red-filter-row { gap: 0.55rem; }
+  .admin-red-shell .red-filter-row > * { flex: 1 1 auto; }
+}
+
+@media (max-width: 420px) {
+  .admin-red-shell .admin-avatar-photo { display: none !important; }
+  .admin-red-shell .admin-theme-switch { width: 64px !important; }
+  .admin-red-shell .admin-language-pill { padding-inline: 0.45rem !important; }
+  .admin-red-shell .red-overview-main { grid-template-columns: auto 1fr; }
+  .admin-red-shell .red-platform-icons { display: none; }
+}

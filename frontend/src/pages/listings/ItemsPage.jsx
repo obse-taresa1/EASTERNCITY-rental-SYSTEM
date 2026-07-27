@@ -34,6 +34,7 @@ export default function ItemsPage() {
       try {
         const data = await getPublicListings({
           search: initialSearch,
+          category,
           city,
           sefar,
           minPrice,
@@ -50,15 +51,14 @@ export default function ItemsPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [initialSearch, category, city, sefar, minPrice, maxPrice, condition]);
 
   const filteredItems = useMemo(() => {
     const searchTerm = search.toLowerCase().trim();
 
     return listings.filter((item) => {
       const itemCategory = item.category || item.categoryName || "";
-      const itemStatus = String(item.status || "").toLowerCase();
-
+      const itemCondition = String(item.condition || item.status || "").toLowerCase();
       if (
         condition !== "all" &&
         itemCondition &&
@@ -97,7 +97,12 @@ export default function ItemsPage() {
         if (!match) return false;
       }
 
-      if (category && category !== "all" && itemCategory !== category) {
+      if (
+        category &&
+        category !== "all" &&
+        !listingMatchesRentalCategory(item, category) &&
+        itemCategory !== category
+      ) {
         return false;
       }
 

@@ -1,10 +1,44 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getBookingById } from "../../services/bookingService.js";
+import { getMyBookings } from "../../services/bookingApiService.js";
 import { formatCurrency } from "../../utils/currency.js";
 
 export default function BookingSuccessPage() {
   const { bookingId } = useParams();
-  const booking = getBookingById(bookingId);
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadBooking() {
+      setLoading(true);
+      try {
+        const bookings = await getMyBookings();
+        if (active) {
+          setBooking(
+            bookings.find((item) => String(item.id) === String(bookingId)) ||
+              null,
+          );
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadBooking();
+    return () => {
+      active = false;
+    };
+  }, [bookingId]);
+
+  if (loading) {
+    return (
+      <main className="container py-5">
+        <h1 className="h4">Loading booking...</h1>
+      </main>
+    );
+  }
 
   if (!booking) {
     return (

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useRefresh, useRefreshToken } from "../../context/RefreshContext.jsx";
 import {
   getStorageItem,
   setStorageItem,
@@ -28,36 +29,24 @@ function toSavedItem(item, userId) {
 export default function ListingCard({ item }) {
   const { t } = useLanguage();
   const { currentUser, isAuthenticated, user } = useAuth();
+  const { refresh } = useRefresh();
   const navigate = useNavigate();
   const location = useLocation();
   const [isSaved, setIsSaved] = useState(false);
   const activeUser = user || currentUser;
+  const savedItemsRefreshToken = useRefreshToken("savedItems");
 
   useEffect(() => {
     if (!item?.id) return;
-    function refreshSavedState() {
-      const savedItems = getStorageItem(SAVED_KEY, []);
-      setIsSaved(
-        savedItems.some(
-          (savedItem) =>
-            savedItem.id === item.id &&
-            String(savedItem.userId || "") === String(activeUser?.id || ""),
-        ),
-      );
-    }
-
-    refreshSavedState();
-    window.addEventListener(
-      "easterncity:saved-items-updated",
-      refreshSavedState,
+    const savedItems = getStorageItem(SAVED_KEY, []);
+    setIsSaved(
+      savedItems.some(
+        (savedItem) =>
+          savedItem.id === item.id &&
+          String(savedItem.userId || "") === String(activeUser?.id || ""),
+      ),
     );
-    return () => {
-      window.removeEventListener(
-        "easterncity:saved-items-updated",
-        refreshSavedState,
-      );
-    };
-  }, [activeUser?.id, item?.id]);
+  }, [activeUser?.id, item?.id, savedItemsRefreshToken]);
 
   if (!item) return null;
 
@@ -103,7 +92,7 @@ export default function ListingCard({ item }) {
 
     setStorageItem(SAVED_KEY, updatedItems);
     setIsSaved(nextSavedState);
-    window.dispatchEvent(new Event("easterncity:saved-items-updated"));
+    refresh("savedItems");
   }
 
   return (

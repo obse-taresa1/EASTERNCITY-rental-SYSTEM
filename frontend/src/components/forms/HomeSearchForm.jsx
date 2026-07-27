@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
 import { getSefarByCity } from "../../data/sefar.js";
-import { fetchCategories } from "../../services/categoryApiService.js";
 
 /** Custom dropdown rendered via a portal so it escapes overflow:hidden parents
  *  and always opens downward (flips up only when near the bottom of the viewport). */
@@ -179,25 +178,6 @@ function PortalDropdown({ value, onChange, options, placeholder, style, disabled
 }
 
 
-function mergeCategoryOptions(apiCategories = []) {
-  const merged = new Map();
-
-  categories.forEach((category) => {
-    merged.set(category.id, category);
-  });
-
-  apiCategories.forEach((category) => {
-    const key = category.slug || category.id;
-    if (!key) return;
-    merged.set(key, {
-      id: key,
-      name: category.name,
-    });
-  });
-
-  return [...merged.values()];
-}
-
 export default function HomeSearchForm() {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -209,27 +189,8 @@ export default function HomeSearchForm() {
   const [maxPrice, setMaxPrice] = useState(15000);
   const [isPriceFilterActive, setIsPriceFilterActive] = useState(false);
   const [status, setStatus] = useState("all");
-  const [categoryOptions, setCategoryOptions] = useState(categories);
 
   const sefarOptions = city !== "all" ? getSefarByCity(city) : [];
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadCategories() {
-      try {
-        const data = await fetchCategories();
-        if (active) setCategoryOptions(mergeCategoryOptions(data));
-      } catch {
-        if (active) setCategoryOptions(categories);
-      }
-    }
-
-    loadCategories();
-    return () => {
-      active = false;
-    };
-  }, []);
 
   function handleCityChange(e) {
     setCity(e.target.value);
@@ -360,7 +321,7 @@ export default function HomeSearchForm() {
                 placeholder={t("allCategories") || "All Categories"}
                 options={[
                   { value: "all", label: t("allCategories") || "All Categories" },
-                  ...categoryOptions.map((item) => ({ value: item.id, label: item.name })),
+                  ...categories.map((item) => ({ value: item.id, label: item.name })),
                 ]}
               />
             </div>

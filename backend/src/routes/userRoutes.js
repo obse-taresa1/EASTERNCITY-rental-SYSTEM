@@ -3,9 +3,8 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/auth');
-const authorize = require('../middleware/authorize');
 const upload = require('../middleware/uploadMiddleware');
-const { validateUpdateUser, validateCreateAdmin } = require('../validators/userValidator');
+const { validateUpdateUser } = require('../validators/userValidator');
 
 // All user routes require authentication
 router.use(authMiddleware);
@@ -18,40 +17,13 @@ router.use(authMiddleware);
 router.get('/profile', userController.getProfile);
 router.get('/me', userController.getProfile);
 
-/**
- * @route   GET /api/users
- * @desc    Get all users list
- * @access  Private (Admin / Super Admin only)
- */
-router.get('/', authorize('ADMIN', 'SUPER_ADMIN'), userController.getUsers);
-
-
-/**
- * @route   POST /api/users/admins
- * @desc    Create an admin account
- * @access  Private (Super Admin only)
- */
-router.post('/admins', authorize('SUPER_ADMIN'), validateCreateAdmin, userController.createAdmin);
 router.put('/:id/profile-image', upload.profileImage, userController.updateProfileImage);
-/**
- * @route   GET /api/users/:id
- * @desc    Get detailed user details by ID
- * @access  Private (Admin / Super Admin only)
- */
-router.get('/:id', authorize('ADMIN', 'SUPER_ADMIN'), userController.getUser);
 
 /**
  * @route   PUT /api/users/:id
- * @desc    Update user profile data
- * @access  Private (Self, Admin, or Super Admin)
+ * @desc    Update own profile data
+ * @access  Private (Self only)
  */
 router.put('/:id', validateUpdateUser, userController.update);
-
-/**
- * @route   DELETE /api/users/:id
- * @desc    Delete user account
- * @access  Private (Admin / Super Admin only)
- */
-router.delete('/:id', authorize('ADMIN', 'SUPER_ADMIN'), userController.remove);
 
 module.exports = router;

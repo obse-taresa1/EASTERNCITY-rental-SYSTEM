@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useRefresh, useRefreshToken } from "../../context/RefreshContext.jsx";
 import {
   getConversationById,
   getConversations,
@@ -11,7 +12,9 @@ import { formatDailyPrice } from "../../utils/currency.js";
 
 export default function MessagesPage() {
   const { currentUser, user } = useAuth();
+  const { refresh } = useRefresh();
   const activeUser = user || currentUser;
+  const messagesRefreshToken = useRefreshToken("messages");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const conversationId = searchParams.get("conversation");
@@ -47,14 +50,11 @@ export default function MessagesPage() {
     loadConversations({ initial: true });
 
     const interval = window.setInterval(() => loadConversations(), 5000);
-    const handleRefresh = () => loadConversations();
-    window.addEventListener("easterncity:messages-updated", handleRefresh);
     return () => {
       active = false;
       window.clearInterval(interval);
-      window.removeEventListener("easterncity:messages-updated", handleRefresh);
     };
-  }, [activeUser?.id, conversationId, navigate]);
+  }, [activeUser?.id, conversationId, navigate, messagesRefreshToken]);
 
   useEffect(() => {
     if (!conversationId) {
@@ -142,7 +142,7 @@ export default function MessagesPage() {
             : conversation,
         ),
       );
-      window.dispatchEvent(new Event("easterncity:messages-updated"));
+      refresh("messages");
     } catch (err) {
       setDraft(body);
       setError(err.message || "Could not send message.");

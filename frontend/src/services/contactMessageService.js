@@ -4,14 +4,13 @@ import {
 } from "./notificationService.js";
 import { apiClient } from "./apiClient.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 const CONTACT_MESSAGES_KEY = "easterncity_contact_messages";
 const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
 
 function emitContactMessagesUpdate() {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("easterncity:contact-messages-updated"));
-  }
+  emitRefresh("contactMessages");
 }
 
 function normalizeMessage(message) {
