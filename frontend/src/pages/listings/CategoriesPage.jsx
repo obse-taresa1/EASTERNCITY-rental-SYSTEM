@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchCategories } from '../../services/categoryApiService';
+import { categories as rentalCategories } from '../../data/items.js';
 import usePageTitle from '../../hooks/usePageTitle.js';
+import { getPublicListings } from '../../services/listingApiService.js';
+import { getCanonicalRentalCategoryId, listingMatchesRentalCategory } from '../../utils/categoryMapping.js';
 import '../../styles/categories-premium.css';
 
 const iconMap = {
@@ -22,29 +24,48 @@ const iconMap = {
 
 export default function CategoriesPage() {
   usePageTitle('Categories');
-  const [categories, setCategories] = useState([]);
+  const [listingCounts, setListingCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    async function loadCategories() {
+    let active = true;
+
+    async function loadListingCounts() {
       try {
-        const data = await fetchCategories();
-        setCategories(data);
+        const listings = await getPublicListings();
+        if (!active) return;
+
+        const counts = rentalCategories.reduce((current, category) => {
+          current[category.id] = listings.filter((listing) =>
+            listingMatchesRentalCategory(listing, category.id),
+          ).length;
+          return current;
+        }, {});
+
+        setListingCounts(counts);
       } catch (err) {
-        console.error("Failed to load categories", err);
+        console.error("Failed to load category listing counts", err);
+        if (active) setListingCounts({});
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
-    loadCategories();
+
+    loadListingCounts();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const filteredCategories = categories.filter((cat) =>
+  const filteredCategories = rentalCategories.filter((cat) =>
     cat.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalListings = categories.reduce((sum, cat) => sum + (cat.listingsCount || 0), 0);
+  const totalListings = Object.values(listingCounts).reduce(
+    (sum, count) => sum + Number(count || 0),
+    0,
+  );
 
   return (
     <div className="premium-categories-page">
@@ -77,7 +98,7 @@ export default function CategoriesPage() {
           </div>
           <div className="stats-wrapper">
             <div className="stat-item">
-              <strong>{categories.length}</strong> Categories
+              <strong>{rentalCategories.length}</strong> Categories
             </div>
             <div className="stat-item">
               <strong>{totalListings}</strong> Listings
@@ -107,9 +128,10 @@ export default function CategoriesPage() {
             </div>
           ) : (
             filteredCategories.map((cat) => {
-              const iconClass = iconMap[cat.slug] || 'bi-box-seam';
+              const iconClass = iconMap[cat.id] || cat.icon || 'bi-box-seam';
+              const routeParam = getCanonicalRentalCategoryId(cat.id);
               return (
-                <Link to={`/categories/${cat.id}`} key={cat.id} className="premium-category-card">
+                <Link to={`/categories/${routeParam}`} key={cat.id} className="premium-category-card">
                   <div className="premium-card-icon">
                     <i className={`bi ${iconClass}`} />
                   </div>
@@ -118,7 +140,7 @@ export default function CategoriesPage() {
                     {cat.description || "Explore verified rentals in this category."}
                   </p>
                   <div className="premium-card-footer">
-                    <span className="listing-count">{cat.listingsCount || 0} Listings</span>
+                    <span className="listing-count">{listingCounts[cat.id] || 0} Listings</span>
                     <span className="explore-text">Explore →</span>
                   </div>
                 </Link>

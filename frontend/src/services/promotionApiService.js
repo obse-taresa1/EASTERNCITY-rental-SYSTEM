@@ -1,5 +1,5 @@
 import { apiClient } from "./apiClient.js";
-import { getMyListings } from "./listingApiService.js";
+import { getMyListings, normalizeListing } from "./listingApiService.js";
 
 const PLACEMENT_BY_PACKAGE = {
   1: "FEATURED",
@@ -18,12 +18,16 @@ function normalizeStatus(status) {
 function normalizePromotion(promotion) {
   if (!promotion) return null;
 
+  const normalizedListing = promotion.listing ? normalizeListing(promotion.listing) : null;
+
   return {
     ...promotion,
     id: promotion.id,
     listingId: promotion.listingId,
+    listing: normalizedListing,
     listingTitle:
       promotion.listingTitle ||
+      normalizedListing?.title ||
       promotion.listing?.title ||
       promotion.title ||
       "Listing",
@@ -33,12 +37,14 @@ function normalizePromotion(promotion) {
       promotion.userName ||
       promotion.ownerName ||
       promotion.user?.name ||
+      normalizedListing?.ownerName ||
       promotion.listing?.owner?.name ||
       "User",
     ownerName:
       promotion.ownerName ||
       promotion.userName ||
       promotion.user?.name ||
+      normalizedListing?.ownerName ||
       promotion.listing?.owner?.name ||
       "User",
     promotionType:
@@ -135,8 +141,6 @@ export async function rejectPromotionRequest(id) {
 }
 
 export async function fetchActivePromotions() {
-  const all = await fetchPromotionRequests();
-  return Array.isArray(all)
-    ? all.filter((p) => String(p.status || "").toLowerCase() === "approved")
-    : [];
+  const data = await apiClient.get("/api/promotions/featured/active");
+  return Array.isArray(data) ? data.map(normalizePromotion) : [];
 }

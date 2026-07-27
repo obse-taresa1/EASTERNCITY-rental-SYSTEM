@@ -1,4 +1,5 @@
 import { apiClient } from "./apiClient.js";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 function query(params = {}) {
   const clean = Object.entries(params).filter(([, value]) => value !== undefined && value !== "");
@@ -6,34 +7,55 @@ function query(params = {}) {
   return search ? `?${search}` : "";
 }
 
+async function mutate(request, scopes = ["adminData"]) {
+  const data = await request;
+  scopes.forEach((scope) => emitRefresh(scope));
+  return data;
+}
+
 export const adminApi = {
   analytics: (params) => apiClient.get(`/api/admin-management/analytics${query(params)}`),
   users: (params) => apiClient.get(`/api/admin-management/users${query(params)}`),
-  createAdmin: (body) => apiClient.post("/api/admin-management/admins", body),
-  updateUser: (id, body) => apiClient.patch(`/api/admin-management/users/${id}`, body),
-  deleteUser: (id) => apiClient.delete(`/api/admin-management/users/${id}`),
+  createAdmin: (body) =>
+    mutate(apiClient.post("/api/admin-management/admins", body), ["users", "adminData"]),
+  updateUser: (id, body) =>
+    mutate(apiClient.patch(`/api/admin-management/users/${id}`, body), ["users", "adminData"]),
+  deleteUser: (id) =>
+    mutate(apiClient.delete(`/api/admin-management/users/${id}`), ["users", "adminData"]),
   listings: (params) => apiClient.get(`/api/admin-management/listings${query(params)}`),
-  updateListing: (id, body) => apiClient.patch(`/api/admin-management/listings/${id}`, body),
-  deleteListing: (id) => apiClient.delete(`/api/admin-management/listings/${id}`),
+  updateListing: (id, body) =>
+    mutate(apiClient.patch(`/api/admin-management/listings/${id}`, body), ["listings", "adminData"]),
+  deleteListing: (id) =>
+    mutate(apiClient.delete(`/api/admin-management/listings/${id}`), ["listings", "adminData"]),
   categories: () => apiClient.get("/api/admin-management/categories"),
-  createCategory: (body) => apiClient.post("/api/admin-management/categories", body),
-  updateCategory: (id, body) => apiClient.patch(`/api/admin-management/categories/${id}`, body),
-  deleteCategory: (id) => apiClient.delete(`/api/admin-management/categories/${id}`),
+  createCategory: (body) =>
+    mutate(apiClient.post("/api/admin-management/categories", body), ["categories", "adminData"]),
+  updateCategory: (id, body) =>
+    mutate(apiClient.patch(`/api/admin-management/categories/${id}`, body), ["categories", "adminData"]),
+  deleteCategory: (id) =>
+    mutate(apiClient.delete(`/api/admin-management/categories/${id}`), ["categories", "adminData"]),
   bookings: (params) => apiClient.get(`/api/admin-management/bookings${query(params)}`),
   promotions: (params) => apiClient.get(`/api/admin-management/promotions${query(params)}`),
-  updatePromotion: (id, body) => apiClient.patch(`/api/admin-management/promotions/${id}`, body),
+  updatePromotion: (id, body) =>
+    mutate(apiClient.patch(`/api/admin-management/promotions/${id}`, body), ["promotions", "listings", "adminData"]),
   reviews: (params) => apiClient.get(`/api/admin-management/reviews${query(params)}`),
-  deleteReview: (id) => apiClient.delete(`/api/admin-management/reviews/${id}`),
+  deleteReview: (id) =>
+    mutate(apiClient.delete(`/api/admin-management/reviews/${id}`), ["reviews", "adminData"]),
   reports: (params) => apiClient.get(`/api/admin-management/reports${query(params)}`),
-  updateReport: (id, body) => apiClient.patch(`/api/admin-management/reports/${id}`, body),
+  updateReport: (id, body) =>
+    mutate(apiClient.patch(`/api/admin-management/reports/${id}`, body), ["reports", "adminData"]),
   supportTickets: (params) => apiClient.get(`/api/admin-management/support-tickets${query(params)}`),
-  updateSupportTicket: (id, body) => apiClient.patch(`/api/admin-management/support-tickets/${id}`, body),
+  updateSupportTicket: (id, body) =>
+    mutate(apiClient.patch(`/api/admin-management/support-tickets/${id}`, body), ["supportTickets", "adminData"]),
   contactMessages: () => apiClient.get("/api/admin-management/contact-messages"),
-  updateContactMessage: (id, body) => apiClient.patch(`/api/admin-management/contact-messages/${id}`, body),
+  updateContactMessage: (id, body) =>
+    mutate(apiClient.patch(`/api/admin-management/contact-messages/${id}`, body), ["contactMessages", "adminData"]),
   notifications: () => apiClient.get("/api/admin-management/notifications"),
-  createNotification: (body) => apiClient.post("/api/admin-management/notifications", body),
+  createNotification: (body) =>
+    mutate(apiClient.post("/api/admin-management/notifications", body), ["notifications", "adminData"]),
   settings: () => apiClient.get("/api/admin-management/settings"),
-  saveSettings: (body) => apiClient.put("/api/admin-management/settings", body),
+  saveSettings: (body) =>
+    mutate(apiClient.put("/api/admin-management/settings", body), ["settings", "adminData"]),
   logs: (params) => apiClient.get(`/api/admin-management/logs${query(params)}`),
 };
 
@@ -45,6 +67,6 @@ export function formatDate(value) {
 }
 
 export function useAdminRefresh() {
-  window.dispatchEvent(new Event("easterncity:admin-data-updated"));
+  emitRefresh("adminData");
 }
 

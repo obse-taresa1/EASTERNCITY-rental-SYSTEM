@@ -114,7 +114,6 @@ export default function BookingPage() {
         createdAt: new Date().toISOString(),
       });
 
-      window.dispatchEvent(new Event("easterncity:bookings-updated"));
       navigate("/my-bookings", {
         state: {
           successMessage:

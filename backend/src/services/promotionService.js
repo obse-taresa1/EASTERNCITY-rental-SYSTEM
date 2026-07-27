@@ -60,10 +60,26 @@ async function reject(id, reason, adminId) {
   return promotion;
 }
 
+function fetchActivePromotions() {
+  return repository.findMany({
+    where: { status: "APPROVED" },
+    include: {
+      listing: {
+        include: {
+          images: true,
+          owner: true,
+          category: true,
+        },
+      },
+    },
+  });
+}
+
 module.exports = {
   requestPromotion,
   list,
   listPending,
   approve,
   reject,
+  fetchActivePromotions,
 };

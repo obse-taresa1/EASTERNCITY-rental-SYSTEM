@@ -1,0 +1,340 @@
+/* Dashboard dark-mode consistency: My Listings, My Bookings, Messages */
+html[data-theme="dark"] .dashboard-content.my-bookings-page,
+html[data-theme="dark"] .dashboard-content.messages-workspace {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(227, 30, 36, 0.08), transparent 30%),
+    var(--bg-page, #0B1120) !important;
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page h1,
+html[data-theme="dark"] .my-bookings-page h2,
+html[data-theme="dark"] .my-bookings-page h3,
+html[data-theme="dark"] .my-bookings-page h4,
+html[data-theme="dark"] .messages-workspace h1,
+html[data-theme="dark"] .messages-workspace h2,
+html[data-theme="dark"] .message-thread strong,
+html[data-theme="dark"] .message-listing-context strong {
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .text-muted,
+html[data-theme="dark"] .my-bookings-page .owner-muted,
+html[data-theme="dark"] .messages-workspace .text-muted,
+html[data-theme="dark"] .messages-workspace .owner-muted,
+html[data-theme="dark"] .message-thread span,
+html[data-theme="dark"] .message-thread small,
+html[data-theme="dark"] .message-thread time,
+html[data-theme="dark"] .message-listing-context span {
+  color: #94A3B8 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .premium-glass-card,
+html[data-theme="dark"] .my-bookings-page .listing-card-hover,
+html[data-theme="dark"] .my-bookings-page .booking-card-enhanced,
+html[data-theme="dark"] .my-bookings-page .bg-white,
+html[data-theme="dark"] .my-bookings-page .card,
+html[data-theme="dark"] .my-bookings-page .alert-info,
+html[data-theme="dark"] .my-bookings-page .alert-success {
+  background: #161b22 !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24) !important;
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .listing-card-hover:hover,
+html[data-theme="dark"] .my-bookings-page .booking-card-enhanced:hover,
+html[data-theme="dark"] .my-bookings-page .premium-glass-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(227, 30, 36, 0.28) !important;
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.34) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .premium-glass-card img,
+html[data-theme="dark"] .my-bookings-page .listing-card-hover img {
+  border-radius: 14px !important;
+  object-fit: cover !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26);
+}
+
+html[data-theme="dark"] .my-bookings-page .bg-light,
+html[data-theme="dark"] .my-bookings-page .border-light {
+  background: var(--bg-elevated, #22304A) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .text-dark,
+html[data-theme="dark"] .my-bookings-page .fw-bold.text-dark {
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .details-tab-system {
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .filter-tab {
+  min-height: 42px;
+  background: var(--bg-card, #182235) !important;
+  color: #CBD5E1 !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .filter-tab:hover,
+html[data-theme="dark"] .my-bookings-page .filter-tab:focus {
+  background: rgba(227, 30, 36, 0.14) !important;
+  color: #fff !important;
+  border-color: rgba(227, 30, 36, 0.36) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .filter-tab.active {
+  background: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  border-color: var(--accent, #e31e24) !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.24) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-primary {
+  background: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(96, 165, 250, 0.6) !important;
+  color: #93C5FD !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-primary:hover {
+  background: #2563EB !important;
+  border-color: #2563EB !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-danger,
+html[data-theme="dark"] .my-bookings-page .listing-delete-btn {
+  background: rgba(248, 113, 113, 0.06) !important;
+  border-color: rgba(248, 113, 113, 0.48) !important;
+  color: #FCA5A5 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-danger:hover,
+html[data-theme="dark"] .my-bookings-page .listing-delete-btn:hover {
+  background: rgba(220, 38, 38, 0.18) !important;
+  border-color: #EF4444 !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-danger,
+html[data-theme="dark"] .my-bookings-page .btn-accent-custom {
+  background: var(--accent, #e31e24) !important;
+  border-color: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.22);
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-danger:hover,
+html[data-theme="dark"] .my-bookings-page .btn-accent-custom:hover {
+  background: #f43f46 !important;
+  border-color: #f43f46 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(227, 30, 36, 0.32);
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-secondary {
+  background: rgba(148, 163, 184, 0.06) !important;
+  border-color: rgba(148, 163, 184, 0.28) !important;
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-outline-secondary:hover {
+  background: var(--bg-elevated, #22304A) !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .btn-light,
+html[data-theme="dark"] .my-bookings-page .btn-warning {
+  background: var(--bg-elevated, #22304A) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .dashboard-table,
+html[data-theme="dark"] .my-bookings-page .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: #CBD5E1;
+  --bs-table-border-color: rgba(148, 163, 184, 0.16);
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .table th {
+  color: #F8FAFC !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .table td {
+  color: #CBD5E1 !important;
+  border-color: rgba(148, 163, 184, 0.12) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .booking-status-badge.badge-pending,
+html[data-theme="dark"] .my-bookings-page .badge-pending {
+  background: rgba(245, 158, 11, 0.16) !important;
+  color: #FCD34D !important;
+  border-color: rgba(245, 158, 11, 0.24) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .booking-status-badge.badge-confirmed,
+html[data-theme="dark"] .my-bookings-page .badge-confirmed,
+html[data-theme="dark"] .my-bookings-page .badge-completed {
+  background: rgba(34, 197, 94, 0.14) !important;
+  color: #86EFAC !important;
+  border-color: rgba(34, 197, 94, 0.24) !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .badge-waiting {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: #93C5FD !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .badge-rejected,
+html[data-theme="dark"] .my-bookings-page .badge-cancelled {
+  background: rgba(239, 68, 68, 0.16) !important;
+  color: #FCA5A5 !important;
+}
+
+html[data-theme="dark"] .my-bookings-page .modal-content,
+html[data-theme="dark"] .my-bookings-page .modal-header,
+html[data-theme="dark"] .my-bookings-page .modal-body {
+  background: var(--bg-card, #182235) !important;
+  color: var(--text, #F8FAFC) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .messages-workspace {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(227, 30, 36, 0.08), transparent 30%),
+    var(--bg-page, #0B1120) !important;
+  min-height: 100vh;
+}
+
+html[data-theme="dark"] .messages-list,
+html[data-theme="dark"] .message-chat {
+  background: #161b22 !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme="dark"] .messages-list {
+  border-right-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .message-thread {
+  background: var(--bg-card, #182235) !important;
+  border-color: transparent !important;
+  border-left-color: transparent !important;
+  color: var(--text, #F8FAFC) !important;
+}
+
+html[data-theme="dark"] .message-thread:hover {
+  background: var(--bg-elevated, #22304A) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-thread.is-active {
+  background: rgba(227, 30, 36, 0.16) !important;
+  border-color: rgba(227, 30, 36, 0.32) !important;
+  border-left-color: var(--accent, #e31e24) !important;
+  box-shadow: 0 14px 30px rgba(227, 30, 36, 0.16) !important;
+}
+
+html[data-theme="dark"] .message-thread:hover strong,
+html[data-theme="dark"] .message-thread.is-active strong {
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .message-thread:hover span,
+html[data-theme="dark"] .message-thread:hover small,
+html[data-theme="dark"] .message-thread:hover time,
+html[data-theme="dark"] .message-thread.is-active span,
+html[data-theme="dark"] .message-thread.is-active small,
+html[data-theme="dark"] .message-thread.is-active time {
+  color: #CBD5E1 !important;
+}
+
+html[data-theme="dark"] .message-thread-avatar {
+  background: var(--bg-elevated, #22304A) !important;
+  color: #F8FAFC !important;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+html[data-theme="dark"] .message-chat-header,
+html[data-theme="dark"] .message-compose {
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+html[data-theme="dark"] .message-chat-header h2 {
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .message-listing-context {
+  background: var(--bg-card, #182235) !important;
+  border: 1px solid rgba(227, 30, 36, 0.18) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-listing-context img {
+  object-fit: cover !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-bubble-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.28) !important;
+}
+
+html[data-theme="dark"] .message-bubble.sent {
+  background: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 30px rgba(227, 30, 36, 0.22) !important;
+}
+
+html[data-theme="dark"] .message-bubble.received {
+  background: var(--bg-elevated, #22304A) !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .message-bubble.received span {
+  color: #94A3B8 !important;
+}
+
+html[data-theme="dark"] .message-compose .form-control {
+  background: var(--bg-card, #182235) !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  color: #F8FAFC !important;
+}
+
+html[data-theme="dark"] .message-compose .form-control::placeholder {
+  color: #94A3B8 !important;
+}
+
+html[data-theme="dark"] .message-compose .form-control:focus {
+  background: var(--bg-card, #182235) !important;
+  border-color: var(--accent, #e31e24) !important;
+  box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.18) !important;
+}
+
+html[data-theme="dark"] .message-compose button {
+  background: var(--accent, #e31e24) !important;
+  border-color: var(--accent, #e31e24) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(227, 30, 36, 0.22);
+}
+

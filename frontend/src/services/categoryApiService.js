@@ -1,4 +1,5 @@
 import { apiClient } from "./apiClient.js";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 function normalizeCategory(category) {
   if (!category) return null;
@@ -11,9 +12,7 @@ function normalizeCategory(category) {
 }
 
 function emitCategoryUpdate() {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("easterncity:categories-updated"));
-  }
+  emitRefresh("categories");
 }
 
 export async function fetchCategories() {

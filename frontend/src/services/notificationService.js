@@ -1,6 +1,7 @@
 import { apiClient } from "./apiClient.js";
 import { getAuthTokens } from "./authService.js";
 import { getStorageItem, setStorageItem } from "./storageService.js";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === "true";
 
@@ -72,7 +73,7 @@ export function createNotification({
   if (useMockAuth) {
     setStorageItem(NOTIFICATIONS_KEY, [notification, ...getNotifications()]);
   }
-  window.dispatchEvent(new Event("easterncity:notifications-updated"));
+  emitRefresh("notifications");
   return notification;
 }
 
@@ -85,7 +86,7 @@ export async function sendDirectNotification({ recipient, title, body }) {
       title,
       body,
     });
-    window.dispatchEvent(new Event("easterncity:notifications-updated"));
+    emitRefresh("notifications");
     return notification;
   }
 
@@ -107,7 +108,7 @@ export async function sendBroadcastNotification({ title, body }) {
       title,
       body,
     });
-    window.dispatchEvent(new Event("easterncity:notifications-updated"));
+    emitRefresh("notifications");
     return result;
   }
 
@@ -119,7 +120,7 @@ export async function markNotificationRead(id) {
 
   if (!useMockAuth && accessToken) {
     const notification = await apiClient.patch(`/api/notifications/${id}/read`);
-    window.dispatchEvent(new Event("easterncity:notifications-updated"));
+    emitRefresh("notifications");
     return notification;
   }
 
@@ -127,7 +128,7 @@ export async function markNotificationRead(id) {
     notification.id === id ? { ...notification, isRead: true } : notification,
   );
   if (useMockAuth) setStorageItem(NOTIFICATIONS_KEY, notifications);
-  window.dispatchEvent(new Event("easterncity:notifications-updated"));
+  emitRefresh("notifications");
   return notifications.find((notification) => notification.id === id) || null;
 }
 
@@ -136,7 +137,7 @@ export async function markAllNotificationsRead() {
 
   if (!useMockAuth && accessToken) {
     const result = await apiClient.patch("/api/notifications/read-all");
-    window.dispatchEvent(new Event("easterncity:notifications-updated"));
+    emitRefresh("notifications");
     return result;
   }
 
@@ -145,6 +146,6 @@ export async function markAllNotificationsRead() {
     isRead: true,
   }));
   if (useMockAuth) setStorageItem(NOTIFICATIONS_KEY, notifications);
-  window.dispatchEvent(new Event("easterncity:notifications-updated"));
+  emitRefresh("notifications");
   return notifications;
 }

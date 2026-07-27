@@ -1,4 +1,5 @@
 import { apiClient } from "./apiClient.js";
+import { emitRefresh } from "../context/RefreshContext.jsx";
 
 function normalizeUser(user) {
   if (!user) return null;
@@ -26,9 +27,7 @@ function normalizeBooking(booking) {
 }
 
 function emitBookingsUpdate() {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("easterncity:bookings-updated"));
-  }
+  emitRefresh("bookings");
 }
 
 export async function createBooking(payload) {

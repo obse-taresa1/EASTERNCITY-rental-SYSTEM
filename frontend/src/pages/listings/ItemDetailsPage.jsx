@@ -2,30 +2,11 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SimilarListingsCarousel from "../../components/listings/SimilarListingsCarousel.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { categories, items as seededItems } from "../../data/items.js";
+import { categories } from "../../data/items.js";
 import { getListingById } from "../../services/listingApiService.js";
 import { getReviewsByListing } from "../../services/reviewApiService.js";
 import { startListingConversation } from "../../services/messageApiService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
-
-const fallbackReviews = [
-  {
-    id: "review-seed-1",
-    userName: "Hassan Ali",
-    rating: 5,
-    comment:
-      "The listing matched the photos, pickup was smooth, and the item worked perfectly.",
-    createdAt: "2026-05-18T10:00:00.000Z",
-  },
-  {
-    id: "review-seed-2",
-    userName: "Amina Yusuf",
-    rating: 4,
-    comment:
-      "Clear requirements and quick communication. I would rent from EasternCity again.",
-    createdAt: "2026-04-28T10:00:00.000Z",
-  },
-];
 
 function renderStars(rating) {
   return Array.from({ length: 5 }, (_, index) => (
@@ -78,10 +59,10 @@ export default function ItemDetailsPage() {
       try {
         const data = await getReviewsByListing(itemId);
         if (!active) return;
-        setReviews(data.length ? data : fallbackReviews);
+        setReviews(Array.isArray(data) ? data : []);
       } catch {
         if (!active) return;
-        setReviews(fallbackReviews);
+        setReviews([]);
       }
     }
 
@@ -325,13 +306,6 @@ export default function ItemDetailsPage() {
             category={item.category}
             currentItemId={item.id}
           />
-          {!seededItems.some(
-            (entry) => entry.category === item.category && entry.id !== item.id,
-          ) && (
-            <p className="owner-muted text-center mt-3">
-              More listings in this category will appear as owners publish them.
-            </p>
-          )}
         </section>
       </div>
     </main>

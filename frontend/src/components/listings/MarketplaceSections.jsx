@@ -5,6 +5,7 @@ import {
   getPromotionPlacement,
   sortPromotedListingsFirst,
 } from "../../services/itemService.js";
+import { useRefreshToken } from "../../context/RefreshContext.jsx";
 import { getPublicListings } from "../../services/listingApiService.js";
 import { fetchActivePromotions } from "../../services/promotionApiService.js";
 
@@ -78,6 +79,7 @@ function findHomepageBanner(listings, promotions) {
 export default function MarketplaceSections() {
   const [savedListings, setSavedListings] = useState([]);
   const [promotions, setPromotions] = useState([]);
+  const marketplaceRefreshToken = useRefreshToken(["listings", "promotions"]);
   const marketplaceListings = useMemo(() => {
     const savedById = new Map(savedListings.map((item) => [item.id, item]));
     const merged = [...savedById.values()];
@@ -121,26 +123,7 @@ export default function MarketplaceSections() {
     return () => {
       active = false;
     };
-  }, []);
-
-  useEffect(() => {
-    function refreshListings() {
-      loadListings();
-    }
-
-    window.addEventListener("easterncity:listings-updated", refreshListings);
-    window.addEventListener("easterncity:promotions-updated", refreshListings);
-    return () => {
-      window.removeEventListener(
-        "easterncity:listings-updated",
-        refreshListings,
-      );
-      window.removeEventListener(
-        "easterncity:promotions-updated",
-        refreshListings,
-      );
-    };
-  }, []);
+  }, [marketplaceRefreshToken]);
 
   return (
     <section className="marketplace-sections py-5">

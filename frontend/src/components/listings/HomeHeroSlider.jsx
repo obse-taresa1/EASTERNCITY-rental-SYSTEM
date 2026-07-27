@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useLanguage } from "../../context/LanguageContext.jsx";
+import HomeSearchForm from "../forms/HomeSearchForm";
+import { fetchActivePromotions } from "../../services/promotionApiService";
 import heroCanon from "../../assets/images/hero_camera.png";
 import heroDrill from "../../assets/images/dewalt.png";
 import heroPc from "../../assets/images/hero_electronics.png";
 import heroSofa from "../../assets/images/furnsofa.png";
 import heroBike from "../../assets/images/sportbick.png";
 import heroToyota from "../../assets/images/hero_vehicles.png";
-import { useLanguage } from "../../context/LanguageContext.jsx";
-import HomeSearchForm from "../forms/HomeSearchForm.jsx";
 
-const slides = [
+// Default static slides
+const defaultSlides = [
   {
     titleKey: "heroVehicleTitle",
     subtitleKey: "heroVehicleSubtitle",
@@ -128,34 +130,85 @@ const slides = [
     rating: "4.9",
     reviewsCount: 15,
     specs: ["Plastic", "White", "Stackable"],
-  }
+  },
 ];
 
 export default function HomeHeroSlider() {
   const { t } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [slides, setSlides] = useState(defaultSlides);
+
+  // Helper to determine category icon
+  function getCategoryIcon(cat) {
+    const c = String(cat || "").toLowerCase();
+    if (c.includes("vehicle") || c.includes("car")) return "bi-car-front";
+    if (c.includes("game") || c.includes("electronic") || c.includes("pc") || c.includes("laptop")) return "bi-controller";
+    if (c.includes("camera")) return "bi-camera-video";
+    if (c.includes("tool") || c.includes("drill")) return "bi-tools";
+    if (c.includes("furniture") || c.includes("sofa")) return "bi-house-heart";
+    if (c.includes("sport") || c.includes("bike")) return "bi-bicycle";
+    if (c.includes("party") || c.includes("wedding") || c.includes("event")) return "bi-tent";
+    return "bi-star-fill";
+  }
+
+  // Load featured promotions and merge/fallback with default slides
+  useEffect(() => {
+    async function loadFeatured() {
+      try {
+        const promos = await fetchActivePromotions();
+        const promoSlides = promos.map((p) => {
+          const itemImage = p.listing?.image || p.screenshotUrl || "";
+          const itemSpecs = p.listing?.features || [];
+          return {
+            titleKey: "",
+            subtitleKey: "",
+            image: itemImage,
+            cardTitle: p.listing?.title || p.listingTitle || "Featured Listing",
+            cardPrice: p.listing?.pricePerDay ? `ETB ${Number(p.listing.pricePerDay).toLocaleString()}` : (p.amount ? `ETB ${p.amount}` : ""),
+            cardLocation: p.listing?.city || p.ownerName || "",
+            categoryId: p.listing?.categoryId || "",
+            categoryKey: p.listing?.category || "",
+            icon: getCategoryIcon(p.listing?.category || p.listing?.categoryData?.name || ""),
+            itemId: p.listingId || "",
+            rating: p.listing?.rating || "5.0",
+            reviewsCount: p.listing?.reviewsCount || 0,
+            specs: Array.isArray(itemSpecs) ? itemSpecs.slice(0, 3) : [],
+          };
+        });
+
+        if (promoSlides.length > 0) {
+          setSlides(promoSlides);
+        } else {
+          setSlides(defaultSlides);
+        }
+      } catch (e) {
+        console.error("Failed to load featured promotions", e);
+        setSlides(defaultSlides);
+      }
+    }
+    loadFeatured();
+  }, []);
+
   const activeSlide = slides[activeIndex];
 
+  // Autoplay effect
   useEffect(() => {
     if (!isPlaying) return;
     const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % slides.length);
+      setActiveIndex((cur) => (cur + 1) % slides.length);
     }, 5000);
-
     return () => window.clearInterval(timer);
-  }, [isPlaying]);
+  }, [isPlaying, slides.length]);
 
   function previousSlide() {
     setIsPlaying(false);
-    setActiveIndex((current) =>
-      current === 0 ? slides.length - 1 : current - 1,
-    );
+    setActiveIndex((cur) => (cur === 0 ? slides.length - 1 : cur - 1));
   }
 
   function nextSlide() {
     setIsPlaying(false);
-    setActiveIndex((current) => (current + 1) % slides.length);
+    setActiveIndex((cur) => (cur + 1) % slides.length);
   }
 
   return (
@@ -163,7 +216,7 @@ export default function HomeHeroSlider() {
       <div className="motorx-hero-bg" aria-hidden="true">
         {slides.map((slide, index) => (
           <div
-            key={slide.titleKey}
+            key={`${slide.titleKey || slide.cardTitle}-${index}`}
             className={`hero-slide ${index === activeIndex ? "is-active kenburns-active" : ""}`}
             style={{ backgroundImage: `url("${slide.image}")` }}
           ></div>
@@ -174,87 +227,47 @@ export default function HomeHeroSlider() {
         <div className="hero-layout mb-4">
           <div className="hero-text">
             <span className="hero-tag mb-3">{t("heroEyebrow")}</span>
-
             <h1 key={`title-${activeIndex}`} className="animate-fade-in-up">
-              {t(activeSlide.titleKey)}
+              {t(activeSlide.titleKey) || activeSlide.cardTitle}
             </h1>
-            <p
-              key={`desc-${activeIndex}`}
-              className="animate-fade-in-up"
-              style={{ animationDelay: "120ms" }}
-            >
-              {t(activeSlide.subtitleKey)}
+            <p className="animate-fade-in-up" style={{ animationDelay: "120ms" }}>
+              {t(activeSlide.subtitleKey) || ""}
             </p>
           </div>
 
           <div className="hero-side">
-            <div
-              className="hero-discount-badge animate-fade-in-up"
-              style={{ animationDelay: "150ms" }}
-            >
+            <div className="hero-discount-badge animate-fade-in-up" style={{ animationDelay: "150ms" }}>
               <span className="discount-pct">40%</span>
               <span className="discount-off">{t("heroDiscountOff")}</span>
             </div>
 
             {/* Advanced Spec Floating Card */}
-            <div
-              className="hero-float-card p-3 rounded-4 d-flex flex-column gap-2 animate-fade-in-up"
-              style={{ animationDelay: "300ms" }}
-              key={`card-${activeIndex}`}
-            >
+            <div className="hero-float-card p-3 rounded-4 d-flex flex-column gap-2 animate-fade-in-up" style={{ animationDelay: "300ms" }} key={`card-${activeIndex}`}>
               <div className="d-flex gap-3 align-items-center">
-                <img
-                  src={activeSlide.image}
-                  alt={t("heroFeaturedAlt")}
-                  className="rounded-3"
-                  style={{ width: "90px", height: "70px", objectFit: "cover" }}
-                />
+                <img src={activeSlide.image} alt={t("heroFeaturedAlt")} className="rounded-3" style={{ width: "90px", height: "70px", objectFit: "cover" }} />
                 <div className="flex-grow-1">
                   <div className="hero-float-card-rating">
-                    <i className={`bi ${activeSlide.icon}`}></i>
+                    {activeSlide.icon && <i className={`bi ${activeSlide.icon}`}></i>}
                     <span>{activeSlide.rating}</span>
-                    <span
-                      className="text-muted"
-                      style={{ fontSize: "0.65rem" }}
-                    >
-                      ({activeSlide.reviewsCount})
-                    </span>
+                    <span className="text-muted" style={{ fontSize: "0.65rem" }}>({activeSlide.reviewsCount})</span>
                   </div>
-                  <h6 className="m-0 fw-bold text-start">
-                    {activeSlide.cardTitle}
-                  </h6>
+                  <h6 className="m-0 fw-bold text-start">{activeSlide.cardTitle}</h6>
                 </div>
               </div>
 
               <div className="hero-float-card-specs text-start">
                 {activeSlide.specs.map((spec) => (
-                  <span key={spec} className="hero-float-card-spec-tag me-1">
-                    {spec}
-                  </span>
+                  <span key={spec} className="hero-float-card-spec-tag me-1">{spec}</span>
                 ))}
               </div>
 
               <div className="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
                 <div className="text-start">
-                  <span
-                    className="text-muted"
-                    style={{ fontSize: "0.75rem", fontWeight: 600 }}
-                  >
-                    {t("perDay")}:{" "}
-                  </span>
-                  <span
-                    className="fw-bold text-danger ms-1"
-                    style={{ fontSize: "1.1rem" }}
-                  >
-                    {activeSlide.cardPrice}
-                  </span>
+                  <span className="text-muted" style={{ fontSize: "0.75rem", fontWeight: 600 }}>{t("perDay")}:{" "}</span>
+                  <span className="fw-bold text-danger ms-1" style={{ fontSize: "1.1rem" }}>{activeSlide.cardPrice}</span>
                 </div>
-                <div
-                  className="text-muted"
-                  style={{ fontSize: "0.75rem", fontWeight: 600 }}
-                >
-                  <i className="bi bi-geo-alt-fill text-danger me-1"></i>
-                  {activeSlide.cardLocation}
+                <div className="text-muted" style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                  <i className="bi bi-geo-alt-fill text-danger me-1"></i>{activeSlide.cardLocation}
                 </div>
               </div>
             </div>
@@ -266,11 +279,8 @@ export default function HomeHeroSlider() {
           <HomeSearchForm />
         </div>
 
-        {/* Platform Stats Banner */}
-        <div
-          className="hero-stats-banner animate-fade-in-up d-none"
-          style={{ animationDelay: "450ms" }}
-        >
+        {/* Platform Stats Banner (currently hidden) */}
+        <div className="hero-stats-banner animate-fade-in-up d-none" style={{ animationDelay: "450ms" }}>
           <div className="hero-stat-block">
             <i className="bi bi-check-circle-fill hero-stat-icon"></i>
             <div className="hero-stat-info text-start">
@@ -294,24 +304,18 @@ export default function HomeHeroSlider() {
           </div>
         </div>
 
+        {/* Slider controls */}
         <div className="hero-slider-controls mt-4" aria-label={t("heroSlides")}>
-          <button
-            type="button"
-            className="hero-slider-arrow"
-            onClick={previousSlide}
-            aria-label={t("heroPrevious")}
-          >
+          <button type="button" className="hero-slider-arrow" onClick={previousSlide} aria-label={t("heroPrevious")}>
             <i className="bi bi-chevron-left"></i>
           </button>
 
           <div className="hero-slider-dots" aria-label="Hero slides">
             {slides.map((slide, index) => (
               <button
-                key={slide.titleKey}
+                key={`${slide.titleKey || slide.cardTitle}-${index}`}
                 type="button"
-                className={`hero-slider-dot ${
-                  index === activeIndex ? "is-active" : ""
-                }`}
+                className={`hero-slider-dot ${index === activeIndex ? "is-active" : ""}`}
                 aria-label={`${t("heroShowSlide")} ${index + 1}`}
                 onClick={() => {
                   setActiveIndex(index);
@@ -321,26 +325,13 @@ export default function HomeHeroSlider() {
             ))}
           </div>
 
-          <button
-            type="button"
-            className="hero-slider-arrow"
-            onClick={nextSlide}
-            aria-label={t("heroNext")}
-          >
+          <button type="button" className="hero-slider-arrow" onClick={nextSlide} aria-label={t("heroNext")}>
             <i className="bi bi-chevron-right"></i>
           </button>
 
-          {/* Autoplay play/pause toggle */}
-          <button
-            type="button"
-            className="hero-autoplay-btn ms-3"
-            onClick={() => setIsPlaying(!isPlaying)}
-            aria-label={isPlaying ? "Pause autoplay" : "Play autoplay"}
-            title={isPlaying ? "Pause Autoplay" : "Play Autoplay"}
-          >
-            <i
-              className={`bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`}
-            ></i>
+          {/* Autoplay toggle */}
+          <button type="button" className="hero-autoplay-btn ms-3" onClick={() => setIsPlaying(!isPlaying)} aria-label={isPlaying ? "Pause autoplay" : "Play autoplay"} title={isPlaying ? "Pause Autoplay" : "Play Autoplay"}>
+            <i className={`bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`}></i>
           </button>
         </div>
       </div>

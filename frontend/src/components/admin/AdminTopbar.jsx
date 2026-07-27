@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useRefreshToken } from "../../context/RefreshContext.jsx";
 import { useTheme } from "../../context/ThemeContext.jsx";
 import { adminApi } from "../../services/adminManagementService.js";
 import { profileForRole } from "../../services/authService.js";
@@ -225,6 +226,7 @@ export default function AdminTopbar({ title, onMenuToggle }) {
   const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const menuRef = useRef(null);
+  const notificationsRefreshToken = useRefreshToken("notifications");
 
   const currentLanguage = useMemo(
     () => LANGUAGES.find((option) => option.code === language) || LANGUAGES[0],
@@ -241,13 +243,11 @@ export default function AdminTopbar({ title, onMenuToggle }) {
     };
 
     updateNotifications();
-    window.addEventListener("easterncity:notifications-updated", updateNotifications);
 
     return () => {
       mounted = false;
-      window.removeEventListener("easterncity:notifications-updated", updateNotifications);
     };
-  }, [activeUser?.id]);
+  }, [activeUser?.id, notificationsRefreshToken]);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -267,9 +267,6 @@ export default function AdminTopbar({ title, onMenuToggle }) {
   const handleLanguageChange = (event) => {
     const nextLanguage = event.target.value;
     setLanguage(nextLanguage);
-    window.dispatchEvent(
-      new CustomEvent("easterncity:language-changed", { detail: nextLanguage }),
-    );
   };
 
   const handleSearchSubmit = (event) => {
