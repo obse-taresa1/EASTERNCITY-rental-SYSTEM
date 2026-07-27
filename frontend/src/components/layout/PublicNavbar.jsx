@@ -67,7 +67,7 @@ const logoSrc = theme === "dark" ? darkLogo : lightLogo;
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/about">About Us</NavLink>
+                <NavLink to="/about">{t("about")}</NavLink>
               </li>
               <li>
                 <NavLink to="/contact">{t("contactUs")}</NavLink>

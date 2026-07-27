@@ -129,9 +129,11 @@ export default function CategoriesPage() {
         
         {/* Bottom CTA Section */}
         <div className="bottom-cta-section mt-5 text-center">
-          <h2>Can't find what you're looking for?</h2>
-          <p>List your item today.</p>
-          <Link to="/dashboard/list-item" className="btn btn-primary-custom mt-3">List an Item</Link>
+          <div className="bottom-cta-section-inner">
+            <h2>Can't find what you're looking for?</h2>
+            <p>List your item today.</p>
+            <Link to="/dashboard/list-item" className="btn btn-primary-custom mt-3">List an Item</Link>
+          </div>
         </div>
 
       </div>

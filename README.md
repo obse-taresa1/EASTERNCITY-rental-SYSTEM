@@ -202,6 +202,20 @@ Environment variables are separated by application layer.
 
 > **Never commit `.env` files.** They contain sensitive credentials and are protected by `.gitignore`.
 
+### AI Assistant Configuration
+
+The EasternCities AI assistant is served only by the backend. Add these variables to
+`backend/.env` for local development, or configure the same variables in the hosting
+platform for production:
+
+```env
+GEMINI_API_KEY=your_server_side_gemini_key
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+Do not add `GEMINI_API_KEY` to `frontend/.env` or any `VITE_` variable. The frontend
+only calls the backend endpoint, so the key remains on the server.
+
 ---
 
 ## Database Setup

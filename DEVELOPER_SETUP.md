@@ -120,9 +120,13 @@ cp .env.example .env      # macOS / Linux
 | `JWT_REFRESH_SECRET` | Secret key for signing refresh tokens |
 | `CLIENT_URL` | Frontend URL (used for CORS and email links) |
 | `CORS_ORIGIN` | Allowed CORS origin for API requests |
+| `GEMINI_API_KEY` | Server-only key for the EasternCities AI assistant |
+| `GEMINI_MODEL` | Optional Gemini model override; defaults to `gemini-2.5-flash` |
 | `SMTP_HOST` | SMTP server hostname for email delivery |
 | `SMTP_PORT` | SMTP port (usually `587`) |
 | `SMTP_SECURE` | Use TLS: `true` or `false` |
+
+> Never place `GEMINI_API_KEY` in `frontend/.env` or use a `VITE_` prefix. In production, add the same variables in the hosting platform's environment-variable settings instead of uploading a `.env` file.
 | `SMTP_USER` | SMTP account email address |
 | `SMTP_PASS` | SMTP account password or app password |
 | `MAIL_FROM` | Display name and email for outgoing emails |

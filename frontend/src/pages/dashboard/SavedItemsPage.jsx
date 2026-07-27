@@ -71,7 +71,7 @@ export default function SavedItemsPage() {
           <i className="bi bi-heart" />
           <h3>No saved items yet</h3>
           <p>Browse the marketplace and tap the heart icon to save items you like.</p>
-          <Link to="/items" className="ud-btn-red">
+          <Link to="/items" className="ud-btn-red saved-items-browse-btn">
             <i className="bi bi-search" /> Browse Marketplace
           </Link>
         </div>

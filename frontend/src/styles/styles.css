@@ -3674,6 +3674,7 @@ html[data-theme="dark"] .theme-toggle .icon-dark {
   --secondary-color: #f8fafc;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
   --shadow-hover: 0 20px 42px rgba(0, 0, 0, 0.44);
+  color-scheme: dark;
 }
 
 *,
@@ -4390,6 +4391,24 @@ main.page-header.dashboard-main,
 [data-theme="dark"] .view-details,
 [data-theme="dark"] .card-specs i {
   color: var(--text-color) !important;
+}
+
+/* Keep every View Details link readable against dark listing cards. */
+html[data-theme="dark"] a.view-details,
+[data-theme="dark"] a.view-details {
+  color: #ffffff !important;
+  background: #8a0f1e;
+  border: 1px solid #b91c35;
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  text-decoration: none;
+}
+
+html[data-theme="dark"] a.view-details:hover,
+[data-theme="dark"] a.view-details:hover {
+  color: #ffffff !important;
+  background: #a8142c !important;
+  border-color: #d13a50 !important;
 }
 
 [data-theme="dark"] .card-similar,
@@ -5972,12 +5991,16 @@ main.page-header.dashboard-main,
   font-size: 1.4rem;
   color: var(--motorx-red);
   margin-bottom: 1.25rem;
-  transition: all 0.3s ease;
+  opacity: 1;
+  position: relative;
+  z-index: 2;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .about-glass-card:hover .about-card-icon {
   background: var(--motorx-red);
   color: #fff;
+  box-shadow: 0 6px 20px rgba(227, 30, 36, 0.35);
 }
 
 .about-glass-card h3 {
@@ -6000,25 +6023,32 @@ main.page-header.dashboard-main,
 
 .about-value-card {
   text-align: center;
-  padding: 2rem 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  padding: 2.25rem 1.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
   height: 100%;
-  transition: all 0.3s ease;
-  background: var(--white);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
 .about-value-card:hover {
-  border-color: var(--motorx-red);
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(227, 30, 36, 0.1);
+  border-color: rgba(227, 30, 36, 0.5);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(227, 30, 36, 0.08), 0 0 15px rgba(227, 30, 36, 0.03);
 }
 
 .about-value-card i {
   font-size: 2.25rem;
-  color: var(--motorx-red);
+  color: var(--text-muted, #64748b);
   display: block;
   margin-bottom: 1rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.about-value-card:hover i {
+  color: var(--motorx-red, #e31e24);
+  transform: scale(1.1);
 }
 
 .about-value-card h4 {
@@ -6032,26 +6062,33 @@ main.page-header.dashboard-main,
 }
 
 .about-city-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2.25rem 1.75rem;
   text-align: center;
   height: 100%;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
 .about-city-card:hover {
-  border-color: var(--motorx-red);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(227, 30, 36, 0.08);
+  border-color: rgba(227, 30, 36, 0.5);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(227, 30, 36, 0.08), 0 0 15px rgba(227, 30, 36, 0.03);
 }
 
 .about-city-card i {
   font-size: 2.5rem;
-  color: var(--motorx-red);
+  color: var(--text-muted, #64748b);
   display: block;
   margin-bottom: 0.75rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.about-city-card:hover i {
+  color: var(--motorx-red, #e31e24);
+  transform: scale(1.1);
 }
 
 .about-city-card h4 {
@@ -6092,13 +6129,9 @@ main.page-header.dashboard-main,
 
 .about-cta-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 15px 40px rgba(138, 15, 30, 0.25);
-  background: linear-gradient(
-    135deg,
-    rgba(138, 15, 30, 0.5) 0%,
-    rgba(18, 18, 22, 0.7) 100%
-  );
-  border-color: rgba(138, 15, 30, 0.5);
+  box-shadow: 0 15px 40px rgba(138, 15, 30, 0.35);
+  border-color: rgba(255, 255, 255, 0.2);
+  /* Background stays exactly the same — only shine sweeps across */
 }
 
 .about-cta-card::before {
@@ -6156,6 +6189,101 @@ main.page-header.dashboard-main,
 .btn-hero-outline:hover {
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORIES PAGE — Bottom CTA Section
+   Matches the About Page 'Ready to rent smarter?' card
+   ═══════════════════════════════════════════ */
+.bottom-cta-section {
+  margin-top: 3rem;
+  padding: 0 1rem;
+}
+
+.bottom-cta-section > * {
+  position: relative;
+  z-index: 2;
+}
+
+.bottom-cta-section-inner {
+  background: linear-gradient(
+    135deg,
+    rgba(138, 15, 30, 0.85) 0%,
+    rgba(18, 18, 22, 0.9) 100%
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.bottom-cta-section-inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: left 0.7s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bottom-cta-section-inner:hover::before {
+  left: 150%;
+}
+
+.bottom-cta-section-inner:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(138, 15, 30, 0.35);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.bottom-cta-section-inner h2 {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.bottom-cta-section-inner p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+}
+
+.bottom-cta-section-inner .btn-primary-custom {
+  background: #ffffff !important;
+  color: #c0151a !important;
+  border: none !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  padding: 0.75rem 2.25rem !important;
+  border-radius: 10px !important;
+  position: relative;
+  z-index: 2;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.bottom-cta-section-inner .btn-primary-custom:hover {
+  background: #f1f5f9 !important;
+  color: #a01015 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,255,255,0.2);
 }
 
 /* ========== DASHBOARD SIDEBAR ENHANCEMENTS ========== */
@@ -7613,7 +7741,7 @@ html[data-theme="dark"] .dashboard-sidebar {
   gap: 0.35rem;
   border: 0;
   background: transparent;
-  color: var(--navbar-text);
+  color: var(--navbar-text, inherit);
   font-weight: 700;
   font-family: inherit;
   font-size: 0.88rem;
@@ -7738,20 +7866,14 @@ html[data-theme="dark"] .dashboard-sidebar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background:
-    radial-gradient(
-      circle at 30% 18%,
-      rgba(255, 255, 255, 0.75),
-      transparent 22%
-    ),
-    linear-gradient(145deg, #ff4b51, #b80f16 68%, #7f0a10);
+  background: linear-gradient(135deg, #c41a2e 0%, #5a0a16 100%);
   color: #fff;
   font-weight: 900;
   letter-spacing: 0;
-  border: none;
+  border: 2px solid #c41a2e;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 10px 24px rgba(227, 30, 36, 0.28);
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 10px 24px rgba(196, 26, 46, 0.35);
 }
 
 .profile-panel-backdrop {
@@ -8217,15 +8339,17 @@ html[data-theme="dark"] .dashboard-sidebar {
 }
 
 .details-gallery {
-  padding: 1rem;
+  padding: 0;
+  overflow: hidden;
 }
 
 .details-gallery img {
   width: 100%;
-  max-height: 560px;
-  object-fit: contain;
-  border-radius: 18px;
-  background: #f8fafc;
+  height: 480px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 20px;
+  display: block;
 }
 
 .details-contact-card {
@@ -8310,6 +8434,11 @@ html[data-theme="dark"] .dashboard-sidebar {
   font-weight: 950;
 }
 
+/* Match the Features heading to the red accent used by the About Us card. */
+.details-info-card:nth-child(2) h2 {
+  color: var(--motorx-red);
+}
+
 .details-info-card p {
   color: var(--text-muted);
   line-height: 1.75;
@@ -8326,11 +8455,25 @@ html[data-theme="dark"] .dashboard-sidebar {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.62rem 0.75rem;
+  padding: 0.5rem 1rem;
   border-radius: 999px;
-  background: rgba(227, 30, 36, 0.08);
-  color: var(--motorx-red);
-  font-weight: 850;
+  background: rgba(227, 30, 36, 0.12);
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid rgba(227, 30, 36, 0.2);
+  box-shadow: 0 1px 4px rgba(227, 30, 36, 0.08);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.details-feature-pill i {
+  color: #e31e24;
+  font-size: 1rem;
+}
+
+.details-feature-pill:hover {
+  background: rgba(227, 30, 36, 0.18);
+  transform: translateY(-1px);
 }
 
 .details-requirement-grid {
@@ -8786,6 +8929,10 @@ html[data-theme="dark"] .dashboard-sidebar {
   color: var(--text-color) !important;
 }
 
+[data-theme="dark"] .details-info-card:nth-child(2) h2 {
+  color: var(--motorx-red) !important;
+}
+
 [data-theme="dark"] .details-rating-row {
   background: rgba(227, 30, 36, 0.12) !important;
 }
@@ -8796,9 +8943,26 @@ html[data-theme="dark"] .dashboard-sidebar {
 
 [data-theme="dark"] .details-location,
 [data-theme="dark"] .details-contact-helper,
-[data-theme="dark"] .details-info-card p,
-[data-theme="dark"] .details-feature-pill {
+[data-theme="dark"] .details-info-card p {
   color: var(--muted-color) !important;
+}
+
+/* Feature pills in dark mode — keep brand red palette */
+[data-theme="dark"] .details-feature-pill {
+  background: rgba(227, 30, 36, 0.15) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(227, 30, 36, 0.3) !important;
+}
+
+[data-theme="dark"] .details-feature-pill i {
+  color: #f87171 !important;
+}
+
+/* Contact card dark mode — match Description/Requirements cards */
+[data-theme="dark"] .details-contact-card {
+  background: var(--card-bg) !important;
+  border-color: rgba(227, 30, 36, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
 }
 
 [data-theme="dark"] .details-requirement-grid strong {
@@ -9017,8 +9181,8 @@ html[data-theme="dark"] .dashboard-sidebar {
   font-size: 1.75rem;
   font-weight: 800;
   color: #fff;
-  background: var(--motorx-red, #e31e24);
-  border: 3px solid var(--motorx-red, #e31e24);
+  background: linear-gradient(135deg, #c41a2e 0%, #5a0a16 100%);
+  border: 3px solid #c41a2e;
 }
 .ud-avatar-badge {
   position: absolute;
@@ -9155,13 +9319,14 @@ html[data-theme="dark"] .dashboard-sidebar {
   font-weight: 800;
 }
 .ud-nav-link--accent {
-  background: var(--motorx-red, #e31e24) !important;
+  background: linear-gradient(135deg, #c41a2e 0%, #5a0a16 100%) !important;
   color: #fff !important;
   font-weight: 700;
   margin-top: 4px;
+  border: 1px solid rgba(196, 26, 46, 0.5);
 }
 .ud-nav-link--accent:hover {
-  background: #c41018 !important;
+  background: linear-gradient(135deg, #d9203a 0%, #6b0a18 100%) !important;
   color: #fff !important;
 }
 .ud-sidebar-footer {
@@ -9387,6 +9552,24 @@ html[data-theme="dark"] .dashboard-sidebar {
 .ud-empty-state-lg h3 {
   color: var(--text-color);
   font-weight: 800;
+}
+.saved-items-browse-btn {
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.5rem !important;
+  max-width: 260px;
+  width: 100%;
+  justify-content: center;
+  gap: 0.4rem !important;
+  box-shadow: 0 4px 12px rgba(227, 30, 36, 0.15);
+}
+.saved-items-browse-btn:hover {
+  background: #c41018 !important;
+  box-shadow: 0 6px 16px rgba(227, 30, 36, 0.25);
+  transform: translateY(-2px);
+}
+.ud-empty-state-lg .saved-items-browse-btn i {
+  font-size: 1.25rem !important;
+  opacity: 1 !important;
 }
 .ud-alert {
   display: flex;
@@ -10501,12 +10684,15 @@ html[data-theme="dark"] .dashboard-sidebar {
 
 /* ── Dark Mode ── */
 [data-theme="dark"] .ud-sidebar {
-  background: var(--card-bg);
-  border-right-color: var(--border-color);
+  background: #111827 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .ud-sidebar-profile {
+  border-bottom: none !important;
 }
 [data-theme="dark"] .ud-mini-stat {
   background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 [data-theme="dark"] .ud-nav-link {
   color: var(--text-color);
@@ -10517,13 +10703,41 @@ html[data-theme="dark"] .dashboard-sidebar {
 [data-theme="dark"] .ud-nav-link--active {
   background: rgba(227, 30, 36, 0.2);
 }
-[data-theme="dark"] .ud-glass-card {
-  background: var(--card-bg);
-  border-color: var(--border-color);
+[data-theme="dark"] .motorx-header {
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: #111827 !important;
+}
+[data-theme="dark"] .ud-glass-card,
+[data-theme="dark"] .card-custom,
+[data-theme="dark"] .owner-empty-state,
+[data-theme="dark"] .empty-state-premium,
+[data-theme="dark"] .ml-empty-state,
+[data-theme="dark"] .ud-empty-state,
+[data-theme="dark"] .ud-stat-card,
+[data-theme="dark"] .listing-form-section,
+[data-theme="dark"] .listing-preview-card,
+[data-theme="dark"] .owner-monetization-card,
+[data-theme="dark"] .promotion-package {
+  background: #1E293B !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 18px !important;
+  box-shadow: none !important;
+}
+[data-theme="dark"] .my-bookings-page .dashboard-header,
+[data-theme="dark"] .dashboard-header {
+  border-bottom: none !important;
 }
 [data-theme="dark"] .ud-stat-card.stat-red {
   background: rgba(190, 18, 60, 0.15);
   border-color: rgba(190, 18, 60, 0.3);
+}
+[data-theme="dark"] .listing-form-section h2 {
+  color: #f8fafc !important;
+}
+[data-theme="dark"] .bg-light {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
 }
 [data-theme="dark"] .ud-stat-card.stat-blue {
   background: rgba(29, 78, 216, 0.15);
@@ -10562,10 +10776,20 @@ html[data-theme="dark"] .dashboard-sidebar {
   border-color: var(--border-color);
 }
 [data-theme="dark"] .incoming-booking-requests-card {
-  background: var(--card-bg, #161b22);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1E293B !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
   color: var(--text-color, #f8fafc);
+}
+[data-theme="dark"] .marketplace-ad-banner {
+  background: linear-gradient(135deg, rgba(90, 10, 22, 0.95) 0%, rgba(10, 10, 14, 0.95) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+  color: #f1f5f9 !important;
+}
+[data-theme="dark"] .marketplace-ad-banner .section-label,
+[data-theme="dark"] .marketplace-ad-banner h2 {
+  color: #f1f5f9 !important;
 }
 [data-theme="dark"] .incoming-booking-requests-card h2,
 [data-theme="dark"] .incoming-booking-requests-card .dashboard-table td {
@@ -12936,6 +13160,7 @@ html[data-theme="dark"] main.legal-document-page .btn-accent-custom:hover {
   align-items: center;
   border-radius: 10px;
   background: transparent !important;
+  color: var(--navbar-text, #f8fafc) !important;
   transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
@@ -13620,4 +13845,735 @@ html[data-theme="dark"] .message-compose button {
   border-color: var(--accent, #e31e24) !important;
   color: #fff !important;
   box-shadow: 0 12px 28px rgba(227, 30, 36, 0.22);
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRIVACY & TERMS PAGE — Shiny Red Border Hover Effect
+   ═══════════════════════════════════════════════════════ */
+
+main.legal-document-page .card.card-custom {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
+}
+
+/* Shine sweep */
+main.legal-document-page .card.card-custom::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(227, 30, 36, 0.07) 50%,
+    transparent 60%
+  );
+  transition: left 0.55s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+main.legal-document-page .card.card-custom:hover::before {
+  left: 150%;
+}
+
+/* Red border glow on hover — light mode */
+main.legal-document-page .card.card-custom:hover {
+  border-color: #e31e24 !important;
+  box-shadow: 0 8px 30px rgba(227, 30, 36, 0.15), 0 0 0 2px rgba(227, 30, 36, 0.5) !important;
+  transform: translateY(-4px);
+}
+
+/* Red border glow on hover — dark mode */
+html[data-theme="dark"] main.legal-document-page .card.card-custom:hover {
+  border-color: #e31e24 !important;
+  box-shadow: 0 10px 35px rgba(227, 30, 36, 0.25), 0 0 0 2px rgba(227, 30, 36, 0.65) !important;
+  transform: translateY(-4px);
+}
+
+/* Listing card action: use literal high-contrast colors so the link never
+   inherits a light/transparent value from a theme or card rule. */
+.listing-card-premium .btn-view-details {
+  background: #b4122c !important;
+  border: 1px solid #b4122c !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+.listing-card-premium .btn-view-details i {
+  color: #ffffff !important;
+}
+
+.listing-card-premium .btn-view-details:hover {
+  background: #8a0f1e !important;
+  border-color: #8a0f1e !important;
+  color: #ffffff !important;
+}
+
+/* Use the Contact Us left-panel treatment for Features & Specifications. */
+.details-info-card:nth-child(2) {
+  background: linear-gradient(135deg, rgba(138, 15, 30, 0.85) 0%, rgba(18, 18, 22, 0.9) 100%) !important;
+  border: 1px solid rgba(138, 15, 30, 0.4) !important;
+  color: #ffffff !important;
+}
+
+.details-info-card:nth-child(2) .section-label,
+.details-info-card:nth-child(2) h2 {
+  color: #ffffff !important;
+}
+
+.details-info-card:nth-child(2) .details-feature-pill {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.details-info-card:nth-child(2) .details-feature-pill i {
+  color: #fecdd3 !important;
+}
+
+/* Keep the Contact Us left card burgundy in dark mode as well. */
+html[data-theme="dark"] .contact-page .contact-shiny-box,
+[data-theme="dark"] .contact-page .contact-shiny-box,
+html[data-theme="dark"] .details-info-card:nth-child(2),
+[data-theme="dark"] .details-info-card:nth-child(2) {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .details-info-card:nth-child(2) .details-feature-pill,
+[data-theme="dark"] .details-info-card:nth-child(2) .details-feature-pill {
+  background: rgba(227, 30, 36, 0.12) !important;
+  border-color: rgba(227, 30, 36, 0.22) !important;
+  color: #fecdd3 !important;
+}
+
+/* Admin and Super Admin: shared premium dashboard polish (visual only). */
+.admin-red-shell .red-dashboard-grid {
+  gap: 1.5rem;
+}
+
+.admin-red-shell .red-glass-card,
+.admin-red-shell .red-overview-card,
+.admin-red-shell .red-mini-campaign-card,
+.admin-red-shell .admin-table-container,
+.admin-red-shell .dashboard-section {
+  border-radius: 20px !important;
+  box-shadow: 0 12px 32px rgba(61, 10, 24, 0.09) !important;
+  transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+}
+
+.admin-red-shell .red-glass-card:hover,
+.admin-red-shell .red-mini-campaign-card:hover,
+.admin-red-shell .admin-table-container:hover,
+.admin-red-shell .dashboard-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 42px rgba(61, 10, 24, 0.14) !important;
+}
+
+.admin-red-shell .red-card-primary {
+  min-height: 280px;
+  padding: 1.75rem !important;
+  isolation: isolate;
+}
+
+.admin-red-shell .red-card-primary::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -90px;
+  bottom: -135px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 26px rgba(255, 255, 255, 0.05), 0 0 0 54px rgba(255, 255, 255, 0.035);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.admin-red-shell .red-overview-main strong {
+  font-size: clamp(3.25rem, 5vw, 4.35rem);
+  letter-spacing: -0.06em;
+}
+
+.admin-red-shell .red-overview-stats {
+  gap: 0.65rem;
+}
+
+.admin-red-shell .red-overview-stats span {
+  padding: 0.42rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+}
+
+.admin-red-shell .red-campaign-search {
+  height: 48px;
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.admin-red-shell .red-market-stats-card,
+.admin-red-shell .red-traffic-card,
+.admin-red-shell .red-analytics-card,
+.admin-red-shell .red-schedule-card {
+  padding: 1.5rem !important;
+}
+
+.admin-red-shell .red-market-stats-card .red-market-stat-grid {
+  gap: 0.85rem;
+}
+
+.admin-red-shell .red-market-stat-pill {
+  min-height: 76px;
+  grid-template-columns: 42px 1fr;
+  gap: 0.14rem 0.75rem;
+  padding: 0.8rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  transition: transform 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.admin-red-shell .red-market-stat-pill i {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: rgba(117, 21, 43, 0.1);
+  font-size: 1.2rem !important;
+}
+
+.admin-red-shell .red-market-stat-pill:nth-child(4n + 2) i { color: #2563eb !important; background: rgba(37, 99, 235, 0.11); }
+.admin-red-shell .red-market-stat-pill:nth-child(4n + 3) i { color: #15803d !important; background: rgba(21, 128, 61, 0.11); }
+.admin-red-shell .red-market-stat-pill:nth-child(4n + 4) i { color: #d97706 !important; background: rgba(217, 119, 6, 0.12); }
+
+.admin-red-shell .red-market-stat-pill:hover {
+  transform: translateY(-3px) scale(1.015);
+  background: #ffffff;
+  box-shadow: 0 12px 22px rgba(61, 10, 24, 0.1);
+}
+
+.admin-red-shell .red-market-stat-pill span { font-size: 0.75rem; font-weight: 650; }
+.admin-red-shell .red-market-stat-pill strong { font-size: 1.18rem; letter-spacing: -0.03em; }
+
+.admin-red-shell .red-ring { width: 102px; box-shadow: 0 10px 20px rgba(61, 10, 24, 0.08); }
+.admin-red-shell .red-ring::after { inset: 11px; }
+.admin-red-shell .red-ring span { font-size: 1.1rem; }
+.admin-red-shell .red-ring-metric { gap: 0.75rem; }
+
+.admin-red-shell .red-bar-chart { height: 254px; margin-top: 1.45rem; }
+.admin-red-shell .red-bar-column { height: 222px; }
+.admin-red-shell .red-bar { border-radius: 10px 10px 3px 3px; transition: height 280ms ease, filter 220ms ease; }
+.admin-red-shell .red-bar-column:hover .red-bar { filter: brightness(1.1); }
+
+.admin-red-shell .red-filter-row button,
+.admin-red-shell .red-filter-row select,
+.admin-red-shell .red-filter-row input {
+  min-height: 42px;
+  border-radius: 12px;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.admin-red-shell .red-filter-row button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(117, 21, 43, 0.34);
+  box-shadow: 0 8px 16px rgba(61, 10, 24, 0.1);
+}
+
+.admin-red-shell .red-schedule-card .table-responsive { border-radius: 14px; max-height: 460px; }
+.admin-red-shell .red-schedule-table thead th { position: sticky; top: 0; z-index: 1; }
+.admin-red-shell .red-schedule-table tbody tr:nth-child(even) td { background: rgba(117, 21, 43, 0.025); }
+.admin-red-shell .red-schedule-table tbody tr { transition: background 180ms ease, transform 180ms ease; }
+.admin-red-shell .red-schedule-table tbody tr:hover td { background: rgba(117, 21, 43, 0.08) !important; }
+.admin-red-shell .red-schedule-table th,
+.admin-red-shell .red-schedule-table td { padding: 0.9rem 1rem !important; }
+
+.admin-red-shell .admin-nav-item { margin-bottom: 0.2rem; border-radius: 14px !important; }
+.admin-red-shell .admin-nav-item i { transition: transform 200ms ease; }
+.admin-red-shell .admin-nav-item:hover i,
+.admin-red-shell .admin-nav-item.active i { transform: scale(1.12); }
+.admin-red-shell .admin-nav-item.active { position: relative; }
+.admin-red-shell .admin-nav-item.active::before { content: ""; position: absolute; left: 0; top: 25%; bottom: 25%; width: 3px; border-radius: 999px; background: #ffffff; }
+
+[data-theme="dark"] .admin-red-shell .red-market-stat-pill { background: rgba(255, 255, 255, 0.055) !important; }
+[data-theme="dark"] .admin-red-shell .red-market-stat-pill:hover { background: rgba(255, 255, 255, 0.09) !important; }
+[data-theme="dark"] .admin-red-shell .red-schedule-table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.025); }
+[data-theme="dark"] .admin-red-shell .red-schedule-table tbody tr:hover td { background: rgba(117, 21, 43, 0.22) !important; }
+
+@media (max-width: 991px) {
+  .admin-red-shell .dashboard-content.red-dashboard-page { padding: 0 !important; }
+  .admin-red-shell .red-dashboard-grid { gap: 1rem; }
+  .admin-red-shell .red-card-primary { min-height: 250px; }
+}
+
+@media (max-width: 520px) {
+  .admin-red-shell .red-card-primary,
+  .admin-red-shell .red-market-stats-card,
+  .admin-red-shell .red-traffic-card,
+  .admin-red-shell .red-analytics-card,
+  .admin-red-shell .red-schedule-card { padding: 1.1rem !important; }
+  .admin-red-shell .red-ring-row { gap: 0.6rem; }
+  .admin-red-shell .red-ring { width: 82px; }
+  .admin-red-shell .red-bar-chart { gap: 0.45rem; }
+}
+
+/* Lighter SaaS color system for Admin and Super Admin dashboards. */
+.admin-red-shell.dashboard-shell {
+  background:
+    radial-gradient(circle at 10% 4%, rgba(117, 21, 43, 0.055), transparent 25%),
+    linear-gradient(145deg, #f8fafc 0%, #fdfbfc 52%, #f7f8fb 100%) !important;
+}
+
+.admin-red-shell .red-glass-card,
+.admin-red-shell .red-mini-campaign-card,
+.admin-red-shell .admin-table-container,
+.admin-red-shell .dashboard-section {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid #e7e9ee !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
+}
+
+.admin-red-shell .red-glass-card:hover,
+.admin-red-shell .red-mini-campaign-card:hover,
+.admin-red-shell .admin-table-container:hover,
+.admin-red-shell .dashboard-section:hover {
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.11) !important;
+}
+
+.admin-red-shell .red-card-primary {
+  background:
+    radial-gradient(circle at 86% 22%, rgba(255, 255, 255, 0.21), transparent 22%),
+    radial-gradient(circle at 10% 105%, rgba(255, 255, 255, 0.11), transparent 35%),
+    linear-gradient(135deg, #8f1d33 0%, #6f1529 58%, #46101d 100%) !important;
+  box-shadow: 0 18px 38px rgba(103, 22, 41, 0.2) !important;
+}
+
+.admin-red-shell .red-card-primary::after {
+  border-color: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 0 0 26px rgba(255, 255, 255, 0.035), 0 0 0 54px rgba(255, 255, 255, 0.025);
+}
+
+.admin-red-shell .red-card-menu,
+.admin-red-shell .red-platform-icons span {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #7c1830 !important;
+  border-color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.admin-red-shell .red-campaign-search {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.72) !important;
+  color: #1f2937;
+}
+
+.admin-red-shell .red-campaign-search input,
+.admin-red-shell .red-campaign-search input::placeholder { color: #667085 !important; }
+
+.admin-red-shell .red-glass-card h2,
+.admin-red-shell .red-mini-campaign-card strong,
+.admin-red-shell .red-market-stat-pill strong { color: #182230 !important; }
+
+.admin-red-shell .red-market-stat-pill {
+  background: #ffffff !important;
+  border-color: #edf0f4 !important;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.035);
+}
+
+.admin-red-shell .red-market-stat-pill:hover { background: #ffffff !important; }
+
+.admin-red-shell .red-market-stat-pill:nth-child(4n + 1) i { color: #7c1830 !important; background: #f8e9ed !important; }
+.admin-red-shell .red-market-stat-pill:nth-child(4n + 2) i { color: #2563eb !important; background: #eaf2ff !important; }
+.admin-red-shell .red-market-stat-pill:nth-child(4n + 3) i { color: #15803d !important; background: #e9f8ef !important; }
+.admin-red-shell .red-market-stat-pill:nth-child(4n + 4) i { color: #c26b09 !important; background: #fff3e2 !important; }
+
+.admin-red-shell .red-mini-campaign-card:nth-child(1) .red-social-icon { color: #15803d !important; background: #e9f8ef !important; }
+.admin-red-shell .red-mini-campaign-card:nth-child(2) .red-social-icon { color: #2563eb !important; background: #eaf2ff !important; }
+.admin-red-shell .red-mini-campaign-card:nth-child(3) .red-social-icon { color: #7e22ce !important; background: #f4ebff !important; }
+
+.admin-red-shell .red-analytics-card { background: #ffffff !important; }
+.admin-red-shell .red-legend-row span { color: #667085; }
+.admin-red-shell .legend-facebook { background: #7c1830 !important; }
+.admin-red-shell .legend-instagram { background: #2563eb !important; }
+.admin-red-shell .legend-youtube { background: #7e22ce !important; }
+.admin-red-shell .legend-add { border-color: #d97706 !important; }
+.admin-red-shell .red-bar { background: linear-gradient(180deg, #b7687c 0%, #8f1d33 52%, #5e1224 100%) !important; }
+.admin-red-shell .red-bar-column:nth-child(3n + 2) .red-bar { background: linear-gradient(180deg, #86b7ff, #2563eb) !important; }
+.admin-red-shell .red-bar-column:nth-child(3n) .red-bar { background: linear-gradient(180deg, #a7e2bd, #15803d) !important; }
+
+.admin-red-shell .red-schedule-table thead th { background: #f7f8fa !important; color: #475467 !important; }
+.admin-red-shell .red-schedule-table tbody tr:nth-child(even) td { background: #fbfcfd !important; }
+.admin-red-shell .red-schedule-table tbody tr:hover td { background: #f8edf0 !important; }
+
+.admin-red-shell .admin-topbar {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: #e7e9ee !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.admin-red-shell .admin-search-pill,
+.admin-red-shell .admin-language-pill,
+.admin-red-shell .admin-icon-button,
+.admin-red-shell .admin-profile-button,
+.admin-red-shell .admin-theme-switch {
+  background: #ffffff !important;
+  border-color: #e7e9ee !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="dark"] .admin-red-shell.dashboard-shell {
+  background: linear-gradient(145deg, #101827 0%, #151b28 55%, #0f1723 100%) !important;
+}
+
+[data-theme="dark"] .admin-red-shell .red-glass-card,
+[data-theme="dark"] .admin-red-shell .red-mini-campaign-card,
+[data-theme="dark"] .admin-red-shell .admin-table-container,
+[data-theme="dark"] .admin-red-shell .dashboard-section {
+  background: #1b2638 !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .admin-red-shell .red-card-primary {
+  background: radial-gradient(circle at 86% 22%, rgba(255, 255, 255, 0.11), transparent 22%), linear-gradient(135deg, #6e1b2d, #431321 100%) !important;
+}
+
+[data-theme="dark"] .admin-red-shell .red-market-stat-pill,
+[data-theme="dark"] .admin-red-shell .red-market-stat-pill:hover { background: #202d40 !important; border-color: rgba(255, 255, 255, 0.075) !important; }
+[data-theme="dark"] .admin-red-shell .red-glass-card h2,
+[data-theme="dark"] .admin-red-shell .red-mini-campaign-card strong,
+[data-theme="dark"] .admin-red-shell .red-market-stat-pill strong { color: #f8fafc !important; }
+[data-theme="dark"] .admin-red-shell .red-schedule-table thead th { background: #202d40 !important; color: #e5e7eb !important; }
+[data-theme="dark"] .admin-red-shell .red-schedule-table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.025) !important; }
+[data-theme="dark"] .admin-red-shell .red-schedule-table tbody tr:hover td { background: rgba(143, 29, 51, 0.22) !important; }
+
+/* Dark admin workspace: charcoal surfaces and refined controls. */
+html[data-theme="dark"] .admin-red-shell.dashboard-shell {
+  background: linear-gradient(180deg, #16070d 0%, #210a14 48%, #1a0e16 100%) !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-sidebar {
+  background: linear-gradient(180deg, #350b16 0%, #250914 48%, #1a0b12 100%) !important;
+  box-shadow: 20px 0 54px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-sidebar-header {
+  min-height: 68px;
+  padding: 0.5rem 0.7rem 1rem !important;
+}
+
+.admin-red-shell .admin-brand-logo { min-width: 0; }
+.admin-red-shell .admin-brand-logo-img {
+  width: min(158px, 100%) !important;
+  max-height: 48px !important;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-topbar {
+  background: rgba(31, 27, 32, 0.82) !important;
+  border-color: #3a3138 !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .dashboard-content > .d-flex:first-child h1 {
+  font-size: clamp(1.45rem, 2vw, 1.85rem) !important;
+  letter-spacing: -0.03em;
+}
+
+html[data-theme="dark"] .admin-red-shell .dashboard-content > .d-flex:first-child .section-label {
+  color: #f0a3b2 !important;
+  letter-spacing: 0.14em;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container,
+html[data-theme="dark"] .admin-red-shell .dashboard-section {
+  background: #1f1b20 !important;
+  border: 1px solid #3a3138 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container .table-responsive {
+  border: 1px solid #3a3138;
+  border-radius: 13px;
+  max-height: 620px;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container table,
+html[data-theme="dark"] .admin-red-shell .dashboard-table {
+  --bs-table-bg: #1f1b20;
+  --bs-table-color: #f8fafc;
+  --bs-table-border-color: #3a3138;
+  --bs-table-hover-bg: #32262f;
+  --bs-table-hover-color: #ffffff;
+  margin-bottom: 0;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container thead th,
+html[data-theme="dark"] .admin-red-shell .dashboard-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #2a2228 !important;
+  color: #f8fafc !important;
+  border-color: #3a3138 !important;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container tbody td,
+html[data-theme="dark"] .admin-red-shell .dashboard-table tbody td {
+  padding: 1rem 1.05rem !important;
+  background: #241e24 !important;
+  border-color: #3a3138 !important;
+  vertical-align: middle;
+}
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container tbody tr:nth-child(even) td,
+html[data-theme="dark"] .admin-red-shell .dashboard-table tbody tr:nth-child(even) td { background: #1f1b20 !important; }
+html[data-theme="dark"] .admin-red-shell .admin-table-container tbody tr:hover td,
+html[data-theme="dark"] .admin-red-shell .dashboard-table tbody tr:hover td { background: #32262f !important; }
+
+html[data-theme="dark"] .admin-red-shell .search-box .form-control,
+html[data-theme="dark"] .admin-red-shell .admin-table-container .form-control,
+html[data-theme="dark"] .admin-red-shell .admin-table-container .form-select {
+  min-height: 42px;
+  background: #2a2228 !important;
+  border: 1px solid #4a3b43 !important;
+  border-radius: 12px !important;
+  color: #f8fafc !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .search-box .form-control::placeholder,
+html[data-theme="dark"] .admin-red-shell .admin-table-container .form-control::placeholder { color: #a8a8a8 !important; }
+html[data-theme="dark"] .admin-red-shell .search-box .form-control:focus,
+html[data-theme="dark"] .admin-red-shell .admin-table-container .form-control:focus,
+html[data-theme="dark"] .admin-red-shell .admin-table-container .form-select:focus {
+  border-color: #b11226 !important;
+  box-shadow: 0 0 0 3px rgba(177, 18, 38, 0.2) !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .btn {
+  border-radius: 11px;
+  font-weight: 700;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+html[data-theme="dark"] .admin-red-shell .btn:hover:not(:disabled) { transform: translateY(-1px); }
+html[data-theme="dark"] .admin-red-shell .btn-accent-custom,
+html[data-theme="dark"] .admin-red-shell .btn-success,
+html[data-theme="dark"] .admin-red-shell .btn-primary {
+  background: linear-gradient(135deg, #b11226, #7f0e1d) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(127, 14, 29, 0.28) !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .btn-danger,
+html[data-theme="dark"] .admin-red-shell .btn-outline-danger {
+  background: #551818 !important;
+  border-color: #783030 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .btn-outline-secondary,
+html[data-theme="dark"] .admin-red-shell .btn-outline-info,
+html[data-theme="dark"] .admin-red-shell .btn-secondary {
+  background: #2c2c2c !important;
+  border-color: #555555 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-red-shell .btn-warning { background: #8b5a12 !important; border-color: #a97016 !important; color: #ffffff !important; }
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container .d-flex.gap-2 > .btn,
+html[data-theme="dark"] .admin-red-shell .admin-table-container .d-flex.gap-2 > button {
+  min-height: 36px;
+  padding-inline: 0.85rem;
+}
+
+html[data-theme="dark"] .admin-red-shell .badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+html[data-theme="dark"] .admin-red-shell .bg-success-subtle { background: rgba(34, 197, 94, 0.14) !important; border-color: rgba(34, 197, 94, 0.28) !important; }
+html[data-theme="dark"] .admin-red-shell .text-success { color: #86efac !important; }
+html[data-theme="dark"] .admin-red-shell .bg-warning-subtle { background: rgba(245, 158, 11, 0.14) !important; border-color: rgba(245, 158, 11, 0.28) !important; }
+html[data-theme="dark"] .admin-red-shell .text-warning { color: #fcd34d !important; }
+html[data-theme="dark"] .admin-red-shell .bg-danger-subtle { background: rgba(239, 68, 68, 0.14) !important; border-color: rgba(239, 68, 68, 0.28) !important; }
+html[data-theme="dark"] .admin-red-shell .text-danger { color: #fca5a5 !important; }
+html[data-theme="dark"] .admin-red-shell .bg-primary-subtle { background: rgba(59, 130, 246, 0.14) !important; border-color: rgba(59, 130, 246, 0.28) !important; }
+html[data-theme="dark"] .admin-red-shell .text-primary { color: #93c5fd !important; }
+html[data-theme="dark"] .admin-red-shell .bg-secondary-subtle { background: rgba(168, 85, 247, 0.14) !important; border-color: rgba(168, 85, 247, 0.28) !important; }
+
+html[data-theme="dark"] .admin-red-shell .admin-table-container .text-center.text-muted {
+  padding-block: 3rem !important;
+  color: #a8a8a8 !important;
+}
+
+/* Keep Admin/Super Admin menus above every dashboard card and chart. */
+.admin-red-shell .admin-main,
+.admin-red-shell .admin-topbar,
+.admin-red-shell .admin-topbar-actions {
+  overflow: visible !important;
+}
+
+.admin-red-shell .admin-topbar {
+  position: relative;
+  z-index: 10000 !important;
+}
+
+.admin-red-shell .admin-topbar-actions {
+  position: relative;
+  z-index: 10001;
+}
+
+.admin-red-shell .admin-profile-menu {
+  z-index: 10002 !important;
+  overflow: visible !important;
+  border-radius: 14px !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26) !important;
+}
+
+@media (max-width: 991px) {
+  .admin-red-shell .admin-topbar { z-index: 10000 !important; }
+  .admin-red-shell .admin-profile-menu { right: 0; }
+}
+
+/* Theme-aware logo and public-layout consistency. */
+.theme-aware-logo {
+  display: block;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.app-main-content {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.app-main-content > .contact-page {
+  flex: 1 0 auto;
+}
+
+.footer-premium {
+  flex: 0 0 auto;
+}
+
+html[data-theme="dark"] .app-public-header,
+html[data-theme="dark"] .footer-premium {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive Admin and Super Admin navigation drawer. */
+.admin-sidebar-backdrop { display: none; }
+
+@media (max-width: 1024px) {
+  .admin-red-shell .admin-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 1rem !important;
+  }
+
+  .admin-red-shell .admin-sidebar {
+    display: flex !important;
+    flex-direction: column;
+    width: min(300px, calc(100vw - 40px)) !important;
+    height: 100dvh !important;
+    transform: translateX(-115%) !important;
+    transition: transform 260ms ease !important;
+    z-index: 30001 !important;
+    overscroll-behavior: contain;
+  }
+
+  .admin-red-shell .admin-sidebar.is-open { transform: translateX(0) !important; }
+
+  .admin-red-shell .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(5, 5, 8, 0.52);
+    backdrop-filter: blur(2px);
+    z-index: 30000;
+    cursor: default;
+  }
+
+  .admin-red-shell .admin-sidebar-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: inherit;
+  }
+
+  .admin-red-shell .admin-nav {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-bottom: 1rem !important;
+  }
+
+  .admin-red-shell .admin-logout {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto !important;
+    background: inherit !important;
+  }
+
+  .admin-red-shell .admin-nav-item { min-height: 48px !important; }
+  .admin-red-shell .admin-topbar { border-radius: 16px !important; }
+  .admin-red-shell .dashboard-content { min-width: 0; }
+}
+
+@media (max-width: 767px) {
+  .admin-red-shell .admin-main { padding: 0.75rem !important; }
+  .admin-red-shell .admin-topbar { padding: 0.65rem 0.75rem !important; }
+  .admin-red-shell .admin-welcome-block { gap: 0.55rem; }
+  .admin-red-shell .admin-topbar-actions { gap: 0.4rem !important; }
+  .admin-red-shell .admin-search-pill { order: 10; width: 100% !important; }
+  .admin-red-shell .admin-language-pill select { min-width: 54px !important; }
+
+  .admin-red-shell .dashboard-content > .d-flex:first-child,
+  .admin-red-shell .dashboard-content .d-flex.justify-content-between {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+
+  .admin-red-shell .dashboard-content .d-flex.gap-2,
+  .admin-red-shell .admin-table-container .d-flex.gap-2 { flex-wrap: wrap !important; }
+  .admin-red-shell .admin-table-container { padding: 1rem !important; }
+  .admin-red-shell .admin-table-container .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-red-shell .admin-table-container table { min-width: 680px; }
+  .admin-red-shell .red-schedule-table { min-width: 680px; }
+  .admin-red-shell .red-dashboard-grid { min-width: 0; }
+  .admin-red-shell .red-filter-row { gap: 0.55rem; }
+  .admin-red-shell .red-filter-row > * { flex: 1 1 auto; }
+}
+
+@media (max-width: 420px) {
+  .admin-red-shell .admin-avatar-photo { display: none !important; }
+  .admin-red-shell .admin-theme-switch { width: 64px !important; }
+  .admin-red-shell .admin-language-pill { padding-inline: 0.45rem !important; }
+  .admin-red-shell .red-overview-main { grid-template-columns: auto 1fr; }
+  .admin-red-shell .red-platform-icons { display: none; }
 }

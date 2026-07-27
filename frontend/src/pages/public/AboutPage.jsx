@@ -1,5 +1,5 @@
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import aboutImg from "../../assets/hero.png";
+
 import usePageTitle from "../../hooks/usePageTitle.js";
 
 export default function AboutPage() {
@@ -41,7 +41,7 @@ export default function AboutPage() {
       <section className="about-hero premium-hero">
         <div className="container">
           <div className="about-hero-content">
-            <img src={aboutImg} alt="About" className="hero-image" />
+
             <span className="section-label">{t("aboutEyebrow")}</span>
             <h2>{t("aboutHeroTitle")}</h2>
             <p>{t("aboutHeroDesc")}</p>

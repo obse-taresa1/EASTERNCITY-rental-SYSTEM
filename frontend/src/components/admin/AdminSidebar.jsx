@@ -1,14 +1,14 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
-import darkLogo from "../../assets/images/eastern-cities-header-logo-white.png";
+import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
 import { useTheme } from "../../context/ThemeContext.jsx";
 
-function NavItem({ link }) {
+function NavItem({ link, onNavigate }) {
   const hasChevron = /Management|Center|Monitoring|Reports|Users|Listings|Categories|Promotion|Verification|Support|Settings/.test(link.label);
 
   return (
-    <NavLink key={link.to} to={link.to} className="admin-nav-item">
+    <NavLink key={link.to} to={link.to} className="admin-nav-item" onClick={onNavigate}>
       <i className={`bi ${link.icon}`} />
       <span>{link.label}</span>
       {hasChevron && <i className="bi bi-chevron-down admin-nav-chevron" />}
@@ -16,7 +16,7 @@ function NavItem({ link }) {
   );
 }
 
-export default function AdminSidebar({ variant = "admin" }) {
+export default function AdminSidebar({ variant = "admin", isOpen = false, onClose }) {
   const { logout } = useAuth();
   const { theme } = useTheme();
   const isSuperAdmin = variant === "superadmin";
@@ -24,19 +24,19 @@ export default function AdminSidebar({ variant = "admin" }) {
   const links = isSuperAdmin ? superAdminLinks : adminLinks;
 
   return (
-    <aside className="admin-sidebar admin-red-sidebar">
+    <aside className={`admin-sidebar admin-red-sidebar${isOpen ? " is-open" : ""}`} aria-hidden={!isOpen ? undefined : false}>
       <div className="admin-sidebar-header">
         <NavLink to={isSuperAdmin ? "/super-admin-dashboard" : "/admin-dashboard"} className="admin-brand admin-brand-logo" aria-label="Eastern Cities dashboard home">
           <img src={logoSrc} alt="Eastern Cities" className="admin-brand-logo-img theme-aware-logo" />
         </NavLink>
-        <button className="admin-sidebar-menu" type="button" aria-label="Collapse menu">
-          <i className="bi bi-list" />
+        <button className="admin-sidebar-menu" type="button" aria-label="Close menu" onClick={onClose}>
+          <i className="bi bi-x-lg" />
         </button>
       </div>
 
       <nav className="admin-nav mt-3">
         {links.map((link) => (
-          <NavItem key={link.to} link={link} />
+          <NavItem key={link.to} link={link} onNavigate={onClose} />
         ))}
       </nav>
 

@@ -202,7 +202,7 @@ function findSearchRoute(query, routes) {
   });
 }
 
-export default function AdminTopbar({ title }) {
+export default function AdminTopbar({ title, onMenuToggle }) {
   const { currentUser, user, logout } = useAuth();
   const activeUser = user || currentUser;
   const navigate = useNavigate();
@@ -310,6 +310,7 @@ export default function AdminTopbar({ title }) {
           className="admin-menu-button"
           type="button"
           aria-label="Open menu"
+          onClick={onMenuToggle}
         >
           <i className="bi bi-list" />
         </button>
