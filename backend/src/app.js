@@ -20,30 +20,9 @@ app.use(
   }),
 );
 
-const defaultCorsOrigins = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5174',
-  'http://localhost:4173',
-  'http://127.0.0.1:4173',
-];
-
-const corsAllowlist = [
-  ...(process.env.CORS_ORIGIN || process.env.CORS_ORIGINS || '')
-  .split(',')
-  .map((origin) => origin.trim())
-    .filter(Boolean),
-  ...defaultCorsOrigins,
-];
-
 app.use(cors({
-  origin(origin, callback) {
-    if (!origin || corsAllowlist.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('CORS origin is not allowed.'));
-  },
+  origin: process.env.CLIENT_ORIGIN || '*',
+  credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));

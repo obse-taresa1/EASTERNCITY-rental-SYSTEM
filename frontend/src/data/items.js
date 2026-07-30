@@ -106,6 +106,8 @@ export const items = [
 export const categories = [
   {
     id: "electronics-cameras",
+    nameKey: "categoryElectronicsCameras",
+    descriptionKey: "categoryElectronicsCamerasDesc",
     name: "Electronics & Cameras",
     icon: "bi-camera",
     description:
@@ -113,6 +115,8 @@ export const categories = [
   },
   {
     id: "cars-bikes",
+    nameKey: "categoryCarsBikes",
+    descriptionKey: "categoryCarsBikesDesc",
     name: "Cars & Bikes",
     icon: "bi-car-front",
     description:
@@ -120,6 +124,8 @@ export const categories = [
   },
   {
     id: "party-wedding",
+    nameKey: "categoryPartyWedding",
+    descriptionKey: "categoryPartyWeddingDesc",
     name: "Party & Wedding",
     icon: "bi-balloon",
     description:
@@ -127,6 +133,8 @@ export const categories = [
   },
   {
     id: "event-essentials",
+    nameKey: "categoryEventEssentials",
+    descriptionKey: "categoryEventEssentialsDesc",
     name: "Event Essentials",
     icon: "bi-calendar-event",
     description:
@@ -134,6 +142,8 @@ export const categories = [
   },
   {
     id: "vehicles",
+    nameKey: "categoryVehicles",
+    descriptionKey: "categoryVehiclesDesc",
     name: "Vehicles",
     icon: "bi-truck",
     description:
@@ -141,6 +151,8 @@ export const categories = [
   },
   {
     id: "gadgets",
+    nameKey: "categoryGadgets",
+    descriptionKey: "categoryGadgetsDesc",
     name: "Gadgets",
     icon: "bi-controller",
     description:
@@ -148,6 +160,8 @@ export const categories = [
   },
   {
     id: "construction-diy",
+    nameKey: "categoryConstructionDiy",
+    descriptionKey: "categoryConstructionDiyDesc",
     name: "Construction & DIY",
     icon: "bi-tools",
     description:
@@ -155,6 +169,8 @@ export const categories = [
   },
   {
     id: "furniture",
+    nameKey: "categoryFurniture",
+    descriptionKey: "categoryFurnitureDesc",
     name: "Furniture",
     icon: "bi-house-heart",
     description:
@@ -162,6 +178,8 @@ export const categories = [
   },
   {
     id: "home-appliances",
+    nameKey: "categoryHomeAppliances",
+    descriptionKey: "categoryHomeAppliancesDesc",
     name: "Home Appliances",
     icon: "bi-house-gear",
     description:
@@ -169,6 +187,8 @@ export const categories = [
   },
   {
     id: "sports-outdoor",
+    nameKey: "categorySportsOutdoor",
+    descriptionKey: "categorySportsOutdoorDesc",
     name: "Sports & Outdoor",
     icon: "bi-bicycle",
     description:
@@ -176,6 +196,8 @@ export const categories = [
   },
   {
     id: "travel-camping",
+    nameKey: "categoryTravelCamping",
+    descriptionKey: "categoryTravelCampingDesc",
     name: "Travel & Camping",
     icon: "bi-compass",
     description:
@@ -183,6 +205,8 @@ export const categories = [
   },
   {
     id: "fashion-accessories",
+    nameKey: "categoryFashionAccessories",
+    descriptionKey: "categoryFashionAccessoriesDesc",
     name: "Fashion & Accessories",
     icon: "bi-handbag",
     description:
@@ -190,6 +214,8 @@ export const categories = [
   },
   {
     id: "music-audio",
+    nameKey: "categoryMusicAudio",
+    descriptionKey: "categoryMusicAudioDesc",
     name: "Music & Audio Equipment",
     icon: "bi-music-note-beamed",
     description:
@@ -197,6 +223,8 @@ export const categories = [
   },
   {
     id: "office-equipment",
+    nameKey: "categoryOfficeEquipment",
+    descriptionKey: "categoryOfficeEquipmentDesc",
     name: "Office Equipment",
     icon: "bi-printer",
     description:
@@ -204,6 +232,8 @@ export const categories = [
   },
   {
     id: "beauty-salon",
+    nameKey: "categoryBeautySalon",
+    descriptionKey: "categoryBeautySalonDesc",
     name: "Beauty & Salon Equipment",
     icon: "bi-scissors",
     description:
@@ -211,6 +241,8 @@ export const categories = [
   },
   {
     id: "baby-kids",
+    nameKey: "categoryBabyKids",
+    descriptionKey: "categoryBabyKidsDesc",
     name: "Baby & Kids Essentials",
     icon: "bi-balloon-heart",
     description:
@@ -218,6 +250,8 @@ export const categories = [
   },
   {
     id: "gaming-equipment",
+    nameKey: "categoryGamingEquipment",
+    descriptionKey: "categoryGamingEquipmentDesc",
     name: "Gaming Equipment",
     icon: "bi-joystick",
     description:

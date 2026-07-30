@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getInitials } from "../../utils/user.js";
 import {
   isVerificationApproved,
@@ -7,6 +8,7 @@ import {
 } from "../../utils/verificationStatus.js";
 
 export default function ProfilePanel({ user, open, onClose, onLogout, dashboardPath = "/dashboard" }) {
+  const { t } = useLanguage();
   const [showImage, setShowImage] = useState(false);
   if (!open) return null;
 
@@ -14,15 +16,15 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
 
   const PANEL_ITEMS = isAdminOrSuperAdmin
     ? [
-        { to: dashboardPath, label: "Dashboard", icon: "bi-speedometer2" },
+        { to: dashboardPath, labelKey: "dashboard", icon: "bi-speedometer2" },
       ]
     : [
-        { to: dashboardPath, label: "Dashboard", icon: "bi-speedometer2" },
-        { to: "/my-listings", label: "My Listings", icon: "bi-card-checklist" },
-        { to: "/my-bookings", label: "My Bookings", icon: "bi-calendar-check" },
-        { to: "/messages", label: "Messages", icon: "bi-chat-dots" },
-        { to: "/notifications", label: "Notifications", icon: "bi-bell" },
-        { to: "/dashboard-settings", label: "Settings", icon: "bi-gear" },
+        { to: dashboardPath, labelKey: "dashboard", icon: "bi-speedometer2" },
+        { to: "/my-listings", labelKey: "myListings", icon: "bi-card-checklist" },
+        { to: "/my-bookings", labelKey: "myBookings", icon: "bi-calendar-check" },
+        { to: "/messages", labelKey: "messages", icon: "bi-chat-dots" },
+        { to: "/notifications", labelKey: "notifications", icon: "bi-bell" },
+        { to: "/dashboard-settings", labelKey: "settings", icon: "bi-gear" },
       ];
 
   const initials = getInitials(user?.name);
@@ -68,8 +70,8 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
             )}
           </div>
           <div>
-            <strong>{user?.name || "User"}</strong>
-            <span>{user?.email || "Email not available"}</span>
+            <strong>{user?.name || t("user")}</strong>
+            <span>{user?.email || t("emailNotAvailable")}</span>
           </div>
         </div>
 
@@ -78,7 +80,7 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
             <i className={`bi ${isVerified ? "bi-shield-check text-success" : "bi-shield-exclamation text-warning"}`} />
             <div>
               <strong>{verificationStatus}</strong>
-              <span>National ID review protects renters and owners.</span>
+              <span>{t("nationalIdReviewNote")}</span>
             </div>
           </div>
         )}
@@ -87,16 +89,16 @@ export default function ProfilePanel({ user, open, onClose, onLogout, dashboardP
           {PANEL_ITEMS.map((item) => (
             <Link
               to={item.to}
-              key={item.label}
+              key={item.labelKey}
               onClick={onClose}
             >
               <i className={`bi ${item.icon}`} />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </Link>
           ))}
           <button type="button" onClick={onLogout}>
             <i className="bi bi-box-arrow-right" />
-            <span>Log out</span>
+            <span>{t("logOut")}</span>
           </button>
         </nav>
       </aside>

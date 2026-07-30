@@ -3,14 +3,44 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
 import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
 import { useTheme } from "../../context/ThemeContext.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
+
+const labelKeyMap = {
+  Dashboard: "dashboard",
+  "Users Management": "userManagement",
+  "User Management": "userManagement",
+  "Admin Management": "adminPanel",
+  "Listing Management": "manageListings",
+  "Categories Management": "manageCategories",
+  "Bookings Management": "manageBookings",
+  "Payments & Revenue": "payment",
+  "Promotion Management": "managePromotions",
+  "Promotion History": "promotionHistory",
+  "Featured Listings": "featured",
+  "Verification Center": "verificationCenter",
+  "Reviews & Ratings": "reviewsRatings",
+  "Reports & Complaints": "reports",
+  "Support Center": "support",
+  "Contact Messages": "contactMessages",
+  Notifications: "notifications",
+  Analytics: "analytics",
+  "Platform Analytics": "platformAnalytics",
+  "Platform Overview": "platformOverview",
+  "Platform Monitoring": "platformMonitoring",
+  "Security Center": "securityCenter",
+  "Activity Logs": "activityLogs",
+  Settings: "settings",
+};
 
 function NavItem({ link, onNavigate }) {
+  const { t } = useLanguage();
   const hasChevron = /Management|Center|Monitoring|Reports|Users|Listings|Categories|Promotion|Verification|Support|Settings/.test(link.label);
+  const label = t(labelKeyMap[link.label]) || link.label;
 
   return (
     <NavLink key={link.to} to={link.to} className="admin-nav-item" onClick={onNavigate}>
       <i className={`bi ${link.icon}`} />
-      <span>{link.label}</span>
+      <span>{label}</span>
       {hasChevron && <i className="bi bi-chevron-down admin-nav-chevron" />}
     </NavLink>
   );
@@ -19,6 +49,7 @@ function NavItem({ link, onNavigate }) {
 export default function AdminSidebar({ variant = "admin", isOpen = false, onClose }) {
   const { logout } = useAuth();
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const isSuperAdmin = variant === "superadmin";
   const logoSrc = theme === "dark" ? darkLogo : logo;
   const links = isSuperAdmin ? superAdminLinks : adminLinks;
@@ -42,7 +73,7 @@ export default function AdminSidebar({ variant = "admin", isOpen = false, onClos
 
       <button type="button" className="admin-logout mt-auto mb-3" onClick={logout}>
         <i className="bi bi-box-arrow-right" />
-        <span>Logout</span>
+        <span>{t("logout")}</span>
       </button>
     </aside>
   );

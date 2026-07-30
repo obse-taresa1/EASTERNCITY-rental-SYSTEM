@@ -11,9 +11,36 @@ import { getInitials } from "../../utils/user.js";
 const LANGUAGES = [
   { code: "en", abbr: "EN", label: "English" },
   { code: "am", abbr: "AM", label: "Amharic" },
-  { code: "om", abbr: "OM", label: "Afaan Oromo" },
+  { code: "af", abbr: "AF", label: "Afaan Oromo" },
   { code: "so", abbr: "SO", label: "Somali" },
 ];
+
+const routeLabelKeyMap = {
+  Dashboard: "dashboard",
+  "Users Management": "userManagement",
+  "User Management": "userManagement",
+  "Admin Management": "adminPanel",
+  "Listing Management": "manageListings",
+  "Categories Management": "manageCategories",
+  "Bookings Management": "manageBookings",
+  "Payments & Revenue": "payment",
+  "Promotion Management": "managePromotions",
+  "Promotion History": "promotionHistory",
+  "Featured Listings": "featured",
+  "Verification Center": "verificationCenter",
+  "Reviews & Ratings": "reviewsRatings",
+  "Reports & Complaints": "reports",
+  "Support Center": "support",
+  "Contact Messages": "contactMessages",
+  Notifications: "notifications",
+  Analytics: "analytics",
+  "Platform Analytics": "platformAnalytics",
+  "Platform Overview": "platformOverview",
+  "Platform Monitoring": "platformMonitoring",
+  "Security Center": "securityCenter",
+  "Activity Logs": "activityLogs",
+  Settings: "settings",
+};
 
 const ADMIN_SEARCH_ROUTES = [
   {
@@ -209,7 +236,7 @@ export default function AdminTopbar({ title, onMenuToggle }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   const isSuperAdmin = location.pathname.startsWith("/super-admin-dashboard");
   const routes = isSuperAdmin ? SUPER_ADMIN_SEARCH_ROUTES : ADMIN_SEARCH_ROUTES;
@@ -321,7 +348,7 @@ export default function AdminTopbar({ title, onMenuToggle }) {
         </button>
         <div className="admin-topbar-title">
           <p>Welcome back,</p>
-          <h1>{title || activeUser?.role || "Admin"}</h1>
+          <h1>{title || activeUser?.role || t("adminPanel")}</h1>
         </div>
       </div>
 
@@ -334,7 +361,7 @@ export default function AdminTopbar({ title, onMenuToggle }) {
           <select
             value={language}
             onChange={handleLanguageChange}
-            title="Language"
+            title={t("language")}
           >
             {LANGUAGES.map((option) => (
               <option value={option.code} key={option.code}>
@@ -363,14 +390,14 @@ export default function AdminTopbar({ title, onMenuToggle }) {
         >
           <input
             type="search"
-            placeholder="Search..."
+            placeholder={`${t("search")}...`}
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             list={
               isSuperAdmin ? "super-admin-search-routes" : "admin-search-routes"
             }
           />
-          <button type="submit" aria-label="Search">
+          <button type="submit" aria-label={t("search")}>
             <i className="bi bi-search" />
           </button>
           <datalist
@@ -379,7 +406,7 @@ export default function AdminTopbar({ title, onMenuToggle }) {
             }
           >
             {routes.map((route) => (
-              <option key={route.to} value={route.label} />
+              <option key={route.to} value={t(routeLabelKeyMap[route.label]) || route.label} />
             ))}
           </datalist>
         </form>

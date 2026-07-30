@@ -6,9 +6,11 @@ import ThemeToggle from "../common/ThemeToggle.jsx";
 import LanguageSwitcher from "../common/LanguageSwitcher.jsx";
 import ProfilePanel from "../common/ProfilePanel.jsx";
 import UserAvatar from "../common/UserAvatar.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function DashboardTopbar() {
   const { currentUser, user, logout } = useAuth();
+  const { t } = useLanguage();
   const activeUser = user || currentUser;
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -40,8 +42,8 @@ export default function DashboardTopbar() {
               <UserAvatar user={activeUser} />
             </div>
             <div className="topbar-user-info">
-              <strong>{activeUser?.name || "User"}</strong>
-              <span>{activeUser?.role || "member"}</span>
+              <strong>{activeUser?.name || t("user")}</strong>
+              <span>{activeUser?.role || t("member")}</span>
             </div>
             <i className={`bi bi-chevron-${open ? "up" : "down"}`}></i>
           </button>
