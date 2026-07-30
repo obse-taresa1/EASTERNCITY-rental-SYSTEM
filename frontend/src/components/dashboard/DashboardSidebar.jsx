@@ -23,40 +23,40 @@ function getInitials(name) {
 
 const NAV_SECTIONS = [
   {
-    label: "OVERVIEW",
+    labelKey: "overview",
     items: [
-      { to: "/dashboard", label: "Dashboard", icon: "bi-speedometer2", end: true },
+      { to: "/dashboard", labelKey: "dashboard", icon: "bi-speedometer2", end: true },
     ],
   },
   {
-    label: "LISTINGS",
+    labelKey: "listingsSection",
     items: [
-      { to: "/my-listings", label: "My Listings", icon: "bi-card-checklist" },
-      { to: "/list-item", label: "Add New Listing", icon: "bi-plus-circle-fill", accent: true },
+      { to: "/my-listings", labelKey: "myListings", icon: "bi-card-checklist" },
+      { to: "/list-item", labelKey: "addNewListing", icon: "bi-plus-circle-fill", accent: true },
     ],
   },
   {
-    label: "ACTIVITY",
+    labelKey: "activity",
     items: [
-      { to: "/my-bookings", label: "My Bookings", icon: "bi-calendar-check" },
-      { to: "/messages", label: "Messages", icon: "bi-chat-dots" },
-      { to: "/saved-items", label: "Saved Items", icon: "bi-heart" },
+      { to: "/my-bookings", labelKey: "myBookings", icon: "bi-calendar-check" },
+      { to: "/messages", labelKey: "messages", icon: "bi-chat-dots" },
+      { to: "/saved-items", labelKey: "savedItems", icon: "bi-heart" },
     ],
   },
   {
-    label: "ACCOUNT",
+    labelKey: "account",
     items: [
-      { to: "/reviews", label: "Reviews & Ratings", icon: "bi-star" },
-      { to: "/verification", label: "Verification Center", icon: "bi-shield-check" },
-      { to: "/dashboard-settings", label: "Settings", icon: "bi-gear" },
-      { to: "/help-center", label: "Help Center", icon: "bi-question-circle" },
+      { to: "/reviews", labelKey: "reviewsRatings", icon: "bi-star" },
+      { to: "/verification", labelKey: "verificationCenter", icon: "bi-shield-check" },
+      { to: "/dashboard-settings", labelKey: "settings", icon: "bi-gear" },
+      { to: "/help-center", labelKey: "helpCenter", icon: "bi-question-circle" },
     ],
   },
 ];
 
 export default function DashboardSidebar() {
   const { currentUser, user, logout } = useAuth();
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const activeUser = user || currentUser;
   const savedItemsRefreshToken = useRefreshToken("savedItems");
@@ -140,7 +140,7 @@ export default function DashboardSidebar() {
         </div>
 
         <div className="ud-sidebar-user-info">
-          <h5 className="ud-sidebar-name">{activeUser?.name || "User"}</h5>
+          <h5 className="ud-sidebar-name">{activeUser?.name || t("user")}</h5>
           <span className={`ud-verification-tag ${isVerified ? "verified" : "pending"}`}> 
             <i className={`bi ${isVerified ? "bi-shield-check" : "bi-shield-exclamation"}`} />
             {verificationStatus}
@@ -151,8 +151,8 @@ export default function DashboardSidebar() {
       {/* Navigation */}
       <nav className="ud-sidebar-nav">
         {NAV_SECTIONS.map((section) => (
-          <div className="ud-nav-section" key={section.label}>
-            <span className="ud-nav-section-label">{section.label}</span>
+          <div className="ud-nav-section" key={section.labelKey}>
+            <span className="ud-nav-section-label">{t(section.labelKey).toUpperCase()}</span>
             {section.items.map((item) => (
               <NavLink
                 key={item.to}
@@ -163,7 +163,7 @@ export default function DashboardSidebar() {
                 }
               >
                 <i className={`bi ${item.icon}`} />
-                <span>{item.label}</span>
+                <span>{t(item.labelKey)}</span>
               </NavLink>
             ))}
           </div>
@@ -174,7 +174,7 @@ export default function DashboardSidebar() {
       <div className="ud-sidebar-footer">
         <button type="button" className="ud-logout-btn" onClick={handleLogout}>
           <i className="bi bi-box-arrow-right" />
-          <span>Log Out</span>
+          <span>{t("logOut")}</span>
         </button>
       </div>
     </aside>

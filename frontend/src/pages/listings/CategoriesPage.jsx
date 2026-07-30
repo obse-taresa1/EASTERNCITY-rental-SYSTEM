@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { categories as rentalCategories } from '../../data/items.js';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import usePageTitle from '../../hooks/usePageTitle.js';
 import { getPublicListings } from '../../services/listingApiService.js';
 import { getCanonicalRentalCategoryId, listingMatchesRentalCategory } from '../../utils/categoryMapping.js';
@@ -23,7 +24,8 @@ const iconMap = {
 };
 
 export default function CategoriesPage() {
-  usePageTitle('Categories');
+  const { t } = useLanguage();
+  usePageTitle(t('categories'));
   const [listingCounts, setListingCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -59,7 +61,9 @@ export default function CategoriesPage() {
   }, []);
 
   const filteredCategories = rentalCategories.filter((cat) =>
-    cat.name.toLowerCase().includes(search.toLowerCase())
+    `${t(cat.nameKey) || cat.name} ${t(cat.descriptionKey) || cat.description}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
   const totalListings = Object.values(listingCounts).reduce(
@@ -72,12 +76,9 @@ export default function CategoriesPage() {
       {/* Hero Section */}
       <section className="categories-hero">
         <div className="hero-content text-center">
-          <div className="breadcrumb-pill">Home → Categories</div>
-          <h1 className="hero-title">Browse Categories</h1>
-          <p className="hero-subtitle">
-            Find rental items across Eastern Cities.<br />
-            Explore hundreds of verified rental items available in Jigjiga, Harar and Dire Dawa.
-          </p>
+          <div className="breadcrumb-pill">{t("home")} &rarr; {t("categories")}</div>
+          <h1 className="hero-title">{t("browseCategories")}</h1>
+          <p className="hero-subtitle">{t("categoriesHeroSubtitle")}</p>
         </div>
       </section>
 
@@ -91,20 +92,20 @@ export default function CategoriesPage() {
             <input 
               type="text" 
               className="premium-search-input" 
-              placeholder="Search Categories..."
+              placeholder={t("searchCategories")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="stats-wrapper">
             <div className="stat-item">
-              <strong>{rentalCategories.length}</strong> Categories
+              <strong>{rentalCategories.length}</strong> {t("categories")}
             </div>
             <div className="stat-item">
-              <strong>{totalListings}</strong> Listings
+              <strong>{totalListings}</strong> {t("listings")}
             </div>
             <div className="stat-item">
-              <strong>3</strong> Cities
+              <strong>3</strong> {t("cities")}
             </div>
           </div>
         </div>
@@ -122,9 +123,9 @@ export default function CategoriesPage() {
             ))
           ) : filteredCategories.length === 0 ? (
             <div className="empty-categories-state">
-              <h3>No categories found</h3>
-              <p>Be the first user to add an item!</p>
-              <Link to="/dashboard/list-item" className="btn btn-accent-custom mt-3">List Item</Link>
+              <h3>{t("noCategoriesFound")}</h3>
+              <p>{t("addFirstItem")}</p>
+              <Link to="/dashboard/list-item" className="btn btn-accent-custom mt-3">{t("listItem")}</Link>
             </div>
           ) : (
             filteredCategories.map((cat) => {
@@ -135,13 +136,13 @@ export default function CategoriesPage() {
                   <div className="premium-card-icon">
                     <i className={`bi ${iconClass}`} />
                   </div>
-                  <h3 className="premium-card-title">{cat.name}</h3>
+                  <h3 className="premium-card-title">{t(cat.nameKey) || cat.name}</h3>
                   <p className="premium-card-desc">
-                    {cat.description || "Explore verified rentals in this category."}
+                    {t(cat.descriptionKey) || cat.description || t("exploreVerifiedRentals")}
                   </p>
                   <div className="premium-card-footer">
-                    <span className="listing-count">{listingCounts[cat.id] || 0} Listings</span>
-                    <span className="explore-text">Explore →</span>
+                    <span className="listing-count">{listingCounts[cat.id] || 0} {t("listings")}</span>
+                    <span className="explore-text">{t("explore")} &rarr;</span>
                   </div>
                 </Link>
               );
@@ -152,9 +153,9 @@ export default function CategoriesPage() {
         {/* Bottom CTA Section */}
         <div className="bottom-cta-section mt-5 text-center">
           <div className="bottom-cta-section-inner">
-            <h2>Can't find what you're looking for?</h2>
-            <p>List your item today.</p>
-            <Link to="/dashboard/list-item" className="btn btn-primary-custom mt-3">List an Item</Link>
+            <h2>{t("categoryCtaTitle")}</h2>
+            <p>{t("categoryCtaBody")}</p>
+            <Link to="/dashboard/list-item" className="btn btn-primary-custom mt-3">{t("listAnItem")}</Link>
           </div>
         </div>
 

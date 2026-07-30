@@ -65,6 +65,12 @@ export default function ListingCard({ item }) {
     item.categoryName ||
     categories.find((category) => category.id === item.category)?.name ||
     item.category;
+  const categoryMeta = categories.find(
+    (category) => category.id === item.category || category.name === categoryName,
+  );
+  const displayCategoryName = categoryMeta?.nameKey
+    ? t(categoryMeta.nameKey)
+    : categoryName || t("rentalItem");
 
   function handleToggleSaved() {
     if (!isAuthenticated || !activeUser?.id) {
@@ -133,7 +139,7 @@ export default function ListingCard({ item }) {
           <span className="card-category">
             {item.categoryKey
               ? t(item.categoryKey)
-              : categoryName || t("rentalItem")}
+              : displayCategoryName}
           </span>
           {item.rating && (
             <span className="card-rating">
@@ -153,12 +159,12 @@ export default function ListingCard({ item }) {
             {item.ownerName ? item.ownerName.charAt(0) : "U"}
           </div>
           <span className="owner-name">
-            {item.ownerName || "Verified Owner"}
+            {item.ownerName || t("verifiedOwner")}
           </span>
           {item.verifiedOwner !== false && (
             <i
               className="bi bi-patch-check-fill text-success"
-              title="Verified Owner"
+              title={t("verifiedOwner")}
             ></i>
           )}
         </div>

@@ -1,13 +1,16 @@
 import ListingCard from "../cards/ListingCard.jsx";
 import EmptyState from "../common/EmptyState.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function ItemGrid({ items }) {
+  const { t } = useLanguage();
+
   if (!items.length) {
     return (
       <EmptyState
         icon="bi-search"
-        title="No items found"
-        description="Try another category or search keyword."
+        title={t("noItemsFound")}
+        description={t("tryAnotherCategory")}
       />
     );
   }

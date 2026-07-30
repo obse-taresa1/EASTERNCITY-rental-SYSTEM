@@ -1,8 +1,33 @@
 import { API_BASE_URL } from "./apiClient.js";
 
+const DEFAULT_AI_ERROR = "The AI assistant is temporarily unavailable. Please try again later.";
+
+function sanitizeAiErrorMessage(message) {
+  const value = String(message || "");
+  const lowerValue = value.toLowerCase();
+
+  if (
+    lowerValue.includes("429") ||
+    lowerValue.includes("quota") ||
+    lowerValue.includes("too many requests") ||
+    lowerValue.includes("rate-limit") ||
+    lowerValue.includes("rate limits")
+  ) {
+    const retryMatch = value.match(/retry in\s+([\d.]+)s/i) || value.match(/"retryDelay":"(\d+)s"/i);
+    const retryText = retryMatch ? ` Please try again in about ${Math.ceil(Number(retryMatch[1]))} seconds.` : " Please try again later.";
+    return `The AI assistant has reached its current usage limit.${retryText}`;
+  }
+
+  if (lowerValue.includes("api key") || lowerValue.includes("backend error") || lowerValue.includes("googlegenerativeai")) {
+    return DEFAULT_AI_ERROR;
+  }
+
+  return value || DEFAULT_AI_ERROR;
+}
+
 async function readError(response) {
   const payload = await response.json().catch(() => null);
-  return payload?.message || "The AI assistant is temporarily unavailable. Please try again.";
+  return sanitizeAiErrorMessage(payload?.message);
 }
 
 export async function streamAiChat({ messages, language, token, signal, onDelta }) {
@@ -50,7 +75,7 @@ export async function streamAiChat({ messages, language, token, signal, onDelta 
       }
 
       if (payload.type === "error") {
-        throw new Error(payload.message);
+        throw new Error(sanitizeAiErrorMessage(payload.message));
       }
     }
   }

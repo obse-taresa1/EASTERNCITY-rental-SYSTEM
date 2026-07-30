@@ -49,8 +49,8 @@ export default function MobileDrawerMenu({ open, onClose }) {
                 <i className="bi bi-person-circle"></i>
               </div>
               <div className="drawer-user-info">
-                <span className="drawer-user-name">Guest User</span>
-                <span className="drawer-user-email">Please login to continue</span>
+                <span className="drawer-user-name">{t("user")}</span>
+                <span className="drawer-user-email">{t("loginRegister")}</span>
               </div>
             </div>
           )}
@@ -65,7 +65,7 @@ export default function MobileDrawerMenu({ open, onClose }) {
               <li>
                 <Link to="/login" onClick={onClose} className="drawer-menu-link">
                   <i className="bi bi-box-arrow-in-right"></i>
-                  <span>Login / Register</span>
+                  <span>{t("loginRegister")}</span>
                 </Link>
               </li>
             )}
@@ -73,7 +73,7 @@ export default function MobileDrawerMenu({ open, onClose }) {
             <li className="drawer-menu-item-interactive">
               <div className="drawer-menu-link-wrapper">
                 <i className="bi bi-globe"></i>
-                <span>Language</span>
+                <span>{t("language")}</span>
                 <div className="drawer-control-inline">
                   <LanguageSwitcher />
                 </div>
@@ -83,7 +83,7 @@ export default function MobileDrawerMenu({ open, onClose }) {
             <li className="drawer-menu-item-interactive">
               <div className="drawer-menu-link-wrapper">
                 <i className="bi bi-moon"></i>
-                <span>Dark Mode</span>
+                <span>{t("settings")}</span>
                 <div className="drawer-control-inline">
                   <ThemeToggle />
                 </div>
@@ -96,32 +96,32 @@ export default function MobileDrawerMenu({ open, onClose }) {
                 <li>
                   <Link to={dashboardForRole(currentUser?.role)} onClick={onClose} className="drawer-menu-link">
                     <i className="bi bi-speedometer2"></i>
-                    <span>Dashboard</span>
+                    <span>{t("dashboard")}</span>
                   </Link>
                 </li>
                 <li>
                   <Link to="/dashboard-settings" onClick={onClose} className="drawer-menu-link">
                     <i className="bi bi-person"></i>
-                    <span>Profile Info</span>
+                    <span>{t("profile")}</span>
                   </Link>
                 </li>
                 <li>
                   <Link to="/notifications" onClick={onClose} className="drawer-menu-link">
                     <i className="bi bi-bell"></i>
-                    <span>Notifications</span>
+                    <span>{t("notifications")}</span>
                   </Link>
                 </li>
                 <li>
                   <Link to="/dashboard-settings" onClick={onClose} className="drawer-menu-link">
                     <i className="bi bi-gear"></i>
-                    <span>Settings</span>
+                    <span>{t("settings")}</span>
                   </Link>
                 </li>
                 <li className="drawer-divider"></li>
                 <li>
                   <button onClick={handleLogout} className="drawer-menu-link text-danger w-100 text-start bg-transparent border-0">
                     <i className="bi bi-box-arrow-right"></i>
-                    <span>Logout</span>
+                    <span>{t("logout")}</span>
                   </button>
                 </li>
               </>

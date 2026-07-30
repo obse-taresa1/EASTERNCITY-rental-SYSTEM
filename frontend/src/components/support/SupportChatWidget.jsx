@@ -147,8 +147,7 @@ export default function SupportChatWidget() {
     } catch (error) {
       if (error.name === "AbortError") return;
       console.error("[AI Chat Error Frontend]:", error);
-      const isDev = import.meta.env.MODE === "development";
-      const errorText = isDev ? `**Error:** ${error.message || error}` : copy.unavailable;
+      const errorText = error.message || copy.unavailable;
       setMessages((current) =>
         current.map((item) => item.id === assistantMessage.id ? { ...item, text: errorText } : item)
       );

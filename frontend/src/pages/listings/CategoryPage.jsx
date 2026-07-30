@@ -75,6 +75,10 @@ export default function CategoryPage() {
   }, [categoryId, listings, staticCategory]);
 
   const category = staticCategory || dbCategory;
+  const categoryName = category?.nameKey ? t(category.nameKey) : category?.name;
+  const categoryDescription = category?.descriptionKey
+    ? t(category.descriptionKey)
+    : category?.description;
 
   const allItems = useMemo(
     () =>
@@ -166,8 +170,8 @@ export default function CategoryPage() {
             </div>
             <div>
               <span className="section-label">{t("category")}</span>
-              <h1 className="category-hero-title">{category.name}</h1>
-              <p className="category-hero-desc">{category.description}</p>
+              <h1 className="category-hero-title">{categoryName}</h1>
+              <p className="category-hero-desc">{categoryDescription}</p>
             </div>
           </div>
         </div>
@@ -276,7 +280,7 @@ export default function CategoryPage() {
             </div>
             <div className="col-md-2">
               <span className="badge bg-danger-subtle text-danger fw-bold px-3 py-2 rounded-pill">
-                {filteredItems.length} {t("availableItems") || "listings"}
+                {filteredItems.length} {t("listings")}
               </span>
             </div>
           </div>
@@ -312,7 +316,7 @@ function CategoryListingCard({ item, t }) {
     item.owner?.businessName ||
     item.owner?.name ||
     (typeof item.owner === "string" ? item.owner : "") ||
-    "Verified Owner";
+    t("verifiedOwner");
 
   return (
     <article className="premium-glass-card listing-card-premium">
@@ -365,7 +369,7 @@ function CategoryListingCard({ item, t }) {
           <span className="owner-name">{String(ownerName)}</span>
           <i
             className="bi bi-patch-check-fill text-success"
-            title="Verified Owner"
+            title={t("verifiedOwner")}
           ></i>
         </div>
 
