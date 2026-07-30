@@ -5,10 +5,13 @@ async function readError(response) {
   return payload?.message || "The AI assistant is temporarily unavailable. Please try again.";
 }
 
-export async function streamAiChat({ messages, language, signal, onDelta }) {
+export async function streamAiChat({ messages, language, token, signal, onDelta }) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
   const response = await fetch(`${API_BASE_URL}/api/ai-chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ messages, language }),
     signal,
   });

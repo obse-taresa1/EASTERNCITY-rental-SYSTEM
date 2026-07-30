@@ -5,6 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import App from "./App.jsx";
 import "./styles/styles.css";
 import "./styles/mobile-ui.css";
+import "./styles/glass-ui.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

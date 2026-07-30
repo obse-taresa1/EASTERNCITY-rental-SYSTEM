@@ -7,6 +7,8 @@ const server = app.listen(PORT, () => {
   console.log(`=========================================`);
   console.log(`  Server is running in ${process.env.NODE_ENV || 'development'} mode`);
   console.log(`  Local Address: http://localhost:${PORT}`);
+  console.log(process.env.GEMINI_API_KEY ? "  ✓ Gemini API Key Loaded" : "  ✗ GEMINI_API_KEY Missing");
+  console.log(`  ✓ Gemini Model: ${process.env.GEMINI_MODEL || "gemini-2.0-flash"}`);
   console.log(`=========================================`);
 });
 

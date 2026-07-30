@@ -60,6 +60,10 @@ async function reject(id, reason, adminId) {
   return promotion;
 }
 
+async function deletePromotion(id) {
+  return repository.delete(id);
+}
+
 function fetchActivePromotions() {
   return repository.findMany({
     where: { status: "APPROVED" },
@@ -82,4 +86,5 @@ module.exports = {
   approve,
   reject,
   fetchActivePromotions,
+  deletePromotion,
 };

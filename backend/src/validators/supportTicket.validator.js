@@ -8,7 +8,7 @@ const createTicketSchema = z.object({
 });
 
 const replyTicketSchema = z.object({
-  message: z.string().trim().min(1, "Reply message is required."),
+  message: z.string().trim().min(1, "Message is required."),
 });
 
 module.exports = {

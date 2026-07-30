@@ -19,4 +19,5 @@ module.exports = {
   findMany,
   create,
   update,
+  delete: (id) => prisma.promotion.delete({ where: { id } }),
 };

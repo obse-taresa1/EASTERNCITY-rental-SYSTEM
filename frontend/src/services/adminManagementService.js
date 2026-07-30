@@ -36,6 +36,8 @@ export const adminApi = {
     mutate(apiClient.delete(`/api/admin-management/categories/${id}`), ["categories", "adminData"]),
   bookings: (params) => apiClient.get(`/api/admin-management/bookings${query(params)}`),
   promotions: (params) => apiClient.get(`/api/admin-management/promotions${query(params)}`),
+  deletePromotion: (id) =>
+    mutate(apiClient.delete(`/api/promotions/${id}`), ["promotions", "listings", "adminData"]),
   updatePromotion: (id, body) =>
     mutate(apiClient.patch(`/api/admin-management/promotions/${id}`, body), ["promotions", "listings", "adminData"]),
   reviews: (params) => apiClient.get(`/api/admin-management/reviews${query(params)}`),
