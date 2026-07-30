@@ -1,0 +1,102 @@
+/* ==========================================================================
+   GLASSMORPHISM UI ENHANCEMENTS
+   Applies modern frosted glass effects to floating mobile elements
+   ========================================================================== */
+
+/* 1. Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  background: rgba(255,255,255,0.60) !important;
+  backdrop-filter: blur(22px) !important;
+  -webkit-backdrop-filter: blur(22px) !important;
+  border-top: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.15) !important;
+  border-radius: 20px 20px 0 0 !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0) + 5px) !important;
+}
+
+html[data-theme="dark"] .mobile-bottom-nav {
+  background: rgba(18,18,18,0.60) !important;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.35) !important;
+}
+
+/* 2. Mobile Drawer (Three-Dot Menu) */
+.mobile-drawer {
+  background: rgba(255,255,255,0.60) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-left: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: -4px 0 15px rgba(0,0,0,0.15) !important;
+}
+
+html[data-theme="dark"] .mobile-drawer {
+  background: rgba(18,18,18,0.60) !important;
+}
+
+/* Drawer Menu Items Animation */
+.drawer-menu-link, .drawer-menu-link-wrapper, .dropdown-item {
+  transition: all 0.25s ease !important;
+  border-radius: 12px;
+  padding: 16px 20px !important;
+  margin: 4px 10px !important;
+}
+.drawer-menu-link:hover, .drawer-menu-link-wrapper:hover, .dropdown-item:hover {
+  background: rgba(0,0,0,0.05) !important;
+}
+html[data-theme="dark"] .drawer-menu-link:hover, 
+html[data-theme="dark"] .drawer-menu-link-wrapper:hover, 
+html[data-theme="dark"] .dropdown-item:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* 3. Language Button & 4. Theme Toggle */
+.language-switcher-pill, .language-switcher, .theme-toggle-btn, .theme-toggle {
+  background: rgba(255,255,255,0.60) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  border-radius: 50px !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+  transition: all 0.25s ease !important;
+}
+
+html[data-theme="dark"] .language-switcher-pill,
+html[data-theme="dark"] .language-switcher,
+html[data-theme="dark"] .theme-toggle-btn,
+html[data-theme="dark"] .theme-toggle {
+  background: rgba(18,18,18,0.60) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+}
+
+.language-switcher-pill:hover, .theme-toggle-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* 5. Floating Support Button */
+.cw-support-launcher {
+  background: var(--accent) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+  transform: translateY(0);
+}
+
+.cw-support-launcher:hover {
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25) !important;
+}
+
+/* Make sure mobile nav items animate */
+.mobile-nav-item {
+  transition: all 0.25s ease !important;
+  border-radius: 12px;
+  margin: 4px;
+}
+
+.mobile-nav-item:hover {
+  background: rgba(0,0,0,0.05) !important;
+}
+html[data-theme="dark"] .mobile-nav-item:hover {
+  background: rgba(255,255,255,0.05) !important;
+}

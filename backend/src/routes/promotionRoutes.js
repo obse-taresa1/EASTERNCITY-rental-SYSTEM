@@ -37,4 +37,8 @@ router.patch(
 );
 
 router.get("/featured/active", controller.getActiveFeatured);
+
+// Delete a promotion (Admin / Super Admin only)
+router.delete('/:id', auth, authorize('ADMIN', 'SUPER_ADMIN'), controller.deletePromotion);
+
 module.exports = router;

@@ -55,6 +55,17 @@ const reject = async (req, res, next) => {
   }
 };
 
+// Delete a promotion (Admin / Super Admin only)
+const deletePromotion = async (req, res, next) => {
+  try {
+    await service.deletePromotion(req.params.id);
+    res.json({ success: true, message: 'Promotion deleted successfully.' });
+  } catch (error) {
+    console.error("Error deleting promotion:", error);
+    res.status(500).json({ success: false, message: 'Failed to delete promotion.' });
+  }
+};
+
 const getActiveFeatured = async (req, res, next) => {
   try {
     const all = await service.fetchActivePromotions();
@@ -95,4 +106,5 @@ module.exports = {
   approve,
   reject,
   getActiveFeatured,
+  deletePromotion,
 };
