@@ -3,7 +3,8 @@ import { readStorage } from "./storageService.js";
 export const API_BASE_URL =
   import.meta.env?.VITE_API_BASE_URL ||
   import.meta.env?.VITE_API_URL ||
-  "http://localhost:5000";
+  (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) ||
+  "https://easterncity-rental-system.onrender.com";
 
 export function resolveAssetUrl(url) {
   if (!url) return "";
