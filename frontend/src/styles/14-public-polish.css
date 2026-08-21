@@ -38,6 +38,11 @@
   transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
+/* The public Categories label is a proper title, not an all-caps navigation label. */
+.app-public-header .nav-category-trigger {
+  text-transform: none !important;
+}
+
 .app-public-header .motorx-nav-links a::after,
 .app-public-header .nav-category-trigger::after {
   content: "";
@@ -67,6 +72,12 @@
 .app-public-header .nav-category-trigger.active::after {
   opacity: 1;
   transform: scaleX(1);
+}
+
+/* Community is a branded discovery link when hovered/active. */
+.app-public-header .motorx-nav-links .nav-community-link:hover,
+.app-public-header .motorx-nav-links .nav-community-link.active {
+  color: var(--primary-color, #e31e24) !important;
 }
 
 .app-public-header .motorx-nav-actions {

@@ -3,24 +3,64 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getPublicListings } from "../../services/listingApiService.js";
 
-// Pick one representative item per category to ensure visual variety
-function pickOnePer(listings) {
-  const seen = new Set();
-  const result = [];
-  for (const item of listings) {
-    const key = item.categoryKey || item.category || "other";
-    if (!seen.has(key)) {
-      seen.add(key);
-      result.push(item);
-    }
-  }
-  return result;
+const CURATED_TITLES = [
+  "Toyota Hiace Van",
+  "Cooler Box",
+  "Camping Chair Set",
+  "Banquet Tables Set",
+  "Barbecue Grill",
+  "Wedding Tent",
+  "Canon DSLR Camera Kit",
+  "Wedding Chairs Set",
+  "Portable Generator",
+  "Stage Platform",
+  "Mels Dress",
+  "Somali Dress",
+  "Harari Wedding Dress",
+  "Camping Tent",
+  "Mountain Bike Pro",
+  "Hyundai Tucson SUV",
+];
+
+/**
+ * Deterministic condition map per item title.
+ * "new"  → brand-new / rarely used item
+ * "used" → second-hand / well-used item
+ */
+const CONDITION_MAP = {
+  "Toyota Hiace Van": "new",
+  "Cooler Box": "used",
+  "Camping Chair Set": "used",
+  "Banquet Tables Set": "used",
+  "Barbecue Grill": "new",
+  "Wedding Tent": "new",
+  "Canon DSLR Camera Kit": "new",
+  "Wedding Chairs Set": "used",
+  "Portable Generator": "new",
+  "Stage Platform": "used",
+  "Mels Dress": "new",
+  "Somali Dress": "new",
+  "Harari Wedding Dress": "used",
+  "Camping Tent": "new",
+  "Mountain Bike Pro": "used",
+  "Hyundai Tucson SUV": "new",
+};
+
+/** Returns the resolved condition for an item:
+ *  1. Uses item.condition if the DB has it ("new" | "used")
+ *  2. Falls back to the static CONDITION_MAP by title
+ *  3. Defaults to "new" if nothing matches
+ */
+function getItemCondition(item) {
+  const dbCond = (item.condition || "").toLowerCase();
+  if (dbCond === "new" || dbCond === "used") return dbCond;
+  return CONDITION_MAP[item.title] ?? "new";
 }
 
 export default function ExploreItemsSection() {
   const { t } = useLanguage();
   const [listings, setListings] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [conditionFilter, setConditionFilter] = useState("all");
 
   useEffect(() => {
     let active = true;
@@ -29,34 +69,27 @@ export default function ExploreItemsSection() {
       try {
         const data = await getPublicListings();
         const combined = Array.isArray(data) ? data : [];
-        const seen = new Set();
-        const deduped = combined.filter((item) => {
-          if (seen.has(item.id)) return false;
-          seen.add(item.id);
-          return true;
-        });
-        if (active) setListings(deduped);
+        // Only keep curated items, in the order specified
+        const curated = CURATED_TITLES
+          .map((title) => combined.find((item) => item.title === title))
+          .filter(Boolean);
+        if (active) setListings(curated);
       } catch {
         if (active) setListings([]);
       }
     }
 
     loadListings();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, []);
 
-  const filtered = listings.filter((item) => {
-    const s = String(item.status || "").toLowerCase();
-    if (["draft", "rejected", "expired", "payment-pending"].includes(s)) return false;
-    if (statusFilter === "new") return s === "new" || item.status === "new";
-    if (statusFilter === "used") return s === "used" || item.condition === "used";
-    return true;
+  // Filter by condition: "all" → show everything, "new" / "used" → exact match
+  const filteredListings = listings.filter((item) => {
+    if (conditionFilter === "all") return true;
+    return getItemCondition(item) === conditionFilter;
   });
 
-  // Always show one per category (varied, not all cars)
-  const visibleListings = pickOnePer(filtered).slice(0, 8);
+  const visibleListings = filteredListings.slice(0, 8);
 
   return (
     <section id="featured-listings" className="section-listings py-5">
@@ -70,22 +103,22 @@ export default function ExploreItemsSection() {
             {["all", "new", "used"].map((f) => (
               <button
                 key={f}
-                onClick={() => setStatusFilter(f)}
+                onClick={() => setConditionFilter(f)}
                 style={{
                   padding: "0.4rem 1.1rem",
                   borderRadius: "9999px",
                   fontWeight: 600,
                   fontSize: "0.85rem",
                   border:
-                    statusFilter === f ? "none" : "1.5px solid #dce1e8",
+                    conditionFilter === f ? "none" : "1.5px solid #dce1e8",
                   background:
-                    statusFilter === f
+                    conditionFilter === f
                       ? "linear-gradient(135deg, #e31e24 0%, #ff6b6b 100%)"
                       : "#fff",
-                  color: statusFilter === f ? "#fff" : "#4b5563",
+                  color: conditionFilter === f ? "#fff" : "#4b5563",
                   cursor: "pointer",
                   boxShadow:
-                    statusFilter === f
+                    conditionFilter === f
                       ? "0 4px 12px rgba(227,30,36,0.25)"
                       : "none",
                   transition: "all 0.2s ease",
@@ -102,15 +135,19 @@ export default function ExploreItemsSection() {
         </div>
 
         <div className="row g-4 listings-grid">
-          {visibleListings.map((item) => (
-            <div
-              className="col-sm-6 col-lg-3"
-              data-status={item.status}
-              key={item.id}
-            >
-              <ListingCard item={item} />
-            </div>
-          ))}
+          {visibleListings.map((item) => {
+            // Inject resolved condition so ListingCard → CardImageSlider shows it
+            const enriched = { ...item, condition: getItemCondition(item) };
+            return (
+              <div
+                className="col-sm-6 col-lg-3"
+                data-condition={enriched.condition}
+                key={item.id}
+              >
+                <ListingCard item={enriched} showCondition={true} />
+              </div>
+            );
+          })}
           {visibleListings.length === 0 && (
             <div className="col-12 text-center py-5 text-muted">
               <i className="bi bi-inbox fs-1 mb-3 d-block" />

@@ -33,7 +33,15 @@ router.patch("/contact-messages/:id", controller.updateContactMessage);
 router.get("/notifications", controller.listNotifications);
 router.post("/notifications", controller.createNotification);
 router.get("/settings", controller.getSettings);
-router.put("/settings", controller.saveSettings);
+// SUPER_ADMIN only — platform-wide settings
+router.put("/settings/platform", authorize("SUPER_ADMIN"), controller.savePlatformSettings);
+// Both roles — admin personal preferences
+router.put("/settings/admin", controller.saveAdminPreferences);
 router.get("/logs", authorize("SUPER_ADMIN"), controller.listLogs);
+
+// Community Posts moderation
+router.get("/community-posts", controller.listCommunityPosts);
+router.patch("/community-posts/:id", controller.updateCommunityPost);
+router.delete("/community-posts/:id", controller.deleteCommunityPost);
 
 module.exports = router;

@@ -58,7 +58,14 @@ export const adminApi = {
   settings: () => apiClient.get("/api/admin-management/settings"),
   saveSettings: (body) =>
     mutate(apiClient.put("/api/admin-management/settings", body), ["settings", "adminData"]),
+  savePlatformSettings: (body) =>
+    mutate(apiClient.put("/api/admin-management/settings/platform", body), ["settings", "adminData"]),
+  saveAdminPreferences: (body) =>
+    mutate(apiClient.put("/api/admin-management/settings/admin", body), ["settings", "adminData"]),
   logs: (params) => apiClient.get(`/api/admin-management/logs${query(params)}`),
+  communityPosts: (params) => apiClient.get(`/api/admin-management/community-posts${query(params)}`),
+  updateCommunityPost: (id, body) => mutate(apiClient.patch(`/api/admin-management/community-posts/${id}`, body), ["communityPosts", "adminData"]),
+  deleteCommunityPost: (id) => mutate(apiClient.delete(`/api/admin-management/community-posts/${id}`), ["communityPosts", "adminData"]),
 };
 
 

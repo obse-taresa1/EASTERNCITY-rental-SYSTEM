@@ -11,13 +11,12 @@ export default function ContactMessagesPage() {
 
   const load = async () => {
     setIsLoading(true);
-    setNotice("");
     try {
       const rows = await adminApi.contactMessages();
       setMessages(rows);
       if (!selectedId && rows[0]) setSelectedId(rows[0].id);
     } catch (error) {
-      setNotice(error.response?.data?.message || "Failed to load contact messages.");
+      setNotice(error.message || "Failed to load contact messages.");
     } finally {
       setIsLoading(false);
     }
@@ -40,11 +39,12 @@ export default function ContactMessagesPage() {
     if (!selectedMessage || !reply.trim()) return;
     setIsLoading(true);
     try {
-      await adminApi.updateContactMessage(selectedMessage.id, { adminReply: reply.trim(), status: "REPLIED" });
-      setNotice("Reply saved to the database.");
+      const updated = await adminApi.updateContactMessage(selectedMessage.id, { adminReply: reply.trim(), status: "REPLIED" });
       await load();
+      const delivery = updated?.emailDelivery;
+      setNotice(delivery?.sent ? "Reply sent by email and saved to the database." : `Reply saved to the database. Email was not sent${delivery?.reason ? `: ${delivery.reason}.` : "."}`);
     } catch (error) {
-      setNotice(error.response?.data?.message || "Failed to save reply.");
+      setNotice(error.message || "Failed to save reply.");
       setIsLoading(false);
     }
   }
@@ -57,7 +57,7 @@ export default function ContactMessagesPage() {
       setNotice("Contact message marked as resolved.");
       await load();
     } catch (error) {
-      setNotice(error.response?.data?.message || "Failed to mark as resolved.");
+      setNotice(error.message || "Failed to mark as resolved.");
       setIsLoading(false);
     }
   }

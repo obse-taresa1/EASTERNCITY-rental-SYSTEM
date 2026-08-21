@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { adminApi, formatDate } from "../../services/adminManagementService.js";
+import { resolveAssetUrl } from "../../services/apiClient.js";
 
 const filters = ["all", "PENDING", "APPROVED", "REJECTED"];
 export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
   const [promotions, setPromotions] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [packageFilter, setPackageFilter] = useState("all");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,11 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
     }
   };
 
-  const filtered = promotions.filter(p => (p.listing?.title || "").toLowerCase().includes(search.toLowerCase()) || (p.user?.name || p.user?.email || "").toLowerCase().includes(search.toLowerCase()));
+  const filtered = promotions.filter(p => {
+    const matchesSearch = (p.listing?.title || "").toLowerCase().includes(search.toLowerCase()) || (p.user?.name || p.user?.email || "").toLowerCase().includes(search.toLowerCase());
+    const matchesPackage = packageFilter === "all" || p.placement === packageFilter || p.packageType === packageFilter;
+    return matchesSearch && matchesPackage;
+  });
   return (
     <main className="dashboard-content">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -79,8 +85,19 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
       {notice && <div className="alert alert-warning">{notice}</div>}
       <div className="admin-table-container">
         <div className="d-flex flex-wrap justify-content-between gap-3 mb-4">
-          <div className="d-flex gap-2">{filters.map(status => <button key={status} type="button" className={`btn btn-sm ${filter === status ? "btn-accent-custom" : "btn-outline-secondary"}`} onClick={() => setFilter(status)}>{status.toUpperCase()}</button>)}</div>
-          <div className="search-box" style={{ maxWidth: "300px", width: "100%" }}>
+          <div className="d-flex flex-column gap-2">
+            <div className="d-flex gap-2">
+              <span className="text-muted small align-self-center me-2" style={{ width: "60px" }}>Status:</span>
+              {filters.map(status => <button key={status} type="button" className={`btn btn-sm ${filter === status ? "btn-accent-custom" : "btn-outline-secondary"}`} onClick={() => setFilter(status)}>{status.toUpperCase()}</button>)}
+            </div>
+            <div className="d-flex gap-2">
+              <span className="text-muted small align-self-center me-2" style={{ width: "60px" }}>Type:</span>
+              <button type="button" className={`btn btn-sm ${packageFilter === "all" ? "btn-accent-custom" : "btn-outline-secondary"}`} onClick={() => setPackageFilter("all")}>ALL TYPES</button>
+              <button type="button" className={`btn btn-sm ${packageFilter === "FEATURED" ? "btn-accent-custom" : "btn-outline-secondary"}`} onClick={() => setPackageFilter("FEATURED")}>FEATURED</button>
+              <button type="button" className={`btn btn-sm ${packageFilter === "HERO_PROMOTION" ? "btn-accent-custom" : "btn-outline-secondary"}`} onClick={() => setPackageFilter("HERO_PROMOTION")}>HERO SECTION</button>
+            </div>
+          </div>
+          <div className="search-box align-self-start" style={{ maxWidth: "300px", width: "100%" }}>
             <input type="text" placeholder="Search listing or user..." className="form-control" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
         </div>
@@ -137,7 +154,36 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
               </div>
               <div className="modal-body text-center">
                 <div className="p-4 mb-3 border rounded" style={{ backgroundColor: "rgba(227, 30, 36, 0.05)", borderStyle: "dashed", borderColor: "var(--primary-color)" }}>
-                  {selectedRequest.paymentProofUrl ? <img src={selectedRequest.paymentProofUrl} alt="Promotion payment proof" className="img-fluid rounded mb-3" style={{ maxHeight: "220px" }} /> : <i className="bi bi-file-earmark-image text-danger" style={{ fontSize: "3rem" }} />}
+                  {selectedRequest.paymentProofUrl ? (
+                    <img
+                      src={resolveAssetUrl(selectedRequest.paymentProofUrl)}
+                      alt="Promotion payment proof"
+                      className="img-fluid rounded mb-2"
+                      style={{ maxHeight: "220px", objectFit: "contain", display: "block", margin: "0 auto" }}
+                      onError={(e) => {
+                        // Legacy records stored /uploads/filename.png; actual file is at /uploads/payments/filename.png
+                        const src = e.target.src;
+                        if (!src.includes("/payments/")) {
+                          const fixed = src.replace("/uploads/", "/uploads/payments/");
+                          e.target.src = fixed;
+                        } else {
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
+                        }
+                      }}
+                    />
+                  ) : null}
+                  {selectedRequest.paymentProofUrl ? (
+                    <div style={{ display: "none" }} className="text-center py-3 flex-column align-items-center justify-content-center">
+                      <i className="bi bi-file-earmark-image text-danger" style={{ fontSize: "3rem" }} />
+                      <p className="text-muted mt-1 small mb-0">Image could not be loaded.</p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-3">
+                      <i className="bi bi-file-earmark-image text-danger" style={{ fontSize: "3rem" }} />
+                      <p className="text-muted mt-1 small mb-0">No payment proof uploaded.</p>
+                    </div>
+                  )}
                   <p className="mt-2 mb-0 fw-bold">Payment proof</p>
                   <span className="text-muted">Bank Transfer Receipt uploaded by User</span>
                 </div>

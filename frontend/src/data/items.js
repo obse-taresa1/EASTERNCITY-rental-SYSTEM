@@ -4,6 +4,7 @@ import dewaltImage from "../assets/images/dewalt.png";
 import canonImage from "../assets/images/canon.png";
 import sofaImage from "../assets/images/furnsofa.png";
 import bikeImage from "../assets/images/sportbick.png";
+import harariDressImage from "../assets/images/harari_wedding_dress_1.png";
 
 export const items = [
   {
@@ -99,6 +100,21 @@ export const items = [
     description:
       "Sport bicycle suitable for exercise, short-distance travel, and weekend rides.",
     features: ["Lightweight", "Helmet Available", "Smooth Gear", "Good Brakes"],
+    available: true,
+  },
+  {
+    id: "harari-wedding-dress",
+    title: "Harari Wedding Dress",
+    category: "cultural-wedding-dress",
+    location: "Old Town, Harar",
+    city: "Harar",
+    pricePerDay: 2000,
+    image: harariDressImage,
+    rating: 4.9,
+    owner: "Harari Bridal",
+    description:
+      "Stunning Harari wedding dress for rent. Perfect for traditional ceremonies and celebrations.",
+    features: ["Authentic Design", "Various Sizes", "Jewelry Included", "Dry Cleaned"],
     available: true,
   },
 ];
@@ -210,7 +226,7 @@ export const categories = [
     name: "Fashion & Accessories",
     icon: "bi-handbag",
     description:
-      "Traditional dresses, wedding jewelry, designer handbags, suits, and evening gowns.",
+      "Harari wedding dress, wedding jewelry, designer handbags, suits, and evening gowns.",
   },
   {
     id: "music-audio",
@@ -240,13 +256,13 @@ export const categories = [
       "Hair dryers, makeup chairs, facial steamers, nail equipment, and salon mirrors.",
   },
   {
-    id: "baby-kids",
-    nameKey: "categoryBabyKids",
-    descriptionKey: "categoryBabyKidsDesc",
-    name: "Baby & Kids Essentials",
-    icon: "bi-balloon-heart",
+    id: "cultural-wedding-dress",
+    nameKey: "categoryCulturalWedding",
+    descriptionKey: "categoryCulturalWeddingDesc",
+    name: "Cultural Wedding Dress",
+    icon: "bi-suit-heart",
     description:
-      "Baby strollers, cribs, kids bicycles, car seats, and baby walkers.",
+      "Traditional and cultural wedding dresses, outfits, and accessories.",
   },
   {
     id: "gaming-equipment",

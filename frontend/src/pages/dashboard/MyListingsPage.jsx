@@ -14,17 +14,8 @@ import {
   fetchOwnerPromotions,
   requestPromotion,
 } from "../../services/promotionApiService.js";
+import { apiClient } from "../../services/apiClient.js";
 
-const promotionPackages = [
-  {
-    id: 1,
-    label: "Featured Listing",
-    baseRate: 100,
-    icon: "bi-lightning-charge",
-  },
-  { id: 2, label: "Top Listing", baseRate: 200, icon: "bi-stars" },
-  { id: 3, label: "Homepage Banner", baseRate: 500, icon: "bi-gem" },
-];
 const durationOptions = [3, 7, 15, 30];
 
 async function fileToDataUrl(file) {
@@ -42,41 +33,83 @@ export default function MyListingsPage() {
   const activeUser = user || currentUser;
   const [activeTab, setActiveTab] = useState("all");
   const refreshToken = useRefreshToken(["listings", "bookings", "promotions"]);
+  
   const [listings, setListings] = useState([]);
-  const [isLoadingListings, setIsLoadingListings] = useState(true);
   const [ownerBookings, setOwnerBookings] = useState([]);
   const [ownerPromotions, setOwnerPromotions] = useState([]);
-  const [notice, setNotice] = useState("");
+
+  // Load dynamic promotion packages from public config
+  const [promotionPackages, setPromotionPackages] = useState([
+    { id: 1, label: "Featured Listing", baseRate: 100, icon: "bi-lightning-charge" },
+    { id: 2, label: "Homepage Promotion", baseRate: 400, icon: "bi-star" },
+    { id: 3, label: "Homepage Banner", baseRate: 500, icon: "bi-gem" },
+  ]);
+
   const [promotionListing, setPromotionListing] = useState(null);
   const [selectedPromotionPackage, setSelectedPromotionPackage] = useState(1);
   const [selectedPromotionDuration, setSelectedPromotionDuration] = useState(7);
   const [promotionScreenshot, setPromotionScreenshot] = useState(null);
+  const [discountPercent, setDiscountPercent] = useState(0);
+
+  const [isLoadingListings, setIsLoadingListings] = useState(true);
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     let active = true;
 
-    async function loadListings() {
+    async function loadData() {
       if (!activeUser) {
         setListings([]);
+        setOwnerBookings([]);
+        setOwnerPromotions([]);
         setIsLoadingListings(false);
         return;
       }
 
       setIsLoadingListings(true);
+      setNotice("");
+
       try {
-        const data = await getMyListings();
-        if (!active) return;
-        setListings(data);
+        const [listingsData, bookingsData, promosData, configRes] = await Promise.all([
+          getMyListings(),
+          getMyBookings(),
+          fetchOwnerPromotions(activeUser.id || activeUser.name || activeUser.businessName),
+          apiClient.get('/api/promotion-config').catch(() => null),
+        ]);
+
+        if (active) {
+          setListings(listingsData);
+          const ownerBookingsData = bookingsData.filter(
+            (booking) => String(booking.ownerId || "") === String(activeUser.id),
+          );
+          setOwnerBookings(
+            ownerBookingsData.sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+            ),
+          );
+          setOwnerPromotions(promosData);
+
+          if (configRes && configRes.data?.data) {
+            const cfg = configRes.data.data;
+            setPromotionPackages([
+              { id: 1, label: "Featured Listing", baseRate: Number(cfg.featuredListingPricePerDay) || 100, icon: "bi-lightning-charge" },
+              { id: 2, label: "Homepage Promotion", baseRate: Number(cfg.homepagePromotionPricePerDay) || 400, icon: "bi-star" },
+              { id: 3, label: "Homepage Banner", baseRate: 500, icon: "bi-gem" },
+            ]);
+          }
+        }
       } catch (error) {
-        if (!active) return;
-        setNotice(error.message || "Unable to load your listings.");
-        setListings([]);
+        if (active) {
+          setNotice(error.message || "Unable to load data.");
+        }
       } finally {
-        if (active) setIsLoadingListings(false);
+        if (active) {
+          setIsLoadingListings(false);
+        }
       }
     }
 
-    loadListings();
+    loadData();
 
     return () => {
       active = false;
@@ -84,72 +117,6 @@ export default function MyListingsPage() {
   }, [activeUser, refreshToken]);
 
   const ownedItems = useMemo(() => listings, [listings]);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadOwnerBookings() {
-      if (!activeUser) {
-        setOwnerBookings([]);
-        return;
-      }
-
-      try {
-        const data = await getMyBookings();
-        const ownerBookingsData = data.filter(
-          (booking) => String(booking.ownerId || "") === String(activeUser.id),
-        );
-        if (active) {
-          setOwnerBookings(
-            ownerBookingsData.sort(
-              (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-            ),
-          );
-        }
-      } catch (error) {
-        if (active) {
-          setNotice(error.message || "Unable to load bookings.");
-          setOwnerBookings([]);
-        }
-      }
-    }
-
-    loadOwnerBookings();
-
-    return () => {
-      active = false;
-    };
-  }, [activeUser, refreshToken]);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadOwnerPromotions() {
-      if (!activeUser) {
-        setOwnerPromotions([]);
-        return;
-      }
-
-      try {
-        const data = await fetchOwnerPromotions(
-          activeUser.id || activeUser.name || activeUser.businessName,
-        );
-        if (active) {
-          setOwnerPromotions(data);
-        }
-      } catch {
-        if (active) {
-          setOwnerPromotions([]);
-        }
-      }
-    }
-
-    loadOwnerPromotions();
-
-    return () => {
-      active = false;
-    };
-  }, [activeUser, refreshToken]);
 
   const getFilteredItems = () => {
     switch (activeTab) {
@@ -186,6 +153,7 @@ export default function MyListingsPage() {
     setSelectedPromotionPackage(1);
     setSelectedPromotionDuration(7);
     setPromotionScreenshot(null);
+    setDiscountPercent(0);
   }
 
   async function handlePromotionScreenshot(event) {
@@ -218,30 +186,46 @@ export default function MyListingsPage() {
     const amount =
       (selectedPackage?.baseRate || 100) * selectedPromotionDuration;
 
-    await requestPromotion(
-      promotionListing.id,
-      selectedPromotionPackage,
-      promotionScreenshot,
-      {
-        listingTitle: promotionListing.title,
-        ownerId: activeUser?.id || activeUser?.name || activeUser?.businessName,
-        userId: activeUser?.id || activeUser?.name || activeUser?.businessName,
-        userName: activeUser?.businessName || activeUser?.name || "User",
-        ownerName:
-          activeUser?.businessName ||
-          activeUser?.name ||
-          promotionListing.ownerName,
-        packageName: selectedPackage?.label,
-        promotionType: selectedPackage?.label,
-        durationDays: selectedPromotionDuration,
-        amount,
-      },
-    );
-    setNotice(
-      `${promotionListing.title} promotion request was submitted for review.`,
-    );
-    setPromotionListing(null);
-    setPromotionScreenshot(null);
+      const spec1 = event.target.spec1?.value;
+      const spec2 = event.target.spec2?.value;
+      const spec3 = event.target.spec3?.value;
+      const specs = [spec1, spec2, spec3].filter(Boolean).join(",");
+
+      try {
+        await requestPromotion(
+          promotionListing.id,
+          selectedPromotionPackage,
+          promotionScreenshot,
+          {
+            listingTitle: promotionListing.title,
+            ownerId: activeUser?.id || activeUser?.name || activeUser?.businessName,
+            userId: activeUser?.id || activeUser?.name || activeUser?.businessName,
+            userName: activeUser?.businessName || activeUser?.name || "User",
+            ownerName:
+              activeUser?.businessName ||
+              activeUser?.name ||
+              promotionListing.ownerName,
+            packageName: selectedPackage?.label,
+            promotionType: selectedPackage?.label,
+            durationDays: selectedPromotionDuration,
+            amount,
+            discount: discountPercent,
+            specs,
+            customTitle: event.target.customTitle?.value || promotionListing.title,
+            customSubtitle: event.target.customSubtitle?.value || promotionListing.description || "",
+          },
+        );
+        setNotice(
+          `${promotionListing.title} promotion request was submitted for review.`,
+        );
+        setPromotionListing(null);
+        setPromotionScreenshot(null);
+      } catch (error) {
+        console.error("Promotion request error:", error);
+        setNotice(`Error: ${error.response?.data?.message || error.message || 'Failed to submit promotion request'}`);
+        setPromotionListing(null);
+        setPromotionScreenshot(null);
+      }
   }
 
   function handleEdit(item) {
@@ -301,15 +285,16 @@ export default function MyListingsPage() {
           </div>
         )
       ) : activeTab === "promotions" ? (
-        ownerPromotions.length === 0 ? (
-          <MyListingsEmptyState
-            icon="bi-megaphone"
-            title="No Promotion Requests"
-            description="Submitted listing promotion requests will appear here."
-          />
-        ) : (
+        <div className="premium-glass-card bg-white p-4 rounded-4">
+          <div className="d-flex align-items-center gap-2 mb-4">
+            <i className="bi bi-megaphone-fill text-danger" />
+            <h6 className="mb-0 fw-bold">My Promotion Requests</h6>
+            {ownerPromotions.length > 0 && (
+              <span className="badge bg-danger ms-auto">{ownerPromotions.length}</span>
+            )}
+          </div>
           <PromotionRequestsTable promotions={ownerPromotions} />
-        )
+        </div>
       ) : isLoadingListings ? (
         <div className="text-center py-5 bg-white rounded-4 shadow-sm border border-light">
           <div className="spinner-border text-danger" role="status" />
@@ -346,6 +331,8 @@ export default function MyListingsPage() {
           selectedPackage={selectedPromotionPackage}
           setSelectedDuration={setSelectedPromotionDuration}
           setSelectedPackage={setSelectedPromotionPackage}
+          discountPercent={discountPercent}
+          onDiscountChange={setDiscountPercent}
         />
       )}
     </main>

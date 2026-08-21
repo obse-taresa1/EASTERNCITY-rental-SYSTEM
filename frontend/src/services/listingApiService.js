@@ -1,17 +1,6 @@
-import { apiClient } from "./apiClient.js";
-import fallbackListingImage from "../assets/images/pc.png";
+import { apiClient, resolveAssetUrl } from "./apiClient.js";
+import { getCategoryFallbackImage } from "../utils/categoryFallbacks.js";
 import { emitRefresh } from "../context/RefreshContext.jsx";
-
-const API_BASE_URL =
-  import.meta.env?.VITE_API_BASE_URL ||
-  import.meta.env?.VITE_API_URL ||
-  "http://localhost:5000";
-
-function resolveAssetUrl(value) {
-  if (!value) return "";
-  if (/^(https?:|data:|blob:)/i.test(value)) return value;
-  return `${API_BASE_URL}${value.startsWith("/") ? value : `/${value}`}`;
-}
 
 function toNumber(value) {
   const parsed = Number(value);
@@ -83,14 +72,18 @@ export function normalizeListing(listing) {
   const images = normalizeImages(listing.images || []);
   const owner = normalizeOwner(listing.owner);
   const categoryData = normalizeCategory(listing.category);
+
+  // Determine the canonical category key for fallback selection
+  const categoryKey =
+    categoryData?.slug || categoryData?.id || listing.category || "";
+
   const firstImage =
     images[0]?.imageUrl ||
     resolveAssetUrl(listing.imageUrl) ||
     resolveAssetUrl(listing.coverImage) ||
-    fallbackListingImage;
+    getCategoryFallbackImage(categoryKey);
 
-  const category =
-    categoryData?.slug || categoryData?.id || listing.category || "";
+  const category = categoryKey;
   const sefar = deriveSefar(listing);
 
   return {

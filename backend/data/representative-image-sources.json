@@ -1,0 +1,37 @@
+{
+  "1c421c50-fad9-4cd0-8424-173b233f7ad7": {
+    "title": "Toyota RAV4 2023",
+    "categoryId": "5dd02cc3-6221-4eac-a0b7-9a57c10e423a",
+    "source": "Wikimedia Commons",
+    "images": [
+      {
+        "imageUrl": "/uploads/listings/representative/toyota-rav4-2023/1.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Toyota,_Paris_Motor_Show_2018,_Paris_(1Y7A2083).jpg",
+        "title": "File:Toyota, Paris Motor Show 2018, Paris (1Y7A2083).jpg",
+        "license": "CC BY-SA 4.0",
+        "sortOrder": 0
+      },
+      {
+        "imageUrl": "/uploads/listings/representative/toyota-rav4-2023/2.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Toyota,_Paris_Motor_Show_2018,_Paris_(1Y7A1784).jpg",
+        "title": "File:Toyota, Paris Motor Show 2018, Paris (1Y7A1784).jpg",
+        "license": "CC BY-SA 4.0",
+        "sortOrder": 1
+      },
+      {
+        "imageUrl": "/uploads/listings/representative/toyota-rav4-2023/3.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Toyota_RAV4_Hybrid,_GIMS_2019,_Le_Grand-Saconnex_(GIMS0518).jpg",
+        "title": "File:Toyota RAV4 Hybrid, GIMS 2019, Le Grand-Saconnex (GIMS0518).jpg",
+        "license": "CC BY-SA 4.0",
+        "sortOrder": 2
+      },
+      {
+        "imageUrl": "/uploads/listings/representative/toyota-rav4-2023/4.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Toyota_Rav4,_Oghuz_(P1090310).jpg",
+        "title": "File:Toyota Rav4, Oghuz (P1090310).jpg",
+        "license": "CC BY-SA 4.0",
+        "sortOrder": 3
+      }
+    ]
+  }
+}

@@ -1,9 +1,9 @@
-import { apiClient } from "./apiClient.js";
+import { apiClient, resolveAssetUrl } from "./apiClient.js";
 import { getMyListings, normalizeListing } from "./listingApiService.js";
 
 const PLACEMENT_BY_PACKAGE = {
   1: "FEATURED",
-  2: "TOP_LISTING",
+  2: "HERO_PROMOTION",
   3: "HOME_BANNER",
 };
 
@@ -24,7 +24,7 @@ function normalizePromotion(promotion) {
     ...promotion,
     id: promotion.id,
     listingId: promotion.listingId,
-    listing: normalizedListing,
+    listing: normalizedListing || promotion.listing || null,
     listingTitle:
       promotion.listingTitle ||
       normalizedListing?.title ||
@@ -57,6 +57,7 @@ function normalizePromotion(promotion) {
       : promotion.screenshotName,
     screenshotUrl: promotion.paymentProofUrl || promotion.screenshotUrl || "",
     amount: Number(promotion.amount || 0),
+    discount: Number(promotion.discount || 0),
     status: normalizeStatus(promotion.status),
   };
 }
@@ -88,6 +89,11 @@ export async function requestPromotion(
     metadata.promotionPlacement || PLACEMENT_BY_PACKAGE[Number(packageId)] || "FEATURED",
   );
   formData.append("amount", String(metadata.amount || 0));
+  formData.append("discount", String(metadata.discount || 0));
+  formData.append("durationDays", String(Number(metadata.durationDays) || 7));
+  if (metadata.specs) {
+    formData.append("specs", metadata.specs);
+  }
   formData.append("paymentType", metadata.paymentMethod || "PROMOTION_FEE");
 
   if (screenshotFile?.file) {
@@ -112,13 +118,8 @@ export async function fetchPendingPromotionRequests() {
 }
 
 export async function fetchOwnerPromotions(ownerId) {
-  const requests = await fetchPromotionRequests();
-  return requests.filter((promotion) => {
-    if (!ownerId) return true;
-    return (
-      String(promotion.userId || promotion.ownerId || "") === String(ownerId)
-    );
-  });
+  const data = await apiClient.get("/api/promotions/mine");
+  return Array.isArray(data) ? data.map(normalizePromotion) : [];
 }
 
 export async function approvePromotionRequest(id) {
@@ -143,4 +144,31 @@ export async function rejectPromotionRequest(id) {
 export async function fetchActivePromotions() {
   const data = await apiClient.get("/api/promotions/featured/active");
   return Array.isArray(data) ? data.map(normalizePromotion) : [];
+}
+
+export async function fetchHeroPromotions() {
+  const data = await apiClient.get("/api/advertising/hero-promotions/active");
+  return Array.isArray(data) ? data : [];
+}
+
+export async function fetchFeaturedListings() {
+  const data = await apiClient.get("/api/advertising/featured-listings/active");
+  return Array.isArray(data) ? data.map(promo => {
+    if (promo.listing) {
+      promo.listing = normalizeListing(promo.listing);
+      if (promo.listing.image) {
+        promo.listing.image = resolveAssetUrl(promo.listing.image);
+      }
+      if (promo.listing.coverImage) {
+        promo.listing.coverImage = resolveAssetUrl(promo.listing.coverImage);
+      }
+      if (Array.isArray(promo.listing.images)) {
+        promo.listing.images = promo.listing.images.map(img => ({
+          ...img,
+          imageUrl: resolveAssetUrl(img.imageUrl)
+        }));
+      }
+    }
+    return promo;
+  }) : [];
 }

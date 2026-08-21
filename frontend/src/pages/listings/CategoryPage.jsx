@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { categories } from "../../data/items.js";
@@ -10,6 +10,8 @@ import {
   listingMatchesRentalCategory,
   normalizeCategoryToken,
 } from "../../utils/categoryMapping.js";
+import ListingCard from "../../components/cards/ListingCard.jsx";
+import { getCategoryFallbackImage } from "../../utils/categoryFallbacks.js";
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -299,7 +301,7 @@ export default function CategoryPage() {
           <div className="row g-4">
             {filteredItems.map((item) => (
               <div className="col-md-6 col-lg-4" key={item.id}>
-                <CategoryListingCard item={item} t={t} />
+                <ListingCard item={item} />
               </div>
             ))}
           </div>
@@ -309,85 +311,8 @@ export default function CategoryPage() {
   );
 }
 
-function CategoryListingCard({ item, t }) {
-  const displayPrice = item.price || formatDailyPrice(item.pricePerDay || 0);
-  const ownerName =
-    item.ownerName ||
-    item.owner?.businessName ||
-    item.owner?.name ||
-    (typeof item.owner === "string" ? item.owner : "") ||
-    t("verifiedOwner");
-
-  return (
-    <article className="premium-glass-card listing-card-premium">
-      {/* Image */}
-      <div className="card-img-wrapper">
-        <img src={item.image} alt={item.title} className="card-img" />
-        <div className="card-badges">
-          {item.featured && (
-            <span className="badge-featured">{t("featured")}</span>
-          )}
-        </div>
-        {item.rating && (
-          <span className="badge-photos">
-            <i className="bi bi-star-fill text-warning"></i> {item.rating}
-          </span>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="card-body-premium">
-        {/* City • Sefar */}
-        <div className="d-flex align-items-center gap-1 mb-2">
-          <i
-            className="bi bi-geo-alt-fill text-danger"
-            style={{ fontSize: "0.8rem" }}
-          ></i>
-          <span
-            style={{
-              fontSize: "0.8rem",
-              color: "var(--text-muted)",
-              fontWeight: 600,
-            }}
-          >
-            {item.city}
-            {item.sefar ? ` • ${item.sefar}` : ""}
-          </span>
-        </div>
-
-        {/* Title */}
-        <h3 className="card-title">{item.title}</h3>
-
-        {/* Price */}
-        <p className="card-price-premium">
-          <strong>{displayPrice}</strong> <small>/ {t("perDay")}</small>
-        </p>
-
-        {/* Owner */}
-        <div className="card-owner-info">
-          <div className="owner-avatar">{String(ownerName).charAt(0)}</div>
-          <span className="owner-name">{String(ownerName)}</span>
-          <i
-            className="bi bi-patch-check-fill text-success"
-            title={t("verifiedOwner")}
-          ></i>
-        </div>
-
-        {/* Actions */}
-        <div className="category-card-actions">
-          <Link to={`/items/${item.id}`} className="btn-view-details">
-            {t("viewDetails")} <i className="bi bi-arrow-right"></i>
-          </Link>
-          <Link to={`/items/${item.id}`} className="btn-contact-owner">
-            <i className="bi bi-chat-dots"></i> {t("contactOwner")}
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 // Helper function - make sure this is defined or imported
 function getCategoryKey(item) {
   return item.slug || item.id || item.name?.toLowerCase().replace(/\s+/g, "-");
 }
+

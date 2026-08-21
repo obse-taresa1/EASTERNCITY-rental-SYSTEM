@@ -1,4 +1,5 @@
 const prisma = require("../config/db");
+const { sendContactReplyEmail } = require("./emailService");
 const { hashPassword } = require("../utils/hash");
 
 function statusIn(values) {
@@ -175,12 +176,41 @@ async function listPromotions(query = {}) {
 }
 
 async function updatePromotion(actor, id, status, reason) {
+  const existingPromotion = await prisma.promotion.findUnique({ where: { id } });
+
+  const updateData = { 
+    status, 
+    rejectionReason: reason, 
+    approvedById: actor.id, 
+    approvedAt: new Date() 
+  };
+
+  if (status === "APPROVED") {
+    updateData.startDate = new Date();
+    const duration = existingPromotion.durationDays || 7;
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + duration);
+    updateData.endDate = endDate;
+  }
+
   const promotion = await prisma.promotion.update({
     where: { id },
-    data: { status, rejectionReason: reason, approvedById: actor.id, approvedAt: new Date() },
+    data: updateData,
     include: { listing: true, user: true },
   });
   await log({ actor, action: `${status} promotion for ${promotion.listing.title}`, metadata: { promotionId: id } });
+
+  // When approving a Hero/Hero-Section promotion, create the HeroPromotion record
+  if (status === "APPROVED" && (promotion.placement === "HERO_PROMOTION" || promotion.placement === "HERO_SECTION" || promotion.placement === "Homepage Promotion" || promotion.placement === "Homepage Banner")) {
+    try {
+      const heroService = require('../services/heroPromotionService');
+      await heroService.createFromPromotion(promotion);
+    } catch (heroErr) {
+      // Log but don't fail the approval
+      console.error("Failed to create HeroPromotion after approval:", heroErr.message);
+    }
+  }
+
   return promotion;
 }
 
@@ -221,13 +251,26 @@ async function listContactMessages() {
 }
 
 async function updateContactMessage(actor, id, payload) {
+  const existingMessage = await prisma.contactMessage.findUnique({ where: { id } });
+  let emailDelivery = null;
+
+  if (payload.adminReply && existingMessage?.email) {
+    emailDelivery = await sendContactReplyEmail({
+      to: existingMessage.email,
+      recipientName: existingMessage.name,
+      subject: existingMessage.subject,
+      reply: payload.adminReply,
+      adminName: actor?.name,
+    });
+  }
+
   const message = await prisma.contactMessage.update({
     where: { id },
     data: { status: payload.status, adminReply: payload.adminReply, repliedAt: payload.adminReply ? new Date() : undefined },
     include: { user: true },
   });
   await log({ actor, action: `Updated contact message ${message.subject}`, metadata: { contactMessageId: id } });
-  return message;
+  return { ...message, emailDelivery };
 }
 
 async function listReports(query = {}) {
@@ -277,6 +320,65 @@ async function saveSettings(actor, payload) {
   return getSettings();
 }
 
+// Keys that only SUPER_ADMIN can read or write
+const PLATFORM_KEYS = new Set([
+  'platformName', 'currency', 'defaultLanguage',
+  'maintenanceMode', 'allowNewListings', 'allowNewRegistrations',
+  'emailAlerts',
+  'featuredListingPricePerDay', 'homepagePromotionPricePerDay',
+  'minPromotionDays', 'maxPromotionDays',
+  'requirePaymentVerification', 'requireAdminApproval',
+]);
+
+async function getSettingsForRole(role) {
+  const rows = await prisma.systemSetting.findMany();
+  const all = rows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
+  if (role === 'SUPER_ADMIN') return all;
+  // ADMIN: return only admin-preference keys (anything NOT in PLATFORM_KEYS)
+  const filtered = {};
+  for (const [k, v] of Object.entries(all)) {
+    if (!PLATFORM_KEYS.has(k)) filtered[k] = v;
+  }
+  return filtered;
+}
+
+async function savePlatformSettings(actor, payload) {
+  // Reject any keys not in PLATFORM_KEYS
+  const entries = Object.entries(payload).filter(([key]) => PLATFORM_KEYS.has(key));
+  if (entries.length === 0) throw Object.assign(new Error('No valid platform settings provided.'), { statusCode: 400 });
+  await Promise.all(entries.map(([key, value]) => prisma.systemSetting.upsert({
+    where: { key },
+    update: { value: String(value), updatedById: actor.id },
+    create: { key, value: String(value), updatedById: actor.id },
+  })));
+  await log({ actor, action: 'Updated platform settings', type: 'SECURITY' });
+  return getSettingsForRole('SUPER_ADMIN');
+}
+
+async function saveAdminPreferences(actor, payload) {
+  // Admin preferences are namespaced by userId to keep them personal
+  const entries = Object.entries(payload).map(([key, value]) => [
+    `admin_${key}_${actor.id}`, value
+  ]);
+  await Promise.all(entries.map(([key, value]) => prisma.systemSetting.upsert({
+    where: { key },
+    update: { value: String(value), updatedById: actor.id },
+    create: { key, value: String(value), updatedById: actor.id },
+  })));
+  await log({ actor, action: 'Updated admin preferences', type: 'INFO' });
+  // Return only this admin's prefs
+  const rows = await prisma.systemSetting.findMany({
+    where: { key: { startsWith: `admin_` } }
+  });
+  const mine = rows
+    .filter(r => r.key.endsWith(`_${actor.id}`))
+    .reduce((acc, r) => {
+      const baseKey = r.key.replace(/^admin_/, '').replace(/_[^_]+$/, '');
+      return { ...acc, [baseKey]: r.value };
+    }, {});
+  return mine;
+}
+
 async function listLogs(query = {}) {
   const where = query.type ? { type: query.type } : {};
   return prisma.activityLog.findMany({ where, include: { actor: true }, orderBy: { createdAt: "desc" }, take: 100 });
@@ -310,17 +412,102 @@ async function analytics(query = {}) {
   };
 }
 
+async function listCommunityPosts(query = {}) {
+  const where = {};
+  if (query.status && query.status !== "all") where.status = query.status.toUpperCase();
+  if (query.search) {
+    where.OR = [
+      { title: { contains: query.search, mode: "insensitive" } },
+      { description: { contains: query.search, mode: "insensitive" } },
+    ];
+  }
+  return prisma.communityPost.findMany({
+    where,
+    include: {
+      author: { select: { id: true, name: true, email: true, city: true, profileImageUrl: true } },
+      media: { orderBy: { createdAt: "asc" }, take: 1 },
+      _count: { select: { comments: true, likes: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+async function updateCommunityPost(actor, id, payload) {
+  const numId = parseInt(id, 10);
+  if (!numId || numId < 1) throw Object.assign(new Error("Invalid post id."), { statusCode: 400 });
+  const data = {};
+  ["status", "rejectionReason"].forEach((key) => {
+    if (payload[key] !== undefined) data[key] = payload[key];
+  });
+  const post = await prisma.communityPost.update({ where: { id: numId }, data, include: { author: true } });
+  await log({ actor, action: `Updated community post ${post.title}`, metadata: { postId: id, status: post.status } });
+
+  if (data.status === "APPROVED") {
+    await prisma.notification.create({
+      data: {
+        userId: post.authorId,
+        title: "Community Post Approved",
+        body: `Your community post "${post.title}" has been approved and is now live.`,
+        type: "SYSTEM",
+      }
+    });
+  } else if (data.status === "REJECTED") {
+     await prisma.notification.create({
+      data: {
+        userId: post.authorId,
+        title: "Community Post Rejected",
+        body: `Your community post "${post.title}" has been rejected.`,
+        type: "SYSTEM",
+      }
+    });
+  }
+
+  return post;
+}
+
+async function deleteCommunityPost(actor, id) {
+  const numId = parseInt(id, 10);
+  if (!numId || numId < 1) throw Object.assign(new Error("Invalid post id."), { statusCode: 400 });
+
+  const post = await prisma.$transaction(async (tx) => {
+    // Check if post exists
+    const existingPost = await tx.communityPost.findUnique({ where: { id: numId } });
+    if (!existingPost) {
+      throw Object.assign(new Error("Community post not found."), { statusCode: 404 });
+    }
+
+    // Delete related records manually to handle FK constraints safely if cascade isn't set
+    await tx.media.deleteMany({ where: { postId: numId } });
+    await tx.comment.deleteMany({ where: { postId: numId } });
+    await tx.like.deleteMany({ where: { postId: numId } });
+    await tx.savedPost.deleteMany({ where: { postId: numId } });
+    await tx.match.deleteMany({ where: { postId: numId } });
+    await tx.ownerReply.deleteMany({ where: { postId: numId } });
+
+    // Delete the post
+    return tx.communityPost.delete({ where: { id: numId } });
+  });
+
+  await log({ actor, action: `Deleted community post ${post.title}`, type: "SECURITY", metadata: { postId: numId } });
+  return post;
+}
+
 module.exports = {
   analytics,
   createAdmin,
   createNotification,
   deleteCategory,
+  deleteCommunityPost,
   deleteListing,
   deleteReview,
   deleteUser,
   getSettings,
+  getSettingsForRole,
+  savePlatformSettings,
+  saveAdminPreferences,
   listBookings,
   listCategories,
+  listCommunityPosts,
   listContactMessages,
   listListings,
   listLogs,
@@ -332,6 +519,7 @@ module.exports = {
   listUsers,
   saveCategory,
   saveSettings,
+  updateCommunityPost,
   updateContactMessage,
   updateListing,
   updatePromotion,

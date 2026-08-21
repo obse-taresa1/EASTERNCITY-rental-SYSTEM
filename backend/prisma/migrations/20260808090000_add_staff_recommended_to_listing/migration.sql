@@ -1,0 +1,2 @@
+ALTER TABLE "Listing"
+ADD COLUMN IF NOT EXISTS "staffRecommended" BOOLEAN NOT NULL DEFAULT false;

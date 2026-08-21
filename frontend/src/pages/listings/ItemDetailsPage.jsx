@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import ListingImageGallery from "../../components/listings/ListingImageGallery.jsx";
 import SimilarListingsCarousel from "../../components/listings/SimilarListingsCarousel.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { categories } from "../../data/items.js";
+import { getCategoryFallbackImage } from "../../utils/categoryFallbacks.js";
 import { getListingById } from "../../services/listingApiService.js";
 import { getReviewsByListing } from "../../services/reviewApiService.js";
 import { startListingConversation } from "../../services/messageApiService.js";
@@ -156,21 +158,30 @@ export default function ItemDetailsPage() {
         )}
 
         <section className="details-hero-grid">
-          <div className="details-gallery premium-glass-card">
-            <img src={item.image} alt={item.title} />
+          <div className="details-gallery premium-glass-card p-0 overflow-hidden">
+            <ListingImageGallery 
+              images={item.images || (item.image ? [item.image] : [])} 
+              fallbackImage={getCategoryFallbackImage(item.category)} 
+            />
           </div>
 
           <aside className="details-contact-card premium-glass-card">
-            <span className="section-label">
-              {category?.name || item.categoryName || item.category}
-            </span>
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <span className="section-label mb-0">
+                {category?.name || item.categoryName || item.category}
+              </span>
+              {item.isFeatured && (
+                <span className="badge-featured" style={{ position: 'static', margin: 0 }}>
+                  FEATURED
+                </span>
+              )}
+            </div>
             <h1>{item.title}</h1>
             <p className="details-location">
               <i className="bi bi-geo-alt-fill"></i> {item.location}
             </p>
             <div className="details-price-row">
               <strong>{displayPrice}</strong>
-              <span>/ day</span>
             </div>
             <div className="details-rating-row">
               <span>{averageRating}</span>

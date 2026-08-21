@@ -6,21 +6,22 @@ function engagementRate(bookings, listings) {
   return Math.min(100, Math.round((bookings / listings) * 100));
 }
 
-export default function AdminAnalyticsPage() {
+export default function AdminAnalyticsPage({ scope = "admin" }) {
   const [filter, setFilter] = useState("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [data, setData] = useState(null);
   const [notice, setNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const sectionLabel = scope === "admin" ? "ADMIN" : "SUPER ADMIN";
 
   useEffect(() => {
     let active = true;
     const params = { range: filter };
     if (filter === "custom") {
       if (!startDate || !endDate) return undefined;
-      params.startDate = startDate;
-      params.endDate = endDate;
+      params.from = startDate;
+      params.to = endDate;
     }
 
     setIsLoading(true);
@@ -41,15 +42,23 @@ export default function AdminAnalyticsPage() {
     };
   }, [filter, startDate, endDate]);
 
-  const counts = data?.counts || {};
-  const revenue = data?.revenue || {};
-  const cityStats = data?.breakdowns?.listingsByCity || [];
+  const counts = {
+    totalUsers: data?.userGrowth,
+    totalListings: data?.listingGrowth,
+    verificationRequests: data?.verifications,
+    totalBookings: data?.bookingGrowth,
+  };
+  const revenue = {
+    listingFeeRevenue: data?.listingFeeRevenue,
+    promotionRevenue: data?.promoRevenue,
+  };
+  const cityStats = data?.cityStats || [];
 
   return (
     <main className="dashboard-content">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <span className="section-label">ADMIN</span>
+          <span className="section-label">{sectionLabel}</span>
           <h1 className="h3 mb-0">Platform Analytics</h1>
           <p className="text-muted mb-0">
             Analyze platform growth metrics and rental activities.
@@ -169,16 +178,19 @@ export default function AdminAnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {cityStats.map((city) => {
+                  {cityStats.map((cityObj) => {
+                    const cityLabel = cityObj.city;
+                    const listingsCount = cityObj.listings;
+                    const rentalsCount = cityObj.rentals;
                     const rate = engagementRate(
-                      counts.totalBookings || 0,
-                      city.value || 0,
+                      rentalsCount || 0,
+                      listingsCount || 0,
                     );
                     return (
-                      <tr key={city.label}>
-                        <td className="fw-bold">{city.label}</td>
-                        <td>{city.value} listings</td>
-                        <td>{counts.totalBookings || 0} bookings</td>
+                      <tr key={cityLabel}>
+                        <td className="fw-bold">{cityLabel}</td>
+                        <td>{listingsCount} listings</td>
+                        <td>{rentalsCount} bookings</td>
                         <td>
                           <div className="d-flex align-items-center gap-2">
                             <div

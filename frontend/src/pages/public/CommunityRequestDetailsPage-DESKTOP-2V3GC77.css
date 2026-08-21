@@ -1,0 +1,213 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { communityService } from '../../services/communityService.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import './CommunityRequestDetailsPage.css';
+
+/**
+ * Details page for a single community post.
+ * Fetches post data, increments view count, and provides interactions (like, save, share, comment).
+ */
+export default function CommunityRequestDetailsPage() {
+  const { postId } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentImgIdx, setCurrentImgIdx] = useState(0);
+  const [newComment, setNewComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Fetch post and increment view count
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const data = await communityService.getPost(postId);
+        setPost(data.post || data);
+        // Increment view count (optimistic)
+        await communityService.incrementViews(postId);
+      } catch (e) {
+        console.error(e);
+        setError('Failed to load post');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, [postId]);
+
+  const handleLike = async () => {
+    if (!isAuthenticated) return navigate('/login');
+    try {
+      await communityService.likePost(postId);
+      setPost({ ...post, likes: (post.likes || 0) + 1 });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleUnlike = async () => {
+    if (!isAuthenticated) return navigate('/login');
+    try {
+      await communityService.unlikePost(postId);
+      setPost({ ...post, likes: Math.max((post.likes || 1) - 1, 0) });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!isAuthenticated) return navigate('/login');
+    try {
+      await communityService.savePost(postId);
+      setPost({ ...post, saved: true });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleUnsave = async () => {
+    if (!isAuthenticated) return navigate('/login');
+    try {
+      await communityService.unsavePost(postId);
+      setPost({ ...post, saved: false });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: post.title, url });
+        await communityService.incrementShares(postId);
+      } catch (e) {
+        console.error('Share failed', e);
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      await communityService.incrementShares(postId);
+      alert('Link copied to clipboard');
+    }
+  };
+
+  const submitComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await communityService.addComment(postId, newComment.trim());
+      // Refresh comments list
+      const updated = await communityService.getPost(postId);
+      setPost(updated.post || updated);
+      setNewComment('');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const nextImage = () => {
+    if (!post?.media) return;
+    setCurrentImgIdx((currentImgIdx + 1) % post.media.length);
+  };
+  const prevImage = () => {
+    if (!post?.media) return;
+    setCurrentImgIdx((currentImgIdx - 1 + post.media.length) % post.media.length);
+  };
+
+  if (loading) return <div className="details-loading">Loading...</div>;
+  if (error) return <div className="details-error">{error}</div>;
+  if (!post) return null;
+
+  const hasLiked = post.userLiked; // assume backend flag
+  const isSaved = post.saved; // assume backend flag
+
+  return (
+    <div className="details-page container">
+      <button className="back-btn" onClick={() => navigate(-1)}>
+        <i className="bi bi-arrow-left" /> Back
+      </button>
+      <div className="details-header">
+        <h1 className="details-title">{post.title}</h1>
+        <div className="details-meta">
+          <span><i className="bi bi-geo-alt" /> {post.city} – {post.neighbourhood}</span>
+          {post.rentalPeriod && (<span><i className="bi bi-clock" /> {post.rentalPeriod}</span>)}
+          {post.budget && (<span><i className="bi bi-cash" /> ETB {post.budget}</span>)}
+        </div>
+        <div className="details-actions">
+          <button className="action-btn" onClick={hasLiked ? handleUnlike : handleLike}>
+            <i className={`bi ${hasLiked ? 'bi-heart-fill' : 'bi-heart'}`} /> {post.likes?.length || 0}
+          </button>
+          <button className="action-btn" onClick={isSaved ? handleUnsave : handleSave}>
+            <i className={`bi ${isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'}`} /> Save
+          </button>
+          <button className="action-btn" onClick={handleShare}>
+            <i className="bi bi-share" /> Share
+          </button>
+        </div>
+      </div>
+
+      {/* Image Gallery */}
+      {post.media && post.media.length > 0 && (
+        <div className="gallery-wrapper">
+          <button className="gallery-nav left" onClick={prevImage}>&lt;</button>
+          <img src={post.media[currentImgIdx].url} alt={`Image ${currentImgIdx + 1}`} className="gallery-image" />
+          <button className="gallery-nav right" onClick={nextImage}>&gt;</button>
+          {post.media.length > 1 && (
+            <div className="gallery-thumb-strip">
+              {post.media.map((m, idx) => (
+                <img
+                  key={m.id || idx}
+                  src={m.url}
+                  alt={`thumb-${idx}`}
+                  className={`thumb ${idx === currentImgIdx ? 'active' : ''}`}
+                  onClick={() => setCurrentImgIdx(idx)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <p className="details-description">{post.description}</p>
+
+      {/* Comments Section */}
+      <section className="comments-section">
+        <h2>Comments ({post.comments?.length || 0})</h2>
+        <div className="comments-list">
+          {post.comments && post.comments.length > 0 ? (
+            post.comments.map((c) => (
+              <div key={c.id} className="comment-item">
+                <div className="comment-header">
+                  <span className="comment-author">{c.author?.name || 'Anonymous'}</span>
+                  <span className="comment-date">{new Date(c.createdAt).toLocaleDateString()}</span>
+                </div>
+                <p className="comment-content">{c.content}</p>
+              </div>
+            ))
+          ) : (
+            <p>No comments yet. Be the first to comment!</p>
+          )}
+        </div>
+        {isAuthenticated && (
+          <form className="comment-form" onSubmit={submitComment}>
+            <textarea
+              placeholder="Write a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              rows={3}
+              required
+            />
+            <button type="submit" disabled={submitting} className="btn-comment-submit">
+              {submitting ? 'Posting...' : 'Post Comment'}
+            </button>
+          </form>
+        )}
+      </section>
+    </div>
+  );
+}

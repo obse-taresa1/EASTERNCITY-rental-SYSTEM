@@ -74,6 +74,22 @@ const profileUpload = multer({
   },
 });
 
+const bannerUpload = multer({
+  storage: createStorage("banners"),
+  fileFilter: imageFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
+const advertisingUpload = multer({
+  storage: createStorage("advertising-requests"),
+  fileFilter: imageFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
 module.exports = {
   listingImages: listingUpload.fields([
     { name: "images", maxCount: 8 },
@@ -81,6 +97,9 @@ module.exports = {
   ]),
   paymentProof: paymentUpload.single("paymentProof"),
   profileImage: profileUpload.single("profileImage"),
+  bannerImage: bannerUpload.single("bannerImage"),
+  advertisingBanner: advertisingUpload.single("banner"),
+  advertisingReceipt: paymentUpload.single("paymentProof"),
   verificationDocuments: verificationUpload.fields([
     { name: "nationalIdFront", maxCount: 1 },
     { name: "nationalIdBack", maxCount: 1 },

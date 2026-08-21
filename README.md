@@ -1,150 +1,187 @@
-# EASTERNCITY Rental System
+# 🏙️ EasternCities Rental System
 
-A full-stack web application that connects property owners with tenants in a streamlined and intuitive rental marketplace. The platform handles the complete rental lifecycle — from listing discovery and user verification to bookings, messaging, payments, and administrative oversight.
+<p align="center">
+  <b>A full-stack rental marketplace platform for Eastern Ethiopian cities — built for tenants, property owners, admins, and super admins.</b>
+</p>
 
----
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Key Features](#key-features)
-- [Technology Stack](#technology-stack)
-- [Project Architecture](#project-architecture)
-- [Installation and Setup](#installation-and-setup)
-- [Environment Variables](#environment-variables)
-- [Database Setup](#database-setup)
-- [Development Guidelines](#development-guidelines)
-- [Future Improvements](#future-improvements)
-- [Screenshots](#screenshots)
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react" />
+  <img src="https://img.shields.io/badge/Node.js-Express-339933?style=flat&logo=node.js" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat&logo=postgresql" />
+  <img src="https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat&logo=prisma" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" />
+</p>
 
 ---
 
-## Project Overview
+## 📌 Table of Contents
 
-**EASTERNCITY Rental System** is a production-quality, full-stack rental marketplace built with React and Node.js. It is designed to solve the common friction points in the property rental process by providing a centralized, role-based platform for four distinct user types:
-
-- **Users (Tenants & Owners):** Browse, book, and manage rental properties.
-- **Admins:** Oversee platform content and moderate listings, users, and bookings.
-- **Super Admins:** Full platform control including admin management, analytics, and system configuration.
+- [Overview](#-overview)
+- [Project Status](#-project-status)
+- [Live Demo](#-live-demo)
+- [Features by Role](#-features-by-role)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Database Setup](#-database-setup)
+- [API Overview](#-api-overview)
+- [Role-Based Access Control](#-role-based-access-control)
+- [Promotion & Featured Listings System](#-promotion--featured-listings-system)
+- [Image Handling & UI/UX Guidelines](#-image-handling--uiux-guidelines)
+- [Community Module](#-community-module)
+- [AI Assistant](#-ai-assistant)
+- [Development Guidelines](#-development-guidelines)
+- [Roadmap](#-roadmap)
 
 ---
 
-## Key Features
+## 🌍 Overview
 
-### User / Tenant Features
-- Secure registration, login, password reset, and email-based authentication
-- Browse all rental listings and filter by category
-- View detailed property pages including descriptions, images, and reviews
-- Book properties directly through the platform
-- Track and manage all personal bookings
-- Save favourite listings for later reference
-- Send and receive messages with property owners
-- Receive real-time notifications
-- Leave and manage reviews for properties
-- Submit identity verification requests
-- Manage profile settings and account preferences
-- Access a help centre for support
+**EasternCities Rental System** is a full-stack rental marketplace serving the cities of **Jigjiga**, **Dire Dawa**, and **Harar** in eastern Ethiopia. It covers the complete rental lifecycle — from listing discovery and verified identity checks, to bookings, messaging, promotions, community requests, and full administrative oversight.
 
-### Property Owner Features
-- Create detailed property listings with multi-step form wizard
-- Upload and manage property images
-- Edit and update existing listing information
-- View and manage all personal listings and their statuses
+The platform supports **four distinct user roles** with strict backend enforcement:
+
+| Role | Description |
+|---|---|
+| **User / Tenant** | Browse, book, and manage listings |
+| **Owner** | List properties, manage bookings, view earnings |
+| **Admin** | Moderate content, approve listings, manage users |
+| **Super Admin** | Full platform control, system settings, revenue analytics |
+
+---
+
+## 🚧 Project Status
+
+This project is currently in **active development and testing**. While many core systems (authentication, listing browsing, role-based dashboards) are implemented, certain features and integrations remain in progress. Please refer to the [Roadmap](#-roadmap) to see the exact state of individual features.
+
+---
+
+## 🚀 Live Demo
+
+> **Production:** https://easterncity-rental-system.onrender.com
+> **Local Dev (Frontend):** `http://localhost:5173`
+> **Local Dev (Backend API):** `http://localhost:5000`
+
+---
+
+## ✨ Features by Role
+
+### 👤 User / Tenant Features
+- Secure registration, login, password reset, and JWT-based authentication (access + refresh tokens)
+- Browse all active listings with keyword, location, neighbourhood, price, and category filters
+- View detailed listing pages with image gallery, reviews, and specs
+- Request bookings and track booking status
+- Save favourite listings across sessions
+- In-platform messaging with listing owners
+- Real-time notification system
+- Leave and manage reviews on visited properties
+- Submit identity verification requests with document uploads
+- Manage profile settings, preferences, and account security
+- Access a built-in help/support centre
+
+### 🏠 Property Owner Features
+- Multi-step listing creation wizard with image uploads (up to 10 photos)
+- Manage, edit, and delete own listings
+- Request promotional placement for listings (Featured Listing, Homepage Promotion, Hero Section)
+- Upload payment proof for promotion requests and track approval status
+- View promotion history including hero section placements
 - Communicate with interested tenants via the messaging system
-- Track listing visibility and booking requests
 
-### Admin Features
-- Full admin dashboard with overview statistics
-- Manage and moderate all platform listings
-- Manage all registered users
-- Review and approve or reject verification requests
+### 🛡️ Admin Features
+- Full admin dashboard with summary statistics
+- Approve, reject, or feature platform listings
+- Manage all registered users (view, suspend, change role)
+- Review and approve identity verification requests
 - View and manage all platform bookings
-- Review and moderate user-submitted reviews
+- Moderate user-submitted reviews
 - Manage listing categories
-- Manage featured listings and promotion history
-- Handle promotion management for listings
-- View and respond to support tickets
-- Read and manage contact form messages
-- Monitor platform analytics and reporting
-- Manage admin notifications
-- View platform statistics and financial payment records
-- Access admin-level settings
+- Review and approve promotion requests — approved Hero promotions automatically appear in the homepage hero slider
+- View banner advertisements and manage advertising campaigns
+- Handle incoming support tickets and contact messages
+- View admin-level analytics and reporting
+- Admin-scoped personal preference settings (role-isolated from platform settings)
 
-### Super Admin Features
-- Complete super admin dashboard with platform-wide overview
+### 👑 Super Admin Features
+- Platform-wide overview dashboard with KPIs and charts
 - Manage and promote/demote admin accounts
-- Full user management across the entire platform
-- Full listing management oversight
-- Manage user role change requests
-- View full platform analytics and revenue reports
-- Monitor payments and revenue streams
-- Oversee identity verification requests
-- Access the security centre for security monitoring
-- View activity logs across the platform
-- Monitor platform health and real-time performance
-- Manage listing promotions across all admins
-- Manage listing categories at the platform level
-- Read and manage contact messages and reports/complaints
-- Access the platform support centre
-- Configure system-wide settings
+- Full user and listing management across the entire platform
+- Manage role-change requests
+- Full revenue analytics and payment tracking
+- Oversee all identity verifications
+- Security centre with platform activity logs
+- Real-time platform health monitoring
+- Configure system-wide platform settings:
+  - Platform name, currency, language
+  - Maintenance mode toggle
+  - Allow/disallow new listings and registrations
+  - Promotion pricing (Featured Listing: 100 ETB/day, Homepage Promotion: 400 ETB/day)
+  - Promotion duration rules (min 1 day, max 30 days)
+  - Payment verification and admin approval requirements
+- Manage contact messages, reports, and complaints
 
 ---
 
-## Technology Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-| Technology | Purpose |
-|---|---|
-| React 18 | UI framework |
-| Vite | Build tool and development server |
-| React Router v6 | Client-side routing |
-| Vanilla CSS | Custom styling |
+
+| Technology | Version | Purpose |
+|---|---|---|
+| **React** | 18 | UI component framework |
+| **Vite** | 5 | Build tool and dev server |
+| **React Router** | v6 | Client-side routing with role guards |
+| **Vanilla CSS** | — | Custom design system |
+| **Bootstrap Icons** | — | Icon library |
 
 ### Backend
-| Technology | Purpose |
-|---|---|
-| Node.js | Runtime environment |
-| Express.js | Web server framework |
-| PostgreSQL (Neon) | Production database |
-| Prisma ORM | Database schema management and queries |
-| JWT | Stateless authentication (access + refresh tokens) |
-| Nodemailer | Email delivery (SMTP) |
+
+| Technology | Version | Purpose |
+|---|---|---|
+| **Node.js** | 22 | Server runtime |
+| **Express.js** | 4 | HTTP framework |
+| **PostgreSQL (Neon)** | — | Cloud-hosted relational database |
+| **Prisma ORM** | 5 | Schema management, migrations, type-safe queries |
+| **JWT** | — | Stateless auth with access + refresh token rotation |
+| **Bcrypt** | — | Password hashing |
+| **Multer** | — | File uploads (listing images, payment proofs) |
+| **Nodemailer** | — | Email delivery via SMTP |
+| **Google Generative AI** | — | Backend-served AI assistant (Gemini) |
 
 ---
 
-## Project Architecture
+## 🏗️ Architecture
 
-The project uses a clean **monorepo structure**, keeping the frontend and backend completely separated:
+The project follows a **monorepo structure** with a clean separation between frontend and backend:
 
-```text
+```
 EASTERNCITY-rental-SYSTEM/
-├── frontend/                 # React application (Vite)
+│
+├── frontend/                         # React application (Vite)
 │   ├── src/
-│   │   ├── assets/           # Images and static files
-│   │   ├── components/       # Reusable UI components
-│   │   ├── context/          # React Context (auth, theme)
-│   │   ├── data/             # Static constants and mock data
-│   │   ├── layouts/          # Layout wrappers per role
-│   │   ├── pages/            # Route-level page components
-│   │   ├── routes/           # App routing and role guards
-│   │   ├── services/         # API call abstractions
-│   │   ├── styles/           # Global CSS stylesheets
-│   │   └── utils/            # Helper utilities
-│   ├── public/               # Static assets
-│   ├── .env.example          # Frontend environment template
-│   ├── package.json
+│   │   ├── assets/                   # Static images and icons
+│   │   ├── components/               # Reusable UI components
+│   │   ├── context/                  # AuthContext, LanguageContext, etc.
+│   │   ├── layouts/                  # Role-scoped layout wrappers
+│   │   ├── pages/                    # Route-level components
+│   │   ├── routes/                   # App router and role-based guards
+│   │   ├── services/                 # API abstraction layer (apiClient.js)
+│   │   ├── styles/                   # Global CSS stylesheets
+│   │   └── utils/                    # Utility helpers
 │   └── vite.config.js
 │
-├── backend/                  # Node.js/Express API server
+├── backend/                          # Node.js / Express API
 │   ├── src/
-│   │   ├── controllers/      # Route handler logic
-│   │   ├── middleware/       # Auth, error handling, etc.
-│   │   ├── routes/           # Express route definitions
-│   │   ├── services/         # Business logic layer
-│   │   └── utils/            # JWT helpers, validators, etc.
-│   ├── prisma/               # Schema, migrations, seed
-│   ├── .env.example          # Backend environment template
-│   └── package.json
+│   │   ├── controllers/              # Route handler logic
+│   │   ├── services/                 # Business logic
+│   │   ├── repositories/             # Data access layer
+│   │   ├── routes/                   # Express route definitions
+│   │   ├── middleware/               # Auth, role authorization, etc.
+│   │   └── utils/                    # Helpers
+│   ├── prisma/
+│   │   ├── schema.prisma             # Database schema
+│   │   └── migrations/               # Prisma migration history
+│   └── server.js                     # Server entry point
 │
 ├── README.md
 ├── DEVELOPER_SETUP.md
@@ -153,115 +190,252 @@ EASTERNCITY-rental-SYSTEM/
 
 ---
 
-## Installation and Setup
+## ⚙️ Getting Started
+
+### Prerequisites
+- Node.js >= 18
+- npm >= 9
+- PostgreSQL database (local or Neon cloud)
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/your-org/EASTERNCITY-rental-SYSTEM.git
 cd EASTERNCITY-rental-SYSTEM
 ```
 
-### 2. Install Frontend Dependencies
+### 2. Install Dependencies
 ```bash
+# Frontend
 cd frontend
 npm install
-```
 
-### 3. Install Backend Dependencies
-```bash
-cd backend
+# Backend
+cd ../backend
 npm install
 ```
 
-### 4. Run the Frontend
+### 3. Configure Environment Variables
+Copy the example files and fill in your values:
 ```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+### 4. Set Up the Database
+```bash
+cd backend
+npx prisma db push       # Apply schema to your DB
+npx prisma generate      # Generate Prisma Client
+```
+
+### 5. Start the Development Servers
+```bash
+# Terminal 1 — Backend (http://localhost:5000)
+cd backend
+npm run dev
+
+# Terminal 2 — Frontend (http://localhost:5173)
 cd frontend
 npm run dev
 ```
 
-### 5. Run the Backend
-```bash
-cd backend
-npm run dev
-```
-
-> For detailed environment configuration and database setup instructions, see [DEVELOPER_SETUP.md](./DEVELOPER_SETUP.md).
+> For full setup details, see [DEVELOPER_SETUP.md](./DEVELOPER_SETUP.md).
 
 ---
 
-## Environment Variables
+## 🔐 Environment Variables
 
-Environment variables are separated by application layer.
-
-| File | Purpose |
-|---|---|
-| `frontend/.env` | Local frontend config (not committed) |
-| `frontend/.env.example` | Frontend environment template (committed) |
-| `backend/.env` | Local backend config with real secrets (not committed) |
-| `backend/.env.example` | Backend environment template (committed) |
-
-> **Never commit `.env` files.** They contain sensitive credentials and are protected by `.gitignore`.
-
-### AI Assistant Configuration
-
-The EasternCities AI assistant is served only by the backend. Add these variables to
-`backend/.env` for local development, or configure the same variables in the hosting
-platform for production:
-
+### `backend/.env`
 ```env
-GEMINI_API_KEY=your_server_side_gemini_key
+# Server
+PORT=5000
+NODE_ENV=development
+
+# Database
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+
+# Authentication
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+# AI Assistant (server-side only — never expose to frontend)
+GEMINI_API_KEY=your_gemini_api_key
 GEMINI_MODEL=gemini-2.5-flash
+
+# File Uploads
+UPLOAD_DIR=./uploads
 ```
 
-Do not add `GEMINI_API_KEY` to `frontend/.env` or any `VITE_` variable. The frontend
-only calls the backend endpoint, so the key remains on the server.
+### `frontend/.env`
+```env
+VITE_API_BASE_URL=http://localhost:5000
+```
+> **Never commit `.env` files.** They are excluded by `.gitignore`. Do NOT add `GEMINI_API_KEY` to any `VITE_` frontend variable.
 
 ---
 
-## Database Setup
+## 🗄️ Database Setup
 
-The backend uses Prisma ORM. Run these commands from the `backend/` directory after configuring your `DATABASE_URL`:
+All database management is done via Prisma from the `backend/` directory:
 
 ```bash
-npx prisma validate       # Validate the schema
-npx prisma format         # Auto-format the schema file
-npx prisma migrate deploy # Apply all pending migrations
-npx prisma generate       # Generate the Prisma Client
+npx prisma db push         # Push schema changes to DB (dev, no migration files)
+npx prisma migrate dev     # Create a new migration (interactive, dev only)
+npx prisma migrate deploy  # Apply migrations in production
+npx prisma generate        # Regenerate Prisma Client after schema changes
+npx prisma studio          # Open visual DB browser
 ```
 
 ---
 
-## Development Guidelines
+## 📡 API Overview
 
-- **Keep concerns separated:** Frontend and backend are independent applications — do not mix logic across them.
-- **Follow clean code practices:** Write readable, consistent, and well-named code.
-- **Maintain stable API contracts:** Coordinate any changes to API endpoints or database schemas with all contributors.
-- **Protect secrets:** Never hardcode credentials or commit `.env` files to version control.
-- **Test before committing:** Verify that both the frontend and backend run correctly before pushing changes.
+The REST API is prefixed at `/api`. Key verified route groups:
+
+| Route Group | Path | Auth Required |
+|---|---|---|
+| Authentication | `/api/auth` | Public |
+| Listings | `/api/listings` | Mixed |
+| Bookings | `/api/bookings` | User+ |
+| Promotions | `/api/promotions` | User+ |
+| Hero Promotions (read) | `/api/advertising/hero-promotions/active` | Public |
+| Hero Promotions (write) | `/api/advertising/hero-promotions` | Admin+ |
+| Featured Listings (admin) | `/api/advertising/featured-listings` | Admin+ |
+| Messaging | `/api/messages` | User+ |
+| Notifications | `/api/notifications` | User+ |
+| Reviews | `/api/reviews` | User+ |
+| Community | `/api/community` | User+ |
+| Support | `/api/support-tickets` | User+ |
+| Contact Messages | `/api/contact-messages` | Public / User+ |
+| Admin Management | `/api/admin-management` | Admin+ |
+| Settings (GET) | `/api/admin-management/settings` | Admin+ (role-filtered) |
+| Platform Settings (PUT) | `/api/admin-management/settings/platform` | Super Admin only |
+| Admin Preferences (PUT) | `/api/admin-management/settings/admin` | Admin+ |
 
 ---
 
-## Future Improvements
+## 🔒 Role-Based Access Control
 
-- **Mobile Application:** iOS and Android apps built with React Native for on-the-go access.
-- **Advanced Search & Recommendations:** AI-driven property recommendations and intelligent filtering.
-- **In-App Payment Integration:** Secure payment processing for booking deposits and subscription plans.
-- **Map-Based Property Search:** Integrate a map view for location-based browsing of listings.
-- **Multi-Language Support:** Internationalization (i18n) for broader audience reach.
+Access control is enforced on **both frontend and backend**:
+
+- **Frontend:** Route guards redirect unauthorized users. Admin/Super Admin UI is hidden based on role.
+- **Backend:** The `authorize(role)` middleware returns `403 Forbidden` if the user lacks the required role.
+
+### Settings Isolation
+
+| Setting Type | Who Can Access | Keys |
+|---|---|---|
+| Platform settings | Super Admin only | `platformName`, `currency`, `maintenanceMode`, `allowNewListings`, promotion pricing, etc. |
+| Admin preferences | Admin (own only) | Namespaced as `admin_<key>_<userId>` |
+
+Admins who attempt to `GET` or `PUT` platform settings via direct API calls receive a `403` response — enforcement is strictly backend-only.
 
 ---
 
-## Screenshots
+## 🌟 Promotion & Featured Listings System
 
-> Screenshots will be added upon final UI completion.
+Featured Listings are strictly time-bound and do not act as a permanent listing state. The entire Featured lifecycle is driven by the backend `Promotion` system.
 
-| Page | Preview |
+### Promotion Packages
+| Package | Placement Value |
 |---|---|
-| Home Page | *Coming soon* |
-| User / Tenant Dashboard | *Coming soon* |
-| Property Owner Dashboard | *Coming soon* |
-| Admin Dashboard | *Coming soon* |
-| Super Admin Dashboard | *Coming soon* |
-| Listing Detail Page | *Coming soon* |
-| Booking Flow | *Coming soon* |
-| Messaging System | *Coming soon* |
+| Featured Listing | `FEATURED` |
+| Homepage Promotion | `HERO_PROMOTION` |
+| Hero Section | `HERO_SECTION` |
+
+### Complete Lifecycle
+1. **Request:** A user submits a promotion request with payment proof from the "My Listings" dashboard.
+2. **Review:** An admin reviews the request and payment in Promotion Management.
+3. **Approval:** Upon approval, the promotion receives active `startDate` and `endDate` timestamps.
+4. **Active State:** 
+   - While the promotion is active, the listing appears dynamically in the Featured Listings section (pulled via the `/api/promotions/featured/active` endpoint).
+   - The listing receives the appropriate `★ FEATURED` badge overlay.
+   - For `HERO_PROMOTION` or `HERO_SECTION`, a `HeroPromotion` record is automatically generated so the listing appears in the main homepage hero slider.
+   - The application ensures listings are deduplicated so the same property does not appear multiple times on the same page.
+5. **Expiration:** Once the `endDate` passes, the backend naturally stops returning the listing as featured, and the property automatically reverts to normal status. 
+
+---
+
+## 🖼️ Image Handling & UI/UX Guidelines
+
+### Multiple Listing Images (Card vs Gallery)
+Listings can contain up to 10 images. 
+- **Listing Cards:** By default, cards display a smooth, automatic slideshow of all available images without requiring user interaction. The primary/cover image acts as a fallback. 
+- **Gallery View:** The full listing detail page presents an interactive grid or gallery view for manual inspection.
+- **Card Containers:** Images are rendered inside fixed-dimension containers using `object-fit: cover` to ensure they are never stretched or distorted.
+- **Image Fallbacks:** Any broken or missing images gracefully downgrade to a category-specific fallback image placeholder.
+
+### Hero Images
+Hero section images dynamically pull from `HeroPromotion` records.
+- **Focal Positioning:** Hero images must remain visually clear and are also styled with `object-fit: cover` (and `object-position: top center` or `center center`) so they never stretch regardless of screen size.
+- **Responsive Handling:** The hero slider seamlessly adapts from desktop ultra-wide displays down to mobile viewports while preserving the intended full-screen presentation.
+
+### UI/UX Behavior
+- **Responsive Layouts:** The entire application (cards, tables, forms, and heroes) supports mobile, tablet, and desktop views.
+- **Loading & Empty States:** Network requests always trigger localized loading spinners or skeleton loaders. If data is absent, a clean, user-friendly "Empty State" message is shown.
+- **API Error States:** Robust `try/catch` boundaries ensure that failed API requests show graceful error banners rather than crashing the React tree.
+- **Badges:** Overlay badges (like Featured, Location) strictly reflect actual promotion status. They are absolute-positioned with appropriate z-indexes to prevent collision with image sliders or titles.
+- **Interactions:** Buttons and controls clearly perform documented actions (e.g., clicking a navigation dot changes the active slide, clicking the wish-list heart saves a listing locally or to the backend).
+
+---
+
+## 🤝 Community Module
+
+The Community page allows authenticated users to:
+- Post and browse community requests (help requests, offers, events)
+- View detailed community posts with full discussion
+- Admins can manage and moderate all community posts from the admin panel
+
+---
+
+## 🤖 AI Assistant
+
+The platform includes a built-in AI assistant powered by **Google Gemini**:
+- Served exclusively by the backend at `/api/ai-chat`
+- The API key is **never exposed to the frontend**
+- Configured via `GEMINI_API_KEY` in `backend/.env`
+- Frontend calls the backend endpoint only
+
+---
+
+## 📐 Development Guidelines
+
+- **Separation of concerns:** Frontend and backend are independent. Never mix logic across them.
+- **API contracts:** Coordinate any changes to endpoints or Prisma schema before merging.
+- **Role security:** Never rely on frontend-only role checks. Always enforce roles in the backend `authorize` middleware.
+- **Image URLs:** Uploaded file paths stored in the DB are relative (e.g., `/uploads/...`). Use `resolveAssetUrl()` from `apiClient.js` in the frontend to prepend the correct backend base URL.
+- **Secrets:** Never hardcode credentials. Never add server-side secrets to `VITE_` variables.
+- **Schema changes:** After every `schema.prisma` change, run `npx prisma generate` and restart the backend.
+
+---
+
+## 🗺️ Roadmap
+
+| Feature | Status |
+|---|---|
+| Core rental marketplace | ✅ Complete |
+| JWT auth with refresh tokens | ✅ Complete |
+| Multi-role dashboard system | ✅ Complete |
+| Listing promotions & hero slider | ✅ Complete |
+| Community requests module | ✅ Complete |
+| Advertising management | ✅ Complete |
+| Role-based settings (backend enforced) | ✅ Complete |
+| AI assistant (Gemini) | ✅ Complete |
+| Advanced Image Sliders | 🔄 Testing |
+| Map-based property search | 🔜 Planned |
+| Mobile app (React Native) | 🔜 Planned |
+| In-app payment gateway integration | 🔜 Planned |
+| Push notifications | 🔜 Planned |
+| Advanced AI recommendations | 🔜 Planned |
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+---
+
+<p align="center">Built with ❤️ for Eastern Ethiopian cities — Jigjiga, Dire Dawa & Harar</p>

@@ -22,6 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
 # Environment files — never commit real secrets
 .env
 .env.local
@@ -37,4 +38,33 @@ dist-ssr
 backend/prisma/*.db
 backend/prisma/*.db-journal
 
+# Uploaded files (user content — never commit)
+backend/uploads/
 
+# Scratch / temp / one-off scripts
+scratch/
+frontend/scratch/
+frontend/scripts/
+frontend/.vscode/
+temp_diagrams/
+temp_adv.jsx
+temp_hero.jsx
+git_log_slider.txt
+recover_files.cjs
+restore_tracked.cjs
+find_modified.cjs
+build_docx.js
+build_internship_report.py
+
+# Report assets (generated diagrams / images)
+report_assets/
+
+# Audit / one-off helper scripts
+backend/introspect-db.js
+backend/check-duplicates.js
+backend/check-aitags.js
+backend/check-hero.js
+backend/verify-final.js
+backend/backfill-condition.js
+backend/db_schema_dump.json
+backend/fix-harari-image.js

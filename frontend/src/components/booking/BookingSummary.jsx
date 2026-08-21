@@ -1,4 +1,5 @@
 import { formatCurrency, formatDailyPrice } from "../../utils/currency.js";
+import { getCategoryFallbackImage } from "../../utils/categoryFallbacks.js";
 
 export default function BookingSummary({
   item,
@@ -19,7 +20,16 @@ export default function BookingSummary({
 
       <div className="booking-summary-item">
         {/* Error 3: Fixed alt text */}
-        <img src={item.image} alt={item.title || "Item image"} />
+        <img 
+          src={item.image || getCategoryFallbackImage(item.category)} 
+          alt={item.title || "Item image"} 
+          onError={(event) => {
+            const fallback = getCategoryFallbackImage(item.category);
+            if (event.currentTarget.src !== fallback && !event.currentTarget.src.includes(fallback)) {
+              event.currentTarget.src = fallback;
+            }
+          }}
+        />
         <div>
           {/* Error 4: Fixed title and location fallbacks */}
           <h4>{item.title || "Untitled"}</h4>

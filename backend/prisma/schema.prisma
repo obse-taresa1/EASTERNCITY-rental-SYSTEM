@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -21,25 +22,30 @@ model User {
   address                       String?
   nationalIdFrontUrl            String?
   nationalIdBackUrl             String?
-  profileImageUrl               String?
   phone                         String?
   nationalIdNumber              String?
+  profileImageUrl               String?
   activityLogs                  ActivityLog[]
   ownedBookings                 Booking[]             @relation("BookingOwner")
   rentedBookings                Booking[]             @relation("BookingRenter")
+  communityComments             Comment[]
+  communityPosts                CommunityPost[]
   contactMessages               ContactMessage[]
   conversationsAsParticipantOne Conversation[]        @relation("ConversationParticipantOne")
   conversationsAsParticipantTwo Conversation[]        @relation("ConversationParticipantTwo")
+  communityLikes                Like[]
   approvedListings              Listing[]             @relation("ListingApprover")
   listings                      Listing[]             @relation("ListingOwner")
   messages                      Message[]             @relation("MessageSender")
   notifications                 Notification[]
+  OwnerReply                    OwnerReply[]
   passwordResetTokens           PasswordResetToken[]
   approvedPromotions            Promotion[]           @relation("PromotionApprover")
   promotions                    Promotion[]           @relation("PromotionRequester")
   refreshTokens                 RefreshToken[]
   reports                       Report[]
   reviews                       Review[]
+  savedCommunityPosts           SavedPost[]
   supportTickets                SupportTicket[]
   supportTicketReplies          SupportTicketReply[]
   updatedSettings               SystemSetting[]       @relation("SystemSettingUpdater")
@@ -68,32 +74,42 @@ model VerificationRequest {
   @@index([status])
 }
 
+enum ListingCondition {
+  NEW
+  USED
+}
+
 model Listing {
-  id              String         @id @default(uuid())
-  createdAt       DateTime       @default(now())
-  title           String
-  description     String
-  ownerId         String
-  categoryId      String?
-  city            String
-  location        String?
-  pricePerDay     Decimal
-  status          String         @default("PENDING")
-  approvedById    String?
-  approvedAt      DateTime?
-  rejectionReason String?
-  updatedAt       DateTime       @updatedAt
-  paymentMethod   String?
-  paymentProofUrl String?
-  paymentStatus   String?        @default("PENDING")
-  bookings        Booking[]
-  conversations   Conversation[]
-  approvedBy      User?          @relation("ListingApprover", fields: [approvedById], references: [id])
-  category        Category?      @relation(fields: [categoryId], references: [id])
-  owner           User           @relation("ListingOwner", fields: [ownerId], references: [id])
-  images          ListingImage[]
-  promotions      Promotion[]
-  reviews         Review[]
+  id               String           @id @default(uuid())
+  createdAt        DateTime         @default(now())
+  title            String
+  description      String
+  ownerId          String
+  categoryId       String?
+  city             String
+  location         String?
+  pricePerDay      Decimal
+  priceType        String           @default("Day") // e.g., Hour, Day, Week, Month
+  status           String           @default("PENDING")
+  condition        ListingCondition? // NEW or USED
+  approvedById     String?
+  approvedAt       DateTime?
+  rejectionReason  String?
+  updatedAt        DateTime       @updatedAt
+  paymentMethod    String?
+  paymentProofUrl  String?
+  paymentStatus    String?        @default("PENDING")
+  staffRecommended Boolean        @default(false)
+  bookings         Booking[]
+  conversations    Conversation[]
+  approvedBy       User?          @relation("ListingApprover", fields: [approvedById], references: [id])
+  category         Category?      @relation(fields: [categoryId], references: [id])
+  owner            User           @relation("ListingOwner", fields: [ownerId], references: [id])
+  images           ListingImage[]
+  matches          Match[]
+  promotions       Promotion[]
+  reviews          Review[]
+  featuredListing  FeaturedListing?
 
   @@index([ownerId])
   @@index([categoryId])
@@ -131,21 +147,24 @@ model Booking {
 }
 
 model Conversation {
-  id               String    @id @default(uuid())
+  id               String         @id @default(uuid())
   participantOneId String
   participantTwoId String
-  listingId        String
+  listingId        String?
   lastMessageAt    DateTime?
-  createdAt        DateTime  @default(now())
-  listing          Listing   @relation(fields: [listingId], references: [id])
-  participantOne   User      @relation("ConversationParticipantOne", fields: [participantOneId], references: [id])
-  participantTwo   User      @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id])
+  createdAt        DateTime       @default(now())
+  communityPostId  Int?
+  CommunityPost    CommunityPost? @relation(fields: [communityPostId], references: [id])
+  listing          Listing?       @relation(fields: [listingId], references: [id])
+  participantOne   User           @relation("ConversationParticipantOne", fields: [participantOneId], references: [id])
+  participantTwo   User           @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id])
   messages         Message[]
 
+  @@unique([participantOneId, participantTwoId, listingId])
   @@index([participantOneId])
   @@index([participantTwoId])
   @@index([listingId])
-  @@unique([participantOneId, participantTwoId, listingId])
+  @@index([communityPostId])
 }
 
 model Message {
@@ -169,9 +188,16 @@ model ListingImage {
   imageUrl  String
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
+  aiTags    String?
+  fileSize  Int?
+  height    Int?
+  imageHash String?
+  mimeType  String?
+  width     Int?
   listing   Listing  @relation(fields: [listingId], references: [id])
 
   @@index([listingId])
+  @@index([imageHash])
 }
 
 model Category {
@@ -199,6 +225,13 @@ model Promotion {
   rejectionReason String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  durationDays    Int?      @default(7)
+  endDate         DateTime?
+  startDate       DateTime?
+  discount        Int?
+  customTitle     String?
+  customSubtitle  String?
+  specs           String?
   approvedBy      User?     @relation("PromotionApprover", fields: [approvedById], references: [id])
   listing         Listing   @relation(fields: [listingId], references: [id])
   user            User      @relation("PromotionRequester", fields: [userId], references: [id])
@@ -270,9 +303,6 @@ model Notification {
   isRead        Boolean  @default(false)
   createdAt     DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([isRead])
 }
 
 model ContactMessage {
@@ -352,8 +382,213 @@ model SupportTicketReply {
   @@index([ticketId])
 }
 
-model playing_with_neon {
-  id    Int    @id @default(autoincrement())
-  name  String
-  value Float? @db.Real
+model CommunityPost {
+  id            Int               @id @default(autoincrement())
+  type          PostType
+  title         String
+  description   String
+  category      CommunityCategory
+  city          String
+  neighbourhood String?
+  rentalPeriod  String?
+  budget        Float?
+  tags          String[]
+  status        PostStatus        @default(PENDING)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  authorId      String
+  savedCount    Int               @default(0)
+  shares        Int               @default(0)
+  views         Int               @default(0)
+  isFeatured    Boolean           @default(false)
+  comments      Comment[]
+  author        User              @relation(fields: [authorId], references: [id])
+  Conversation  Conversation[]
+  likes         Like[]
+  Match         Match[]
+  media         Media[]
+  OwnerReply    OwnerReply[]
+  savedPosts    SavedPost[]
+}
+
+model Media {
+  id        Int           @id @default(autoincrement())
+  type      MediaType
+  url       String
+  thumbnail String?
+  postId    Int
+  createdAt DateTime      @default(now())
+  post      CommunityPost @relation(fields: [postId], references: [id])
+}
+
+model Like {
+  id        Int            @id @default(autoincrement())
+  userId    String
+  postId    Int?
+  commentId Int?
+  createdAt DateTime       @default(now())
+  Comment   Comment?       @relation(fields: [commentId], references: [id])
+  post      CommunityPost? @relation(fields: [postId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id        Int           @id @default(autoincrement())
+  content   String
+  authorId  String
+  postId    Int
+  createdAt DateTime      @default(now())
+  author    User          @relation(fields: [authorId], references: [id])
+  post      CommunityPost @relation(fields: [postId], references: [id])
+  Like      Like[]
+}
+
+model SavedPost {
+  id        Int           @id @default(autoincrement())
+  userId    String
+  postId    Int
+  createdAt DateTime      @default(now())
+  post      CommunityPost @relation(fields: [postId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model Match {
+  id            Int           @id @default(autoincrement())
+  requestId     Int
+  listingId     String
+  createdAt     DateTime      @default(now())
+  notified      Boolean       @default(false)
+  listing       Listing       @relation(fields: [listingId], references: [id])
+  CommunityPost CommunityPost @relation(fields: [requestId], references: [id])
+}
+
+model OwnerReply {
+  id            Int            @id @default(autoincrement())
+  requestId     Int
+  ownerId       String
+  type          OwnerReplyType
+  payload       Json
+  createdAt     DateTime       @default(now())
+  User          User           @relation(fields: [ownerId], references: [id])
+  CommunityPost CommunityPost  @relation(fields: [requestId], references: [id])
+}
+
+model AdvertisingRequest {
+  id                 String    @id
+  reference          String    @unique
+  companyName        String
+  contactPerson      String
+  email              String
+  phone              String
+  businessCategory   String
+  campaignType       String
+  website            String?
+  socialMedia        String?
+  campaignGoal       String?
+  campaignMessage    String
+  preferredStartDate DateTime?
+  preferredEndDate   DateTime?
+  bannerUrl          String?
+  termsAccepted      Boolean   @default(false)
+  status             String    @default("PENDING")
+  adminNote          String?
+  reviewedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime
+  paymentProofUrl    String?
+  paymentSubmittedAt DateTime?
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+enum PostType {
+  RENTAL_REQUEST
+  COMMUNITY_FEED
+  OWNER_ANNOUNCEMENT
+  DISCUSSION
+}
+
+enum CommunityCategory {
+  LOOKING_FOR_ITEM
+  OFFERING_RENTAL
+  EQUIPMENT_NEEDED
+  EVENT_PLANNING
+  BUSINESS_ANNOUNCEMENT
+  RECOMMENDATION
+  LOST_FOUND
+  EMERGENCY_REQUEST
+}
+
+enum PostStatus {
+  PENDING
+  RESOLVED
+  EXPIRED
+  APPROVED
+  REJECTED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  ATTACHMENT
+}
+
+enum OwnerReplyType {
+  LISTING
+  QUOTE
+  DISCOUNT
+  QUESTION
+  RECOMMENDATION
+  MULTIPLE_LISTINGS
+}
+
+enum NotificationType {
+  COMMENT
+  LIKE
+  OWNER_REPLY
+  MATCH_FOUND
+  SIMILAR_POST
+  REQUEST_EXPIRED
+  REQUEST_RESOLVED
+}
+
+model HeroPromotion {
+  id               String    @id @default(uuid())
+  title            String
+  description      String?
+  heroImage        String    
+  productService   String?
+  cardImage        String    
+  location         String?
+  rating           String?
+  originalPrice    Decimal?
+  discountPercent  Int?
+  discountedPrice  Decimal?
+  ctaText          String?
+  ctaLink          String?
+  listingId        String?   // optional link back to the source Listing
+  startDate        DateTime?
+  endDate          DateTime?
+  isActive         Boolean   @default(true)
+  displayOrder     Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  specs            String?
+}
+
+model FeaturedListing {
+  id               String    @id @default(uuid())
+  listingId        String    @unique
+  discountPercent  Int?
+  startDate        DateTime?
+  endDate          DateTime?
+  isActive         Boolean   @default(true)
+  displayOrder     Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  listing          Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }

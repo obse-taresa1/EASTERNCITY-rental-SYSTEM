@@ -298,19 +298,22 @@ export default function AdminTopbar({ title, onMenuToggle }) {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    const match = findSearchRoute(searchQuery, routes);
+    const query = searchQuery.trim();
+    if (!query) return;
 
+    const match = findSearchRoute(query, routes);
     if (match) {
       navigate(match.to);
       setSearchQuery("");
       return;
     }
 
-    if (searchQuery.trim()) {
-      navigate(
-        `${fallbackPath}?search=${encodeURIComponent(searchQuery.trim())}`,
-      );
-    }
+    // Fallback: search users/listings by redirecting to users page with ?q=
+    const usersPath = isSuperAdmin
+      ? `/super-admin-dashboard/user-management?q=${encodeURIComponent(query)}`
+      : `/admin-dashboard/users?q=${encodeURIComponent(query)}`;
+    navigate(usersPath);
+    setSearchQuery("");
   };
 
   const handleProfileClick = () => {

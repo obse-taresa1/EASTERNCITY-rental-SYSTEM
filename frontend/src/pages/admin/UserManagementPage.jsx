@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { adminApi, formatDate } from "../../services/adminManagementService.js";
 
 export default function UserManagementPage() {
+  const [searchParams] = useSearchParams();
   const [usersList, setUsersList] = useState([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("q") || "");
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");

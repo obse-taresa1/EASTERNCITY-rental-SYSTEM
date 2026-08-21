@@ -1,0 +1,10 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+async function main() {
+  const all = await prisma.promotion.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 5
+  });
+  console.log(JSON.stringify(all, null, 2));
+}
+main().catch(e => console.error(e)).finally(() => prisma.$disconnect());

@@ -2,7 +2,7 @@ const { z } = require('zod');
 const { cleanupUploadedFiles } = require('../utils/uploadCleanup');
 const { firstZodMessage } = require('./validationHelpers');
 
-const ALLOWED_PLACEMENTS = ['FEATURED', 'TOP_LISTING', 'HOME_BANNER'];
+const ALLOWED_PLACEMENTS = ['FEATURED', 'TOP_LISTING', 'HOME_BANNER', 'HERO_PROMOTION'];
 
 function rejectWithCleanup(req, res, message) {
   cleanupUploadedFiles(req);
@@ -16,6 +16,8 @@ const promotionSchema = z.object({
     errorMap: () => ({ message: 'Invalid promotion placement.' }),
   }),
   amount: z.coerce.number().positive('Amount must be greater than 0.'),
+  discount: z.coerce.number().min(0).optional(),
+  specs: z.string().optional(),
 });
 
 function validatePromotionRequest(req, res, next) {
