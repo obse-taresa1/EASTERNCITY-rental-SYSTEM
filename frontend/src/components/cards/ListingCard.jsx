@@ -10,7 +10,8 @@ import {
 import { categories } from "../../data/items.js";
 import { getPromotionLabel } from "../../services/itemService.js";
 import { formatDailyPrice } from "../../utils/currency.js";
-import fallbackListingImage from "../../assets/images/pc.png";
+import { getCategoryFallbackImage } from "../../utils/categoryFallbacks.js";
+import CardImageSlider from "./CardImageSlider.jsx";
 
 const SAVED_KEY = "saved_items";
 
@@ -26,7 +27,13 @@ function toSavedItem(item, userId) {
   };
 }
 
-export default function ListingCard({ item }) {
+export default function ListingCard({
+  item,
+  viewMode = "grid",
+  onContact,
+  onBook,
+  showCondition = false,
+}) {
   const { t } = useLanguage();
   const { currentUser, isAuthenticated, user } = useAuth();
   const { refresh } = useRefresh();
@@ -61,12 +68,16 @@ export default function ListingCard({ item }) {
     },
     { icon: "bi-clock", label: t("perDay") },
   ];
+  // item.category may be a string (id) OR a full object {id, name, slug, ...}
+  const categoryObj = item.category && typeof item.category === "object" ? item.category : null;
+  const categoryId = categoryObj ? categoryObj.id : item.category;
   const categoryName =
     item.categoryName ||
-    categories.find((category) => category.id === item.category)?.name ||
-    item.category;
+    categoryObj?.name ||
+    categories.find((cat) => cat.id === categoryId)?.name ||
+    (typeof item.category === "string" ? item.category : "");
   const categoryMeta = categories.find(
-    (category) => category.id === item.category || category.name === categoryName,
+    (cat) => cat.id === categoryId || cat.name === categoryName,
   );
   const displayCategoryName = categoryMeta?.nameKey
     ? t(categoryMeta.nameKey)
@@ -101,38 +112,20 @@ export default function ListingCard({ item }) {
     refresh("savedItems");
   }
 
+  const fallbackKey = categoryMeta?.id || categoryObj?.slug || categoryId;
+
   return (
     <article className="premium-glass-card listing-card-premium">
-      <div className="card-img-wrapper" style={{ height: "120px" }}>
-        <img
-          src={item.image || item.coverImage || fallbackListingImage}
-          alt={item.imageAlt || item.title}
-          className="card-img"
-          onError={(event) => {
-            if (event.currentTarget.src !== fallbackListingImage) {
-              event.currentTarget.src = fallbackListingImage;
-            }
-          }}
-        />
-        <div className="card-badges">
-          {item.featured && (
-            <span className="badge-featured">
-              {promotionLabel || t("featured")}
-            </span>
-          )}
-          {item.city && (
-            <span className="badge-city">
-              <i className="bi bi-geo-alt-fill"></i> {item.city}
-              {item.sefar ? ` • ${item.sefar}` : ""}
-            </span>
-          )}
-        </div>
-        {item.photos && (
-          <span className="badge-photos">
-            <i className="bi bi-camera"></i> {item.photos}
-          </span>
-        )}
-      </div>
+      <CardImageSlider
+        images={item.images || []}
+        coverImage={item.image || item.coverImage || ""}
+        fallbackKey={fallbackKey}
+        title={item.title}
+        isFeatured={!!(item.featured || item.isFeatured)}
+        city={item.city || ""}
+        sefar={item.sefar || ""}
+        condition={showCondition ? (item.condition || "") : ""}
+      />
 
       <div className="card-body-premium">
         <div className="card-header-top">
@@ -150,11 +143,20 @@ export default function ListingCard({ item }) {
 
         <h3 className="card-title">{item.title}</h3>
 
-        <p className="card-price-premium">
-          <strong>{displayPrice}</strong> <small>/ {t("perDay")}</small>
-        </p>
+        <div className="card-price-premium d-flex align-items-center">
+          {item.discountPercent && item.discountPercent > 0 ? (
+            <div className="d-flex align-items-center flex-wrap gap-1">
+              <span className="text-decoration-line-through text-muted small" style={{ fontSize: '0.85rem' }}>
+                ETB {Number(item.originalPrice ?? item.pricePerDay ?? 0).toLocaleString()}
+              </span>
+              <strong>ETB {Number(item.discountedPrice ?? 0).toLocaleString()}</strong>
+            </div>
+          ) : (
+            <strong>{displayPrice}</strong>
+          )}
+        </div>
 
-        <div className="card-owner-info">
+        <div className="card-owner-info mt-3">
           <div className="owner-avatar">
             {item.ownerName ? item.ownerName.charAt(0) : "U"}
           </div>

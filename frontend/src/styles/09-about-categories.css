@@ -110,7 +110,9 @@
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
-  color: var(--motorx-red);
+  /* Do not rely on a page-level theme variable here: a missing value made
+     Bootstrap's icon inherit white text on some public pages. */
+  color: #b91c2c;
   margin-bottom: 1.25rem;
   opacity: 1;
   position: relative;
@@ -119,9 +121,20 @@
 }
 
 .about-glass-card:hover .about-card-icon {
-  background: var(--motorx-red);
+  background: linear-gradient(135deg, #dc2626, #991b1b);
   color: #fff;
   box-shadow: 0 6px 20px rgba(227, 30, 36, 0.35);
+}
+
+/* Bootstrap icons are glyphs, so give them an explicit, inherited color in
+   both states. This prevents them disappearing when a card is hovered. */
+.about-card-icon i {
+  color: #b91c2c !important;
+  opacity: 1;
+}
+
+.about-glass-card:hover .about-card-icon i {
+  color: #fff !important;
 }
 
 .about-glass-card h3 {

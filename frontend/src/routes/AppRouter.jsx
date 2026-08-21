@@ -12,14 +12,18 @@ import HomePage from "../pages/public/HomePage.jsx";
 import AboutPage from "../pages/public/AboutPage.jsx";
 import CareersPage from "../pages/public/CareersPage.jsx";
 import ContactPage from "../pages/public/ContactPage.jsx";
+import AdvertiseWithUsPage from "../pages/public/AdvertiseWithUsPage.jsx";
 import HowItWorksPage from "../pages/public/HowItWorksPage.jsx";
 import PrivacyPolicyPage from "../pages/public/PrivacyPolicyPage.jsx";
 import TermsPage from "../pages/public/TermsPage.jsx";
+import CommunityPage from "../pages/public/CommunityPage.jsx";
+import CommunityRequestDetailsPage from "../pages/public/CommunityRequestDetailsPage.jsx";
 
 import ItemsPage from "../pages/listings/ItemsPage.jsx";
 import CategoryPage from "../pages/listings/CategoryPage.jsx";
 import ItemDetailsPage from "../pages/listings/ItemDetailsPage.jsx";
 import CategoriesPage from "../pages/listings/CategoriesPage.jsx";
+import FeaturedListingsPublicPage from "../pages/public/FeaturedListingsPublicPage.jsx";
 
 import BookingPage from "../pages/booking/BookingPage.jsx";
 import BookingSuccessPage from "../pages/booking/BookingSuccessPage.jsx";
@@ -55,6 +59,8 @@ import AdminDashboardPage from "../pages/admin/AdminDashboardPage.jsx";
 import AdminBookingsPage from "../pages/admin/AdminBookingsPage.jsx";
 import AdminReviewsPage from "../pages/admin/AdminReviewsPage.jsx";
 import AdminProfilePage from "../pages/admin/AdminProfilePage.jsx";
+import BannerAdsManagementPage from "../pages/admin/BannerAdsManagementPage.jsx";
+import AdvertisingManagementPage from "../pages/admin/AdvertisingManagementPage.jsx";
 
 // Inside Admin Layout routes block (after existing admin routes)
 
@@ -63,6 +69,7 @@ import AdminListingManagementPage from "../pages/admin/AdminListingManagementPag
 import AdminReportsPage from "../pages/admin/AdminReportsPage.jsx";
 import AdminStatisticsPage from "../pages/admin/AdminStatisticsPage.jsx";
 import AdminSettingsPage from "../pages/admin/AdminSettingsPage.jsx";
+import AdminCommunityPostsPage from "../pages/admin/AdminCommunityPostsPage.jsx";
 
 import SuperAdminDashboardPage from "../pages/super-admin/SuperAdminDashboardPage.jsx";
 import AdminManagementPage from "../pages/super-admin/AdminManagementPage.jsx";
@@ -70,7 +77,6 @@ import SuperUserManagementPage from "../pages/super-admin/SuperUserManagementPag
 import SuperListingManagementPage from "../pages/super-admin/SuperListingManagementPage.jsx";
 import ContactMessagesPage from "../pages/super-admin/ContactMessagesPage.jsx";
 import RoleRequestsPage from "../pages/super-admin/RoleRequestsPage.jsx";
-import AnalyticsPage from "../pages/super-admin/AnalyticsPage.jsx";
 import ActivityLogsPage from "../pages/super-admin/ActivityLogsPage.jsx";
 import SystemSettingsPage from "../pages/super-admin/SystemSettingsPage.jsx";
 import PlatformOverviewPage from "../pages/super-admin/PlatformOverviewPage.jsx";
@@ -90,6 +96,7 @@ export default function AppRouter() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/items" element={<ItemsPage />} />
+          <Route path="/featured" element={<FeaturedListingsPublicPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/categories/:categoryId" element={<CategoryPage />} />
           <Route path="/items/:itemId" element={<ItemDetailsPage />} />
@@ -98,9 +105,13 @@ export default function AppRouter() {
           <Route path="/our-story" element={<AboutPage />} />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/advertise-with-us" element={<AdvertiseWithUsPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/community" element={<CommunityPage />} />
+          <Route path="/community/request/:postId" element={<CommunityRequestDetailsPage />} />
+          <Route path="/community/:postId" element={<CommunityRequestDetailsPage />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -213,10 +224,8 @@ export default function AppRouter() {
                 path="/admin-dashboard/promotion-management"
                 element={<SuperPromotionManagementPage scope="admin" />}
               />
-              <Route
-                path="/admin-dashboard/featured-listings"
-                element={<FeaturedListingsPage />}
-              />
+              <Route path="/admin-dashboard/banner-ads" element={<BannerAdsManagementPage />} />
+              <Route path="/admin-dashboard/advertising-management" element={<AdvertisingManagementPage />} />
               <Route
                 path="/admin-dashboard/promotion-history"
                 element={<PromotionHistoryPage />}
@@ -236,6 +245,10 @@ export default function AppRouter() {
               <Route
                 path="/admin-dashboard/contact-messages"
                 element={<ContactMessagesPage />}
+              />
+              <Route
+                path="/admin-dashboard/community-posts"
+                element={<AdminCommunityPostsPage />}
               />
               <Route
                 path="/admin-dashboard/notifications"
@@ -301,6 +314,10 @@ export default function AppRouter() {
                 element={<ContactMessagesPage />}
               />
               <Route
+                path="/super-admin-dashboard/community-posts"
+                element={<AdminCommunityPostsPage />}
+              />
+              <Route
                 path="/super-admin-dashboard/role-requests"
                 element={<RoleRequestsPage />}
               />
@@ -314,7 +331,7 @@ export default function AppRouter() {
               />
               <Route
                 path="/super-admin-dashboard/analytics"
-                element={<AnalyticsPage />}
+                element={<AdminAnalyticsPage scope="superadmin" />}
               />
               <Route
                 path="/super-admin-dashboard/activity-logs"
@@ -356,6 +373,8 @@ export default function AppRouter() {
                 path="/super-admin-dashboard/promotion-management"
                 element={<SuperPromotionManagementPage />}
               />
+              <Route path="/super-admin-dashboard/banner-ads" element={<BannerAdsManagementPage scope="superadmin" />} />
+              <Route path="/super-admin-dashboard/advertising-management" element={<AdvertisingManagementPage scope="superadmin" />} />
               <Route
                 path="/super-admin-dashboard/system-settings"
                 element={<SystemSettingsPage />}

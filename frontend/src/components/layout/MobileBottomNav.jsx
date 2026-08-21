@@ -45,6 +45,17 @@ export default function MobileBottomNav() {
         </li>
         <li>
           <NavLink
+            to="/community"
+            className={({ isActive }) =>
+              `mobile-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <i className="bi bi-people"></i>
+            <span>{t("community") || "Community"}</span>
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
             to="/contact"
             className={({ isActive }) =>
               `mobile-nav-item ${isActive ? "active" : ""}`

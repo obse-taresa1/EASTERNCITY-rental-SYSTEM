@@ -1,4 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="76" ry="76" fill="#E31E24"/>
-  <text x="256" y="330" font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="260" fill="#FFFFFF" text-anchor="middle" letter-spacing="-10">EC</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <path fill="#ff2027" d="M78 31 221 54l-17 147-48-8 7-65-62 52-44-52 69-56-56-8z"/>
 </svg>

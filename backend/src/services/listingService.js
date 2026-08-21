@@ -394,6 +394,7 @@ async function create(ownerId, payload, files) {
       paymentProofPath(paymentProofFile) || payload.paymentProofUrl || null,
     paymentStatus: payload.paymentStatus || "PENDING",
     status: String(payload.status || "PENDING").toUpperCase(),
+    condition: payload.condition ? String(payload.condition).toUpperCase() : null,
     images: {
       create: mapUploadedImages(uploadedFiles.images),
     },

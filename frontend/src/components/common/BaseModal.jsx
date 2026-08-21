@@ -22,7 +22,7 @@ export default function BaseModal({
           </button>
         </div>
 
-        {children}
+        <div className="base-modal-content">{children}</div>
       </div>
     </div>
   );

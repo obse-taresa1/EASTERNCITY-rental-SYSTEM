@@ -18,6 +18,15 @@ const listPending = async (req, res, next) => {
   }
 };
 
+const listMine = async (req, res, next) => {
+  try {
+    const data = await service.listByUserWithHero(req.user.id);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const request = async (req, res, next) => {
   try {
     const data = await service.requestPromotion(
@@ -102,6 +111,7 @@ const getActiveFeatured = async (req, res, next) => {
 module.exports = {
   list,
   listPending,
+  listMine,
   request,
   approve,
   reject,

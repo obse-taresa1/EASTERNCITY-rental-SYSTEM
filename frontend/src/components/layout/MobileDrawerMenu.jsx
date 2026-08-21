@@ -90,6 +90,7 @@ export default function MobileDrawerMenu({ open, onClose }) {
               </div>
             </li>
 
+
             {isAuthenticated && (
               <>
                 <li className="drawer-divider"></li>

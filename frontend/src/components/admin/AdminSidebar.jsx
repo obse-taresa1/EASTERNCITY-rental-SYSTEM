@@ -3,44 +3,14 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
 import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
 import { useTheme } from "../../context/ThemeContext.jsx";
-import { useLanguage } from "../../context/LanguageContext.jsx";
-
-const labelKeyMap = {
-  Dashboard: "dashboard",
-  "Users Management": "userManagement",
-  "User Management": "userManagement",
-  "Admin Management": "adminPanel",
-  "Listing Management": "manageListings",
-  "Categories Management": "manageCategories",
-  "Bookings Management": "manageBookings",
-  "Payments & Revenue": "payment",
-  "Promotion Management": "managePromotions",
-  "Promotion History": "promotionHistory",
-  "Featured Listings": "featured",
-  "Verification Center": "verificationCenter",
-  "Reviews & Ratings": "reviewsRatings",
-  "Reports & Complaints": "reports",
-  "Support Center": "support",
-  "Contact Messages": "contactMessages",
-  Notifications: "notifications",
-  Analytics: "analytics",
-  "Platform Analytics": "platformAnalytics",
-  "Platform Overview": "platformOverview",
-  "Platform Monitoring": "platformMonitoring",
-  "Security Center": "securityCenter",
-  "Activity Logs": "activityLogs",
-  Settings: "settings",
-};
 
 function NavItem({ link, onNavigate }) {
-  const { t } = useLanguage();
   const hasChevron = /Management|Center|Monitoring|Reports|Users|Listings|Categories|Promotion|Verification|Support|Settings/.test(link.label);
-  const label = t(labelKeyMap[link.label]) || link.label;
 
   return (
     <NavLink key={link.to} to={link.to} className="admin-nav-item" onClick={onNavigate}>
       <i className={`bi ${link.icon}`} />
-      <span>{label}</span>
+      <span>{link.label}</span>
       {hasChevron && <i className="bi bi-chevron-down admin-nav-chevron" />}
     </NavLink>
   );
@@ -49,7 +19,6 @@ function NavItem({ link, onNavigate }) {
 export default function AdminSidebar({ variant = "admin", isOpen = false, onClose }) {
   const { logout } = useAuth();
   const { theme } = useTheme();
-  const { t } = useLanguage();
   const isSuperAdmin = variant === "superadmin";
   const logoSrc = theme === "dark" ? darkLogo : logo;
   const links = isSuperAdmin ? superAdminLinks : adminLinks;
@@ -73,7 +42,7 @@ export default function AdminSidebar({ variant = "admin", isOpen = false, onClos
 
       <button type="button" className="admin-logout mt-auto mb-3" onClick={logout}>
         <i className="bi bi-box-arrow-right" />
-        <span>{t("logout")}</span>
+        <span>Logout</span>
       </button>
     </aside>
   );
@@ -86,8 +55,10 @@ const adminLinks = [
   { to: "/admin-dashboard/categories", label: "Categories Management", icon: "bi-grid-3x3-gap" },
   { to: "/admin-dashboard/bookings", label: "Bookings Management", icon: "bi-calendar-check" },
   { to: "/admin-dashboard/payments", label: "Payments & Revenue", icon: "bi-wallet2" },
+  { to: "/admin-dashboard/community-posts", label: "Community Management", icon: "bi-people-fill" },
   { to: "/admin-dashboard/promotion-management", label: "Promotion Management", icon: "bi-patch-check" },
-  { to: "/admin-dashboard/featured-listings", label: "Featured Listings", icon: "bi-star" },
+  { to: "/admin-dashboard/advertising-management", label: "Advertising Management", icon: "bi-megaphone-fill" },
+  { to: "/admin-dashboard/banner-ads", label: "Banner Ads", icon: "bi-megaphone" },
   { to: "/admin-dashboard/promotion-history", label: "Promotion History", icon: "bi-clock-history" },
   { to: "/admin-dashboard/verification-requests", label: "Verification Center", icon: "bi-shield-check" },
   { to: "/admin-dashboard/reviews", label: "Reviews & Ratings", icon: "bi-star-half" },
@@ -106,7 +77,10 @@ const superAdminLinks = [
   { to: "/super-admin-dashboard/user-management", label: "User Management", icon: "bi-person-lines-fill" },
   { to: "/super-admin-dashboard/listing-management", label: "Listing Management", icon: "bi-card-checklist" },
   { to: "/super-admin-dashboard/categories-management", label: "Categories Management", icon: "bi-grid-3x3-gap" },
+  { to: "/super-admin-dashboard/community-posts", label: "Community Management", icon: "bi-people-fill" },
   { to: "/super-admin-dashboard/promotion-management", label: "Promotion Management", icon: "bi-patch-check" },
+  { to: "/super-admin-dashboard/advertising-management", label: "Advertising Management", icon: "bi-megaphone-fill" },
+  { to: "/super-admin-dashboard/banner-ads", label: "Banner Ads", icon: "bi-megaphone" },
   { to: "/super-admin-dashboard/verification-center", label: "Verification Center", icon: "bi-shield-check" },
   { to: "/super-admin-dashboard/payments-revenue", label: "Payments & Revenue", icon: "bi-wallet2" },
   { to: "/super-admin-dashboard/reports-complaints", label: "Reports & Complaints", icon: "bi-file-earmark-text" },
@@ -119,4 +93,3 @@ const superAdminLinks = [
   { to: "/super-admin-dashboard/activity-logs", label: "Activity Logs", icon: "bi-file-earmark" },
   { to: "/super-admin-dashboard/system-settings", label: "Settings", icon: "bi-gear" },
 ];
-

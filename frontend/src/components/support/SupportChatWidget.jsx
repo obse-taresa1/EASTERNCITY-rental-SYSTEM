@@ -20,7 +20,9 @@ const chatCopy = {
     }
   },
   // Adding minimal fallbacks for others to keep it concise
-  am: { greeting: "ሰላም። የEasternCities AI ረዳት ነኝ።", placeholder: "ስለ EasternCities ይጠይቁ...", unavailable: "አልተሳካም።", suggestions: { GUEST: [] } }
+  am: { greeting: "ሰላም። እኔ የ EasternCities AI ረዳት ነኝ። በኪራይ፣ በዝርዝሮች፣ በማረጋገጫ፣ በአካውንቶች እና መድረኩን በመጠቀም ልረዳዎ እችላለሁ።", placeholder: "ስለ EasternCities ይጠይቁ...", unavailable: "በአሁኑ ጊዜ መልስ መስጠት አልችልም። እባክዎ ቆይተው እንደገና ይሞክሩ።", suggestions: { GUEST: ["መኪና እንዴት እከራያለሁ?", "ካሜራዎችን ይፈልጉ", "የክፍያ መመሪያ"] } }
+  ,om: { greeting: "Akkam. Ani gargaaraa AI EasternCities dha. Kiraa, tarreeffamoota, mirkaneessa, herrega fi fayyadama marsariitii irratti si gargaaruu nan danda'a.", placeholder: "Waa'ee EasternCities gaafadhu...", unavailable: "Amma deebii kennuu hin danda'u. Mee yeroo biraa yaali.", suggestions: { GUEST: ["Akkamitti konkolaataa kiraa fudhadha?", "Kaameraa barbaadi", "Qajeelfama kaffaltii"] } },
+  so: { greeting: "Salaan. Waxaan ahay kaaliyaha AI ee EasternCities. Waxaan kaa caawin karaa kirada, liisaska, xaqiijinta, akoonnada, iyo isticmaalka madasha.", placeholder: "Wax ka weydii EasternCities...", unavailable: "Hadda ma jawaabi karo. Fadlan mar kale isku day.", suggestions: { GUEST: ["Sideen baabuur u kireystaa?", "Raadi kamarado", "Hagaha lacag-bixinta"] } }
 };
 
 function createMessage(sender, text) {
@@ -118,6 +120,24 @@ export default function SupportChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isLoading]);
 
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].sender === "bot") {
+        return [{ ...prev[0], text: copy.greeting }];
+      }
+      return prev;
+    });
+  }, [language, copy.greeting]);
+
+  useEffect(() => {
+    const openChat = () => {
+      setIsOpen(true);
+      setIsMinimized(false);
+    };
+    window.addEventListener("easterncities:open-support-chat", openChat);
+    return () => window.removeEventListener("easterncities:open-support-chat", openChat);
+  }, []);
+
   async function sendMessage(text) {
     const value = text.trim();
     if (!value || isLoading) return;
@@ -164,7 +184,7 @@ export default function SupportChatWidget() {
 
   return (
     <section className={`cw-support-widget ${isOpen ? "is-open" : ""} ${isMinimized ? "is-minimized" : ""}`.trim()} aria-label="EasternCities AI chat">
-      <button className="cw-support-launcher" onClick={() => { setIsOpen(true); setIsMinimized(false); }}>
+      <button type="button" className="cw-support-launcher" aria-expanded={isOpen} onClick={() => { setIsOpen(true); setIsMinimized(false); }}>
         <i className="bi bi-robot"></i>
         <span>Ask AI</span>
       </button>

@@ -42,6 +42,7 @@ const initialFormData = {
   availableFrom: "",
   availableUntil: "",
   quantity: "1",
+  condition: "new",
   requiredDocuments: ["National ID"],
   otherDocument: "",
   minimumRentalPeriod: "1 Day",
@@ -198,6 +199,7 @@ export default function ListItemPage() {
       payload.append("availableFrom", formData.availableFrom || "");
       payload.append("availableUntil", formData.availableUntil || "");
       payload.append("quantity", String(Number(formData.quantity || 1)));
+      payload.append("condition", formData.condition || "new");
       payload.append("subcategory", formData.subcategory || "");
       payload.append("pickupOption", formData.pickupOption || "");
       payload.append("deliveryFee", formData.deliveryFee || "");
@@ -493,7 +495,7 @@ export default function ListItemPage() {
         <section className="listing-form-section">
           <h2>Basic Information</h2>
           <div className="row g-3">
-            <div className="col-md-6">
+            <div className="col-md-5">
               <FormInput
                 label="Item Title"
                 name="title"
@@ -517,13 +519,26 @@ export default function ListItemPage() {
                 required
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-2">
               <FormInput
                 label="Subcategory"
                 name="subcategory"
                 value={formData.subcategory}
                 onChange={handleChange}
-                placeholder="SUV, DSLR, Drill kit"
+                placeholder="SUV, DSLR"
+                required
+              />
+            </div>
+            <div className="col-md-2">
+              <FormSelect
+                label="Condition"
+                name="condition"
+                value={formData.condition}
+                onChange={handleChange}
+                options={[
+                  { value: "new", label: "New" },
+                  { value: "used", label: "Used" }
+                ]}
                 required
               />
             </div>

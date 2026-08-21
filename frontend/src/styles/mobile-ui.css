@@ -272,7 +272,7 @@
   .cw-support-widget {
     bottom: 90px !important;
     right: 15px !important;
-    z-index: 1020 !important;
+    z-index: 2147483000 !important;
   }
 
   .cw-support-launcher {
@@ -297,7 +297,7 @@
     width: 90vw !important;
     max-width: 400px;
     max-height: 80vh !important;
-    z-index: 1020 !important;
+    z-index: 2147483000 !important;
     position: fixed !important;
   }
 

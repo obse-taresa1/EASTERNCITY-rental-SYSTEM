@@ -81,7 +81,13 @@ export default function Footer() {
                   <Link to="/about">{t("about")}</Link>
                 </li>
                 <li>
+                  <Link to="/community">{t("community") || "Community"}</Link>
+                </li>
+                <li>
                   <Link to="/contact">{t("contactUs")}</Link>
+                </li>
+                <li>
+                  <Link to="/advertise-with-us">{t("advertiseWithUs") || "Advertise With Us"}</Link>
                 </li>
                 <li>
                   <Link to="/privacy-policy">{t("privacyPolicy")}</Link>

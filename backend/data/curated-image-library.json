@@ -1,0 +1,540 @@
+{
+  "portable generator": {
+    "categorySlug": "event-essentials",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/portable-generator/front.jpg",
+        "angle": "Front three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/portable-generator/side.jpg",
+        "angle": "Side view"
+      },
+      {
+        "url": "/uploads/listings/curated/portable-generator/control-panel.jpg",
+        "angle": "Control panel close-up"
+      },
+      {
+        "url": "/uploads/listings/curated/portable-generator/rear.jpg",
+        "angle": "Rear view"
+      }
+    ]
+  },
+  "toyota hilux": {
+    "categorySlug": "cars-bikes",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/toyota-hilux/front.jpg",
+        "angle": "Front-left view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-hilux/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-hilux/rear.jpg",
+        "angle": "Cargo bed and rear"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-hilux/control-panel.jpg",
+        "angle": "Interior dashboard"
+      }
+    ]
+  },
+  "toyota corolla 2021": {
+    "categorySlug": "cars-bikes",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/front.jpg",
+        "angle": "Front three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/rear.jpg",
+        "angle": "Rear three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/control-panel.jpg",
+        "angle": "Driver interior and seats"
+      }
+    ]
+  },
+  "toyota yaris": {
+    "categorySlug": "cars-bikes",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/toyota-yaris/front.jpg",
+        "angle": "Front three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-yaris/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-yaris/rear.jpg",
+        "angle": "Rear three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-yaris/control-panel.jpg",
+        "angle": "Driver interior and dashboard"
+      }
+    ]
+  },
+  "canon eos 90d dslr camera kit": {
+    "categorySlug": "electronics-cameras",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/front.jpg",
+        "angle": "Front body and lens"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/rear.jpg",
+        "angle": "Rear LCD"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/side.jpg",
+        "angle": "Top and side controls"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/control-panel.jpg",
+        "angle": "Carrying bag and accessories"
+      }
+    ]
+  },
+  "canon dslr camera kit": {
+    "categorySlug": "electronics-cameras",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/front.jpg",
+        "angle": "Front body and lens"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/rear.jpg",
+        "angle": "Rear LCD"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/side.jpg",
+        "angle": "Top and side controls"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d/control-panel.jpg",
+        "angle": "Carrying bag and accessories"
+      }
+    ]
+  },
+  "wedding tent": {
+    "categorySlug": "party-wedding",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/wedding-tent/front.jpg",
+        "angle": "Full exterior"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent/side.jpg",
+        "angle": "Interior wedding setup"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent/rear.jpg",
+        "angle": "Entrance and side"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent/control-panel.jpg",
+        "angle": "Night lighting"
+      }
+    ]
+  },
+  "wedding tent 500 pax": {
+    "categorySlug": "party-wedding",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/wedding-tent/front.jpg",
+        "angle": "Full exterior"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent/side.jpg",
+        "angle": "Interior wedding setup"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent/rear.jpg",
+        "angle": "Entrance and side"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent/control-panel.jpg",
+        "angle": "Night lighting"
+      }
+    ]
+  },
+  "stage platform": {
+    "categorySlug": "event-essentials",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/stage-platform/front.jpg",
+        "angle": "Complete platform"
+      },
+      {
+        "url": "/uploads/listings/curated/stage-platform/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/stage-platform/rear.jpg",
+        "angle": "Top surface"
+      },
+      {
+        "url": "/uploads/listings/curated/stage-platform/control-panel.jpg",
+        "angle": "Modular frame and legs"
+      }
+    ]
+  },
+  "toyota hiace van": {
+    "categorySlug": "vehicles",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/toyota-hiace-van/front.jpg",
+        "angle": "Front three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-hiace-van/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-hiace-van/rear.jpg",
+        "angle": "Rear doors"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-hiace-van/control-panel.jpg",
+        "angle": "Interior dashboard and seats"
+      }
+    ]
+  },
+  "cooler box": {
+    "categorySlug": "travel-camping",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/cooler-box/front.jpg",
+        "angle": "Front closed"
+      },
+      {
+        "url": "/uploads/listings/curated/cooler-box/side.jpg",
+        "angle": "Side handle and drain"
+      },
+      {
+        "url": "/uploads/listings/curated/cooler-box/rear.jpg",
+        "angle": "Open interior"
+      },
+      {
+        "url": "/uploads/listings/curated/cooler-box/control-panel.jpg",
+        "angle": "Rear wheels"
+      }
+    ]
+  },
+  "camping chair set": {
+    "categorySlug": "sports-outdoor",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/camping-chair-set/front.jpg",
+        "angle": "Set front view"
+      },
+      {
+        "url": "/uploads/listings/curated/camping-chair-set/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/camping-chair-set/rear.jpg",
+        "angle": "Folded chairs and bags"
+      },
+      {
+        "url": "/uploads/listings/curated/camping-chair-set/control-panel.jpg",
+        "angle": "Outdoor setup"
+      }
+    ]
+  },
+  "banquet tables set": {
+    "categorySlug": "party-wedding",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/banquet-tables-set/front.jpg",
+        "angle": "Complete table set"
+      },
+      {
+        "url": "/uploads/listings/curated/banquet-tables-set/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/banquet-tables-set/rear.jpg",
+        "angle": "Folding leg detail"
+      },
+      {
+        "url": "/uploads/listings/curated/banquet-tables-set/control-panel.jpg",
+        "angle": "Decorated event setup"
+      }
+    ]
+  },
+  "hyundai tucson suv": {
+    "categorySlug": "vehicles",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/hyundai-tucson-suv/front.jpg",
+        "angle": "Front three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/hyundai-tucson-suv/side.jpg",
+        "angle": "Side profile"
+      },
+      {
+        "url": "/uploads/listings/curated/hyundai-tucson-suv/rear.jpg",
+        "angle": "Rear three-quarter view"
+      },
+      {
+        "url": "/uploads/listings/curated/hyundai-tucson-suv/control-panel.jpg",
+        "angle": "Interior dashboard and seats"
+      }
+    ]
+  },
+  "toyota-corolla-2021": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/front.jpg",
+        "angle": "Toyota Corolla 2021 front view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/side.jpg",
+        "angle": "Toyota Corolla 2021 side view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/rear.jpg",
+        "angle": "Toyota Corolla 2021 rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/toyota-corolla-2021/detail.jpg",
+        "angle": "Toyota Corolla 2021 close‑up detail view"
+      }
+    ]
+  },
+  "canon-eos-90d-dslr-camera": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d-dslr-camera/front.jpg",
+        "angle": "Canon EOS 90D DSLR Camera front view"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d-dslr-camera/side.jpg",
+        "angle": "Canon EOS 90D DSLR Camera side view"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d-dslr-camera/rear.jpg",
+        "angle": "Canon EOS 90D DSLR Camera rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/canon-eos-90d-dslr-camera/detail.jpg",
+        "angle": "Canon EOS 90D DSLR Camera close‑up detail view"
+      }
+    ]
+  },
+  "wedding-tent-500-pax": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/wedding-tent-500-pax/front.jpg",
+        "angle": "Wedding Tent 500 Pax front view"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent-500-pax/side.jpg",
+        "angle": "Wedding Tent 500 Pax side view"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent-500-pax/rear.jpg",
+        "angle": "Wedding Tent 500 Pax rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/wedding-tent-500-pax/detail.jpg",
+        "angle": "Wedding Tent 500 Pax close‑up detail view"
+      }
+    ]
+  },
+  "heavy-duty-concrete-mixer": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/heavy-duty-concrete-mixer/front.jpg",
+        "angle": "Heavy Duty Concrete Mixer front view"
+      },
+      {
+        "url": "/uploads/listings/curated/heavy-duty-concrete-mixer/side.jpg",
+        "angle": "Heavy Duty Concrete Mixer side view"
+      },
+      {
+        "url": "/uploads/listings/curated/heavy-duty-concrete-mixer/rear.jpg",
+        "angle": "Heavy Duty Concrete Mixer rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/heavy-duty-concrete-mixer/detail.jpg",
+        "angle": "Heavy Duty Concrete Mixer close‑up detail view"
+      }
+    ]
+  },
+  "baby-stroller": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/baby-stroller/front.jpg",
+        "angle": "Baby Stroller front view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-stroller/side.jpg",
+        "angle": "Baby Stroller side view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-stroller/rear.jpg",
+        "angle": "Baby Stroller rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-stroller/detail.jpg",
+        "angle": "Baby Stroller close‑up detail view"
+      }
+    ]
+  },
+  "baby-crib": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/baby-crib/front.jpg",
+        "angle": "Baby Crib front view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-crib/side.jpg",
+        "angle": "Baby Crib side view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-crib/rear.jpg",
+        "angle": "Baby Crib rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-crib/detail.jpg",
+        "angle": "Baby Crib close‑up detail view"
+      }
+    ]
+  },
+  "child-car-seat": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/child-car-seat/front.jpg",
+        "angle": "Child Car Seat front view"
+      },
+      {
+        "url": "/uploads/listings/curated/child-car-seat/side.jpg",
+        "angle": "Child Car Seat side view"
+      },
+      {
+        "url": "/uploads/listings/curated/child-car-seat/rear.jpg",
+        "angle": "Child Car Seat rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/child-car-seat/detail.jpg",
+        "angle": "Child Car Seat close‑up detail view"
+      }
+    ]
+  },
+  "baby-walker": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/baby-walker/front.jpg",
+        "angle": "Baby Walker front view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-walker/side.jpg",
+        "angle": "Baby Walker side view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-walker/rear.jpg",
+        "angle": "Baby Walker rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-walker/detail.jpg",
+        "angle": "Baby Walker close‑up detail view"
+      }
+    ]
+  },
+  "baby-high-chair": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/baby-high-chair/front.jpg",
+        "angle": "Baby High Chair front view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-high-chair/side.jpg",
+        "angle": "Baby High Chair side view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-high-chair/rear.jpg",
+        "angle": "Baby High Chair rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/baby-high-chair/detail.jpg",
+        "angle": "Baby High Chair close‑up detail view"
+      }
+    ]
+  },
+  "playpen": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/playpen/front.jpg",
+        "angle": "Playpen front view"
+      },
+      {
+        "url": "/uploads/listings/curated/playpen/side.jpg",
+        "angle": "Playpen side view"
+      },
+      {
+        "url": "/uploads/listings/curated/playpen/rear.jpg",
+        "angle": "Playpen rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/playpen/detail.jpg",
+        "angle": "Playpen close‑up detail view"
+      }
+    ]
+  },
+  "barber-chair": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/barber-chair/front.jpg",
+        "angle": "Barber Chair front view"
+      },
+      {
+        "url": "/uploads/listings/curated/barber-chair/side.jpg",
+        "angle": "Barber Chair side view"
+      },
+      {
+        "url": "/uploads/listings/curated/barber-chair/rear.jpg",
+        "angle": "Barber Chair rear view"
+      }
+    ]
+  },
+  "facial-steamer": {
+    "categorySlug": "auto-generated",
+    "images": [
+      {
+        "url": "/uploads/listings/curated/facial-steamer/side.jpg",
+        "angle": "Facial Steamer side view"
+      },
+      {
+        "url": "/uploads/listings/curated/facial-steamer/rear.jpg",
+        "angle": "Facial Steamer rear view"
+      },
+      {
+        "url": "/uploads/listings/curated/facial-steamer/detail.jpg",
+        "angle": "Facial Steamer close‑up detail view"
+      }
+    ]
+  }
+}

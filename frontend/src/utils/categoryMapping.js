@@ -111,11 +111,12 @@ export const rentalCategoryAliases = {
     "beauty",
     "salon",
   ],
-  "baby-kids": [
-    "baby-kids",
-    "baby & kids essentials",
-    "baby",
-    "kids",
+  "cultural-wedding-dress": [
+    "cultural-wedding-dress",
+    "cultural wedding dress",
+    "harari wedding",
+    "wedding dress",
+    "cultural dress",
   ],
   "gaming-equipment": [
     "gaming-equipment",

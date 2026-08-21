@@ -1,0 +1,12 @@
+{
+  "portable generator": {
+    "name": "Portable Generator",
+    "category": "event-essentials",
+    "images": [
+      { "file": "/uploads/listings/curated/portable-generator/front.jpg", "angle": "Front three-quarter view" },
+      { "file": "/uploads/listings/curated/portable-generator/side.jpg", "angle": "Side view" },
+      { "file": "/uploads/listings/curated/portable-generator/control-panel.jpg", "angle": "Control panel close-up" },
+      { "file": "/uploads/listings/curated/portable-generator/rear.jpg", "angle": "Rear view" }
+    ]
+  }
+}

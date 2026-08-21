@@ -1,0 +1,15 @@
+UPDATE "User" SET "email" = 'eliastadesse681@gmail.com' WHERE "email" = 'eliastadesse681@mail.tm';
+UPDATE "User" SET "email" = 'marthaalemu824@gmail.com' WHERE "email" = 'marthaalemu824@mail.tm';
+UPDATE "User" SET "email" = 'saronassefa223@gmail.com' WHERE "email" = 'saronassefa223@mail.tm';
+UPDATE "User" SET "email" = 'hawaibrahim744@gmail.com' WHERE "email" = 'hawaibrahim744@mail.tm';
+UPDATE "User" SET "email" = 'bethlehemdesta950@gmail.com' WHERE "email" = 'bethlehemdesta950@mail.tm';
+UPDATE "User" SET "email" = 'hanatesfaye52@gmail.com' WHERE "email" = 'hanatesfaye52@mail.tm';
+UPDATE "User" SET "email" = 'sarayonas23@gmail.com' WHERE "email" = 'sarayonas23@mail.tm';
+UPDATE "User" SET "email" = 'ahmedali634@gmail.com' WHERE "email" = 'ahmedali634@mail.tm';
+UPDATE "User" SET "email" = 'ruthsolomon653@gmail.com' WHERE "email" = 'ruthsolomon653@mail.tm';
+UPDATE "User" SET "email" = 'mustafeibrahim652@gmail.com' WHERE "email" = 'mustafeibrahim652@mail.tm';
+UPDATE "User" SET "email" = 'dawitsolomon431@gmail.com' WHERE "email" = 'dawitsolomon431@mail.tm';
+UPDATE "User" SET "email" = 'mohamedhassan208@gmail.com' WHERE "email" = 'mohamedhassan208@mail.tm';
+UPDATE "User" SET "email" = 'fadumoali917@gmail.com' WHERE "email" = 'fadumoali917@mail.tm';
+UPDATE "User" SET "email" = 'merongirma665@gmail.com' WHERE "email" = 'merongirma665@mail.tm';
+UPDATE "User" SET "email" = 'lidiatadesse202@gmail.com' WHERE "email" = 'lidiatadesse202@mail.tm';

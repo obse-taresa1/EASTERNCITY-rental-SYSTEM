@@ -31,21 +31,70 @@ const listingInclude = {
   },
 };
 
-function findPublic(args = {}) {
-  return prisma.listing.findMany({
+async function findPublic(args = {}) {
+  const now = new Date();
+
+  const baseWhere = {
+    ...(args.where || {}),
+    status: { in: ["APPROVED", "ACTIVE", "FEATURED"] },
+  };
+
+  const includeWithPromotions = {
+    ...listingInclude,
+    promotions: {
+      where: {
+        status: "APPROVED",
+        placement: { in: ["Featured Listing", "FEATURED", "FEATURED_LISTING"] },
+        startDate: { lte: now },
+        endDate: { gte: now }
+      }
+    }
+  };
+
+  const featuredListings = await prisma.listing.findMany({
     ...args,
     where: {
-      ...(args.where || {}),
-      status: { in: ["APPROVED", "ACTIVE", "FEATURED"] },
+      ...baseWhere,
+      promotions: {
+        some: {
+          status: "APPROVED",
+          placement: { in: ["Featured Listing", "FEATURED", "FEATURED_LISTING"] },
+          startDate: { lte: now },
+          endDate: { gte: now }
+        }
+      }
     },
-    include: listingInclude,
+    include: includeWithPromotions,
   });
+
+  const featuredIds = featuredListings.map(l => l.id);
+
+  const normalListings = await prisma.listing.findMany({
+    ...args,
+    where: {
+      ...baseWhere,
+      id: { notIn: featuredIds.length > 0 ? featuredIds : ["__none__"] }
+    },
+    include: includeWithPromotions,
+  });
+
+  const combined = [...featuredListings, ...normalListings];
+  return combined.map(listing => ({
+    ...listing,
+    isFeatured: listing.promotions && listing.promotions.length > 0
+  }));
 }
 
 function findById(id) {
   return prisma.listing.findUnique({
     where: { id },
     include: listingInclude,
+  }).then(listing => {
+    if (!listing) return null;
+    return {
+      ...listing,
+      isFeatured: listing.promotions && listing.promotions.length > 0
+    };
   });
 }
 

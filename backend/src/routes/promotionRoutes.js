@@ -8,6 +8,9 @@ const {
   validatePromotionRequest,
 } = require("../validators/promotionValidator");
 
+// User's own promotions (must come before the admin-only GET /)
+router.get("/mine", auth, controller.listMine);
+
 router.get("/", auth, authorize("ADMIN", "SUPER_ADMIN"), controller.list);
 router.get(
   "/pending",

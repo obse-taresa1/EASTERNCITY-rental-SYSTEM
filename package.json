@@ -1,9 +1,13 @@
 {
+  "prisma": {
+    "schema": "backend/prisma/schema.prisma"
+  },
   "devDependencies": {
     "@playwright/test": "^1.62.0",
     "playwright": "^1.62.0"
   },
   "dependencies": {
+    "@prisma/client": "^7.9.1",
     "axios": "^1.18.1",
     "formdata-node": "^6.0.3"
   }
