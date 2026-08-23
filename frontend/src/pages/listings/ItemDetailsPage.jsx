@@ -33,15 +33,23 @@ export default function ItemDetailsPage() {
   const [contactLoading, setContactLoading] = useState(false);
   const [contactError, setContactError] = useState("");
   const [reviews, setReviews] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let active = true;
 
     async function loadItem() {
       setLoading(true);
+      setErrorMsg("");
       try {
         const data = await getListingById(itemId);
         if (active) setItem(data);
+      } catch (err) {
+        if (active) {
+          console.error("Error loading item:", err);
+          setErrorMsg(err.response?.status === 404 ? "Item not found." : "The server is waking up. Please try again in a moment.");
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -52,7 +60,7 @@ export default function ItemDetailsPage() {
     return () => {
       active = false;
     };
-  }, [itemId]);
+  }, [itemId, retryCount]);
 
   useEffect(() => {
     let active = true;
@@ -78,7 +86,9 @@ export default function ItemDetailsPage() {
   if (loading) {
     return (
       <main className="container py-5 text-center">
-        <h1 className="h4 text-muted">Loading item...</h1>
+        <div className="spinner-border text-danger mb-3" role="status" />
+        <h1 className="h4 text-muted">Loading listing…</h1>
+        <p className="text-muted small">Connecting to the server, please wait.</p>
       </main>
     );
   }
@@ -86,7 +96,7 @@ export default function ItemDetailsPage() {
   if (!item) {
     return (
       <main className="container py-5 text-center">
-        <h1 className="h4 text-muted">Item not found</h1>
+        <h1 className="h4 text-muted">{errorMsg || "Item not found"}</h1>
         <button
           className="btn btn-danger mt-3"
           onClick={() => navigate("/items")}

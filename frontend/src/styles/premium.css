@@ -2043,7 +2043,7 @@ section.motorx-hero .hero-slider-controls .hero-autoplay-btn {
 }
 
 .footer-link-list li a::before {
-  content: 'Ã¢â‚¬Âº';
+  content: '\203A';
   color: var(--motorx-red, #e31e24);
   font-weight: 900;
   font-size: 1.1rem;

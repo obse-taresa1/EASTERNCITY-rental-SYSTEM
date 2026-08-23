@@ -114,7 +114,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <i className="bi bi-clock-fill text-danger me-2"></i>
-                  <span>Mon – Sat, 8:00 AM – 8:00 PM</span>
+                  <span>Mon - Sat, 8:00 AM - 8:00 PM</span>
                 </li>
                 <li>
                   <i className="bi bi-geo-alt-fill text-danger me-2"></i>
