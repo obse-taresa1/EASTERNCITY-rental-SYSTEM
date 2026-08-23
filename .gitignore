@@ -70,3 +70,15 @@ backend/db_schema_dump.json
 backend/fix-harari-image.js
 
 *.docx
+
+# AI agent checkpoints (Codex, Antigravity, etc.)
+.codex-checkpoints/
+.gemini/
+
+# Backend scratch/one-off scripts
+backend/scratch/
+backend/scratch_*.js
+backend/seed-community.js
+
+# OneDrive sync conflict duplicates (*-DESKTOP-*.*)
+*-DESKTOP-*.*
