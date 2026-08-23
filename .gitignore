@@ -68,3 +68,5 @@ backend/verify-final.js
 backend/backfill-condition.js
 backend/db_schema_dump.json
 backend/fix-harari-image.js
+
+*.docx
