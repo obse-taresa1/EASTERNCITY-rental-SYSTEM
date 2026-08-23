@@ -45,22 +45,7 @@ const defaultSlides = [
     specs: ["Automatic", "Petrol", "5 Seats"],
     discountPercent: 10,
   },
-  {
-    customTitle: "Reliable Vans for Hire",
-    customSubtitle: "Spacious and comfortable transport for your group.",
-    image: heroToyota,
-    cardTitle: "Toyota Hiace Van",
-    cardPrice: "ETB 7,000",
-    cardLocation: "Dire Dawa",
-    categoryId: "vehicles",
-    categoryKey: "vehicles",
-    icon: "bi-car-front",
-    itemId: "",
-    rating: "4.7",
-    reviewsCount: 8,
-    specs: ["Van", "Diesel", "12 Seats"],
-    discountPercent: 5,
-  },
+
   {
     customTitle: "Professional Cameras",
     customSubtitle: "Capture every moment with high-quality gear.",
@@ -140,19 +125,19 @@ const defaultSlides = [
     specs: ["Cordless", "20V", "Brushless"],
   },
   {
-    customTitle: "Large Event Tents",
-    customSubtitle: "Spacious tents for weddings and outdoor gatherings.",
-    image: "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=1200&h=800&fit=crop",
-    cardTitle: "Wedding Tent 20x30m",
-    cardPrice: "ETB 8,000",
+    customTitle: "Premium Chair Rentals",
+    customSubtitle: "Stylish chairs for weddings, events, and outdoor gatherings.",
+    image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&h=800&fit=crop",
+    cardTitle: "Banquet Chairs (Set of 100)",
+    cardPrice: "ETB 3,000",
     cardLocation: "Dire Dawa",
     categoryId: "party-wedding",
     categoryKey: "party",
-    icon: "bi-tent",
+    icon: "bi-shop",
     itemId: "",
     rating: "4.9",
     reviewsCount: 24,
-    specs: ["200 Capacity", "Lighting", "Setup"],
+    specs: ["100 Chairs", "White Finish", "Delivery Included"],
     discountPercent: 15,
   },
 ];
@@ -219,9 +204,12 @@ export default function HomeHeroSlider() {
         // Use both promoSlides and defaultSlides
         const baseSlides = [...promoSlides, ...defaultSlides];
 
-        // For every slide without a valid itemId, try to find a matching listing by title
+        // Only try to find a matching listing for DB-fetched promo slides that
+        // don't already have an itemId. Never auto-match default/static slides
+        // to a random DB listing — those should fall back to their category.
         const enriched = baseSlides.map((slide) => {
           if (slide.itemId) return slide;
+          if (!slide.isPromotion) return slide; // default slides: skip auto-match
           const match = listings.find(
             (l) => normalizeTitle(l.title) === normalizeTitle(slide.cardTitle)
           );
@@ -245,9 +233,19 @@ export default function HomeHeroSlider() {
 
   // Navigate to the item detail page if we have a valid listing id,
   // otherwise fall back to the category page.
-  const activeSlideHref = activeSlide?.itemId
-    ? `/items/${activeSlide.itemId}`
-    : `/categories/${activeSlide?.categoryId || ""}`;
+  const getExternalUrl = (link) => {
+    if (!link || link === "#" || link.startsWith("/")) return null;
+    return link.startsWith("http") ? link : `https://${link}`;
+  };
+
+  const externalUrl = getExternalUrl(activeSlide?.ctaLink);
+  const isExternalLink = !!externalUrl;
+
+  const activeSlideHref = isExternalLink 
+    ? externalUrl 
+    : activeSlide?.itemId
+      ? `/items/${activeSlide.itemId}`
+      : `/categories/${activeSlide?.categoryId || ""}`;
 
   // Determine the current price value (numeric) for calculations
   const currentPriceValue = activeSlide?.cardPriceValue ?? getPriceValue(activeSlide.cardPrice);
@@ -280,7 +278,17 @@ export default function HomeHeroSlider() {
 
   return (
     <section className="motorx-hero" data-hero-slider>
-      <div className="motorx-hero-bg" aria-hidden="true">
+      <div 
+        className="motorx-hero-bg" 
+        aria-hidden="true"
+        style={{ cursor: isExternalLink ? "pointer" : "default" }}
+        onClick={(e) => {
+          if (isExternalLink && isLoaded) {
+            e.preventDefault();
+            window.open(activeSlideHref, "_blank", "noopener,noreferrer");
+          }
+        }}
+      >
         {slides.map((slide, index) => (
           <div
             key={`${slide.titleKey || slide.cardTitle}-${index}`}
@@ -292,7 +300,16 @@ export default function HomeHeroSlider() {
 
       <div className="container motorx-hero-inner">
         <div className="hero-layout mb-4">
-          <div className="hero-text">
+          <div 
+            className="hero-text"
+            style={{ cursor: isExternalLink ? "pointer" : "default" }}
+            onClick={(e) => {
+              if (isExternalLink && isLoaded) {
+                e.preventDefault();
+                window.open(activeSlideHref, "_blank", "noopener,noreferrer");
+              }
+            }}
+          >
             <h1 key={`title-${activeIndex}`} className="animate-fade-in-up">
               {activeSlide.customTitle || t(activeSlide.titleKey) || activeSlide.cardTitle}
             </h1>
@@ -310,9 +327,16 @@ export default function HomeHeroSlider() {
               className="hero-float-card hero-product-card d-flex flex-column animate-fade-in-up"
               style={{ animationDelay: "300ms", cursor: isLoaded ? "pointer" : "wait" }}
               key={`card-${activeIndex}`}
-              to={activeSlideHref}
+              to={isExternalLink ? "#" : activeSlideHref}
               onClick={(e) => {
-                if (!isLoaded) e.preventDefault();
+                if (!isLoaded) {
+                  e.preventDefault();
+                  return;
+                }
+                if (isExternalLink) {
+                  e.preventDefault();
+                  window.open(activeSlideHref, "_blank", "noopener,noreferrer");
+                }
               }}
               aria-label={`View details for ${activeSlide.cardTitle}`}
             >

@@ -89,7 +89,7 @@ export default function AdvertisementCarousel() {
               const safeUrl = (() => {
                 let url = ad.ctaUrl || "#";
                 if (url !== "#" && !/^(https?:\/\/)/i.test(url) && !url.startsWith("/")) {
-                  url = "#";
+                  url = `https://${url}`;
                 }
                 return url;
               })();
@@ -100,11 +100,15 @@ export default function AdvertisementCarousel() {
                 if (!isActive) { e.preventDefault(); return; }
                 // Track click
                 if (ad.id) trackBannerAdClick(ad.id).catch(() => null);
-                // Navigate to item details if possible
-                if (ad.id) {
-                  // Prevent default anchor navigation
+                
+                // Navigation
+                if (safeUrl !== "#") {
                   e.preventDefault();
-                  navigate(`/items/${ad.id}`);
+                  if (isExternal) {
+                    window.open(safeUrl, "_blank", "noopener,noreferrer");
+                  } else {
+                    navigate(safeUrl);
+                  }
                 }
               };
 

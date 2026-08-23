@@ -71,26 +71,26 @@ async function main() {
     // ── EMERGENCY_REQUEST (3 posts: 2 images, 1 no-image) ──────────────────
     {
       type: 'COMMUNITY_FEED',
-      title: 'Urgent: Plumber Needed for Burst Pipe',
-      description: 'A pipe has burst and is flooding our store in Jigjiga near the central market. We need an emergency plumber who can come within the hour. We will pay emergency rates. Please call immediately.',
+      title: 'Urgent: Need to Rent a High-Capacity Water Pump',
+      description: 'Our basement is flooding in Jigjiga due to the heavy rain. We urgently need to rent a high-capacity water pump or wet vac to clear the water. We will pay premium rental rates for immediate delivery.',
       category: 'EMERGENCY_REQUEST',
       city: 'Jigjiga',
       authorId: rahma.id, // Rahma post #2
-      imageUrl: 'https://images.unsplash.com/photo-1607472586893-edb57cb31422?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800',
     },
     {
       type: 'COMMUNITY_FEED',
-      title: 'Broken Down Truck — Need Emergency Towing Service',
-      description: 'My delivery truck broke down on the main road outside Dire Dawa. It is a heavy vehicle (3-ton truck) and I need a towing service that can handle it. Please reply with your contact number and available time.',
+      title: 'Emergency: Temporary Replacement Truck Needed for Rent',
+      description: 'My delivery truck broke down outside Dire Dawa, and I have urgent deliveries to make today. I need to rent a 3-ton box truck or large van for the next 48 hours while mine is being repaired. Please reply with rates.',
       category: 'EMERGENCY_REQUEST',
       city: 'Dire Dawa',
       authorId: u3.id,
-      imageUrl: 'https://images.unsplash.com/photo-1543465077-db45d34b88a5?w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=800',
     },
     {
       type: 'COMMUNITY_FEED',
-      title: 'Emergency Backup Generator Needed for Local Clinic',
-      description: 'Our local health clinic in Harar lost power and critical medical equipment is at risk. We need an emergency backup generator (15–20 kW minimum) as soon as possible. All rental and delivery costs will be covered.',
+      title: 'Urgent: Need to Rent a Backup Generator for Local Clinic',
+      description: 'Our local health clinic in Harar lost power and critical medical equipment is at risk. We urgently need to rent a backup generator (15–20 kW minimum) for the next 24-48 hours. All rental and delivery costs will be covered immediately.',
       category: 'EMERGENCY_REQUEST',
       city: 'Harar',
       authorId: u4.id,
@@ -98,7 +98,10 @@ async function main() {
     },
   ];
 
-  // ── Insert posts using raw SQL ────────────────────────────────────────────
+  // ── Clear and Insert posts using raw SQL ────────────────────────────────────────────
+  await prisma.$executeRawUnsafe(`DELETE FROM "Media" WHERE "postId" IS NOT NULL`);
+  await prisma.$executeRawUnsafe(`DELETE FROM "CommunityPost"`);
+
   let rahmaPostCount = 0;
   let insertedCount = 0;
 

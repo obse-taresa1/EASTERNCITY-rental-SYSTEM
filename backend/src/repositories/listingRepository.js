@@ -51,7 +51,7 @@ async function findPublic(args = {}) {
     }
   };
 
-  const featuredListings = await prisma.listing.findMany({
+  const featuredListings = await prisma.$withRetry(() => prisma.listing.findMany({
     ...args,
     where: {
       ...baseWhere,
@@ -65,18 +65,18 @@ async function findPublic(args = {}) {
       }
     },
     include: includeWithPromotions,
-  });
+  }));
 
   const featuredIds = featuredListings.map(l => l.id);
 
-  const normalListings = await prisma.listing.findMany({
+  const normalListings = await prisma.$withRetry(() => prisma.listing.findMany({
     ...args,
     where: {
       ...baseWhere,
       id: { notIn: featuredIds.length > 0 ? featuredIds : ["__none__"] }
     },
     include: includeWithPromotions,
-  });
+  }));
 
   const combined = [...featuredListings, ...normalListings];
   return combined.map(listing => ({
@@ -86,10 +86,10 @@ async function findPublic(args = {}) {
 }
 
 function findById(id) {
-  return prisma.listing.findUnique({
+  return prisma.$withRetry(() => prisma.listing.findUnique({
     where: { id },
     include: listingInclude,
-  }).then(listing => {
+  })).then(listing => {
     if (!listing) return null;
     return {
       ...listing,
