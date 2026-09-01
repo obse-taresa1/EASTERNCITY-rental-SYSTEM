@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { createSupportTicket } from "../../services/supportTicketService.js";
 
 const FAQS = [
@@ -69,34 +68,6 @@ export default function HelpCenterPage() {
             Find answers and get support from the EasternCity team.
           </p>
         </div>
-      </div>
-
-      {/* Quick Links */}
-      <div className="help-quick-links">
-        {[
-          { to: "/dashboard", icon: "bi-speedometer2", label: "Dashboard" },
-          {
-            to: "/my-bookings",
-            icon: "bi-calendar-check",
-            label: "My Bookings",
-          },
-          { to: "/messages", icon: "bi-chat-dots", label: "Messages" },
-          {
-            to: "/verification",
-            icon: "bi-shield-check",
-            label: "Verification",
-          },
-          { to: "/contact", icon: "bi-envelope", label: "Contact Us" },
-        ].map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className="help-quick-link ud-glass-card"
-          >
-            <i className={`bi ${link.icon}`} />
-            <span>{link.label}</span>
-          </Link>
-        ))}
       </div>
 
       <div className="help-layout">

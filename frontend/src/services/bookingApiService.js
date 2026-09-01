@@ -22,6 +22,7 @@ function normalizeBooking(booking) {
     itemId: booking.listingId || booking.itemId,
     itemTitle:
       booking.listing?.title || booking.itemTitle || booking.title || "Listing",
+    itemImage: booking.listing?.images?.[0]?.imageUrl || null,
     totalPrice: Number(booking.totalAmount || booking.totalPrice || 0),
   };
 }
@@ -52,3 +53,4 @@ export async function rejectBooking(id, reason = "Rejected by owner.") {
   emitBookingsUpdate();
   return normalizeBooking(data);
 }
+

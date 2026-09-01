@@ -346,8 +346,17 @@ export default function AdminTopbar({ title, onMenuToggle }) {
           type="button"
           onClick={handleProfileClick}
           title="View profile"
+          style={{ padding: (activeUser?.avatar || activeUser?.profileImage || activeUser?.profileImageUrl) ? 0 : undefined, overflow: "hidden" }}
         >
-          <span>{getInitials(activeUser?.name)}</span>
+          {(activeUser?.avatar || activeUser?.profileImage || activeUser?.profileImageUrl) ? (
+            <img 
+              src={activeUser.avatar || activeUser.profileImage || activeUser.profileImageUrl} 
+              alt="Profile" 
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+            />
+          ) : (
+            <span>{getInitials(activeUser?.name)}</span>
+          )}
         </button>
         <div className="admin-topbar-title">
           <p>Welcome back,</p>

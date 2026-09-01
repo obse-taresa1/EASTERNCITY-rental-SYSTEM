@@ -25,10 +25,10 @@ export default function MobileDrawerMenu({ open, onClose }) {
         <div className="mobile-drawer-header">
           {isAuthenticated ? (
             <Link to="/dashboard-settings" onClick={onClose} className="mobile-drawer-profile" style={{ textDecoration: 'none', display: 'flex', color: 'inherit' }}>
-              <div className="drawer-avatar" style={{ padding: currentUser?.avatar ? 0 : undefined, overflow: 'hidden' }}>
-                {currentUser?.avatar ? (
+              <div className="drawer-avatar" style={{ padding: (currentUser?.avatar || currentUser?.profileImage || currentUser?.profileImageUrl) ? 0 : undefined, overflow: 'hidden' }}>
+                {(currentUser?.avatar || currentUser?.profileImage || currentUser?.profileImageUrl) ? (
                   <img 
-                    src={currentUser.avatar} 
+                    src={currentUser.avatar || currentUser.profileImage || currentUser.profileImageUrl} 
                     alt="Profile" 
                     style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
                   />

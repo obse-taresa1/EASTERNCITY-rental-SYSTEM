@@ -9,14 +9,26 @@ function findManyByUser(userId) {
     where: {
       OR: [{ renterId: userId }, { ownerId: userId }],
     },
-    include: { listing: true, renter: true, owner: true },
+    include: { 
+      listing: {
+        include: { images: true }
+      },
+      renter: true, 
+      owner: true 
+    },
     orderBy: { createdAt: "desc" },
   });
 }
 
 function findAll() {
   return prisma.booking.findMany({
-    include: { listing: true, renter: true, owner: true },
+    include: { 
+      listing: {
+        include: { images: true }
+      },
+      renter: true, 
+      owner: true 
+    },
     orderBy: { createdAt: "desc" },
   });
 }

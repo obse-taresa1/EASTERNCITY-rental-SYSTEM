@@ -218,6 +218,11 @@ export default function CommunityRequestDetailsPage() {
                 <i className="bi bi-check-circle-fill" /> Resolved
               </span>
             )}
+            {post.status === "PENDING" && (
+              <span className="cdp-resolved-badge" style={{ backgroundColor: "#ffc107", color: "#000" }}>
+                <i className="bi bi-hourglass-split" /> Pending Review
+              </span>
+            )}
           </div>
 
           {/* Actions */}

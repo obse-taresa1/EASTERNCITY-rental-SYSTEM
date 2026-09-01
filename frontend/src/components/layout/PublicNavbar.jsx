@@ -18,14 +18,21 @@ export default function PublicNavbar() {
   const navigate = useNavigate();
   const [panelOpen, setPanelOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-const { theme } = useTheme();
-const logoSrc = theme === "dark" ? darkLogo : lightLogo;
+  const { theme } = useTheme();
+  const logoSrc = theme === "dark" ? darkLogo : lightLogo;
 
   const handleLogout = () => {
     setPanelOpen(false);
     logout();
     navigate("/login");
   };
+
+  // Resolve avatar from any of the three possible fields
+  const avatarSrc =
+    currentUser?.avatar ||
+    currentUser?.profileImage ||
+    currentUser?.profileImageUrl ||
+    "";
 
   return (
     <header id="top" className="motorx-header app-public-header">
@@ -90,17 +97,17 @@ const logoSrc = theme === "dark" ? darkLogo : lightLogo;
                     aria-haspopup="true"
                     type="button"
                     style={{
-                      padding: currentUser?.avatar ? 0 : undefined,
+                      padding: avatarSrc ? 0 : undefined,
                       overflow: "hidden",
-                      backgroundColor: currentUser?.avatar ? "transparent" : undefined,
-                      border: currentUser?.avatar ? "none" : undefined
+                      backgroundColor: avatarSrc ? "transparent" : undefined,
+                      border: avatarSrc ? "none" : undefined,
                     }}
                   >
-                    {currentUser?.avatar ? (
-                      <img 
-                        src={currentUser.avatar} 
-                        alt="Profile" 
-                        style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} 
+                    {avatarSrc ? (
+                      <img
+                        src={avatarSrc}
+                        alt="Profile"
+                        style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
                       />
                     ) : (
                       <span className="avatar-initials">
