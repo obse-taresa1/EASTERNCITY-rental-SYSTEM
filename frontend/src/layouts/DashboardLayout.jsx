@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import PublicNavbar from "../components/layout/PublicNavbar.jsx";
 import DashboardSidebar from "../components/dashboard/DashboardSidebar.jsx";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 export default function DashboardLayout() {
   useEffect(() => {
@@ -17,7 +18,9 @@ export default function DashboardLayout() {
       <div className="unified-dashboard-body">
         <DashboardSidebar />
         <main className="unified-dashboard-main">
-          <Outlet />
+          <Suspense fallback={<LoadingSpinner fullPage={true} />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

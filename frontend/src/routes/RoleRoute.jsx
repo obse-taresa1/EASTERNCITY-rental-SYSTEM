@@ -1,13 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { dashboardForRole, coerceRole } from "../services/authService.js";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 export default function RoleRoute({ allowedRoles = [], children }) {
   const { user, currentUser, isAuthReady } = useAuth();
   const activeUser = user || currentUser;
 
   if (!isAuthReady) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner fullPage={true} />;
   }
 
   // If no authenticated user, redirect to login

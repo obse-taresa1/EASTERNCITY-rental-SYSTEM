@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { lazy } from "react";
 
 import PublicLayout from "../layouts/PublicLayout.jsx";
 import DashboardLayout from "../layouts/DashboardLayout.jsx";
@@ -8,92 +9,92 @@ import SuperAdminLayout from "../layouts/SuperAdminLayout.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx";
 
-import HomePage from "../pages/public/HomePage.jsx";
-import AboutPage from "../pages/public/AboutPage.jsx";
-import CareersPage from "../pages/public/CareersPage.jsx";
-import ContactPage from "../pages/public/ContactPage.jsx";
-import AdvertiseWithUsPage from "../pages/public/AdvertiseWithUsPage.jsx";
-import HowItWorksPage from "../pages/public/HowItWorksPage.jsx";
-import PrivacyPolicyPage from "../pages/public/PrivacyPolicyPage.jsx";
-import TermsPage from "../pages/public/TermsPage.jsx";
-import CommunityPage from "../pages/public/CommunityPage.jsx";
-import CommunityRequestDetailsPage from "../pages/public/CommunityRequestDetailsPage.jsx";
+const HomePage = lazy(() => import("../pages/public/HomePage.jsx"));
+const AboutPage = lazy(() => import("../pages/public/AboutPage.jsx"));
+const CareersPage = lazy(() => import("../pages/public/CareersPage.jsx"));
+const ContactPage = lazy(() => import("../pages/public/ContactPage.jsx"));
+const AdvertiseWithUsPage = lazy(() => import("../pages/public/AdvertiseWithUsPage.jsx"));
+const HowItWorksPage = lazy(() => import("../pages/public/HowItWorksPage.jsx"));
+const PrivacyPolicyPage = lazy(() => import("../pages/public/PrivacyPolicyPage.jsx"));
+const TermsPage = lazy(() => import("../pages/public/TermsPage.jsx"));
+const CommunityPage = lazy(() => import("../pages/public/CommunityPage.jsx"));
+const CommunityRequestDetailsPage = lazy(() => import("../pages/public/CommunityRequestDetailsPage.jsx"));
 
-import ItemsPage from "../pages/listings/ItemsPage.jsx";
-import CategoryPage from "../pages/listings/CategoryPage.jsx";
-import ItemDetailsPage from "../pages/listings/ItemDetailsPage.jsx";
-import CategoriesPage from "../pages/listings/CategoriesPage.jsx";
-import FeaturedListingsPublicPage from "../pages/public/FeaturedListingsPublicPage.jsx";
+const ItemsPage = lazy(() => import("../pages/listings/ItemsPage.jsx"));
+const CategoryPage = lazy(() => import("../pages/listings/CategoryPage.jsx"));
+const ItemDetailsPage = lazy(() => import("../pages/listings/ItemDetailsPage.jsx"));
+const CategoriesPage = lazy(() => import("../pages/listings/CategoriesPage.jsx"));
+const FeaturedListingsPublicPage = lazy(() => import("../pages/public/FeaturedListingsPublicPage.jsx"));
 
-import BookingPage from "../pages/booking/BookingPage.jsx";
-import BookingSuccessPage from "../pages/booking/BookingSuccessPage.jsx";
-import MyBookingsPage from "../pages/booking/MyBookingsPage.jsx";
+const BookingPage = lazy(() => import("../pages/booking/BookingPage.jsx"));
+const BookingSuccessPage = lazy(() => import("../pages/booking/BookingSuccessPage.jsx"));
+const MyBookingsPage = lazy(() => import("../pages/booking/MyBookingsPage.jsx"));
 
-import BothDashboardPage from "../pages/dashboard/BothDashboardPage.jsx";
-import ListItemPage from "../pages/dashboard/ListItemPage.jsx";
-import MyListingsPage from "../pages/dashboard/MyListingsPage.jsx";
-import SavedItemsPage from "../pages/dashboard/SavedItemsPage.jsx";
-import DashboardSettingsPage from "../pages/dashboard/DashboardSettingsPage.jsx";
-import ReviewsPage from "../pages/dashboard/ReviewsPage.jsx";
-import VerificationPage from "../pages/dashboard/VerificationPage.jsx";
-import HelpCenterPage from "../pages/dashboard/HelpCenterPage.jsx";
+const BothDashboardPage = lazy(() => import("../pages/dashboard/BothDashboardPage.jsx"));
+const ListItemPage = lazy(() => import("../pages/dashboard/ListItemPage.jsx"));
+const MyListingsPage = lazy(() => import("../pages/dashboard/MyListingsPage.jsx"));
+const SavedItemsPage = lazy(() => import("../pages/dashboard/SavedItemsPage.jsx"));
+const DashboardSettingsPage = lazy(() => import("../pages/dashboard/DashboardSettingsPage.jsx"));
+const ReviewsPage = lazy(() => import("../pages/dashboard/ReviewsPage.jsx"));
+const VerificationPage = lazy(() => import("../pages/dashboard/VerificationPage.jsx"));
+const HelpCenterPage = lazy(() => import("../pages/dashboard/HelpCenterPage.jsx"));
 
-import ProfilePage from "../pages/profile/ProfilePage.jsx";
-import MessagesPage from "../pages/profile/MessagesPage.jsx";
-import NotificationsPage from "../pages/profile/NotificationsPage.jsx";
+const ProfilePage = lazy(() => import("../pages/profile/ProfilePage.jsx"));
+const MessagesPage = lazy(() => import("../pages/profile/MessagesPage.jsx"));
+const NotificationsPage = lazy(() => import("../pages/profile/NotificationsPage.jsx"));
 
-import LoginPage from "../pages/auth/LoginPage.jsx";
-import RegisterPage from "../pages/auth/RegisterPage.jsx";
-import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage.jsx";
-import ResetPasswordPage from "../pages/auth/ResetPasswordPage.jsx";
+const LoginPage = lazy(() => import("../pages/auth/LoginPage.jsx"));
+const RegisterPage = lazy(() => import("../pages/auth/RegisterPage.jsx"));
+const ForgotPasswordPage = lazy(() => import("../pages/auth/ForgotPasswordPage.jsx"));
+const ResetPasswordPage = lazy(() => import("../pages/auth/ResetPasswordPage.jsx"));
 
-import AdminPaymentsPage from "../pages/admin/AdminPaymentsPage.jsx";
-import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage.jsx";
-import FeaturedListingsPage from "../pages/admin/FeaturedListingsPage.jsx";
-import PromotionHistoryPage from "../pages/admin/PromotionHistoryPage.jsx";
-import AdminVerificationPage from "../pages/admin/AdminVerificationPage.jsx";
-import AdminAnalyticsPage from "../pages/admin/AdminAnalyticsPage.jsx";
-import AdminSupportTicketsPage from "../pages/admin/AdminSupportTicketsPage.jsx";
-import AdminNotificationsPage from "../pages/admin/AdminNotificationsPage.jsx";
-import AdminDashboardPage from "../pages/admin/AdminDashboardPage.jsx";
-import AdminBookingsPage from "../pages/admin/AdminBookingsPage.jsx";
-import AdminReviewsPage from "../pages/admin/AdminReviewsPage.jsx";
-import AdminProfilePage from "../pages/admin/AdminProfilePage.jsx";
-import BannerAdsManagementPage from "../pages/admin/BannerAdsManagementPage.jsx";
-import AdvertisingManagementPage from "../pages/admin/AdvertisingManagementPage.jsx";
+const AdminPaymentsPage = lazy(() => import("../pages/admin/AdminPaymentsPage.jsx"));
+const AdminCategoriesPage = lazy(() => import("../pages/admin/AdminCategoriesPage.jsx"));
+const FeaturedListingsPage = lazy(() => import("../pages/admin/FeaturedListingsPage.jsx"));
+const PromotionHistoryPage = lazy(() => import("../pages/admin/PromotionHistoryPage.jsx"));
+const AdminVerificationPage = lazy(() => import("../pages/admin/AdminVerificationPage.jsx"));
+const AdminAnalyticsPage = lazy(() => import("../pages/admin/AdminAnalyticsPage.jsx"));
+const AdminSupportTicketsPage = lazy(() => import("../pages/admin/AdminSupportTicketsPage.jsx"));
+const AdminNotificationsPage = lazy(() => import("../pages/admin/AdminNotificationsPage.jsx"));
+const AdminDashboardPage = lazy(() => import("../pages/admin/AdminDashboardPage.jsx"));
+const AdminBookingsPage = lazy(() => import("../pages/admin/AdminBookingsPage.jsx"));
+const AdminReviewsPage = lazy(() => import("../pages/admin/AdminReviewsPage.jsx"));
+const AdminProfilePage = lazy(() => import("../pages/admin/AdminProfilePage.jsx"));
+const BannerAdsManagementPage = lazy(() => import("../pages/admin/BannerAdsManagementPage.jsx"));
+const AdvertisingManagementPage = lazy(() => import("../pages/admin/AdvertisingManagementPage.jsx"));
 
 // Inside Admin Layout routes block (after existing admin routes)
 
-import UserManagementPage from "../pages/admin/UserManagementPage.jsx";
-import AdminListingManagementPage from "../pages/admin/AdminListingManagementPage.jsx";
-import AdminReportsPage from "../pages/admin/AdminReportsPage.jsx";
-import AdminStatisticsPage from "../pages/admin/AdminStatisticsPage.jsx";
-import AdminSettingsPage from "../pages/admin/AdminSettingsPage.jsx";
-import AdminCommunityPostsPage from "../pages/admin/AdminCommunityPostsPage.jsx";
+const UserManagementPage = lazy(() => import("../pages/admin/UserManagementPage.jsx"));
+const AdminListingManagementPage = lazy(() => import("../pages/admin/AdminListingManagementPage.jsx"));
+const AdminReportsPage = lazy(() => import("../pages/admin/AdminReportsPage.jsx"));
+const AdminStatisticsPage = lazy(() => import("../pages/admin/AdminStatisticsPage.jsx"));
+const AdminSettingsPage = lazy(() => import("../pages/admin/AdminSettingsPage.jsx"));
+const AdminCommunityPostsPage = lazy(() => import("../pages/admin/AdminCommunityPostsPage.jsx"));
 
-import SuperAdminDashboardPage from "../pages/super-admin/SuperAdminDashboardPage.jsx";
-import AdminManagementPage from "../pages/super-admin/AdminManagementPage.jsx";
-import SuperUserManagementPage from "../pages/super-admin/SuperUserManagementPage.jsx";
-import SuperListingManagementPage from "../pages/super-admin/SuperListingManagementPage.jsx";
-import ContactMessagesPage from "../pages/super-admin/ContactMessagesPage.jsx";
-import RoleRequestsPage from "../pages/super-admin/RoleRequestsPage.jsx";
-import ActivityLogsPage from "../pages/super-admin/ActivityLogsPage.jsx";
-import SystemSettingsPage from "../pages/super-admin/SystemSettingsPage.jsx";
-import PlatformOverviewPage from "../pages/super-admin/PlatformOverviewPage.jsx";
-import SuperPaymentsRevenuePage from "../pages/super-admin/SuperPaymentsRevenuePage.jsx";
-import SuperVerificationCenterPage from "../pages/super-admin/SuperVerificationCenterPage.jsx";
-import SecurityCenterPage from "../pages/super-admin/SecurityCenterPage.jsx";
-import SuperReportsComplaintsPage from "../pages/super-admin/SuperReportsComplaintsPage.jsx";
-import SuperSupportCenterPage from "../pages/super-admin/SuperSupportCenterPage.jsx";
-import SuperCategoriesManagementPage from "../pages/super-admin/SuperCategoriesManagementPage.jsx";
-import SuperPlatformMonitoringPage from "../pages/super-admin/SuperPlatformMonitoringPage.jsx";
-import SuperPromotionManagementPage from "../pages/super-admin/SuperPromotionManagementPage.jsx";
+const SuperAdminDashboardPage = lazy(() => import("../pages/super-admin/SuperAdminDashboardPage.jsx"));
+const AdminManagementPage = lazy(() => import("../pages/super-admin/AdminManagementPage.jsx"));
+const SuperUserManagementPage = lazy(() => import("../pages/super-admin/SuperUserManagementPage.jsx"));
+const SuperListingManagementPage = lazy(() => import("../pages/super-admin/SuperListingManagementPage.jsx"));
+const ContactMessagesPage = lazy(() => import("../pages/super-admin/ContactMessagesPage.jsx"));
+const RoleRequestsPage = lazy(() => import("../pages/super-admin/RoleRequestsPage.jsx"));
+const ActivityLogsPage = lazy(() => import("../pages/super-admin/ActivityLogsPage.jsx"));
+const SystemSettingsPage = lazy(() => import("../pages/super-admin/SystemSettingsPage.jsx"));
+const PlatformOverviewPage = lazy(() => import("../pages/super-admin/PlatformOverviewPage.jsx"));
+const SuperPaymentsRevenuePage = lazy(() => import("../pages/super-admin/SuperPaymentsRevenuePage.jsx"));
+const SuperVerificationCenterPage = lazy(() => import("../pages/super-admin/SuperVerificationCenterPage.jsx"));
+const SecurityCenterPage = lazy(() => import("../pages/super-admin/SecurityCenterPage.jsx"));
+const SuperReportsComplaintsPage = lazy(() => import("../pages/super-admin/SuperReportsComplaintsPage.jsx"));
+const SuperSupportCenterPage = lazy(() => import("../pages/super-admin/SuperSupportCenterPage.jsx"));
+const SuperCategoriesManagementPage = lazy(() => import("../pages/super-admin/SuperCategoriesManagementPage.jsx"));
+const SuperPlatformMonitoringPage = lazy(() => import("../pages/super-admin/SuperPlatformMonitoringPage.jsx"));
+const SuperPromotionManagementPage = lazy(() => import("../pages/super-admin/SuperPromotionManagementPage.jsx"));
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<PublicLayout />}>
+      <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/items" element={<ItemsPage />} />
           <Route path="/featured" element={<FeaturedListingsPublicPage />} />

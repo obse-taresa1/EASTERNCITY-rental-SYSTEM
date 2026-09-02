@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import BackToTopButton from "../components/common/BackToTopButton.jsx";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 import PublicNavbar from "../components/layout/PublicNavbar.jsx";
 import Footer from "../components/layout/Footer.jsx";
@@ -14,7 +16,9 @@ export default function PublicLayout() {
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <PublicNavbar />
       <main className="app-main-content" style={{ flex: 1 }}>
-        <Outlet />
+        <Suspense fallback={<LoadingSpinner fullPage={true} />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
       {!isAuthPage && (

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet } from "react-router-dom";
 import AdminSidebar from "../components/admin/AdminSidebar.jsx";
 import AdminTopbar from "../components/admin/AdminTopbar.jsx";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 export default function SuperAdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,7 +14,9 @@ export default function SuperAdminLayout() {
 
       <div className="admin-main">
         <AdminTopbar title="Super Admin" onMenuToggle={() => setSidebarOpen((open) => !open)} />
-        <Outlet />
+        <Suspense fallback={<LoadingSpinner fullPage={true} />}>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   );
