@@ -19,9 +19,10 @@
 
 /* ─── Main image ───────────────────────────────────────────────────────────── */
 .gallery-main-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top center !important;
   display: block;
   /* Smooth fade-in on src change (requires key= remount in JSX) */
   animation: galleryFadeIn 0.25s ease-in-out;
