@@ -17,8 +17,8 @@ const prisma = new PrismaClient({
 });
 
 // Wrap every Prisma query with automatic retry on connection errors.
-const MAX_RETRIES = 3;
-const INITIAL_DELAY_MS = 800;
+const MAX_RETRIES = 5;
+const INITIAL_DELAY_MS = 1500;
 
 function isConnectionError(err) {
   return (

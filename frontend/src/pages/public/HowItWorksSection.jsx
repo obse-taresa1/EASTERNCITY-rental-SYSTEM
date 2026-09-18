@@ -19,6 +19,13 @@ const steps = [
   },
 ];
 
+const stats = [
+  ["87", "Active Listings"],
+  ["230+", "Verified Members"],
+  ["3", "Cities Served"],
+  ["★★★★★", "Community Rated"],
+];
+
 export default function HowItWorksSection() {
   const publicStats = usePublicStats();
   
