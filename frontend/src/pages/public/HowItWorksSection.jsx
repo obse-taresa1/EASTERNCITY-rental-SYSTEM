@@ -17,10 +17,10 @@ const steps = [
 ];
 
 const stats = [
-  ["2,400+", "Active Listings"],
-  ["8,900+", "Verified Members"],
-  ["14", "Neighbourhoods Served"],
-  ["4.9", "Average Rating"],
+  ["87", "Active Listings"],
+  ["230+", "Verified Members"],
+  ["3", "Cities Served"],
+  ["★★★★★", "Community Rated"],
 ];
 
 export default function HowItWorksSection() {
