@@ -274,8 +274,8 @@ export default function CommunityPage() {
                       <span className="post-category-badge">
                         <i className={"bi " + cat.icon} /> {cat.label}
                       </span>
-                      {/* Show status badge in "My Posts" tab */}
-                      {showMine && postStatus && (
+                      {/* Show status badge in "My Posts" tab except for APPROVED */}
+                      {showMine && postStatus && postStatus !== "APPROVED" && (
                         <span className={`badge bg-${statusColor(postStatus)}`} style={{ fontSize: "0.7rem" }}>
                           {postStatus === "PENDING" ? "PENDING REVIEW" : postStatus}
                         </span>

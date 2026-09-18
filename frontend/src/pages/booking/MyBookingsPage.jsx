@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { getMyBookings } from "../../services/bookingApiService.js";
-import { getReviewsByListings } from "../../services/reviewApiService.js";
+import { getMyReviews } from "../../services/reviewApiService.js";
 import LeaveReviewModal from "../../components/reviews/LeaveReviewModal.jsx";
 
 const STATUS_LABELS = {
@@ -59,26 +59,28 @@ export default function MyBookingsPage() {
 
       setLoading(true);
       try {
-        const data = await getMyBookings();
+        const [data, allReviews] = await Promise.all([
+          getMyBookings(),
+          getMyReviews(),
+        ]);
         const renterBookings = data.filter(
           (booking) =>
             String(booking.renterId || booking.userId || "") ===
             String(activeUser.id),
         );
 
-        const completedListingIds = renterBookings
-          .filter(
-            (booking) =>
-              String(booking.status || "").toUpperCase() === "COMPLETED",
-          )
-          .map((booking) => booking.listingId || booking.itemId)
-          .filter(Boolean);
-
-        const listingReviews = await getReviewsByListings(completedListingIds);
+        // Build reviewsByListing map from the single /api/reviews/my response
+        const listingReviewsMap = {};
+        allReviews.forEach((review) => {
+          const lid = String(review.listingId || review.itemId || "");
+          if (!lid) return;
+          if (!listingReviewsMap[lid]) listingReviewsMap[lid] = [];
+          listingReviewsMap[lid].push(review);
+        });
 
         if (active) {
           setBookings(renterBookings);
-          setReviewsByListing(listingReviews);
+          setReviewsByListing(listingReviewsMap);
         }
       } finally {
         if (active) setLoading(false);
@@ -233,15 +235,28 @@ export default function MyBookingsPage() {
                     className="booking-card-icon-area text-center"
                     style={{ minWidth: "120px" }}
                   >
-                    <div
-                      className="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-2"
-                      style={{ width: "80px", height: "80px" }}
-                    >
-                      <i
-                        className={`bi ${statusInfo.icon} text-danger`}
-                        style={{ fontSize: "2.5rem" }}
-                      ></i>
-                    </div>
+                    {booking.itemImage ? (
+                      <div
+                        className="rounded-circle mx-auto mb-2 overflow-hidden"
+                        style={{ width: "80px", height: "80px", border: "2px solid #e31e24" }}
+                      >
+                        <img 
+                          src={booking.itemImage.startsWith('http') ? booking.itemImage : `http://localhost:5000${booking.itemImage}`}
+                          alt={booking.itemTitle}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-2"
+                        style={{ width: "80px", height: "80px" }}
+                      >
+                        <i
+                          className={`bi ${statusInfo.icon} text-danger`}
+                          style={{ fontSize: "2.5rem" }}
+                        ></i>
+                      </div>
+                    )}
                     <span
                       className={`badge bg-${isCompleted ? "success" : "warning"} text-dark border w-100`}
                     >
@@ -316,7 +331,7 @@ export default function MyBookingsPage() {
                     {isCompleted &&
                       (alreadyReviewed ? (
                         <span className="btn btn-light w-100 rounded-pill fw-bold text-success border">
-                          <i className="bi bi-check-circle-fill"></i> Reviewed
+                          <i className="bi bi-check-circle-fill" /> Reviewed
                         </span>
                       ) : (
                         <button
@@ -324,7 +339,7 @@ export default function MyBookingsPage() {
                           onClick={() => setReviewBooking(booking)}
                           type="button"
                         >
-                          <i className="bi bi-star-fill"></i> Leave Review
+                          <i className="bi bi-star-fill" /> Leave Review
                         </button>
                       ))}
                   </div>

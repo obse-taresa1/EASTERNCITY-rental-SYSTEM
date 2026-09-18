@@ -57,6 +57,30 @@ router.get("/health", (req, res) => {
 // Public promotion config for authenticated users
 const auth = require('../middleware/auth');
 const prisma = require('../config/db');
+
+router.get('/public-stats', async (req, res, next) => {
+  try {
+    const [verifiedUsers, activeListings, cities, rating] = await Promise.all([
+      prisma.user.count({ where: { verificationStatus: { in: ['APPROVED', 'VERIFIED'] } } }),
+      prisma.listing.count({ where: { status: { in: ['APPROVED', 'PUBLISHED', 'ACTIVE'] } } }), // Assuming APPROVED/PUBLISHED/ACTIVE means active
+      prisma.listing.groupBy({ by: ['city'] }).then(c => c.length),
+      prisma.review.aggregate({ _avg: { rating: true } })
+    ]);
+    
+    res.json({
+      success: true,
+      data: {
+        verifiedUsers: verifiedUsers,
+        activeListings: activeListings,
+        cities: cities || 3, // Fallback if no listings
+        averageRating: rating._avg.rating ? Number(rating._avg.rating.toFixed(1)) : 5.0
+      }
+    });
+  } catch (e) { 
+    next(e); 
+  }
+});
+
 router.get('/promotion-config', auth, async (req, res, next) => {
   try {
     const PROMO_KEYS = ['featuredListingPricePerDay','homepagePromotionPricePerDay','minPromotionDays','maxPromotionDays','requirePaymentVerification','requireAdminApproval'];

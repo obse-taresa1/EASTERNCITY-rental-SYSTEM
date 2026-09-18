@@ -42,4 +42,22 @@ async function rejectBooking(req, res, next) {
   }
 }
 
-module.exports = { createBooking, getMyBookings, acceptBooking, rejectBooking };
+async function activateBooking(req, res, next) {
+  try {
+    const data = await service.activateBooking(req.user, req.params.id);
+    res.json({ success: true, message: "Booking marked as active.", data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function completeBooking(req, res, next) {
+  try {
+    const data = await service.completeBooking(req.user, req.params.id);
+    res.json({ success: true, message: "Booking marked as completed.", data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { createBooking, getMyBookings, acceptBooking, rejectBooking, activateBooking, completeBooking };

@@ -7,6 +7,7 @@ import { dashboardForRole as getDashboardPath } from "../../services/authService
 import usePageTitle from "../../hooks/usePageTitle.js";
 import lightLogo from "../../assets/images/eastern-cities-header-logo-transparent.png";
 import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
+import usePublicStats from "../../hooks/usePublicStats.js";
 import "../../styles/auth-premium.css";
 
 const PASSWORD_RECOVERY_PATH = "/contact";
@@ -84,6 +85,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login, loginWithGoogle } = useAuth();
   const { theme } = useTheme();
+  const publicStats = usePublicStats();
   const authLogo = theme === "dark" ? darkLogo : lightLogo;
   const googleClientId = import.meta.env?.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -165,15 +167,15 @@ export default function LoginPage() {
           
           <div className="premium-auth-stats">
             <div className="premium-auth-stat-card">
-              <div className="premium-auth-stat-value">230+</div>
+              <div className="premium-auth-stat-value">{publicStats.loading ? "..." : (publicStats.verifiedUsers > 200 ? publicStats.verifiedUsers + "+" : publicStats.verifiedUsers)}</div>
               <div className="premium-auth-stat-label">Verified Users</div>
             </div>
             <div className="premium-auth-stat-card">
-              <div className="premium-auth-stat-value">87</div>
+              <div className="premium-auth-stat-value">{publicStats.loading ? "..." : publicStats.activeListings}</div>
               <div className="premium-auth-stat-label">Active Listings</div>
             </div>
             <div className="premium-auth-stat-card">
-              <div className="premium-auth-stat-value">3</div>
+              <div className="premium-auth-stat-value">{publicStats.loading ? "..." : publicStats.cities}</div>
               <div className="premium-auth-stat-label">Cities</div>
             </div>
             <div className="premium-auth-stat-card">

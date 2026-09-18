@@ -592,3 +592,9 @@ model FeaturedListing {
 
   listing          Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../ERD.png"
+  theme    = "neutral"
+}

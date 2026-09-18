@@ -292,9 +292,9 @@ export default function BothDashboardPage() {
     <div className="ud-overview-page">
       <div className="ud-welcome-banner">
         <div className="ud-welcome-avatar">
-          {activeUser?.avatar ? (
+          {(activeUser?.avatar || activeUser?.profileImage || activeUser?.profileImageUrl) ? (
             <img 
-              src={activeUser.avatar} 
+              src={activeUser.avatar || activeUser.profileImage || activeUser.profileImageUrl} 
               alt={activeUser.name || "User Avatar"} 
               style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(255,255,255,0.5)" }} 
             />
