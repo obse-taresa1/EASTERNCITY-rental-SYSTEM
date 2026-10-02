@@ -1,6 +1,7 @@
 // src/services/userService.js
 const prisma = require('../config/db');
 const { hashPassword } = require('../utils/hash');
+const { withPrivateUserMedia } = require('./privateMediaService');
 
 const USER_UPDATE_FIELDS = new Set([
   'name',
@@ -51,7 +52,7 @@ const getUserById = async (id) => {
     throw error;
   }
 
-  return user;
+  return withPrivateUserMedia(user);
 };
 
 /**
@@ -111,7 +112,7 @@ const updateUser = async (id, updateData) => {
     });
   }
 
-  return updatedUser;
+  return withPrivateUserMedia(updatedUser);
 };
 
 const updateProfileImage = async (id, profileImageUrl) => {
@@ -134,7 +135,7 @@ const updateProfileImage = async (id, profileImageUrl) => {
       profileImageUrl: true,
       createdAt: true,
     },
-  });
+  }).then(withPrivateUserMedia);
 };
 
 module.exports = {

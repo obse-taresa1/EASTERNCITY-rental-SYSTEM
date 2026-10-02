@@ -19,8 +19,9 @@ function formatDateInput(value) {
 export default function AdminDashboardPage() {
   const [dashboard, setDashboard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const [dateFilters, setDateFilters] = useState({
-    range: "month",
+    range: "all",
     startDate: "",
     endDate: "",
   });
@@ -38,6 +39,10 @@ export default function AdminDashboardPage() {
     try {
       const data = await fetchAdminDashboard(dateFilters);
       setDashboard(data);
+      setError("");
+    } catch (requestError) {
+      console.error("Unable to load the admin dashboard:", requestError);
+      setError(requestError.message || "Unable to load live dashboard data.");
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +148,7 @@ export default function AdminDashboardPage() {
     <AdminOverviewDashboard
       variant="admin"
       loading={isLoading}
-      error={null}
+      error={error}
       overview={{
         title: "Marketplace Overview",
         primaryValue: counts.activeListings || 0,

@@ -93,7 +93,7 @@ async function createBannerAd(actor, payload, file) {
   // image when an approved request is published, rather than requiring a
   // second upload from the admin dashboard.
   const imageUrl = file
-    ? `/uploads/banners/${file.filename}`
+    ? file.cloudinaryUrl
     : String(payload.imageUrl || "").trim();
   const banner = buildBannerAd(payload, imageUrl);
   ads.unshift({ ...banner, createdAt: new Date().toISOString() });
@@ -105,7 +105,7 @@ async function updateBannerAd(actor, id, payload, file) {
   const ads = await getAllBannerAds();
   const index = ads.findIndex((ad) => ad.id === id);
   if (index < 0) throw new Error("Banner advertisement was not found.");
-  const imageUrl = file ? `/uploads/banners/${file.filename}` : "";
+  const imageUrl = file?.cloudinaryUrl || "";
   ads[index] = buildBannerAd(payload, imageUrl, ads[index]);
   await persistBannerAds(actor, ads);
   return ads[index];

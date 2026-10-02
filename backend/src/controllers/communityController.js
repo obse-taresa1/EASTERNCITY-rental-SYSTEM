@@ -26,7 +26,7 @@ function normalizeTags(tags) {
 function mediaData(files = []) {
   return files.slice(0, 5).map((file) => ({
     type: file.mimetype.startsWith('video/') ? 'VIDEO' : 'IMAGE',
-    url: `/uploads/community/${file.filename}`,
+    url: file.cloudinaryUrl,
   }));
 }
 

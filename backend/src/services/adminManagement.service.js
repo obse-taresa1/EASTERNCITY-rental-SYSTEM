@@ -1,6 +1,11 @@
 const prisma = require("../config/db");
 const { sendContactReplyEmail } = require("./emailService");
 const { hashPassword } = require("../utils/hash");
+const {
+  withPrivateListingMedia,
+  withPrivatePromotionMedia,
+  withPrivateUserMedia,
+} = require("./privateMediaService");
 
 function statusIn(values) {
   return { in: values.flatMap((value) => [value, value.toUpperCase(), value.toLowerCase()]) };
@@ -43,7 +48,8 @@ async function listUsers(query = {}) {
   if (query.search) {
     where.OR = ["name", "email", "city"].map((field) => ({ [field]: { contains: query.search, mode: "insensitive" } }));
   }
-  return prisma.user.findMany({ where, select: userSelect(), orderBy: { createdAt: "desc" } });
+  const users = await prisma.user.findMany({ where, select: userSelect(), orderBy: { createdAt: "desc" } });
+  return users.map(withPrivateUserMedia);
 }
 
 async function updateUser(actor, id, payload) {
@@ -54,7 +60,7 @@ async function updateUser(actor, id, payload) {
   if (payload.password) data.password = await hashPassword(payload.password);
   const updated = await prisma.user.update({ where: { id }, data, select: userSelect() });
   await log({ actor, action: `Updated user ${updated.email}`, metadata: { userId: id } });
-  return updated;
+  return withPrivateUserMedia(updated);
 }
 
 async function createAdmin(actor, payload) {
@@ -79,13 +85,13 @@ async function createAdmin(actor, payload) {
     select: userSelect(),
   });
   await log({ actor, action: `Created admin ${user.email}`, type: "SECURITY", metadata: { userId: user.id } });
-  return user;
+  return withPrivateUserMedia(user);
 }
 
 async function deleteUser(actor, id) {
   const user = await prisma.user.update({ where: { id }, data: { status: "DELETED" }, select: userSelect() });
   await log({ actor, action: `Deleted user ${user.email}`, type: "SECURITY", metadata: { userId: id } });
-  return user;
+  return withPrivateUserMedia(user);
 }
 
 async function listListings(query = {}) {
@@ -103,11 +109,12 @@ async function listListings(query = {}) {
       { owner: { name: { contains: query.search, mode: "insensitive" } } },
     ];
   }
-  return prisma.listing.findMany({
+  const listings = await prisma.listing.findMany({
     where,
     include: { owner: { select: { id: true, name: true, email: true } }, category: true, images: true },
     orderBy: { createdAt: "desc" },
   });
+  return listings.map(withPrivateListingMedia);
 }
 
 async function updateListing(actor, id, payload) {
@@ -172,7 +179,8 @@ async function listBookings(query = {}) {
 async function listPromotions(query = {}) {
   const where = {};
   if (query.status && query.status !== "all") where.status = statusIn([query.status]);
-  return prisma.promotion.findMany({ where, include: { listing: true, user: true }, orderBy: { createdAt: "desc" } });
+  const promotions = await prisma.promotion.findMany({ where, include: { listing: true, user: true }, orderBy: { createdAt: "desc" } });
+  return promotions.map(withPrivatePromotionMedia);
 }
 
 async function updatePromotion(actor, id, status, reason) {
@@ -211,7 +219,7 @@ async function updatePromotion(actor, id, status, reason) {
     }
   }
 
-  return promotion;
+  return withPrivatePromotionMedia(promotion);
 }
 
 async function listReviews(query = {}) {

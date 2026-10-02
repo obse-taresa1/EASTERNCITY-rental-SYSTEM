@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { destroyAsset } = require('../config/cloudinary');
 
 function collectUploadedFiles(req) {
   const files = [];
@@ -19,6 +20,10 @@ function collectUploadedFiles(req) {
 
 function cleanupUploadedFiles(req) {
   collectUploadedFiles(req).forEach((file) => {
+    if (file.cloudinaryPublicId) {
+      void destroyAsset(file);
+      return;
+    }
     try {
       fs.unlinkSync(file.path);
     } catch {

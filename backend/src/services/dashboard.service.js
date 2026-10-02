@@ -8,9 +8,13 @@ function normalizeDate(value) {
 
 function getDateRange(query = {}) {
   const now = new Date();
-  const range = String(query.range || "month").toLowerCase();
+  const range = String(query.range || "all").toLowerCase();
   let startDate = normalizeDate(query.startDate);
   let endDate = normalizeDate(query.endDate);
+
+  if (range === "all") {
+    return { startDate: null, endDate: null, range };
+  }
 
   if (range !== "custom" || !startDate || !endDate) {
     endDate = now;
@@ -33,6 +37,8 @@ function getDateRange(query = {}) {
 }
 
 function dateWhere(startDate, endDate, field = "createdAt") {
+  if (!startDate || !endDate) return {};
+
   return {
     [field]: {
       gte: startDate,

@@ -3,6 +3,7 @@ const prisma = require("../config/db");
 const logger = require("../config/logger");
 const { sendAdvertisingRequestEmails, sendAdvertisingStatusEmail } = require("./emailService");
 const { createBannerAd } = require("./bannerAdService");
+const { withPrivateAdvertisingMedia } = require("./privateMediaService");
 
 function toDate(value) {
   if (!value) return null;
@@ -29,7 +30,7 @@ async function create(payload, file) {
       campaignGoal: payload.campaignGoal || null,
       preferredStartDate: toDate(payload.preferredStartDate),
       preferredEndDate: toDate(payload.preferredEndDate),
-      bannerUrl: file ? `/uploads/advertising-requests/${file.filename}` : null,
+      bannerUrl: file?.cloudinaryUrl || null,
       termsAccepted: true,
     },
   });
@@ -38,11 +39,13 @@ async function create(payload, file) {
   return request;
 }
 
-function list(status) {
-  return prisma.advertisingRequest.findMany({
+async function list(status) {
+  const requests = await prisma.advertisingRequest.findMany({
     where: status ? { status } : undefined,
     orderBy: { createdAt: "desc" },
   });
+
+  return requests.map(withPrivateAdvertisingMedia);
 }
 
 async function update(id, payload, actor) {
@@ -88,7 +91,7 @@ async function update(id, payload, actor) {
     });
   }
   await sendAdvertisingStatusEmail(updated).catch((error) => logger.warn("Advertising status email failed", { id, error: error.message }));
-  return updated;
+  return withPrivateAdvertisingMedia(updated);
 }
 
 async function uploadReceipt(reference, email, file) {
@@ -110,7 +113,7 @@ async function uploadReceipt(reference, email, file) {
   }
   return prisma.advertisingRequest.update({
     where: { id: request.id },
-    data: { paymentProofUrl: `/uploads/payments/${file.filename}`, paymentSubmittedAt: new Date() },
+    data: { paymentProofUrl: file.cloudinaryUrl, paymentSubmittedAt: new Date() },
   });
 }
 

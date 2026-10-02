@@ -19,7 +19,7 @@ function normalizeDashboardData(data) {
     breakdowns: data?.breakdowns || {},
     chart: data?.chart || {},
     recentRows: Array.isArray(data?.recentRows) ? data.recentRows : [],
-    range: data?.range || "month",
+    range: data?.range || "all",
     startDate: data?.startDate || "",
     endDate: data?.endDate || "",
   };

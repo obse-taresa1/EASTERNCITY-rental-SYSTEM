@@ -25,6 +25,21 @@ function normalizeTitle(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+function getListingImage(listing) {
+  return (
+    listing?.image ||
+    listing?.coverImage ||
+    listing?.images?.[0]?.imageUrl ||
+    ""
+  );
+}
+
+function getPromotionItemId(promotion) {
+  if (promotion?.listingId) return promotion.listingId;
+  const ctaLink = promotion?.ctaLink || "";
+  return ctaLink.includes("/items/") ? ctaLink.split("/items/")[1] : "";
+}
+
 // Duplicate getCategoryIcon removed; using imported version
 
 // Default static slides
@@ -165,30 +180,37 @@ export default function HomeHeroSlider() {
           getPublicListings(),
         ]);
 
-        // Convert DB hero promotions into slide objects, resolving image URLs
+        // Convert DB hero promotions into slide objects, resolving image URLs.
+        // Promotions without their own image reuse the linked listing image.
         const promoSlides = promos.map((p) => {
-          const rawImage = p.heroImage || p.cardImage || "";
-          // resolveAssetUrl handles both absolute http:// URLs and relative /uploads/... paths
+          const itemId = getPromotionItemId(p);
+          const match = listings.find(
+            (l) =>
+              (itemId && l.id === itemId) ||
+              normalizeTitle(l.title) === normalizeTitle(p.title || p.listingTitle)
+          );
+          const rawImage = p.heroImage || p.cardImage || getListingImage(match);
           const resolvedImage = resolveAssetUrl(rawImage);
+          if (!resolvedImage) return null;
           const hasDiscount = p.discountPercent && Number(p.discountPercent) > 0;
           const discountedVal = p.discountedPrice !== null && p.discountedPrice !== undefined ? Number(p.discountedPrice) : null;
-          const originalVal = Number(p.originalPrice || 0);
+          const originalVal = Number(p.originalPrice || match?.pricePerDay || 0);
           return {
             titleKey: "",
-            customTitle: p.title || "",
-            customSubtitle: p.description || "",
+            customTitle: p.title || match?.title || "",
+            customSubtitle: p.description || match?.description || "",
             image: resolvedImage,
-            cardTitle: p.title || "",
+            cardTitle: p.title || match?.title || "",
             cardPrice: discountedVal !== null
               ? `ETB ${discountedVal.toLocaleString()}`
               : originalVal ? `ETB ${originalVal.toLocaleString()}` : "",
             cardPriceValue: discountedVal !== null ? discountedVal : originalVal,
             originalPriceValue: hasDiscount ? originalVal : null,
-            cardLocation: p.location || "",
-            categoryId: "",
-            categoryKey: "",
-            icon: "bi-star-fill",
-            itemId: p.ctaLink && p.ctaLink.includes("/items/") ? p.ctaLink.split("/items/")[1] : "",
+            cardLocation: p.location || match?.city || match?.location || "",
+            categoryId: match?.category || "",
+            categoryKey: match?.category || "",
+            icon: match?.category ? getCategoryIcon(match.category) : "bi-star-fill",
+            itemId: itemId || match?.id || "",
             rating: p.rating || "5.0",
             reviewsCount: 0,
             discountPercent: hasDiscount ? Number(p.discountPercent) : null,
@@ -199,7 +221,7 @@ export default function HomeHeroSlider() {
             cardImage: resolvedImage,
             isPromotion: true,
           };
-        });
+        }).filter(Boolean);
 
         // Use both promoSlides and defaultSlides
         const baseSlides = [...promoSlides, ...defaultSlides];

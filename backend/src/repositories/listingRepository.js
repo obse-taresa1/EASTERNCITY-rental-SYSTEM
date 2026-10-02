@@ -46,43 +46,23 @@ async function findPublic(args = {}) {
         status: "APPROVED",
         placement: { in: ["Featured Listing", "FEATURED", "FEATURED_LISTING"] },
         startDate: { lte: now },
-        endDate: { gte: now }
+        endDate: { gte: now },
       }
     }
   };
 
-  const featuredListings = await prisma.$withRetry(() => prisma.listing.findMany({
+  const listings = await prisma.$withRetry(() => prisma.listing.findMany({
     ...args,
-    where: {
-      ...baseWhere,
-      promotions: {
-        some: {
-          status: "APPROVED",
-          placement: { in: ["Featured Listing", "FEATURED", "FEATURED_LISTING"] },
-          startDate: { lte: now },
-          endDate: { gte: now }
-        }
-      }
-    },
+    where: baseWhere,
     include: includeWithPromotions,
   }));
 
-  const featuredIds = featuredListings.map(l => l.id);
-
-  const normalListings = await prisma.$withRetry(() => prisma.listing.findMany({
-    ...args,
-    where: {
-      ...baseWhere,
-      id: { notIn: featuredIds.length > 0 ? featuredIds : ["__none__"] }
-    },
-    include: includeWithPromotions,
-  }));
-
-  const combined = [...featuredListings, ...normalListings];
-  return combined.map(listing => ({
-    ...listing,
-    isFeatured: listing.promotions && listing.promotions.length > 0
-  }));
+  return listings
+    .map((listing) => ({
+      ...listing,
+      isFeatured: Boolean(listing.promotions?.length),
+    }))
+    .sort((left, right) => Number(right.isFeatured) - Number(left.isFeatured));
 }
 
 function findById(id) {

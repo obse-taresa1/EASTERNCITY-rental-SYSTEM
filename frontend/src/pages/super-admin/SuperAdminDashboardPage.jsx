@@ -19,8 +19,9 @@ function formatDateInput(value) {
 export default function SuperAdminDashboardPage() {
   const [dashboard, setDashboard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const [dateFilters, setDateFilters] = useState({
-    range: "month",
+    range: "all",
     startDate: "",
     endDate: "",
   });
@@ -38,6 +39,10 @@ export default function SuperAdminDashboardPage() {
     try {
       const data = await fetchSuperAdminDashboard(dateFilters);
       setDashboard(data);
+      setError("");
+    } catch (requestError) {
+      console.error("Unable to load the super admin dashboard:", requestError);
+      setError(requestError.message || "Unable to load live dashboard data.");
     } finally {
       setIsLoading(false);
     }
@@ -170,7 +175,7 @@ export default function SuperAdminDashboardPage() {
   return (
     <AdminOverviewDashboard
       variant="superadmin"
-      error={null}
+      error={error}
       overview={{
         title: "Platform Overview",
         primaryValue: counts.totalUsers || 0,

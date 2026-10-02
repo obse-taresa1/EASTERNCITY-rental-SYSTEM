@@ -24,9 +24,10 @@ function isConnectionError(err) {
   return (
     err?.code === 'P1001' ||
     err?.code === 'P1008' ||
-    /Can't reach database|connection.*refused|ECONNREFUSED|ENOTFOUND|socket hang up/i.test(
+    /Can't reach database|connection.*refused|connection reset|server has closed the connection|ECONNREFUSED|ECONNRESET|ENOTFOUND|socket hang up/i.test(
       String(err?.message || '')
     )
+    || err?.code === 'P1017'
   );
 }
 

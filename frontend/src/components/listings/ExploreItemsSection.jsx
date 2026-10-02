@@ -57,6 +57,23 @@ function getItemCondition(item) {
   return CONDITION_MAP[item.title] ?? "new";
 }
 
+function sortListingsForHome(items) {
+  const curatedOrder = new Map(
+    CURATED_TITLES.map((title, index) => [title.toLowerCase(), index]),
+  );
+
+  return [...items].sort((a, b) => {
+    const aOrder = curatedOrder.get(String(a.title || "").toLowerCase());
+    const bOrder = curatedOrder.get(String(b.title || "").toLowerCase());
+
+    if (aOrder !== undefined && bOrder !== undefined) return aOrder - bOrder;
+    if (aOrder !== undefined) return -1;
+    if (bOrder !== undefined) return 1;
+
+    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+  });
+}
+
 export default function ExploreItemsSection() {
   const { t } = useLanguage();
   const [listings, setListings] = useState([]);
@@ -68,12 +85,8 @@ export default function ExploreItemsSection() {
     async function loadListings() {
       try {
         const data = await getPublicListings();
-        const combined = Array.isArray(data) ? data : [];
-        // Only keep curated items, in the order specified
-        const curated = CURATED_TITLES
-          .map((title) => combined.find((item) => item.title === title))
-          .filter(Boolean);
-        if (active) setListings(curated);
+        const combined = Array.isArray(data) ? data.filter(Boolean) : [];
+        if (active) setListings(sortListingsForHome(combined));
       } catch {
         if (active) setListings([]);
       }

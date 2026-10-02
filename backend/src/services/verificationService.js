@@ -1,6 +1,7 @@
 const prisma = require('../config/db');
 const userRepository = require('../repositories/userRepository');
 const { VERIFICATION_STATUSES } = require('../utils/constants');
+const { signedPrivateUrl } = require('./privateMediaService');
 
 const USER_VERIFICATION_STATUSES = Object.freeze({
   NOT_VERIFIED: 'NOT_VERIFIED',
@@ -39,7 +40,7 @@ function getUploadedFile(files, fieldName) {
 }
 
 function toUploadUrl(file) {
-  return file ? `/uploads/verification/${file.filename}` : null;
+  return file?.cloudinaryUrl || null;
 }
 
 function mapVerificationRequest(request) {
@@ -54,8 +55,8 @@ function mapVerificationRequest(request) {
     city: request.city,
     sefer: request.sefer,
     address: request.address || '',
-    nationalIdFrontUrl: request.nationalIdFrontUrl,
-    nationalIdBackUrl: request.nationalIdBackUrl,
+    nationalIdFrontUrl: signedPrivateUrl(request.nationalIdFrontUrl),
+    nationalIdBackUrl: signedPrivateUrl(request.nationalIdBackUrl),
     status: request.status,
     rejectionReason: request.rejectionReason || '',
     reviewedById: request.reviewedById || '',

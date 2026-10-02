@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const RANGE_OPTIONS = [
+  { value: "all", label: "All Time" },
   { value: "today", label: "Today" },
   { value: "week", label: "This Week" },
   { value: "month", label: "This Month" },
@@ -83,7 +84,7 @@ function PieBreakdown({ breakdown = [] }) {
 }
 
 function DateRangeControls({ filters = {}, onFiltersChange }) {
-  const range = filters.range || "month";
+  const range = filters.range || "all";
 
   function update(next) {
     onFiltersChange?.({ ...filters, ...next });
@@ -117,7 +118,7 @@ export default function AdminOverviewDashboard({
   miniCards = [],
   chart = {},
   rows = [],
-  dateRange = "month",
+  dateRange = "all",
   startDate = "",
   endDate = "",
   onDateRangeChange,

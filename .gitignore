@@ -79,6 +79,9 @@ backend/fix-harari-image.js
 backend/scratch/
 backend/scratch_*.js
 backend/seed-community.js
+backend/data/cloudinary-upload-migration.json
+backend/data/cloudinary-private-upload-migration.json
+backend/data/cloudinary-private-cleanup.json
 
 # OneDrive sync conflict duplicates (*-DESKTOP-*.*)
 *-DESKTOP-*.*

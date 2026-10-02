@@ -1,6 +1,10 @@
 const listingRepository = require("../repositories/listingRepository");
 const categoryRepository = require("../repositories/categoryRepository");
 const notificationService = require("./notificationService");
+const {
+  withPrivateListingMedia,
+  withoutPrivateListingMedia,
+} = require("./privateMediaService");
 
 function ensureOwnerOrAdmin(user, listing) {
   const isAdmin = ["ADMIN", "SUPER_ADMIN"].includes(user.role);
@@ -14,7 +18,7 @@ function ensureOwnerOrAdmin(user, listing) {
 
 function mapUploadedImages(files = []) {
   return files.map((file, index) => ({
-    imageUrl: `/uploads/listings/${file.filename}`,
+    imageUrl: file.cloudinaryUrl,
     sortOrder: index,
   }));
 }
@@ -34,7 +38,7 @@ function getUploadedFiles(files = {}) {
 }
 
 function paymentProofPath(file) {
-  return file ? `/uploads/listings/${file.filename}` : null;
+  return file?.cloudinaryUrl || null;
 }
 
 function toListingData(listing) {
@@ -340,28 +344,34 @@ async function listPublic(query) {
     where.pricePerDay = { lte: maxPrice };
   }
 
-  return listingRepository.findPublic({
+  const listings = await listingRepository.findPublic({
     where: buildPublicListingWhere(query),
     orderBy: {
       createdAt: "desc",
     },
   });
+
+  return listings.map(withoutPrivateListingMedia);
 }
 
 async function listMy(userId) {
-  return listingRepository.findManyByOwner(userId, {
+  const listings = await listingRepository.findManyByOwner(userId, {
     orderBy: {
       createdAt: "desc",
     },
   });
+
+  return listings.map(withPrivateListingMedia);
 }
 
 async function listManage() {
-  return listingRepository.findMany({
+  const listings = await listingRepository.findMany({
     orderBy: {
       createdAt: "desc",
     },
   });
+
+  return listings.map(withPrivateListingMedia);
 }
 
 async function getById(id) {
@@ -373,7 +383,7 @@ async function getById(id) {
     throw error;
   }
 
-  return toListingData(listing);
+  return toListingData(withoutPrivateListingMedia(listing));
 }
 
 async function create(ownerId, payload, files) {
@@ -381,7 +391,7 @@ async function create(ownerId, payload, files) {
   const paymentProofFile = uploadedFiles.paymentProof[0] || null;
   const categoryId = await resolveCategoryId(payload);
 
-  return listingRepository.create({
+  const listing = await listingRepository.create({
     title: payload.title,
     description: payload.description,
     categoryId,
@@ -399,6 +409,8 @@ async function create(ownerId, payload, files) {
       create: mapUploadedImages(uploadedFiles.images),
     },
   });
+
+  return withPrivateListingMedia(listing);
 }
 
 async function update(user, id, payload) {

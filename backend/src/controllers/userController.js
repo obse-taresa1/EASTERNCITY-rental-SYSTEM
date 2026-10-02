@@ -71,7 +71,7 @@ const updateProfileImage = async (req, res, next) => {
 
     const updatedUser = await userService.updateProfileImage(
       id,
-      `/uploads/profiles/${req.file.filename}`,
+      req.file.cloudinaryUrl,
     );
 
     res.status(200).json({

@@ -1,16 +1,16 @@
 const repository = require('../repositories/promotionRepository');
 const listingRepository = require('../repositories/listingRepository');
 const notificationService = require('../services/notificationService');
+const {
+  withPrivatePromotionMedia,
+} = require('./privateMediaService');
 
 const PAYMENT_TYPES = {
   PROMOTION_FEE: 'PROMOTION_FEE',
 };
 
 function proofPath(file) {
-  if (!file || !file.filename) return null;
-  // multer saves to uploads/payments/ — include the subfolder in the URL
-  const folder = (file.destination || '').replace(/\\/g, '/').split('/uploads/')[1] || 'payments';
-  return `/uploads/${folder}/${file.filename}`;
+  return file?.cloudinaryUrl || null;
 }
 
 /** Create a promotion request */
@@ -20,7 +20,7 @@ async function requestPromotion(userId, payload, file) {
       throw new Error('Discount must be a positive integer');
     }
   }
-  return repository.create({
+  const promotion = await repository.create({
     userId,
     listingId: payload.listingId,
     packageType: payload.packageType,
@@ -35,14 +35,18 @@ async function requestPromotion(userId, payload, file) {
     customSubtitle: payload.customSubtitle || null,
     specs: payload.specs || null,
   });
+
+  return withPrivatePromotionMedia(promotion);
 }
 
-function list(query) {
-  return repository.findMany();
+async function list(query) {
+  const promotions = await repository.findMany();
+  return promotions.map(withPrivatePromotionMedia);
 }
 
-function listByUser(userId) {
-  return repository.findMany({ where: { userId } });
+async function listByUser(userId) {
+  const promotions = await repository.findMany({ where: { userId } });
+  return promotions.map(withPrivatePromotionMedia);
 }
 
 /**
@@ -108,11 +112,12 @@ async function listByUserWithHero(userId) {
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  return merged;
+  return merged.map(withPrivatePromotionMedia);
 }
 
-function listPending() {
-  return repository.findMany({ where: { status: "PENDING" } });
+async function listPending() {
+  const promotions = await repository.findMany({ where: { status: "PENDING" } });
+  return promotions.map(withPrivatePromotionMedia);
 }
 
 /** Approve a promotion request; creates hero promotion if placement is HERO_PROMOTION */
@@ -162,8 +167,8 @@ async function deletePromotion(id) {
   return repository.delete(id);
 }
 
-function fetchActivePromotions() {
-  return repository.findMany({
+async function fetchActivePromotions() {
+  const promotions = await repository.findMany({
     where: { status: "APPROVED" },
     include: {
       listing: {
@@ -171,6 +176,8 @@ function fetchActivePromotions() {
       },
     },
   });
+
+  return promotions.map((promotion) => ({ ...promotion, paymentProofUrl: null }));
 }
 
 module.exports = {

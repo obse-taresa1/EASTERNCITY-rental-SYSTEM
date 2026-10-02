@@ -30,7 +30,13 @@ function getClientUrl() {
 }
 
 function publicUser(user) {
-  const { password: _, ...userWithoutPassword } = user;
+  const {
+    password: _,
+    nationalIdNumber: __,
+    nationalIdFrontUrl: ___,
+    nationalIdBackUrl: ____,
+    ...userWithoutPassword
+  } = user;
   return userWithoutPassword;
 }
 

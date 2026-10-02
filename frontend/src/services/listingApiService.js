@@ -66,6 +66,8 @@ function emitListingUpdate() {
   emitRefresh("listings");
 }
 
+const inFlightPublicListingRequests = new Map();
+
 export function normalizeListing(listing) {
   if (!listing) return null;
 
@@ -109,8 +111,17 @@ export function normalizeListing(listing) {
 }
 
 export async function getPublicListings(filters = {}) {
-  const data = await apiClient.get(`/api/listings${buildQueryString(filters)}`);
-  return Array.isArray(data) ? data.map(normalizeListing) : [];
+  const query = buildQueryString(filters);
+  const existingRequest = inFlightPublicListingRequests.get(query);
+  if (existingRequest) return existingRequest;
+
+  const request = apiClient
+    .get(`/api/listings${query}`)
+    .then((data) => (Array.isArray(data) ? data.map(normalizeListing) : []))
+    .finally(() => inFlightPublicListingRequests.delete(query));
+
+  inFlightPublicListingRequests.set(query, request);
+  return request;
 }
 
 export async function getListingById(id) {
