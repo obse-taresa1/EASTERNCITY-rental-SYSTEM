@@ -6,7 +6,7 @@ export const API_BASE_URL =
   (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) ||
   (import.meta.env?.DEV
     ? "http://localhost:5000"
-    : "https://easterncity-rental-system.onrender.com");
+    : "");
 
 export function resolveAssetUrl(url) {
   if (!url) return "";

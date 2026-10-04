@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { getMyBookings } from "../../services/bookingApiService.js";
 import { getMyReviews } from "../../services/reviewApiService.js";
+import { resolveAssetUrl } from "../../services/apiClient.js";
 import LeaveReviewModal from "../../components/reviews/LeaveReviewModal.jsx";
 
 const STATUS_LABELS = {
@@ -241,7 +242,7 @@ export default function MyBookingsPage() {
                         style={{ width: "80px", height: "80px", border: "2px solid #e31e24" }}
                       >
                         <img 
-                          src={booking.itemImage.startsWith('http') ? booking.itemImage : `http://localhost:5000${booking.itemImage}`}
+                          src={resolveAssetUrl(booking.itemImage)}
                           alt={booking.itemTitle}
                           style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         />

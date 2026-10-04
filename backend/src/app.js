@@ -20,9 +20,15 @@ app.use(
   }),
 );
 
+const allowedOrigin =
+  process.env.CORS_ORIGIN ||
+  process.env.CLIENT_ORIGIN ||
+  process.env.CLIENT_URL ||
+  '*';
+
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || '*',
-  credentials: true
+  origin: allowedOrigin,
+  credentials: allowedOrigin !== '*',
 }));
 app.use(express.json({ limit: '1mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));

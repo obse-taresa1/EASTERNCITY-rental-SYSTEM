@@ -1,15 +1,6 @@
-import { apiClient } from "./apiClient.js";
+import { apiClient, resolveAssetUrl as resolveApiAssetUrl } from "./apiClient.js";
 
-const API_BASE_URL =
-  import.meta.env?.VITE_API_BASE_URL ||
-  import.meta.env?.VITE_API_URL ||
-  "http://localhost:5000";
-
-function resolveAssetUrl(value) {
-  if (!value) return "";
-  if (/^(https?:|data:|blob:)/i.test(value)) return value;
-  return `${API_BASE_URL}${value.startsWith("/") ? value : `/${value}`}`;
-}
+const resolveAssetUrl = resolveApiAssetUrl;
 
 function normalizeListing(listing) {
   if (!listing) return null;
