@@ -20,15 +20,25 @@ app.use(
   }),
 );
 
-const allowedOrigin =
-  process.env.CORS_ORIGIN ||
-  process.env.CLIENT_ORIGIN ||
-  process.env.CLIENT_URL ||
-  '*';
+const allowedOrigins = [
+  process.env.CORS_ORIGIN,
+  process.env.CORS_ORIGINS,
+  process.env.CLIENT_ORIGIN,
+  process.env.CLIENT_URL,
+]
+  .filter(Boolean)
+  .flatMap((value) => value.split(','))
+  .map((value) => value.trim().replace(/\/$/, ''))
+  .filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigin,
-  credentials: allowedOrigin !== '*',
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Origin is not allowed by CORS.'));
+  },
+  credentials: allowedOrigins.length > 0,
 }));
 app.use(express.json({ limit: '1mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
