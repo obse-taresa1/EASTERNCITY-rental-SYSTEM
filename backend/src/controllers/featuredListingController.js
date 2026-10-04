@@ -7,8 +7,10 @@ exports.getActiveFeatured = async (req, res, next) => {
       where: {
         status: 'APPROVED',
         placement: { in: ['Featured Listing', 'FEATURED', 'FEATURED_LISTING'] },
-        startDate: { lte: now },
-        endDate: { gte: now }
+        AND: [
+          { OR: [{ startDate: null }, { startDate: { lte: now } }] },
+          { OR: [{ endDate: null }, { endDate: { gte: now } }] },
+        ],
       },
       orderBy: { startDate: 'desc' }, // newest approved first
       include: {
