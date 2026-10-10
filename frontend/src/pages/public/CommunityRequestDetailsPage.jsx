@@ -114,7 +114,10 @@ export default function CommunityRequestDetailsPage() {
     if (!post || !post.author || !post.author.id) return;
     if (post.author.id === (viewer && viewer.id)) return;
     try {
-      const conversation = await createConversation({ participantTwoId: post.author.id });
+      const conversation = await createConversation({
+        participantTwoId: post.author.id,
+        communityPostId: post.id,
+      });
       if (conversation && conversation.isNew) {
         await sendMessage({
           conversationId: conversation.id,

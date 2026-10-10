@@ -48,22 +48,39 @@ async function findOrCreateConversation(userId, payload) {
     throw error;
   }
 
-  const listing = await listingRepository.findById(payload.listingId);
+  if (payload.listingId) {
+    const listing = await listingRepository.findById(payload.listingId);
 
-  if (!listing) {
-    const error = new Error("Listing not found.");
-    error.statusCode = 404;
-    throw error;
+    if (!listing) {
+      const error = new Error("Listing not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (listing.ownerId !== payload.participantTwoId) {
+      const error = new Error("The selected user is not the owner of this listing.");
+      error.statusCode = 400;
+      throw error;
+    }
+  } else {
+    const communityPost = await repository.findCommunityPostById(payload.communityPostId);
+
+    if (!communityPost) {
+      const error = new Error("Community request not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (communityPost.authorId !== payload.participantTwoId) {
+      const error = new Error("The selected user is not the author of this community request.");
+      error.statusCode = 400;
+      throw error;
+    }
   }
 
-  if (listing.ownerId !== payload.participantTwoId) {
-    const error = new Error("The selected user is not the owner of this listing.");
-    error.statusCode = 400;
-    throw error;
-  }
-
-  const existing = await repository.findForListingAndParticipants({
+  const existing = await repository.findForContextAndParticipants({
     listingId: payload.listingId,
+    communityPostId: payload.communityPostId,
     participantOneId: userId,
     participantTwoId: payload.participantTwoId,
   });
@@ -76,6 +93,7 @@ async function findOrCreateConversation(userId, payload) {
     participantOneId: userId,
     participantTwoId: payload.participantTwoId,
     listingId: payload.listingId,
+    communityPostId: payload.communityPostId,
     lastMessageAt: null,
   });
 

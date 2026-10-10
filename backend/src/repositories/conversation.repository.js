@@ -62,10 +62,10 @@ function findById(id) {
   });
 }
 
-function findForListingAndParticipants({ listingId, participantOneId, participantTwoId }) {
+function findForContextAndParticipants({ listingId, communityPostId, participantOneId, participantTwoId }) {
   return prisma.conversation.findFirst({
     where: {
-      listingId,
+      ...(listingId ? { listingId } : { communityPostId }),
       OR: [
         { participantOneId, participantTwoId },
         {
@@ -75,6 +75,13 @@ function findForListingAndParticipants({ listingId, participantOneId, participan
       ],
     },
     include: conversationInclude,
+  });
+}
+
+function findCommunityPostById(id) {
+  return prisma.communityPost.findUnique({
+    where: { id },
+    select: { authorId: true },
   });
 }
 
@@ -96,7 +103,8 @@ module.exports = {
   findManyByUser,
   create,
   findById,
-  findForListingAndParticipants,
+  findForContextAndParticipants,
+  findCommunityPostById,
   countUnread,
   updateLastMessageAt,
 };
