@@ -101,6 +101,11 @@ export default function LoginPage() {
 
   function getPostLoginPath(loggedInUser) {
     const from = location.state?.from;
+    const returnTo = new URLSearchParams(location.search).get("returnTo");
+
+    if (loggedInUser?.role === "USER" && returnTo === "community-post") {
+      return { pathname: "/community", search: "?compose=1" };
+    }
 
     if (
       loggedInUser?.role === "USER" &&

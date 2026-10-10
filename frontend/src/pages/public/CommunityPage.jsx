@@ -124,7 +124,7 @@ export default function CommunityPage() {
           ) : (
             <Link
               className="btn-community-post"
-              to="/login"
+              to="/login?returnTo=community-post"
               state={{ from: { pathname: "/community", search: "?compose=1" } }}
             >
               <i className="bi bi-box-arrow-in-right" /> Login to Post
