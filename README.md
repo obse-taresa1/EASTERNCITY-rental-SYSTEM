@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react" />
   <img src="https://img.shields.io/badge/Node.js-Express-339933?style=flat&logo=node.js" />
   <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat&logo=postgresql" />
   <img src="https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat&logo=prisma" />
@@ -18,7 +18,9 @@
 
 - [Overview](#-overview)
 - [Project Status](#-project-status)
-- [Live Demo](#-live-demo)
+- [Live Application](#-live-application)
+- [Deployment](#-deployment)
+- [Cloudinary Media Storage](#-cloudinary-media-storage)
 - [Features by Role](#-features-by-role)
 - [Tech Stack](#-tech-stack)
 - [Architecture](#-architecture)
@@ -57,11 +59,38 @@ This project is currently in **active development and testing**. While many core
 
 ---
 
-## 🚀 Live Demo
+## 🚀 Live Application
 
-> **Production:** https://easterncity-rental-system.onrender.com
-> **Local Dev (Frontend):** `http://localhost:5173`
-> **Local Dev (Backend API):** `http://localhost:5000`
+**Frontend / Live Demo:**  
+https://easterncity-rental-system.vercel.app/
+
+**GitHub Repository:**  
+https://github.com/obse-taresa1/EASTERNCITY-rental-SYSTEM
+
+## ☁️ Deployment
+
+The EasternCities Rental Management System is deployed using a cloud-based architecture:
+
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** Neon PostgreSQL
+- **Media Storage:** Cloudinary
+
+The React/Vite frontend is deployed on Vercel and communicates with the Node.js/Express REST API hosted on Render.
+
+> Note: The backend deployment URL is intentionally not listed here unless it is available in the project\'s deployment configuration.
+
+## 🖼️ Cloudinary Media Storage
+
+Cloudinary is integrated into the system for cloud-based media storage and delivery.
+
+It is used for:
+- Property/listing images
+- Public application media
+- Uploaded verification documents
+- Secure/private media where authenticated delivery is required
+
+Sensitive verification files are configured for authenticated/private delivery rather than unrestricted public access.
 
 ---
 
@@ -128,9 +157,9 @@ This project is currently in **active development and testing**. While many core
 
 | Technology | Version | Purpose |
 |---|---|---|
-| **React** | 18 | UI component framework |
-| **Vite** | 5 | Build tool and dev server |
-| **React Router** | v6 | Client-side routing with role guards |
+| **React** | 19.2.6 | UI component framework |
+| **Vite** | 6.0.1 | Build tool and dev server |
+| **React Router** | v7.18.0 | Client-side routing with role guards |
 | **Vanilla CSS** | — | Custom design system |
 | **Bootstrap Icons** | — | Icon library |
 
@@ -139,12 +168,12 @@ This project is currently in **active development and testing**. While many core
 | Technology | Version | Purpose |
 |---|---|---|
 | **Node.js** | 22 | Server runtime |
-| **Express.js** | 4 | HTTP framework |
+| **Express.js** | 5.2.1 | HTTP framework |
 | **PostgreSQL (Neon)** | — | Cloud-hosted relational database |
-| **Prisma ORM** | 5 | Schema management, migrations, type-safe queries |
+| **Prisma ORM** | 5.22.0 | Schema management, migrations, type-safe queries |
 | **JWT** | — | Stateless auth with access + refresh token rotation |
 | **Bcrypt** | — | Password hashing |
-| **Multer** | — | File uploads (listing images, payment proofs) |
+| ****Cloudinary** | - | Cloud media storage and secure document delivery (National IDs, Payment Proofs) |
 | **Nodemailer** | — | Email delivery via SMTP |
 | **Google Generative AI** | — | Backend-served AI assistant (Gemini) |
 
@@ -243,38 +272,19 @@ npm run dev
 
 ---
 
-## 🔐 Environment Variables
+## 🔐 Environment Configuration
 
-### `backend/.env`
-```env
-# Server
-PORT=5000
-NODE_ENV=development
+The application uses environment variables for deployment configuration and sensitive credentials.
 
-# Database
-DATABASE_URL=postgresql://user:password@host:5432/dbname
+Example:
 
-# Authentication
+`env
+DATABASE_URL=your_database_url
 JWT_SECRET=your_jwt_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-JWT_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
-
-# AI Assistant (server-side only — never expose to frontend)
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash
-
-# File Uploads
-UPLOAD_DIR=./uploads
-```
-
-### `frontend/.env`
-```env
-VITE_API_BASE_URL=http://localhost:5000
-```
-> **Never commit `.env` files.** They are excluded by `.gitignore`. Do NOT add `GEMINI_API_KEY` to any `VITE_` frontend variable.
-
----
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+`
 
 ## 🗄️ Database Setup
 
@@ -405,7 +415,7 @@ The platform includes a built-in AI assistant powered by **Google Gemini**:
 - **Separation of concerns:** Frontend and backend are independent. Never mix logic across them.
 - **API contracts:** Coordinate any changes to endpoints or Prisma schema before merging.
 - **Role security:** Never rely on frontend-only role checks. Always enforce roles in the backend `authorize` middleware.
-- **Image URLs:** Uploaded file paths stored in the DB are relative (e.g., `/uploads/...`). Use `resolveAssetUrl()` from `apiClient.js` in the frontend to prepend the correct backend base URL.
+- **Image URLs:** Media is stored securely via Cloudinary. Public assets (listing images) return standard HTTPS URLs. Sensitive assets (IDs, payments) are stored as authenticated delivery types and require signed backend URLs to view.
 - **Secrets:** Never hardcode credentials. Never add server-side secrets to `VITE_` variables.
 - **Schema changes:** After every `schema.prisma` change, run `npx prisma generate` and restart the backend.
 
