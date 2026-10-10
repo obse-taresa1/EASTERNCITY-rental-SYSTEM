@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useTheme } from "../../context/ThemeContext.jsx";
@@ -83,6 +83,7 @@ async function requestGoogleUser(loginWithGoogle, googleClientId) {
 export default function LoginPage() {
   usePageTitle("Login");
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, loginWithGoogle } = useAuth();
   const { theme } = useTheme();
   const publicStats = usePublicStats();
@@ -98,6 +99,20 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  function getPostLoginPath(loggedInUser) {
+    const from = location.state?.from;
+
+    if (
+      loggedInUser?.role === "USER" &&
+      typeof from?.pathname === "string" &&
+      from.pathname.startsWith("/booking/")
+    ) {
+      return from;
+    }
+
+    return getDashboardPath(loggedInUser.role);
+  }
+
   // Google login handler
   async function handleGoogleLogin() {
     setGoogleLoading(true);
@@ -105,7 +120,7 @@ export default function LoginPage() {
     try {
       // Call the auth service – adjust if a dedicated endpoint exists
       const loggedInUser = await requestGoogleUser(loginWithGoogle, googleClientId);
-      navigate(getDashboardPath(loggedInUser.role), { replace: true });
+      navigate(getPostLoginPath(loggedInUser), { replace: true });
     } catch (err) {
       setError(err?.message ?? "Google sign‑in failed.");
     } finally {
@@ -127,7 +142,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const loggedInUser = await login(formData.email, formData.password);
-      navigate(getDashboardPath(loggedInUser.role), { replace: true });
+      navigate(getPostLoginPath(loggedInUser), { replace: true });
     } catch (loginError) {
       setError(loginError.message || "Login failed.");
     } finally {
