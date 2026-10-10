@@ -33,6 +33,8 @@ const databaseColumns = [
   ['Promotion', 'paymentProofUrl'],
   ['AdvertisingRequest', 'bannerUrl'],
   ['AdvertisingRequest', 'paymentProofUrl'],
+  ['HeroPromotion', 'heroImage'],
+  ['HeroPromotion', 'cardImage'],
   ['Media', 'url'],
 ];
 
