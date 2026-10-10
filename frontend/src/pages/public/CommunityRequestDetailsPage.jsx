@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { communityService } from "../../services/communityService.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { resolveAssetUrl } from "../../services/apiClient.js";
@@ -8,6 +8,7 @@ import "./CommunityRequestDetailsPage.css";
 
 export default function CommunityRequestDetailsPage() {
   const { postId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, currentUser } = useAuth();
   const [post, setPost] = useState(null);
@@ -57,7 +58,7 @@ export default function CommunityRequestDetailsPage() {
   }
 
   async function handleLike() {
-    if (!isAuthenticated) return navigate("/login");
+    if (!isAuthenticated) return navigate("/login", { state: { from: location } });
     try {
       if (hasLiked) {
         await communityService.unlikePost(postId);
@@ -70,7 +71,7 @@ export default function CommunityRequestDetailsPage() {
   }
 
   async function handleSave() {
-    if (!isAuthenticated) return navigate("/login");
+    if (!isAuthenticated) return navigate("/login", { state: { from: location } });
     try {
       if (isSaved) {
         await communityService.unsavePost(postId);
@@ -109,7 +110,7 @@ export default function CommunityRequestDetailsPage() {
   }
 
   async function startConversation() {
-    if (!isAuthenticated) return navigate("/login");
+    if (!isAuthenticated) return navigate("/login", { state: { from: location } });
     if (!post || !post.author || !post.author.id) return;
     if (post.author.id === (viewer && viewer.id)) return;
     try {

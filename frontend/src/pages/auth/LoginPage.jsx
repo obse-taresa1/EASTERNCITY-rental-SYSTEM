@@ -105,7 +105,7 @@ export default function LoginPage() {
     if (
       loggedInUser?.role === "USER" &&
       typeof from?.pathname === "string" &&
-      from.pathname.startsWith("/booking/")
+      (from.pathname.startsWith("/booking/") || from.pathname.startsWith("/community"))
     ) {
       return from;
     }

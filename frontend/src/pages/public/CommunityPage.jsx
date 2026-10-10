@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { communityService } from "../../services/communityService.js";
 import { resolveAssetUrl } from "../../services/apiClient.js";
@@ -26,6 +26,7 @@ function statusColor(status) {
 
 export default function CommunityPage() {
   const { isAuthenticated, currentUser } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +59,13 @@ export default function CommunityPage() {
   }, [currentUser?.id, filterCategory, filterCity, showMine]);
 
   useEffect(() => { loadPosts(); }, [loadPosts]);
+
+  useEffect(() => {
+    if (isAuthenticated && new URLSearchParams(location.search).get("compose") === "1") {
+      setShowForm(true);
+      navigate("/community", { replace: true });
+    }
+  }, [isAuthenticated, location.search, navigate]);
 
   const postCountText = useMemo(
     () => posts.length + " post" + (posts.length === 1 ? "" : "s"),
@@ -114,7 +122,11 @@ export default function CommunityPage() {
               <i className="bi bi-plus-circle" /> Post to Community
             </button>
           ) : (
-            <Link className="btn-community-post" to="/login">
+            <Link
+              className="btn-community-post"
+              to="/login"
+              state={{ from: { pathname: "/community", search: "?compose=1" } }}
+            >
               <i className="bi bi-box-arrow-in-right" /> Login to Post
             </Link>
           )}
