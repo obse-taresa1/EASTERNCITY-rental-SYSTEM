@@ -23,8 +23,9 @@ async function create(payload, file) {
   }
   const request = await prisma.advertisingRequest.create({
     data: {
-      reference: reference(),
       ...payload,
+      id: crypto.randomUUID(),
+      reference: reference(),
       website: payload.website || null,
       socialMedia: payload.socialMedia || null,
       campaignGoal: payload.campaignGoal || null,
@@ -32,6 +33,7 @@ async function create(payload, file) {
       preferredEndDate: toDate(payload.preferredEndDate),
       bannerUrl: file?.cloudinaryUrl || null,
       termsAccepted: true,
+      updatedAt: new Date(),
     },
   });
 
