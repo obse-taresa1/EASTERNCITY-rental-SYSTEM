@@ -27,6 +27,60 @@ function getMailFrom() {
   return process.env.MAIL_FROM || process.env.SMTP_USER || "EasternCity <no-reply@easterncity.local>";
 }
 
+function getBrevoApiKey() {
+  return String(process.env.BREVO_API_KEY || "").trim() || null;
+}
+
+function getBrevoSender() {
+  const from = getMailFrom().trim();
+  const match = from.match(/^(.*?)\s*<([^>]+)>$/);
+
+  return match
+    ? { name: match[1].trim() || "Eastern Cities", email: match[2].trim() }
+    : { name: "Eastern Cities", email: from };
+}
+
+async function sendEmail({ to, subject, text, html }) {
+  const brevoApiKey = getBrevoApiKey();
+
+  if (brevoApiKey) {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": brevoApiKey,
+      },
+      body: JSON.stringify({
+        sender: getBrevoSender(),
+        to: [{ email: to }],
+        subject,
+        textContent: text,
+        htmlContent: html,
+      }),
+    });
+
+    if (!response.ok) {
+      const details = await response.text();
+      throw new Error(
+        `Brevo email delivery failed (${response.status})${details ? `: ${details.slice(0, 300)}` : ""}`,
+      );
+    }
+
+    return { provider: "brevo" };
+  }
+
+  const smtpConfig = getSmtpConfig();
+  if (!smtpConfig) {
+    throw new Error("Email is not configured. Add BREVO_API_KEY or SMTP settings to the backend environment.");
+  }
+
+  const nodemailer = require("nodemailer");
+  const transporter = nodemailer.createTransport(smtpConfig);
+  await transporter.sendMail({ from: getMailFrom(), to, subject, text, html });
+  return { provider: "smtp" };
+}
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -36,31 +90,9 @@ function escapeHtml(value) {
 }
 
 async function sendPasswordResetEmail({ to, resetUrl }) {
-  const smtpConfig = getSmtpConfig();
-
-  if (!smtpConfig) {
-    logger.warn("SMTP is not configured. Password reset email was not sent.", {
-      to,
-    });
-    console.log(`Password reset link for ${to}: ${resetUrl}`);
-    return;
-  }
-
-  let nodemailer;
-  try {
-    nodemailer = require("nodemailer");
-  } catch (error) {
-    logger.error("Nodemailer is not installed. Password reset email was not sent.", {
-      to,
-    });
-    throw new Error("Email service is not installed. Run npm install in the backend folder.");
-  }
-
-  const transporter = nodemailer.createTransport(smtpConfig);
   const safeResetUrl = escapeHtml(resetUrl);
 
-  await transporter.sendMail({
-    from: getMailFrom(),
+  const delivery = await sendEmail({
     to,
     subject: "Reset your EasternCity password",
     text: [
@@ -80,37 +112,17 @@ async function sendPasswordResetEmail({ to, resetUrl }) {
     `,
   });
 
-  logger.info("Password reset email sent", { to });
+  logger.info("Password reset email sent", { to, provider: delivery.provider });
 }
 
 async function sendContactReplyEmail({ to, recipientName, subject, reply, adminName }) {
-  const smtpConfig = getSmtpConfig();
-
-  if (!smtpConfig) {
-    logger.warn("SMTP is not configured. Contact reply email was not sent.", { to });
-    return {
-      sent: false,
-      reason: "SMTP is not configured. Add SMTP_HOST, SMTP_USER, SMTP_PASS, and MAIL_FROM to backend/.env, then restart the backend.",
-    };
-  }
-
-  let nodemailer;
   try {
-    nodemailer = require("nodemailer");
-  } catch (error) {
-    logger.error("Nodemailer is not installed. Contact reply email was not sent.", { to });
-    return { sent: false, reason: "Email service is not installed" };
-  }
-
-  try {
-    const transporter = nodemailer.createTransport(smtpConfig);
     const safeName = escapeHtml(recipientName || "there");
     const safeSubject = escapeHtml(subject || "Your Eastern Cities enquiry");
     const safeReply = escapeHtml(reply).replace(/\n/g, "<br />");
     const safeAdminName = escapeHtml(adminName || "Eastern Cities Support");
 
-    await transporter.sendMail({
-      from: getMailFrom(),
+    const delivery = await sendEmail({
       to,
       subject: `Reply from Eastern Cities: ${subject || "Your enquiry"}`,
       text: [
@@ -160,11 +172,11 @@ async function sendContactReplyEmail({ to, recipientName, subject, reply, adminN
       `,
     });
 
-    logger.info("Contact reply email sent", { to });
+    logger.info("Contact reply email sent", { to, provider: delivery.provider });
     return { sent: true };
   } catch (error) {
     logger.error("Contact reply email delivery failed", { to, error: error.message });
-    return { sent: false, reason: "SMTP delivery failed" };
+    return { sent: false, reason: "Email delivery failed" };
   }
 }
 
@@ -190,11 +202,6 @@ function advertisingEmailTemplate({ title, eyebrow = "ADVERTISING CAMPAIGN", gre
 }
 
 async function sendAdvertisingStatusEmail(request) {
-  const smtpConfig = getSmtpConfig();
-  if (!smtpConfig) {
-    logger.warn("SMTP is not configured. Advertising status email was not sent.", { to: request.email, reference: request.reference });
-    return { sent: false, reason: "SMTP is not configured" };
-  }
   const baseUrl = getPublicAppUrl();
   const status = String(request.status || "PENDING").toUpperCase();
   let title = "Your advertising campaign has been updated";
@@ -221,15 +228,13 @@ async function sendAdvertisingStatusEmail(request) {
     ctaLabel = "Contact support";
     ctaUrl = `${baseUrl}/contact`;
   }
-  const transporter = require("nodemailer").createTransport(smtpConfig);
-  await transporter.sendMail({
-    from: getMailFrom(),
+  const delivery = await sendEmail({
     to: request.email,
     subject: status === "WAITING_PAYMENT" ? "Payment requested for your Eastern Cities campaign" : status === "APPROVED" ? "Your Eastern Cities advertising campaign has been approved" : `Your Eastern Cities advertising campaign: ${statusLabel}`,
     text: `${title}\n\nReference: ${request.reference}\nCompany: ${request.companyName}\nStatus: ${statusLabel}\n\n${request.adminNote || ""}\n\n${ctaUrl}`,
     html: advertisingEmailTemplate({ title, greeting: request.contactPerson, intro, request, statusLabel, note: request.adminNote, ctaLabel, ctaUrl, success }),
   });
-  logger.info("Advertising status email sent", { to: request.email, reference: request.reference, status });
+  logger.info("Advertising status email sent", { to: request.email, reference: request.reference, status, provider: delivery.provider });
   return { sent: true };
 }
 
