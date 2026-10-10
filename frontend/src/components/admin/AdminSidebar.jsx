@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import logo from "../../assets/images/eastern-cities-header-logo-transparent.png";
 import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
@@ -18,10 +18,20 @@ function NavItem({ link, onNavigate }) {
 
 export default function AdminSidebar({ variant = "admin", isOpen = false, onClose }) {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const isSuperAdmin = variant === "superadmin";
   const logoSrc = theme === "dark" ? darkLogo : logo;
   const links = isSuperAdmin ? superAdminLinks : adminLinks;
+
+  async function handleLogout() {
+    try {
+      await logout();
+    } finally {
+      onClose?.();
+      navigate("/login", { replace: true });
+    }
+  }
 
   return (
     <aside className={`admin-sidebar admin-red-sidebar${isOpen ? " is-open" : ""}`} aria-hidden={!isOpen ? undefined : false}>
@@ -40,7 +50,7 @@ export default function AdminSidebar({ variant = "admin", isOpen = false, onClos
         ))}
       </nav>
 
-      <button type="button" className="admin-logout mt-auto mb-3" onClick={logout}>
+      <button type="button" className="admin-logout mt-auto mb-3" onClick={handleLogout}>
         <i className="bi bi-box-arrow-right" />
         <span>Logout</span>
       </button>

@@ -287,8 +287,13 @@ export default function AdminTopbar({ title, onMenuToggle }) {
   }, []);
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+    try {
+      await logout();
+    } finally {
+      setMenuOpen(false);
+      setNotificationMenuOpen(false);
+      navigate("/login", { replace: true });
+    }
   };
 
   const handleLanguageChange = (event) => {
