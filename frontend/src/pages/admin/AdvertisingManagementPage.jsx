@@ -117,12 +117,12 @@ export default function AdvertisingManagementPage({ scope = "admin" }) {
                         <div className="w-100 mt-2">
                           <div className="small fw-semibold mb-2">Email reply to {request.contactPerson}</div>
                           <textarea className="form-control form-control-sm mb-2" rows="2" value={paymentReplies[request.id]||""} onChange={e => setPaymentReplies(prev => ({...prev, [request.id]: e.target.value}))} placeholder="Write your reply, payment amount, and Telebirr/CBE Birr instructions..." />
-                          <button className="btn btn-sm btn-warning" onClick={async () => {
+                          <button type="button" className="btn btn-sm btn-warning" onClick={async () => {
                             const adminNote = (paymentReplies[request.id]||"").trim();
                             if (!adminNote) { setError("Write a reply and payment instructions before sending the payment request."); return; }
                             if (await setStatus(request,"WAITING_PAYMENT",{adminNote})) setContactingRequestId(null);
                           }}>Send payment request email</button>
-                          <button className="btn btn-sm btn-outline-danger ms-2" onClick={async () => {
+                          <button type="button" className="btn btn-sm btn-outline-danger ms-2" onClick={async () => {
                             if (await setStatus(request,"REJECTED", { adminNote: (paymentReplies[request.id] || "Campaign request was not approved.").trim() })) setContactingRequestId(null);
                           }}>Reject</button>
                         </div>
