@@ -17,7 +17,14 @@ exports.getActiveFeatured = async (req, res, next) => {
         listing: {
           include: {
             images: { orderBy: { sortOrder: 'asc' } },
-            owner: { select: { id: true, name: true, email: true } },
+            owner: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                verificationStatus: true,
+              },
+            },
             category: true
           }
         }
