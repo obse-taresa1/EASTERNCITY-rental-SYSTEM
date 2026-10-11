@@ -70,10 +70,15 @@ export async function getConversationById(conversationId) {
   };
 }
 
-export async function createConversation({ participantTwoId, listingId }) {
+export async function createConversation({
+  participantTwoId,
+  listingId,
+  communityPostId,
+}) {
   const data = await apiClient.post("/api/conversations", {
     participantTwoId,
     listingId,
+    communityPostId,
   });
   return normalizeConversation(data);
 }

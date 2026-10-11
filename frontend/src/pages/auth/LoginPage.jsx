@@ -4,6 +4,12 @@ import PasswordInput from "../../components/forms/PasswordInput.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useTheme } from "../../context/ThemeContext.jsx";
 import { dashboardForRole as getDashboardPath } from "../../services/authService.js";
+import { getListingById } from "../../services/listingApiService.js";
+import { startListingConversation } from "../../services/messageApiService.js";
+import {
+  getStorageItem,
+  removeStorageItem,
+} from "../../services/storageService.js";
 import usePageTitle from "../../hooks/usePageTitle.js";
 import lightLogo from "../../assets/images/eastern-cities-header-logo-transparent.png";
 import darkLogo from "../../assets/images/eastern-cities-header-logo-dark.png";
@@ -99,9 +105,31 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  function getPostLoginPath(loggedInUser) {
+  async function getPostLoginPath(loggedInUser) {
     const from = location.state?.from;
     const returnTo = new URLSearchParams(location.search).get("returnTo");
+    const pendingContactUrl = getStorageItem("pendingContactUrl");
+    const contactPath = location.state?.contactReturn
+      ? from?.pathname
+      : pendingContactUrl;
+    const contactMatch = String(contactPath || "").match(/^\/items\/([^/?#]+)$/);
+
+    if (loggedInUser?.role === "USER" && contactMatch) {
+      try {
+        const item = await getListingById(contactMatch[1]);
+        const conversation = await startListingConversation({
+          renter: loggedInUser,
+          item,
+        });
+
+        removeStorageItem("pendingContactUrl");
+        return `/messages?conversation=${conversation.id}`;
+      } catch {
+        // Do not lose the original action if a conversation cannot be opened.
+        removeStorageItem("pendingContactUrl");
+        return contactPath;
+      }
+    }
 
     if (loggedInUser?.role === "USER" && returnTo === "community-post") {
       return { pathname: "/community", search: "?compose=1" };
@@ -125,7 +153,7 @@ export default function LoginPage() {
     try {
       // Call the auth service – adjust if a dedicated endpoint exists
       const loggedInUser = await requestGoogleUser(loginWithGoogle, googleClientId);
-      navigate(getPostLoginPath(loggedInUser), { replace: true });
+      navigate(await getPostLoginPath(loggedInUser), { replace: true });
     } catch (err) {
       setError(err?.message ?? "Google sign‑in failed.");
     } finally {
@@ -147,7 +175,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const loggedInUser = await login(formData.email, formData.password);
-      navigate(getPostLoginPath(loggedInUser), { replace: true });
+      navigate(await getPostLoginPath(loggedInUser), { replace: true });
     } catch (loginError) {
       setError(loginError.message || "Login failed.");
     } finally {
