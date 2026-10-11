@@ -10,6 +10,7 @@ const listingInclude = {
       name: true,
       email: true,
       role: true,
+      verificationStatus: true,
       createdAt: true,
     },
   },

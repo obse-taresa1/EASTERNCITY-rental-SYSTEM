@@ -163,7 +163,7 @@ export default function ListingCard({
           <span className="owner-name">
             {item.ownerName || t("verifiedOwner")}
           </span>
-          {item.verifiedOwner !== false && (
+          {item.verifiedOwner === true && (
             <i
               className="bi bi-patch-check-fill text-success"
               title={t("verifiedOwner")}

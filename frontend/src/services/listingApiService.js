@@ -20,6 +20,9 @@ function normalizeOwner(owner) {
   if (!owner) return null;
   return {
     ...owner,
+    verified: ["APPROVED", "VERIFIED"].includes(
+      String(owner.verificationStatus || "").toUpperCase(),
+    ),
   };
 }
 
@@ -95,6 +98,7 @@ export function normalizeListing(listing) {
     coverImage: firstImage,
     images,
     owner,
+    verifiedOwner: owner?.verified === true,
     ownerName:
       owner?.businessName ||
       owner?.name ||
