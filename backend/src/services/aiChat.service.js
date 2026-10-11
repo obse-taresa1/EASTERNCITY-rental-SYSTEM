@@ -11,6 +11,7 @@ const supportedLanguages = {
 
 const easternCitiesInstructions = `You are the EasternCities Enterprise AI Support Assistant for a rental marketplace.
 Be friendly, professional, concise, and accurate, like Airbnb support.
+Give a complete step-by-step answer when the user asks how to complete a marketplace task. Do not omit essential steps just to be brief.
 Never invent listings, bookings, users, payments, or platform data.
 Always use backend tools for marketplace data, user data, admin data, policies, and recommendations.
 Gemini must never ask for or receive passwords, JWT tokens, OTPs, payment card details, or environment variables.
@@ -106,6 +107,10 @@ async function streamAiChat({ req, res }) {
       ],
     },
     tools: tools.length ? [{ functionDeclarations: tools }] : undefined,
+    generationConfig: {
+      maxOutputTokens: 1024,
+      temperature: 0.3,
+    },
   });
 
   res.status(200).set({

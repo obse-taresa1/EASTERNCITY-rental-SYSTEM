@@ -30,7 +30,7 @@ function getLastUserMessage(req) {
 function buildFallbackAnswer(req) {
   const message = getLastUserMessage(req).toLowerCase();
 
-  if (message.includes("rent") || message.includes("book") || message.includes("car")) {
+  if (/\b(rent|rental|book|booking|car|vehicle)\b/.test(message)) {
     return [
       "You can rent an item from EasternCities like this:",
       "",
@@ -44,7 +44,7 @@ function buildFallbackAnswer(req) {
     ].join("\n");
   }
 
-  if (message.includes("list") || message.includes("post") || message.includes("item")) {
+  if (/\b(create|add|submit|post|publish).*(listing|item)\b|\b(listing|item).*(create|add|submit|post|publish)\b/.test(message)) {
     return [
       "To create a listing:",
       "",
@@ -58,7 +58,7 @@ function buildFallbackAnswer(req) {
     ].join("\n");
   }
 
-  if (message.includes("verify") || message.includes("id")) {
+  if (/\b(verify|verification|national id|identity|id card)\b/.test(message)) {
     return [
       "To verify your account:",
       "",
@@ -71,7 +71,7 @@ function buildFallbackAnswer(req) {
     ].join("\n");
   }
 
-  if (message.includes("payment") || message.includes("pay") || message.includes("fee")) {
+  if (/\b(payment|pay|fee|receipt|proof|promotion)\b/.test(message)) {
     return [
       "EasternCities uses platform payments only for listing fees and promotion payments.",
       "",
@@ -81,7 +81,72 @@ function buildFallbackAnswer(req) {
     ].join("\n");
   }
 
-  if (message.includes("support") || message.includes("help") || message.includes("ticket")) {
+  if (/\b(search|find|filter|category|city|sefer|neighbou?rhood|price)\b/.test(message)) {
+    return [
+      "To find a rental item:",
+      "",
+      "1. Use the Home page search form or open **Categories**.",
+      "2. Filter by keyword, category, city, sefer (neighbourhood), maximum price, condition, or listing type.",
+      "3. Combine filters to narrow the results.",
+      "4. Open **View Details** to see the owner, images, price, and booking option.",
+      "",
+      "Only approved listings are shown publicly.",
+    ].join("\n");
+  }
+
+  if (/\b(save|saved|favourite|favorite|heart|wishlist)\b/.test(message)) {
+    return [
+      "To save an item, open its listing card or details page and select the heart button.",
+      "",
+      "Saved items appear in **Dashboard > Saved Items**. Select the heart again to remove an item from your saved list.",
+    ].join("\n");
+  }
+
+  if (/\b(contact|message|chat|owner)\b/.test(message)) {
+    return [
+      "To contact an owner, open the listing and select **Contact Owner**.",
+      "",
+      "Sign in first if requested. The conversation then appears in **Dashboard > Messages**, where you can discuss availability, pickup, delivery, dates, and price.",
+    ].join("\n");
+  }
+
+  if (/\b(login|log in|sign in|register|sign up|password|reset)\b/.test(message)) {
+    return [
+      "For account access:",
+      "",
+      "- Use **Register / Login** in the navigation bar to create an account or sign in.",
+      "- Select **Forgot Password** on the login screen to request a password-reset link.",
+      "- After signing in, use **Dashboard > Settings** to update your profile information.",
+      "",
+      "Never share your password, reset token, or one-time code in chat.",
+    ].join("\n");
+  }
+
+  if (/\b(review|rating)\b/.test(message)) {
+    return [
+      "Reviews are available after an eligible booking is completed.",
+      "",
+      "Open **Dashboard > Reviews & Ratings**, choose the completed rental, then submit your rating and comment. Your received reviews are also shown there.",
+    ].join("\n");
+  }
+
+  if (/\b(community|request|post)\b/.test(message)) {
+    return [
+      "The Community page lets users publish rental requests and browse requests from other users.",
+      "",
+      "Sign in, open **Community**, choose the relevant request type, add clear item and location details, and submit. You can contact the post author from the request details page.",
+    ].join("\n");
+  }
+
+  if (/\b(advertis|banner|campaign)\b/.test(message)) {
+    return [
+      "To advertise on EasternCities, open **Advertise With Us** and submit your campaign details and banner image.",
+      "",
+      "After review, follow the payment instructions, upload the receipt when requested, and wait for the administrator to approve or reject the advertising request.",
+    ].join("\n");
+  }
+
+  if (/\b(support|help|ticket|problem|issue)\b/.test(message)) {
     return [
       "For support, open **Dashboard > Help Center** or submit a support ticket from your dashboard.",
       "",
@@ -90,7 +155,7 @@ function buildFallbackAnswer(req) {
   }
 
   return [
-    "I can help with EasternCities rentals, listings, bookings, verification, payments, and support.",
+    "I can help with EasternCities rentals, listings, search filters, bookings, verification, payments, saved items, messages, reviews, community requests, advertising, and support.",
     "",
     "Try asking things like:",
     "- How do I rent a car?",
