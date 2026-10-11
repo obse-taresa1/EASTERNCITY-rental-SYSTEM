@@ -165,7 +165,9 @@ export default function ListingCard({
           </span>
           {item.verifiedOwner === true && (
             <i
-              className="bi bi-patch-check-fill text-success"
+              className="bi bi-patch-check-fill verified-owner-badge"
+              role="img"
+              aria-label={t("verifiedOwner")}
               title={t("verifiedOwner")}
             ></i>
           )}
