@@ -9,7 +9,8 @@ import { listingMatchesRentalCategory } from "../../utils/categoryMapping.js";
 export default function ItemsPage() {
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
-  const initialSearch = searchParams.get("search") || "";
+  const initialSearch =
+    searchParams.get("search") || searchParams.get("keyword") || "";
   const category = searchParams.get("category") || "all";
   const city = searchParams.get("city") || "all";
   const sefar = searchParams.get("sefar") || "all";

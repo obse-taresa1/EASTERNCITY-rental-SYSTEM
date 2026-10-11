@@ -189,6 +189,11 @@ function buildPublicListingWhere(query = {}) {
     query.maxPrice || query.priceMax || query.maximumPrice || 0,
   );
   const condition = normalizeQueryValue(query.condition || query.itemCondition);
+  const listingCondition = ["new", "used"].includes(
+    String(condition || "").toLowerCase(),
+  )
+    ? String(condition).toUpperCase()
+    : "";
   const listingType = normalizeQueryValue(query.listingType || query.type);
   const propertyType = normalizeQueryValue(query.propertyType);
   const bedrooms = normalizeQueryValue(query.bedrooms || query.bedroom);
@@ -244,8 +249,11 @@ function buildPublicListingWhere(query = {}) {
     if (maxPrice > 0) where.pricePerDay.lte = maxPrice;
   }
 
+  if (listingCondition) {
+    where.condition = listingCondition;
+  }
+
   const textFilters = [
-    condition,
     listingType,
     propertyType,
     bedrooms ? `${bedrooms} bedroom` : "",

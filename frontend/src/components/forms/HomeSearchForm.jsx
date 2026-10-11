@@ -200,11 +200,11 @@ export default function HomeSearchForm() {
   function submitSearch(event) {
     event.preventDefault();
     const params = new URLSearchParams();
-    if (search.trim() !== "") params.set("keyword", search.trim());
+    if (search.trim() !== "") params.set("search", search.trim());
     if (category !== "all") params.set("category", category);
     if (city !== "all") params.set("city", city);
     if (sefar !== "all") params.set("sefar", sefar);
-    params.set("maxPrice", maxPrice);
+    if (isPriceFilterActive) params.set("maxPrice", maxPrice);
     if (status !== "all") params.set("condition", status);
 
     navigate(`/items?${params.toString()}`);
