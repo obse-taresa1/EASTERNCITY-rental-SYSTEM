@@ -169,7 +169,7 @@ export async function approveListing(id) {
   return normalizeListing(data);
 }
 
-export async function rejectListing(id, reason = "Rejected by admin.") {
+export async function rejectListing(id, reason = "") {
   const data = await apiClient.patch(`/api/listings/${id}/reject`, { reason });
   emitListingUpdate();
   return normalizeListing(data);

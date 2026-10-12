@@ -13,8 +13,14 @@ export default function BookingTable({ bookings }) {
   }, [bookings]);
 
   async function handleStatusChange(id, status) {
-    const updated =
-      status === "ACCEPTED" ? await acceptBooking(id) : await rejectBooking(id);
+    let updated;
+    if (status === "ACCEPTED") {
+      updated = await acceptBooking(id);
+    } else {
+      const reason = window.prompt("Enter the reason for rejecting this booking:");
+      if (!reason?.trim()) return;
+      updated = await rejectBooking(id, reason.trim());
+    }
 
     setRows((current) =>
       current.map((booking) => (booking.id === id ? updated : booking)),

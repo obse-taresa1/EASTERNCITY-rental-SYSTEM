@@ -43,9 +43,11 @@ export default function SuperPromotionManagementPage({ scope = "superadmin" }) {
   };
 
   const handleReject = async (id) => {
+    const reason = window.prompt("Enter the reason for rejecting this promotion:");
+    if (!reason?.trim()) return;
     setLoading(true);
     try {
-      await adminApi.updatePromotion(id, { status: "REJECTED" });
+      await adminApi.updatePromotion(id, { status: "REJECTED", reason: reason.trim() });
       setNotice("Promotion rejected.");
       await load();
     } catch (error) {

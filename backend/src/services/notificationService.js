@@ -8,6 +8,7 @@ const NOTIFICATION_TYPES = {
   LISTING_REJECTED: "LISTING_REJECTED",
   PROMOTION_APPROVED: "PROMOTION_APPROVED",
   PROMOTION_REJECTED: "PROMOTION_REJECTED",
+  VERIFICATION_REJECTED: "VERIFICATION_REJECTED",
   MESSAGE_RECEIVED: "MESSAGE_RECEIVED",
   SUPPORT_REPLY: "SUPPORT_REPLY",
   REVIEW_ADDED: "REVIEW_ADDED",
@@ -137,7 +138,7 @@ const notifyBookingRejected = (booking) =>
   createNotification({
     userId: booking.renterId,
     title: "Your booking request was rejected",
-    body: `${booking.itemTitle || "Your booking"} was rejected.`,
+    body: `${booking.itemTitle || booking.listing?.title || "Your booking"} was rejected. Reason: ${booking.cancellationReason || "No reason was provided."}`,
     type: NOTIFICATION_TYPES.BOOKING_REJECTED,
     referenceId: booking.id,
     referenceType: "BOOKING",
@@ -177,10 +178,20 @@ const notifyPromotionRejected = (promotion) =>
   createNotification({
     userId: promotion.userId,
     title: "Your promotion was rejected",
-    body: `${promotion.listing?.title || promotion.listingTitle || "Your listing"} promotion request was rejected.`,
+    body: `${promotion.listing?.title || promotion.listingTitle || "Your listing"} promotion request was rejected. Reason: ${promotion.rejectionReason || "No reason was provided."}`,
     type: NOTIFICATION_TYPES.PROMOTION_REJECTED,
     referenceId: promotion.id,
     referenceType: "PROMOTION",
+  });
+
+const notifyVerificationRejected = (request) =>
+  createNotification({
+    userId: request.userId,
+    title: "Your verification request was rejected",
+    body: `Your identity verification request was rejected. Reason: ${request.rejectionReason || "No reason was provided."}`,
+    type: NOTIFICATION_TYPES.VERIFICATION_REJECTED,
+    referenceId: request.id,
+    referenceType: "VERIFICATION",
   });
 
 const notifyMessageReceived = (message, conversation, recipientId) =>
@@ -218,6 +229,7 @@ module.exports = {
   notifyListingRejected,
   notifyPromotionApproved,
   notifyPromotionRejected,
+  notifyVerificationRejected,
   notifyMessageReceived,
   notifyReviewAdded,
 };

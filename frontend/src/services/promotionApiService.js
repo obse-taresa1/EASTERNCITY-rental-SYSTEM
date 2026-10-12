@@ -131,9 +131,9 @@ export async function approvePromotionRequest(id) {
   return normalizePromotion(data);
 }
 
-export async function rejectPromotionRequest(id) {
+export async function rejectPromotionRequest(id, reason = "") {
   const data = await apiClient.patch(`/api/promotions/${id}/reject`, {
-    reason: "Rejected by admin.",
+    reason,
   });
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("easterncity:promotions-updated"));

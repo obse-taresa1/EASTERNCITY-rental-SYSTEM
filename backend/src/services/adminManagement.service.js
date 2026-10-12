@@ -1,5 +1,6 @@
 const prisma = require("../config/db");
 const { sendContactReplyEmail } = require("./emailService");
+const notificationService = require("./notificationService");
 const { hashPassword } = require("../utils/hash");
 const {
   withPrivateListingMedia,
@@ -129,7 +130,20 @@ async function updateListing(actor, id, payload) {
     data.approvedById = actor.id;
     data.approvedAt = new Date();
   }
+  if (String(data.status || "").toUpperCase() === "REJECTED") {
+    data.rejectionReason = String(data.rejectionReason || "").trim();
+    if (!data.rejectionReason) {
+      const error = new Error("A rejection reason is required.");
+      error.statusCode = 400;
+      throw error;
+    }
+    data.approvedById = actor.id;
+    data.approvedAt = new Date();
+  }
   const listing = await prisma.listing.update({ where: { id }, data, include: { owner: true, category: true, images: true } });
+  if (String(data.status || "").toUpperCase() === "REJECTED") {
+    await notificationService.notifyListingRejected(listing, listing.rejectionReason);
+  }
   await log({ actor, action: `Updated listing ${listing.title}`, metadata: { listingId: id, status: listing.status } });
   return listing;
 }
@@ -193,6 +207,15 @@ async function updatePromotion(actor, id, status, reason) {
     approvedAt: new Date() 
   };
 
+  if (String(status || "").toUpperCase() === "REJECTED") {
+    updateData.rejectionReason = String(reason || "").trim();
+    if (!updateData.rejectionReason) {
+      const error = new Error("A rejection reason is required.");
+      error.statusCode = 400;
+      throw error;
+    }
+  }
+
   if (status === "APPROVED") {
     updateData.startDate = new Date();
     const duration = existingPromotion.durationDays || 7;
@@ -206,6 +229,9 @@ async function updatePromotion(actor, id, status, reason) {
     data: updateData,
     include: { listing: true, user: true },
   });
+  if (String(status || "").toUpperCase() === "REJECTED") {
+    await notificationService.notifyPromotionRejected(promotion);
+  }
   await log({ actor, action: `${status} promotion for ${promotion.listing.title}`, metadata: { promotionId: id } });
 
   // When approving a Hero/Hero-Section promotion, create the HeroPromotion record

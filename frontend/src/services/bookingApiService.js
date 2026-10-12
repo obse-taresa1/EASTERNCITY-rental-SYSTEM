@@ -48,7 +48,7 @@ export async function acceptBooking(id) {
   return normalizeBooking(data);
 }
 
-export async function rejectBooking(id, reason = "Rejected by owner.") {
+export async function rejectBooking(id, reason = "") {
   const data = await apiClient.patch(`/api/bookings/${id}/reject`, { reason });
   emitBookingsUpdate();
   return normalizeBooking(data);

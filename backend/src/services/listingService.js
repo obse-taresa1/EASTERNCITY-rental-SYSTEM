@@ -456,14 +456,21 @@ async function approve(id, adminId) {
 }
 
 async function reject(id, reason, adminId) {
+  const rejectionReason = String(reason || "").trim();
+  if (!rejectionReason) {
+    const error = new Error("A rejection reason is required.");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const listing = await listingRepository.update(id, {
     status: "REJECTED",
-    rejectionReason: reason || "Rejected by admin.",
+    rejectionReason,
     approvedById: adminId,
     approvedAt: new Date(),
   });
 
-  await notificationService.notifyListingRejected(listing, reason);
+  await notificationService.notifyListingRejected(listing, rejectionReason);
 
   return listing;
 }

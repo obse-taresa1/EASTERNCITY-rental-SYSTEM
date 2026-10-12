@@ -122,12 +122,19 @@ async function rejectBooking(user, id, reason) {
     throw error;
   }
 
+  const rejectionReason = String(reason || "").trim();
+  if (!rejectionReason) {
+    const error = new Error("A rejection reason is required.");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const updated = await repository.update(id, {
     status: "REJECTED",
-    cancellationReason: reason || null,
+    cancellationReason: rejectionReason,
   });
 
-  await notificationService.notifyBookingRejected(updated);
+  await notificationService.notifyBookingRejected({ ...booking, ...updated });
   return updated;
 }
 

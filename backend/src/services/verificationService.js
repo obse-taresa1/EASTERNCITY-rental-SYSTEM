@@ -2,6 +2,7 @@ const prisma = require('../config/db');
 const userRepository = require('../repositories/userRepository');
 const { VERIFICATION_STATUSES } = require('../utils/constants');
 const { signedPrivateUrl } = require('./privateMediaService');
+const notificationService = require('./notificationService');
 
 const USER_VERIFICATION_STATUSES = Object.freeze({
   NOT_VERIFIED: 'NOT_VERIFIED',
@@ -218,6 +219,10 @@ async function reviewVerification(identifier, payload, reviewedById) {
 
     return reviewedRequest;
   });
+
+  if (status === VERIFICATION_STATUSES.REJECTED) {
+    await notificationService.notifyVerificationRejected(updated);
+  }
 
   return mapVerificationRequest(updated);
 }
